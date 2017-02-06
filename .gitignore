@@ -262,6 +262,8 @@ __pycache__/
 *.lib
 *.lib
 *.exe
-/Binaries/Client/Launcher.exe
 *.txt
 *.dll
+
+# Custom stuff
+Binaries/Client/logs

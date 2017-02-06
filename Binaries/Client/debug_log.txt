@@ -1,4 +1,0 @@
-02/06/17 23:12:37 | Succesfully started Mafia 2 Online - Reloaded compiled on Feb  6 2017 23:12:31.
-02/06/17 23:12:37 | CGraphicsManager::Init()
-02/06/17 23:12:37 | <CGame::HirePreHookers> Current Thread ID: 3b18
-02/06/17 23:12:38 | FilePatcher: Redirecting game file sdsconfig.bin to C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Binaries\Client\game_files\sdsconfig.bin

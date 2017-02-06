@@ -38,7 +38,7 @@ void CCore::OnAttach(HMODULE module)
 	m_strappdir.GetSTLString().erase(pos, std::string::npos);
 	
 
-	SString strLogPath(m_strappdir + "\\debug_log.txt");
+	SString strLogPath(m_strappdir + "\\logs\\debug_log.txt");
 
 	if (m_debuglog.Open(strLogPath))
 	{
