@@ -1,7 +1,7 @@
 #pragma once
 
 #define VERSION_SAFE_STEAM_API_INTERFACES
-#include <SteamAPI\steam_api.h>
+#include <steam_api.h>
 
 enum SteamWrapperError
 {
