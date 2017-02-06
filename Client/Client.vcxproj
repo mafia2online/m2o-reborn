@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
@@ -96,6 +96,7 @@
     </PostBuildEvent>
     <PreLinkEvent>
       <Command>taskkill /F /IM mafia2.exe
+
 exit /b 0</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
@@ -113,7 +114,7 @@ exit /b 0</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
@@ -128,6 +129,7 @@ exit /b 0</Command>
     </PostBuildEvent>
     <PreLinkEvent>
       <Command>taskkill /F /IM mafia2.exe
+
 exit /b 0</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
