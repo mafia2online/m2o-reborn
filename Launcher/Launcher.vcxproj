@@ -69,12 +69,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)\Binaries\$(ProjectName)</OutDir>
+    <OutDir>$(SolutionDir)\Binaries\Client</OutDir>
     <IntDir>Intermediate\$(Configuration)</IntDir>
+    <LibraryPath>..\Libraries\SteamAPI\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\Binaries\$(ProjectName)</OutDir>
     <IntDir>Intermediate\$(Configuration)</IntDir>
+    <LibraryPath>..\Libraries\SteamAPI\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,10 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Injector.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\SteamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Injector.h" />
     <ClInclude Include="src\SteamWrapper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

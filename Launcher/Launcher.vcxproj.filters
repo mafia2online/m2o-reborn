@@ -27,10 +27,16 @@
     <ClCompile Include="src\SteamWrapper.cpp">
       <Filter>Fichiers sources\Steam</Filter>
     </ClCompile>
+    <ClCompile Include="src\Injector.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\SteamWrapper.h">
       <Filter>Fichiers d%27en-tête\Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Injector.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
