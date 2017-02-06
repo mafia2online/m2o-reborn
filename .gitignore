@@ -261,3 +261,7 @@ __pycache__/
 *.pyc
 *.lib
 *.lib
+*.exe
+/Binaries/Client/Launcher.exe
+*.txt
+*.dll
