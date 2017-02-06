@@ -1,10 +1,10 @@
 #include <string>
 #include <Windows.h>
 
-#include "Injector.h"
-#include "SteamWrapper.h"
+#include <Injector.h>
+#include <SteamWrapper.h>
 
-#include "Shared\String.hpp"
+#include <Shared\String.hpp>
 
 #ifdef _DEBUG
 static const char *const CORE_DLL_NAME("Client_d.dll");

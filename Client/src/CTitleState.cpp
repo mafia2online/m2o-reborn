@@ -58,6 +58,6 @@ void CTitleState::Render(void * userptr)
 		iYOffset -= iFontHeight;
 
 		pFontManager->DrawTextA("MAFIA II ", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *pFontManager->GetFont("TitleUIFontBig"), true);
-		pFontManager->DrawTextA("Multiplayer", 25 + pFontManager->GetTextWidthA(*pFontManager->GetFont("TitleUIFontBig"), "MAFIA II "), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *pFontManager->GetFont("TitleUIFontBig"), true);
+		pFontManager->DrawTextA("Online", 25 + pFontManager->GetTextWidthA(*pFontManager->GetFont("TitleUIFontBig"), "MAFIA II "), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *pFontManager->GetFont("TitleUIFontBig"), true);
 	}
 }
