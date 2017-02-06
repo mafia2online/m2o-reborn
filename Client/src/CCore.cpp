@@ -53,3 +53,9 @@ void CCore::OnAttach(HMODULE module)
 
 	m_statemanager.ActivateState(States::Title); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }
+
+void CCore::ExitGame(SString strreason)
+{
+	MessageBoxA(nullptr, strreason.GetCStr(), "Well.. Something went wrong!", MB_OK);
+	exit(0);
+}
