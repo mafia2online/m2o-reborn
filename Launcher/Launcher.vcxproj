@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,20 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1AF9DD35-0064-45EE-8807-77A8E6941E2A}</ProjectGuid>
-    <RootNamespace>Client</RootNamespace>
+    <ProjectGuid>{4E1F5497-A74B-4DE1-B264-8CF23079D21D}</ProjectGuid>
+    <RootNamespace>Launcher</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -70,34 +69,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>Intermediate\$(Configuration)</IntDir>
     <OutDir>$(SolutionDir)\Binaries\$(ProjectName)</OutDir>
-    <TargetExt>_d.dll</TargetExt>
+    <IntDir>Intermediate\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>Intermediate\$(Configuration)</IntDir>
     <OutDir>$(SolutionDir)\Binaries\$(ProjectName)</OutDir>
+    <IntDir>Intermediate\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\Libraries;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Game_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>steam_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <PreLinkEvent>
-      <Command>taskkill /F /IM mafia2.exe
-exit /b 0</Command>
-    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -113,23 +102,14 @@ exit /b 0</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories>..\Libraries;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\trollin\Documents\Visual Studio 2017\Projects\M2OR\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Game_r.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>steam_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <PreLinkEvent>
-      <Command>taskkill /F /IM mafia2.exe
-exit /b 0</Command>
-    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -145,47 +125,11 @@ exit /b 0</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Shared\Client\CPatcher.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\Shared\FileLogger.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="src\CCore.cpp" />
-    <ClCompile Include="src\CDirect3D9Hook.cpp" />
-    <ClCompile Include="src\CDirect3D9Proxy.cpp" />
-    <ClCompile Include="src\CDirect3DDevice9Proxy.cpp" />
-    <ClCompile Include="src\CFontManager.cpp" />
-    <ClCompile Include="src\CGame.cpp" />
-    <ClCompile Include="src\CGraphicsManager.cpp" />
-    <ClCompile Include="src\CMPStateManager.cpp" />
-    <ClCompile Include="src\CTitleState.cpp" />
-    <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\FilePatcher.cpp" />
-    <ClCompile Include="src\SteamDRMPatch.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SteamWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Shared\Client\CPatcher.h" />
-    <ClInclude Include="..\Shared\Common.h" />
-    <ClInclude Include="..\Shared\Constants.h" />
-    <ClInclude Include="..\Shared\CSignelton.h" />
-    <ClInclude Include="..\Shared\FileLogger.h" />
-    <ClInclude Include="..\Shared\String.hpp" />
-    <ClInclude Include="..\Shared\Types.h" />
-    <ClInclude Include="src\CCore.h" />
-    <ClInclude Include="src\CDirect3D9Hook.h" />
-    <ClInclude Include="src\CDirect3D9Proxy.h" />
-    <ClInclude Include="src\CDirect3DDevice9Proxy.h" />
-    <ClInclude Include="src\CFontManager.h" />
-    <ClInclude Include="src\CGame.h" />
-    <ClInclude Include="src\CGraphicsManager.h" />
-    <ClInclude Include="src\CMPStateManager.h" />
-    <ClInclude Include="src\CTitleState.h" />
-    <ClInclude Include="src\FilePatcher.h" />
-    <ClInclude Include="src\stdafx.h" />
-    <ClInclude Include="src\SteamDRMPatch.h" />
+    <ClInclude Include="src\SteamWrapper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
