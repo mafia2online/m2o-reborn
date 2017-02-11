@@ -26,6 +26,8 @@ IO::CFileLogger::~CFileLogger()
 
 bool IO::CFileLogger::Open(SString path)
 {
+	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // plox no writes while we open
+
 	m_ofstream.open(path.GetSTLString(), std::ios::trunc | std::ios::out);
 
 	if (m_ofstream.is_open())
@@ -36,7 +38,7 @@ bool IO::CFileLogger::Open(SString path)
 
 void IO::CFileLogger::Writeln(const char *szFormat, ...)
 {
-	if (m_mutex)	m_mutex->lock(); // if mutex is available -> lock it!
+	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!
 
 	va_list args;
 	va_start(args, szFormat);
@@ -49,25 +51,21 @@ void IO::CFileLogger::Writeln(const char *szFormat, ...)
 	m_ofstream << pszBuffer << "\n";
 	m_ofstream.flush(); // fuuu
 	delete[] pszBuffer;
-
-	if (m_mutex)	m_mutex->unlock(); // if mutex is available -> unlock lock it!
-
 }
 
 void IO::CFileLogger::Writeln(SString & str)
 {
-	if (m_mutex)	m_mutex->lock(); // if mutex is available -> lock it!
+	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!
 	if (m_timestamp) WriteTimestamp();
 	m_ofstream << str.GetSTLString() << "\n";
-	if (m_mutex)	m_mutex->unlock(); // if mutex is available -> unlock lock it!
+
 }
 
 void IO::CFileLogger::Writeln(char * szString)
 {
-	if (m_mutex)	m_mutex->lock(); // if mutex is available -> lock it!
+	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!
 	if (m_timestamp) WriteTimestamp();
 	m_ofstream << szString << "\n";
-	if (m_mutex)	m_mutex->unlock(); // if mutex is available -> unlock lock it!
 }
 
 void IO::CFileLogger::WriteTimestamp()
