@@ -89,7 +89,7 @@ public:
     {
 		Vector3 result;
 
-        if (abs(x) > abs(y))
+        if (fabs(x) > fabs(y))
 	        result = Vector3(z, 0, -x);
         else
 	        result = Vector3(0, -z, y);
