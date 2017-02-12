@@ -267,3 +267,7 @@ __pycache__/
 
 # Custom stuff
 Binaries/Client/logs
+
+# custom os stuff
+.DS_Store
+Thumbs.db
