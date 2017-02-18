@@ -38,7 +38,7 @@ void CCore::OnAttach(HMODULE module)
 	m_strappdir.GetSTLString().erase(pos, std::string::npos);
 	
 
-	SString strLogPath(m_strappdir + "\\debug_log.txt");
+	SString strLogPath(m_strappdir + "\\logs\\debug_log.txt");
 
 	if (m_debuglog.Open(strLogPath))
 	{
@@ -53,4 +53,10 @@ void CCore::OnAttach(HMODULE module)
 	m_statemanager.AddState(States::Playing, new CGameState);
 
 	m_statemanager.ActivateState(States::Title); // GO IN THE TITLE STATE! IMMEDIATEALY!
+}
+
+void CCore::ExitGame(SString strreason)
+{
+	MessageBoxA(nullptr, strreason.GetCStr(), "Well.. Something went wrong!", MB_OK);
+	exit(0);
 }

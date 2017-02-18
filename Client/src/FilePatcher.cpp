@@ -48,6 +48,11 @@ HANDLE WINAPI CreateFileAHooked(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD
 		strNewDir += strFileName;
 		CCore::Instance().GetLogger().Writeln("FilePatcher: Redirecting game file %s to %s", strFileName.GetCStr(), strNewDir.GetCStr());
 		hFile = orig_CreateFileA(strNewDir.GetCStr(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+	
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			CCore::Instance().ExitGame(SString("Couldn't patch file: ") + strFileName);
+		}
 	}
 	else
 	{

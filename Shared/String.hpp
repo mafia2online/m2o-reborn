@@ -37,7 +37,8 @@ public:
 	SuperString& operator+=(SuperString strString) { m_str.append(strString.GetSTLString()); return *this; }
 	
 	SuperString operator+(const char *szString) { SuperString _str(m_str); _str += szString; return _str; }
-	
+	SuperString operator+(SuperString &str) { SuperString _str(m_str); _str += str.GetSTLString(); return _str; }
+
 	SuperString& operator=(std::string &str) { m_str = str; return *this; }
 	SuperString& operator=(SuperString &str) { m_str.assign(str.GetSTLString()); return *this; }
 

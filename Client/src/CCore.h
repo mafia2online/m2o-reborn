@@ -12,6 +12,7 @@ public:
 	~CCore();
 
 	void OnAttach(HMODULE module);
+	void ExitGame(SString strreason);
 
 public:
 	SString& GetModAppDir() { return m_strappdir; }
