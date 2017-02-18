@@ -14,7 +14,7 @@
 #include <stdafx.h>
 #include "CCore.h"
 #include <CTitleState.h>
-
+#include <CGameState.h>
 CCore::CCore() :
 	m_debuglog(true, true)
 {
@@ -50,6 +50,7 @@ void CCore::OnAttach(HMODULE module)
 	m_game.Initialize();
 
 	m_statemanager.AddState(States::Title, new CTitleState);
+	m_statemanager.AddState(States::Playing, new CGameState);
 
 	m_statemanager.ActivateState(States::Title); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }
