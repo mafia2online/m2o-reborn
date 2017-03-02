@@ -76,6 +76,9 @@
     <ClCompile Include="src\CTitleState.cpp">
       <Filter>Source Files\Multiplayer</Filter>
     </ClCompile>
+    <ClCompile Include="src\CGameState.cpp">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\Client\CPatcher.h">
@@ -133,6 +136,9 @@
       <Filter>Source Files\Multiplayer\Managers</Filter>
     </ClInclude>
     <ClInclude Include="src\CTitleState.h">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameState.h">
       <Filter>Source Files\Multiplayer</Filter>
     </ClInclude>
   </ItemGroup>

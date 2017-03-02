@@ -14,7 +14,7 @@
 #include <stdafx.h>
 #include "CCore.h"
 #include <CTitleState.h>
-
+#include <CGameState.h>
 CCore::CCore() :
 	m_debuglog(true, true)
 {
@@ -51,9 +51,7 @@ void CCore::OnAttach(HMODULE module)
 	m_graphicsmanager.Init();
 	m_game.Initialize();
 
-	m_statemanager.AddState(States::Menu, new CTitleState);
-	M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("test");
-
+	m_statemanager.AddState(States::Title, new CTitleState);
 
 	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }

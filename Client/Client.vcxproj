@@ -161,6 +161,7 @@ exit /b 0</Command>
     <ClCompile Include="src\CDirect3DDevice9Proxy.cpp" />
     <ClCompile Include="src\CFontManager.cpp" />
     <ClCompile Include="src\CGame.cpp" />
+    <ClCompile Include="src\CGameState.cpp" />
     <ClCompile Include="src\CGraphicsManager.cpp" />
     <ClCompile Include="src\CMPStateManager.cpp" />
     <ClCompile Include="src\CTitleState.cpp" />
@@ -182,6 +183,7 @@ exit /b 0</Command>
     <ClInclude Include="src\CDirect3DDevice9Proxy.h" />
     <ClInclude Include="src\CFontManager.h" />
     <ClInclude Include="src\CGame.h" />
+    <ClInclude Include="src\CGameState.h" />
     <ClInclude Include="src\CGraphicsManager.h" />
     <ClInclude Include="src\CMPStateManager.h" />
     <ClInclude Include="src\CTitleState.h" />

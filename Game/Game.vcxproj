@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CHud.cpp" />
     <ClCompile Include="src\CSDSManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CHud.h" />
     <ClInclude Include="src\CommonHeaders.h" />
     <ClInclude Include="src\CSDSManager.h" />
   </ItemGroup>

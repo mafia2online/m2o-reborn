@@ -30,8 +30,16 @@ bool CGame::HirePreHookers()
 	FilePatcher::Initialize();
 	SteamDRMPatch::Apply();
 
+	Patch();
+
+	return true;
+}
+
+void CGame::Patch()
+{
 	// Disable loading screen
 	Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
 
-	return true;
+	// Disable DLC loadings
+	Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
 }
