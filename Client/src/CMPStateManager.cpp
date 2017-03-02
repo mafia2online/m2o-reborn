@@ -1,9 +1,7 @@
 #include <stdafx.h>
 #include "CMPStateManager.h"
 
-CMPStateManager::CMPStateManager() :
-	m_state(States::None),
-	m_substate(Substates::Subtate_None)
+CMPStateManager::CMPStateManager()
 {
 	//
 }
@@ -15,7 +13,7 @@ CMPStateManager::~CMPStateManager()
 
 void CMPStateManager::AddState(States state, IMPState * pstate)
 {
-	m_states[state] = pstate;
+	m_states[state] = std::make_pair(false, pstate);
 }
 
 void CMPStateManager::DeleteState(States state, IMPState * pstate)
@@ -32,11 +30,8 @@ void CMPStateManager::ActivateState(States state)
 {
 	if (IsValidState(state))
 	{
-		if (GetActiveState() != States::None)
-			DeActivateState(GetActiveState());
-
-		m_states[state]->Activate(nullptr);
-		m_state = state;
+		m_states[state].first = true;
+		m_states[state].second->Activate(nullptr);
 	}
 }
 
@@ -44,32 +39,38 @@ void CMPStateManager::DeActivateState(States state)
 {
 	if (IsValidState(state))
 	{
-		m_states[state]->Deactivate(nullptr);
-		m_state = States::None;
+		m_states[state].first = false;
+		m_states[state].second->Deactivate(nullptr);
 	}
 }
 
 void CMPStateManager::Render(void * userptr)
 {
-	if(IsValidState(m_state))
+	for(const auto &state : m_states)
 	{
-		m_states[m_state]->Render(userptr);
+		if (!state.second.first)
+			continue;
+
+		state.second.second->Render(userptr);
 	}
 }
 
 void CMPStateManager::Tick(void * userptr)
 {
-	if (IsValidState(m_state))
+	for (const auto &state : m_states)
 	{
-		m_states[m_state]->Tick(userptr);
+		if (!state.second.first)
+			continue;
+
+		state.second.second->Tick(userptr);
 	}
 }
 
 void CMPStateManager::InitializeResources(void * userptr)
 {
-	if (IsValidState(m_state))
+	for (const auto &state : m_states)
 	{
-		m_states[m_state]->InitializeResources(userptr);
+		state.second.second->InitializeResources(userptr);
 	}
 }
 

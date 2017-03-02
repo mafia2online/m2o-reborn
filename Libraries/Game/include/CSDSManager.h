@@ -16,15 +16,25 @@ namespace M2
 		ICEnumator *m_pEnumerator; // 0004
 	};
 
-	class C_SDSLoadingTable : public ClassWrapper<C_SDSLoadingTable>
+	class C_SDSLoadingTable : public GameClassWrapper<C_SDSLoadingTable, 0x1ABFE4C>
 	{
 	public:
-		C_SDSLoadingTable();
+		ICSDSLoadingTable* GetInterface() { return reinterpret_cast<ICSDSLoadingTable*>(this); }
 
-		void ActivateStreamMapLine(char *szName);
+		/*
+		void _declspec(naked) (int un)
+		{
+			_asm jmp off
+		}*/
 
-		inline ICSDSLoadingTable* GetInterface() { return m_interface; }
-	private:
-		ICSDSLoadingTable* m_interface;
+		void ActivateStreamMapLine(char * szName)
+		{
+			static uint32_t dwReturn;
+			// method addr, class pointer | return name
+			Mem::InvokeFunction<Mem::call_this, void>(0x5CFCD0, &GetInterface()->m_pEnumerator, &dwReturn, szName);
+		}
+
+
+
 	};
 };

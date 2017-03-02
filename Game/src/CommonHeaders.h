@@ -5,13 +5,12 @@
 namespace M2
 {
 
-	template < typename T > class ClassWrapper
+	template < typename T, Address A > class GameClassWrapper
 	{
 	public:
-		static T &Instance()
+		static T *Get()
 		{
-			static T instance;
-			return instance;
+			return reinterpret_cast<T*>(A);
 		}
 	};
 }

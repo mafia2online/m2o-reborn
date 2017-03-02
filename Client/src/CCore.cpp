@@ -26,6 +26,8 @@ CCore::~CCore()
 
 }
 
+#include <Libraries\Game\include\CommonHeaders.h>
+#include <Libraries\Game\include\CSDSManager.h>
 void CCore::OnAttach(HMODULE module)
 {
 	m_module = module;
@@ -49,9 +51,11 @@ void CCore::OnAttach(HMODULE module)
 	m_graphicsmanager.Init();
 	m_game.Initialize();
 
-	m_statemanager.AddState(States::Title, new CTitleState);
+	m_statemanager.AddState(States::Menu, new CTitleState);
+	M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("test");
 
-	m_statemanager.ActivateState(States::Title); // GO IN THE TITLE STATE! IMMEDIATEALY!
+
+	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }
 
 void CCore::ExitGame(SString strreason)

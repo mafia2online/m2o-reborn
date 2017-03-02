@@ -14,7 +14,6 @@ void CTitleState::InitializeResources(void *userptr)
 
 	pFontManager->AddFont("TitleUIFont", "Aurora BdCn BT", 26, false);
 	pFontManager->AddFont("TitleUIFontBig", "Aurora BdCn BT", 32, false);
-	
 }
 
 void CTitleState::Render(void * userptr)
@@ -36,8 +35,6 @@ void CTitleState::Render(void * userptr)
 
 	if (font != nullptr)
 	{
-
-
 
 		int iYOffset = iScreenH - 50;
 

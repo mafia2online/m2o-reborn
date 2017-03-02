@@ -5,17 +5,9 @@
 enum States : Byte
 {
 	None = 0,
-	Title,
-	Connecting,
-	Connected,
-	Playing
-};
-
-enum Substates : Byte //?
-{
-	Subtate_None = 0,
-	Subtate_Menu,
-	Subtate_DevConsole
+	MPManager,
+	MPGame,
+	Menu
 };
 
 class IMPState
@@ -40,9 +32,8 @@ public:
 
 	void ActivateState(States state);
 	void DeActivateState(States state);
-
-
-	States GetActiveState() { return m_state; }
+	
+	bool IsStateActive(States state) { return m_states[state].first; }
 
 public:
 	void Render(void *userptr);
@@ -50,8 +41,5 @@ public:
 	void InitializeResources(void * userptr);
 
 private:
-	States m_state;
-	Substates m_substate;
-	std::unordered_map<States, IMPState*> m_states;
-	std::unordered_map<Substates, IMPState*> m_substates;
+	std::unordered_map<States, std::pair<bool, IMPState*>> m_states;
 };

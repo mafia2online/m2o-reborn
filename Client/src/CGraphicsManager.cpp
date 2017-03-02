@@ -57,5 +57,4 @@ void CGraphicsManager::OnDevicePreRender(void)
 void CGraphicsManager::OnDeviceRender(void)
 {
 	CCore::Instance().GetStateManager().Render(this);
-
 }
