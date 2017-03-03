@@ -1,7 +1,6 @@
 #include <stdafx.h>
 #include "CGameState.h"
 
-#include <CHud.h>
 
 void CGameState::Activate(void *userptr)
 {

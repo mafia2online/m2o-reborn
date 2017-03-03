@@ -92,7 +92,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy /B "$(ProjectDir)\src\*.h" "$(TargetDir)\include"</Command>
+      <Command>copy /B "$(ProjectDir)\src\*.h" "$(TargetDir)\include"
+copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -103,7 +104,8 @@
       <AdditionalIncludeDirectories>../</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>copy /B "$(ProjectDir)\src\*.h" "$(TargetDir)\include"</Command>
+      <Command>copy /B "$(ProjectDir)\src\*.h" "$(TargetDir)\include"
+copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,13 +129,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\CHud.cpp" />
-    <ClCompile Include="src\CSDSManager.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\CHud.h" />
+    <ClInclude Include="src\CHud.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
-    <ClInclude Include="src\CSDSManager.h" />
+    <ClInclude Include="src\CSDSManager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

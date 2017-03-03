@@ -51,7 +51,7 @@ void CCore::OnAttach(HMODULE module)
 	m_graphicsmanager.Init();
 	m_game.Initialize();
 
-	m_statemanager.AddState(States::Title, new CTitleState);
+	m_statemanager.AddState(States::Menu, new CTitleState);
 
 	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }
