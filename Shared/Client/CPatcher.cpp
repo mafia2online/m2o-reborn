@@ -8,7 +8,6 @@ void * Mem::Hooks::InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDet
 	// Allocate the trampoline memory
 	BYTE * pbyteTrampoline = (BYTE *)malloc(iSize + 5);
 	ScopedProtect((Address)pbyteTrampoline, iSize + 5);
-
 	{
 		ScopedProtect((Address)pbyteAddr, iSize + 5);
 

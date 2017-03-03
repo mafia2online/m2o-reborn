@@ -30,36 +30,34 @@ Mem::InvokeFunction<Mem::call_this, void>(0x0890F10, &m_interface->m_pEnumerator
 
 namespace M2
 {
-	class ICcEnumator
+	class ICGameGuiModule
 	{
 	public:
 		void *m_pVFTable;
 	};
 
-	class ICHud
+	class C_GameGuiModule : public GameClassWrapper<C_GameGuiModule, 0x1AB64F0>
 	{
 	public:
-		void *m_pVFTable;
-		ICcEnumator *m_pEnumerator; // 0004
-	};
+		/*void _declspec(naked) FaderFadeIn(int un)
+		{
 
-	class C_Hud : public GameClassWrapper<C_Hud, 0x1CBA618>
-	{
-	public:
+		}*/
+
 		void FaderFadeIn(float time)
 		{
-			static uint32_t dwReturn;
-			float test;
-			Mem::InvokeFunction<Mem::call_this, void>(0x08910C0, this, &dwReturn, &test, time, 0, 0);
+			static float dwReturn;
+			Mem::InvokeFunction<Mem::call_this, void>(0x472300, this, &dwReturn, time, 0);
 		}
-
+		/*
 		void FaderFadeOut(float time)
 		{
 			static uint32_t dwReturn;
 			float test;
 			Mem::InvokeFunction<Mem::call_this, void>(0x0890F10, this, &dwReturn, &test, time, 0, 0);
 		}
+		*/
 
-		inline ICHud* GetInterface() { return reinterpret_cast<ICHud*>(this); }
+		inline ICGameGuiModule* GetInterface() { return reinterpret_cast<ICGameGuiModule*>(this); }
 	};
 };

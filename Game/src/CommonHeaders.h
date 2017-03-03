@@ -10,7 +10,7 @@ namespace M2
 	public:
 		static T *Get()
 		{
-			return reinterpret_cast<T*>(A);
+			return reinterpret_cast<T*>(*(Address*)A);
 		}
 	};
 }
