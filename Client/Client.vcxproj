@@ -181,6 +181,10 @@ exit /b 0</Command>
     <ClInclude Include="..\Shared\Constants.h" />
     <ClInclude Include="..\Shared\CSignelton.h" />
     <ClInclude Include="..\Shared\FileLogger.h" />
+    <ClInclude Include="..\Shared\Math\Math.hpp" />
+    <ClInclude Include="..\Shared\Math\Matrix.hpp" />
+    <ClInclude Include="..\Shared\Math\vector2.hpp" />
+    <ClInclude Include="..\Shared\Math\vector3.hpp" />
     <ClInclude Include="..\Shared\String.hpp" />
     <ClInclude Include="..\Shared\Types.h" />
     <ClInclude Include="src\CCore.h" />

@@ -1,3 +1,10 @@
+/** @file CCameraModule.cpp
+*  @brief Game's GameCameraMafia wrapper
+*
+*
+*  @author Tyldar (darreugne@gmail.com)
+*/
+
 #pragma once
 #include "CommonHeaders.h"
 

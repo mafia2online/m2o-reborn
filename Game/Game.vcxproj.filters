@@ -21,9 +21,6 @@
     <ClInclude Include="src\CSDSManager.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\CHud.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="src\CNavigation.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -31,6 +28,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\CCameraModule.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameGuiModule.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHud.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

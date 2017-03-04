@@ -32,6 +32,9 @@
     <Filter Include="Source Files\Multiplayer\Managers">
       <UniqueIdentifier>{dade651e-744e-4bc9-a83d-cfaf1eec6c91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shared\Math">
+      <UniqueIdentifier>{ca67843b-b09c-461d-b5db-d1f135e867f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\Client\CPatcher.cpp">
@@ -152,6 +155,18 @@
     </ClInclude>
     <ClInclude Include="src\GameHooks.h">
       <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Math\Math.hpp">
+      <Filter>Source Files\Shared\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Math\vector2.hpp">
+      <Filter>Source Files\Shared\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Math\vector3.hpp">
+      <Filter>Source Files\Shared\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Math\Matrix.hpp">
+      <Filter>Source Files\Shared\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
