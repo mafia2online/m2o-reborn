@@ -13,30 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Headerdateien\Global">
-      <UniqueIdentifier>{a1461d0d-7f66-46e2-8f20-e400b88666c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\Entites/And/Weed">
-      <UniqueIdentifier>{77759bec-1aeb-423f-a387-05991498002a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CommonHeaders.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\CHud.hpp">
-      <Filter>Headerdateien\Global</Filter>
-    </ClInclude>
     <ClInclude Include="src\CSDSManager.hpp">
-      <Filter>Headerdateien\Global</Filter>
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHud.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNavigation.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameCameraMafia.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CCameraModule.hpp">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\forcebuild.cpp">
+    <ClCompile Include="src\CGame.hpp">
       <Filter>Headerdateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\CGame.hpp">
-      <Filter>Headerdateien\Global</Filter>
+    <ClCompile Include="src\forcebuild.cpp">
+      <Filter>Headerdateien</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
