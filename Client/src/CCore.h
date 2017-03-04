@@ -23,7 +23,6 @@ public:
 private:
 	HMODULE m_module;
 	SString m_strappdir;
-	CGame m_game;
 	CGraphicsManager m_graphicsmanager;
 	CMPStateManager m_statemanager;
 

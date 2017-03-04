@@ -15,6 +15,8 @@
 #include "CCore.h"
 #include <CTitleState.h>
 #include <CGameState.h>
+#include "ExceptionHandler.h"
+
 CCore::CCore() :
 	m_debuglog(true, true)
 {
@@ -26,8 +28,6 @@ CCore::~CCore()
 
 }
 
-#include <Libraries\Game\include\CommonHeaders.h>
-#include <Libraries\Game\include\CSDSManager.h>
 void CCore::OnAttach(HMODULE module)
 {
 	m_module = module;
@@ -49,10 +49,11 @@ void CCore::OnAttach(HMODULE module)
 
 	// todo: check return values and scream like a little baby
 	m_graphicsmanager.Init();
-	m_game.Initialize();
+	CGame::Instance().Initialize();
+
+	ExceptionHandler::Install();
 
 	m_statemanager.AddState(States::Menu, new CTitleState);
-
 	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
 }
 

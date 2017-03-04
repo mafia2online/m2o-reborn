@@ -25,4 +25,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CGame.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\forcebuild.cpp">
+      <Filter>Headerdateien</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>

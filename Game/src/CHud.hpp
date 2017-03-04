@@ -36,7 +36,7 @@ namespace M2
 		void *m_pVFTable;
 	};
 
-	class C_GameGuiModule : public GameClassWrapper<C_GameGuiModule, 0x1AB64F0>
+	class C_GameGuiModule : public GameClassWrapperStatic<C_GameGuiModule, 0x1AB64F0>
 	{
 	public:
 		/*void _declspec(naked) FaderFadeIn(int un)

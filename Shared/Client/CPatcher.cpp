@@ -72,6 +72,17 @@ void * Mem::Hooks::InstallJmpPatch(uint32_t dwAddress, uint32_t dwJmpAddress, in
 	return InstallDetourPatchInternal(dwAddress, dwJmpAddress, JMP, iSize);
 }
 
+Address Mem::Hooks::InstallNotDumbJMP(Address target_addr, Address hookfnc_addr, size_t len)
+{
+	ScopedProtect(target_addr, len);
+	std::vector<Byte> patch_data(len, 0x90);
+	patch_data[0] = X86Instructions::JMP;
+	*reinterpret_cast<Address *>(patch_data.data() + 1) = hookfnc_addr - (target_addr + 5);
+	std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
+	return target_addr + len;
+}
+
+
 void Mem::Utilites::InstallNopPatch(uint32_t dwAddress, int iSize)
 {
 	ScopedProtect(dwAddress, iSize);

@@ -1,8 +1,10 @@
 #pragma once
+#define _SCL_SECURE_NO_WARNINGS // fak you i do what i want i am old enough
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <iostream>
 #include <Shared/Types.h>
+#include <vector>
 
 #pragma comment(lib, "Libraries\\detours\\detours.lib")
 
@@ -84,6 +86,9 @@ namespace Mem
 
 		static	void				* InstallCallPatch(uint32_t dwAddress, uint32_t dwCallAddress, int iSize = 5);
 		static	void				* InstallJmpPatch(uint32_t dwAddress, uint32_t dwJmpAddress, int iSize = 5);
+	
+		static  Address				InstallNotDumbJMP(Address target_addr, Address hookfnc_addr, size_t len = 5);
+	
 	};
 
 	class Utilites

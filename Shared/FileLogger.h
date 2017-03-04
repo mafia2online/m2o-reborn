@@ -17,6 +17,8 @@ namespace IO
 	public:
 		bool Open(SString path);
 
+		void Close();
+
 	public:
 		void Writeln(const char *szFormat, ...);
 		void Writeln(SString& str);

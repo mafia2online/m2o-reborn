@@ -159,6 +159,7 @@ exit /b 0</Command>
     <ClCompile Include="src\CDirect3D9Hook.cpp" />
     <ClCompile Include="src\CDirect3D9Proxy.cpp" />
     <ClCompile Include="src\CDirect3DDevice9Proxy.cpp" />
+    <ClCompile Include="src\ExceptionHandler.cpp" />
     <ClCompile Include="src\CFontManager.cpp" />
     <ClCompile Include="src\CGame.cpp" />
     <ClCompile Include="src\CGameState.cpp" />
@@ -167,6 +168,7 @@ exit /b 0</Command>
     <ClCompile Include="src\CTitleState.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FilePatcher.cpp" />
+    <ClCompile Include="src\GameHooks.cpp" />
     <ClCompile Include="src\SteamDRMPatch.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +183,7 @@ exit /b 0</Command>
     <ClInclude Include="src\CDirect3D9Hook.h" />
     <ClInclude Include="src\CDirect3D9Proxy.h" />
     <ClInclude Include="src\CDirect3DDevice9Proxy.h" />
+    <ClInclude Include="src\ExceptionHandler.h" />
     <ClInclude Include="src\CFontManager.h" />
     <ClInclude Include="src\CGame.h" />
     <ClInclude Include="src\CGameState.h" />
@@ -188,6 +191,7 @@ exit /b 0</Command>
     <ClInclude Include="src\CMPStateManager.h" />
     <ClInclude Include="src\CTitleState.h" />
     <ClInclude Include="src\FilePatcher.h" />
+    <ClInclude Include="src\GameHooks.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\SteamDRMPatch.h" />
   </ItemGroup>

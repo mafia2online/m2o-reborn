@@ -36,6 +36,12 @@ bool IO::CFileLogger::Open(SString path)
 	return false;
 }
 
+void IO::CFileLogger::Close()
+{
+	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex);
+	m_ofstream.close();
+}
+
 void IO::CFileLogger::Writeln(const char *szFormat, ...)
 {
 	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!

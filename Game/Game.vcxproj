@@ -133,6 +133,10 @@ copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
     <ClInclude Include="src\CommonHeaders.h" />
     <ClInclude Include="src\CSDSManager.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CGame.hpp" />
+    <ClCompile Include="src\forcebuild.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
