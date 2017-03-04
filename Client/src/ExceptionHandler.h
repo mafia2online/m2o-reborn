@@ -2,6 +2,6 @@
 
 namespace ExceptionHandler
 {
-	void Install();
+	bool Install();
 	long WINAPI ExceptionHandlerCallback(_EXCEPTION_POINTERS *pExceptionInfo);
 };

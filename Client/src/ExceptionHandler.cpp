@@ -16,9 +16,12 @@
 #include <CCore.h>
 IO::CFileLogger exception_logger(true, false);
 
-void ExceptionHandler::Install()
+bool ExceptionHandler::Install()
 {
-	AddVectoredExceptionHandler(1, ExceptionHandlerCallback);
+	if (AddVectoredExceptionHandler(1, ExceptionHandlerCallback) == NULL)
+		return false;
+
+	return true;
 }
 
 long WINAPI ExceptionHandler::ExceptionHandlerCallback(_EXCEPTION_POINTERS *pExceptionInfo)

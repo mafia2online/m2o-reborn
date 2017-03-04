@@ -47,11 +47,16 @@ void CCore::OnAttach(HMODULE module)
 		m_debuglog.Writeln("Succesfully started %s compiled on %s %s.", MOD_NAME, __DATE__, __TIME__);
 	}
 
-	// todo: check return values and scream like a little baby
-	m_graphicsmanager.Init();
-	CGame::Instance().Initialize();
+	if (m_graphicsmanager.Init() == false) {
+		ExitGame("Unable to init Graphics Manager");
+	}
 
-	ExceptionHandler::Install();
+	if (CGame::Instance().Initialize() == false) {
+		ExitGame("Unable to init game instance");
+	}
+
+	if (ExceptionHandler::Install() == false)
+		ExitGame("Unable to install exception handler");
 
 	m_statemanager.AddState(States::Menu, new CTitleState);
 	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
