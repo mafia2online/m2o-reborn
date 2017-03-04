@@ -24,6 +24,7 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
 {
 	CCore::Instance().GetLogger().Writeln("CGraphicsManager::OnDeviceCreate(%x, %x)", pDevice, pPresentationParameters);
 	m_pfontmanager = new CFontManager(pDevice);
+	m_pGwenManager = new GwenManager(pDevice, pPresentationParameters);
 
 	m_pdevice = pDevice;
 	memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
@@ -57,4 +58,5 @@ void CGraphicsManager::OnDevicePreRender(void)
 void CGraphicsManager::OnDeviceRender(void)
 {
 	CCore::Instance().GetStateManager().Render(this);
+	m_pGwenManager->OnDeviceRender();
 }

@@ -39,15 +39,12 @@ namespace M2
 		VCGame *m_pVFTable;
 	};
 
-	class C_Game : public GameClassWrapper<C_Game, 0x1ABFE14>
+	class C_Game : public GameClassWrapper<C_Game, ICGame, 0x1ABFE14>
 	{
 	public:
-		ICGame* GetInterface() { return reinterpret_cast<ICGame*>(this); }
-
-		// @todo myu: maybe find another, neater way?
 		__forceinline DWORD GetEntityFromIndex(int index)
 		{
-			return Mem::InvokeFunction<Mem::call_this, DWORD>(GetInterface()->m_pVFTable->GetEntityFromIndex, this, index);
+			return VTBLCall(DWORD, GetEntityFromIndex, index);
 		}
 
 	};

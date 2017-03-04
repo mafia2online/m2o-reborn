@@ -38,13 +38,46 @@ void __declspec(naked) GameInitHook()
 	__asm jmp[GameInitHook_Return];
 }
 
+WNDPROC _WndProc;
+
+LRESULT __stdcall WndProcHk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (CGame::Instance().WndProc(hWnd, uMsg, wParam, lParam))
+		return true; // handled by ourselves
+
+	return CallWindowProc(_WndProc, hWnd, uMsg, wParam, lParam);
+}
+
+typedef BOOL(WINAPI *tPeekMessageA)(LPMSG pMsg, HWND  hwnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax, UINT  wRemoveMsg);
+tPeekMessageA orig_PeekMessageA;
+BOOL WINAPI PeekMessageAhk(LPMSG pMsg, HWND  hwnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax, UINT  wRemoveMsg)
+{
+
+	if(CCore::Instance().GetGraphics().GetGwenManager() != nullptr)
+		CCore::Instance().GetGraphics().GetGwenManager()->GetInput().ProcessMessage(*pMsg);
+
+	return orig_PeekMessageA(pMsg, hwnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
+}
+
+
+void GameHooks::InstallLate()
+{
+	HWND hWnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
+
+	SetWindowText(hWnd, "Mafia II Online: Reborn");
+	_WndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(hWnd, GWL_WNDPROC, (LONG_PTR)WndProcHk));
+	SetWindowLongW(hWnd, GWL_WNDPROC, GetWindowLong(hWnd, GWL_WNDPROC));
+
+	//orig_PeekMessageA = reinterpret_cast<tPeekMessageA>(Mem::Hooks::InstallDetourPatch("user32.dll", "PeekMessageA", (DWORD)PeekMessageAhk));
+
+}
+
 void GameHooks::Install()
 {
 	GameLoopHook_1_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED614, (Address)GameLoopHook_1);
 	GameLoopHook_2_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED04D, (DWORD)GameLoopHook_2, 8);
-
+	
 	GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
-
 
 	/*
 		* Disabled hooks

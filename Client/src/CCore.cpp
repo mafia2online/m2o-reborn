@@ -16,6 +16,7 @@
 #include <CTitleState.h>
 #include <CGameState.h>
 #include "ExceptionHandler.h"
+#include "CDirectInput8Hook.h"
 
 CCore::CCore() :
 	m_debuglog(true, true)
@@ -40,6 +41,9 @@ void CCore::OnAttach(HMODULE module)
 	m_strappdir.GetSTLString().erase(pos, std::string::npos);
 	
 
+	m_strfilesdir = m_strappdir;
+	m_strfilesdir += "\\files";
+
 	SString strLogPath(m_strappdir + "\\logs\\debug_log.txt");
 
 	if (m_debuglog.Open(strLogPath))
@@ -57,6 +61,9 @@ void CCore::OnAttach(HMODULE module)
 
 	if (ExceptionHandler::Install() == false)
 		ExitGame("Unable to install exception handler");
+
+	CDirectInput8Hook::Install();
+
 
 	m_statemanager.AddState(States::Menu, new CTitleState);
 	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!

@@ -83,13 +83,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\GWen\include;..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Game_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Libraries\GWen;..\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Game_d.lib;gwen_staticd.lib;GWEND-Renderer-DirectX9d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -116,15 +117,17 @@ exit /b 0</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\GWen\include;..\Libraries\Game\include;.\src;..\;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Game_r.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Libraries\GWen;..\Libraries\Game;..\;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Game_r.lib;gwen_static.lib;GWEN-Renderer-DirectX9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -160,9 +163,13 @@ exit /b 0</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\CCore.cpp" />
+    <ClCompile Include="src\CDebugConsole.cpp" />
     <ClCompile Include="src\CDirect3D9Hook.cpp" />
     <ClCompile Include="src\CDirect3D9Proxy.cpp" />
     <ClCompile Include="src\CDirect3DDevice9Proxy.cpp" />
+    <ClCompile Include="src\CDirectInput8Hook.cpp" />
+    <ClCompile Include="src\CDirectInput8Proxy.cpp" />
+    <ClCompile Include="src\CDirectInputDevice8Proxy.cpp" />
     <ClCompile Include="src\ExceptionHandler.cpp" />
     <ClCompile Include="src\CFontManager.cpp" />
     <ClCompile Include="src\CGame.cpp" />
@@ -173,6 +180,7 @@ exit /b 0</Command>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FilePatcher.cpp" />
     <ClCompile Include="src\GameHooks.cpp" />
+    <ClCompile Include="src\GwenManager.cpp" />
     <ClCompile Include="src\SteamDRMPatch.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -188,9 +196,13 @@ exit /b 0</Command>
     <ClInclude Include="..\Shared\String.hpp" />
     <ClInclude Include="..\Shared\Types.h" />
     <ClInclude Include="src\CCore.h" />
+    <ClInclude Include="src\CDebugConsole.h" />
     <ClInclude Include="src\CDirect3D9Hook.h" />
     <ClInclude Include="src\CDirect3D9Proxy.h" />
     <ClInclude Include="src\CDirect3DDevice9Proxy.h" />
+    <ClInclude Include="src\CDirectInput8Hook.h" />
+    <ClInclude Include="src\CDirectInput8Proxy.h" />
+    <ClInclude Include="src\CDirectInputDevice8Proxy.h" />
     <ClInclude Include="src\ExceptionHandler.h" />
     <ClInclude Include="src\CFontManager.h" />
     <ClInclude Include="src\CGame.h" />
@@ -200,6 +212,7 @@ exit /b 0</Command>
     <ClInclude Include="src\CTitleState.h" />
     <ClInclude Include="src\FilePatcher.h" />
     <ClInclude Include="src\GameHooks.h" />
+    <ClInclude Include="src\GwenManager.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\SteamDRMPatch.h" />
   </ItemGroup>

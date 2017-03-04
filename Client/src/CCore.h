@@ -16,6 +16,7 @@ public:
 
 public:
 	SString& GetModAppDir() { return m_strappdir; }
+	SString& GetModFilesDir() { return m_strfilesdir; }
 	IO::CFileLogger& GetLogger() { return m_debuglog; }
 	CGraphicsManager& GetGraphics() { return m_graphicsmanager; }
 	CMPStateManager& GetStateManager() { return m_statemanager; }
@@ -23,6 +24,7 @@ public:
 private:
 	HMODULE m_module;
 	SString m_strappdir;
+	SString m_strfilesdir;
 	CGraphicsManager m_graphicsmanager;
 	CMPStateManager m_statemanager;
 

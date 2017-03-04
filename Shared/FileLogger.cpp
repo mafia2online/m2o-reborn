@@ -12,6 +12,7 @@
 IO::CFileLogger::CFileLogger(bool _threadsafe, bool _timestamp) : m_timestamp(_timestamp)
 {
 	m_mutex = nullptr;
+	m_funcback = nullptr;
 
 	if (_threadsafe)
 	{
@@ -53,6 +54,8 @@ void IO::CFileLogger::Writeln(const char *szFormat, ...)
 	vsnprintf(pszBuffer, len+1, szFormat, args);
 	va_end(args);
 
+	if (m_funcback) m_funcback(pszBuffer);
+
 	if (m_timestamp) WriteTimestamp();
 	m_ofstream << pszBuffer << "\n";
 	m_ofstream.flush(); // fuuu
@@ -63,6 +66,8 @@ void IO::CFileLogger::Writeln(SString & str)
 {
 	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!
 	if (m_timestamp) WriteTimestamp();
+	if (m_funcback) m_funcback(str.GetCStr());
+
 	m_ofstream << str.GetSTLString() << "\n";
 
 }
@@ -71,6 +76,8 @@ void IO::CFileLogger::Writeln(char * szString)
 {
 	if (m_mutex)	std::lock_guard<std::mutex> guard(*m_mutex); // if the mutex is available -> lock it!
 	if (m_timestamp) WriteTimestamp();
+	if (m_funcback) m_funcback(szString);
+
 	m_ofstream << szString << "\n";
 }
 

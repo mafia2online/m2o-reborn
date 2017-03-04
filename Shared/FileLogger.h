@@ -16,8 +16,8 @@ namespace IO
 		~CFileLogger();
 	public:
 		bool Open(SString path);
-
 		void Close();
+		void SetCallback(std::function<void(const char*)> func) { m_funcback = func; }
 
 	public:
 		void Writeln(const char *szFormat, ...);
@@ -30,6 +30,7 @@ namespace IO
 	private:
 		bool m_timestamp;
 		std::unique_ptr<std::mutex> m_mutex;
+		std::function<void(const char*)> m_funcback;
 		std::ofstream m_ofstream;
 	};
 };
