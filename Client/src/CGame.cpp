@@ -15,7 +15,7 @@
 
 #include <Shared\Math\Math.hpp>
 
-#include <Libraries\Game\include\CHud.hpp>
+#include <Libraries\Game\include\CGameGuiModule.hpp>
 #include <Libraries\Game\include\CGame.hpp>
 
 #include <CGraphicsManager.h>
