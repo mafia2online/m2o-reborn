@@ -9,7 +9,7 @@ namespace M2
 		void *m_pVFTable;
 	};
 
-	class C_GameGuiModule : public GameClassWrapperStatic<C_GameGuiModule, 0x1AB64F0>
+	class C_GameGuiModule : public GameClassWrapperStatic<C_GameGuiModule, ICGameGuiModule, 0x1AB64F0>
 	{
 	public:
 		void FaderFadeIn(float time)
@@ -23,7 +23,5 @@ namespace M2
 			static uint32_t dwReturn;
 			Mem::InvokeFunction<Mem::call_this, void>(0x472330, this, &dwReturn, time, 0);
 		}
-
-		inline ICGameGuiModule* GetInterface() { return reinterpret_cast<ICGameGuiModule*>(this); }
 	};
 };
