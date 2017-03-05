@@ -129,7 +129,10 @@ copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\CCameraModule.hpp" />
+    <ClInclude Include="src\CGameCameraMafia.hpp" />
     <ClInclude Include="src\CHud.hpp" />
+    <ClInclude Include="src\CNavigation.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
     <ClInclude Include="src\CSDSManager.hpp" />
   </ItemGroup>
