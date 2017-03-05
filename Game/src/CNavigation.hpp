@@ -1,3 +1,10 @@
+/** @file CNavigation.cpp
+*  @brief Game's CNavigation wrapper
+*
+*
+*  @author Tyldar (darreugne@gmail.com)
+*/
+
 #pragma once
 #include "CommonHeaders.h"
 

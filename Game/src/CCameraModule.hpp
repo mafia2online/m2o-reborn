@@ -1,3 +1,10 @@
+/** @file CCameraModule.cpp
+*  @brief Game's CameraModule wrapper
+*
+*
+*  @author Tyldar (darreugne@gmail.com)
+*/
+
 #pragma once
 #include "CommonHeaders.h"
 

@@ -30,14 +30,25 @@
     <ClInclude Include="src\CSDSManager.hpp">
       <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="src\CHud.hpp">
       <Filter>Headerdateien\Generalized</Filter>
+=======
+    <ClInclude Include="src\CNavigation.hpp">
+      <Filter>Headerdateien</Filter>
+>>>>>>> d6ab3100364a261d9ebf14e08d75305f5eb7092f
     </ClInclude>
     <ClInclude Include="src\CGameCameraMafia.hpp">
       <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
     <ClInclude Include="src\CCameraModule.hpp">
       <Filter>Headerdateien\Generalized</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameGuiModule.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHud.hpp">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
