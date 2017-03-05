@@ -2,6 +2,7 @@
 
 namespace GameHooks
 {
+	void InstallLate();
 	void Install();
 };
 

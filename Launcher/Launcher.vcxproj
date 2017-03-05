@@ -73,7 +73,7 @@
     <IntDir>Intermediate\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)\Binaries\$(ProjectName)</OutDir>
+    <OutDir>$(SolutionDir)\Binaries\Client</OutDir>
     <IntDir>Intermediate\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

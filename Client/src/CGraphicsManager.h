@@ -1,5 +1,6 @@
 #pragma once
 #include <CFontManager.h>
+#include <GwenManager.h>
 #include <d3d9.h>
 #pragma comment(lib, "d3d9.lib")
 
@@ -21,6 +22,8 @@ public:
 	void OnDeviceRender(void);
 
 	CFontManager* GetFontManager() { return m_pfontmanager; }
+	GwenManager* GetGwenManager() { return m_pGwenManager; }
+
 
 	void GetScreenDimensions(int *w, int *h)
 	{
@@ -29,6 +32,7 @@ public:
 	}
 
 private:
+	GwenManager* m_pGwenManager;
 	CFontManager* m_pfontmanager;
 	IDirect3DDevice9* m_pdevice;
 	D3DPRESENT_PARAMETERS m_presentparams;

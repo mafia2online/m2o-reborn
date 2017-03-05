@@ -9,6 +9,7 @@ public:
 public:
 	void OnGameInit();
 	void OnGameLoop();
+	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	uint32_t m_base;

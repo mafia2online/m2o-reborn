@@ -32,6 +32,12 @@
     <Filter Include="Source Files\Multiplayer\Managers">
       <UniqueIdentifier>{dade651e-744e-4bc9-a83d-cfaf1eec6c91}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics\GWen">
+      <UniqueIdentifier>{304f5e42-7e90-4bfa-98ce-44026b4488cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{97a4f0ec-3705-463a-a4c5-a79075a7f988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\Client\CPatcher.cpp">
@@ -84,6 +90,21 @@
     </ClCompile>
     <ClCompile Include="src\GameHooks.cpp">
       <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GwenManager.cpp">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInput8Hook.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInput8Proxy.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInputDevice8Proxy.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDebugConsole.cpp">
+      <Filter>Source Files\Graphics\GWen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +173,21 @@
     </ClInclude>
     <ClInclude Include="src\GameHooks.h">
       <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GwenManager.h">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInput8Hook.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInput8Proxy.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInputDevice8Proxy.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDebugConsole.h">
+      <Filter>Source Files\Graphics\GWen</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
