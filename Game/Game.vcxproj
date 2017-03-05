@@ -137,6 +137,7 @@ copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
     <ClInclude Include="src\CSDSManager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CEntityFactory.cpp" />
     <ClCompile Include="src\CGame.hpp" />
     <ClCompile Include="src\forcebuild.cpp" />
   </ItemGroup>

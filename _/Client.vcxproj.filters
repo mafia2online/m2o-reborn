@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{a0637c1b-21f1-4ec1-93a3-211d119936e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared\Client">
+      <UniqueIdentifier>{47bd4e2d-2ce5-40c8-9f4f-6763ae5aa5ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{e2655e94-1e35-4821-931f-61534df56ba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilites">
+      <UniqueIdentifier>{c6260234-a751-4ed6-9a75-9c48f636ee54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared\IO">
+      <UniqueIdentifier>{3eb0a094-2ce5-490e-9981-72b9fac39511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{70d95030-1d38-4d86-8eb8-adfdeb61eaa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Hooks">
+      <UniqueIdentifier>{676a7366-90ee-41de-87de-2c0708d020e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Multiplayer">
+      <UniqueIdentifier>{a3a682cc-0b9d-49fa-9a9c-e2cc2a86de6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Multiplayer\Managers">
+      <UniqueIdentifier>{dade651e-744e-4bc9-a83d-cfaf1eec6c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\GWen">
+      <UniqueIdentifier>{304f5e42-7e90-4bfa-98ce-44026b4488cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{97a4f0ec-3705-463a-a4c5-a79075a7f988}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Shared\Client\CPatcher.cpp">
+      <Filter>Source Files\Shared\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CGame.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SteamDRMPatch.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FilePatcher.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\FileLogger.cpp">
+      <Filter>Source Files\Shared\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirect3D9Hook.cpp">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirect3D9Proxy.cpp">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirect3DDevice9Proxy.cpp">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CGraphicsManager.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CFontManager.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CMPStateManager.cpp">
+      <Filter>Source Files\Multiplayer\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CTitleState.cpp">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CGameState.cpp">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExceptionHandler.cpp">
+      <Filter>Source Files\Utilites</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameHooks.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GwenManager.cpp">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInput8Hook.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInput8Proxy.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDirectInputDevice8Proxy.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CDebugConsole.cpp">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Shared\Client\CPatcher.h">
+      <Filter>Source Files\Shared\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGame.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SteamDRMPatch.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Common.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\CSignelton.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Types.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CCore.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\String.hpp">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilePatcher.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\FileLogger.h">
+      <Filter>Source Files\Shared\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Constants.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirect3D9Hook.h">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirect3D9Proxy.h">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirect3DDevice9Proxy.h">
+      <Filter>Source Files\Graphics\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGraphicsManager.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CFontManager.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CMPStateManager.h">
+      <Filter>Source Files\Multiplayer\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CTitleState.h">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameState.h">
+      <Filter>Source Files\Multiplayer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ExceptionHandler.h">
+      <Filter>Source Files\Utilites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameHooks.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GwenManager.h">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInput8Hook.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInput8Proxy.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDirectInputDevice8Proxy.h">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CDebugConsole.h">
+      <Filter>Source Files\Graphics\GWen</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

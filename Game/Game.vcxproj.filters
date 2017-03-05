@@ -13,33 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Headerdateien\Generalized">
+      <UniqueIdentifier>{1a27c559-57c8-4884-b0d1-b4d636c701cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Entities">
+      <UniqueIdentifier>{658a5f6e-6c84-49b6-a145-66e8c336b0fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CommonHeaders.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\CNavigation.hpp">
+      <Filter>Headerdateien\Generalized</Filter>
+    </ClInclude>
     <ClInclude Include="src\CSDSManager.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
     <ClInclude Include="src\CHud.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CNavigation.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
     <ClInclude Include="src\CGameCameraMafia.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
     <ClInclude Include="src\CCameraModule.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generalized</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CGame.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClCompile>
     <ClCompile Include="src\forcebuild.cpp">
       <Filter>Headerdateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CGame.hpp">
+      <Filter>Headerdateien\Generalized</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CEntityFactory.cpp">
+      <Filter>Headerdateien\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
