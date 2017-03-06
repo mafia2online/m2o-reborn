@@ -34,7 +34,8 @@ namespace M2
 	public:
 		static T *Get()
 		{
-			return reinterpret_cast<T*>(A);
+			static T classs;
+			return &classs;
 		}
 	};
 }

@@ -55,7 +55,7 @@
     <ClCompile Include="src\forcebuild.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\CEntityFactory.cpp">
+    <ClCompile Include="src\CEntityFactory.hpp">
       <Filter>Game stuff\Entites</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,7 +6,7 @@
 void CDebugConsole::RegisterComponents(Gwen::Controls::Canvas * pCanvas)
 {
 	Gwen::Controls::WindowControl *base = new Gwen::Controls::WindowControl(pCanvas);
-	base->SetBounds(10, 10, 600, 400);
+	base->SetBounds(10, 10, 600, 300);
 	base->SetTitle(L"Debug console ЧФчфв");
 	
 	m_plistboxctrl = new Gwen::Controls::ListBox(base);
@@ -50,6 +50,9 @@ void CDebugConsole::Focus()
 {
 	m_inputbox->Focus();
 	m_inputbox->SetKeyboardInputEnabled(true);
+	m_inputbox->SetText("/");
+	m_inputbox->SetCursorPos(1);
+	m_inputbox->SetCursorEnd(1);
 }
 
 // dirty mafaka
