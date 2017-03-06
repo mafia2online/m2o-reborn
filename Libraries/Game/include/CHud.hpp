@@ -1,3 +1,10 @@
+/** @file CHud.cpp
+*  @brief Game's CHud wrapper
+*
+*
+*  @author Tyldar (darreugne@gmail.com)
+*/
+
 #pragma once
 #include "CommonHeaders.h"
 

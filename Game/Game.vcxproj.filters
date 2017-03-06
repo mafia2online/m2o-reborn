@@ -1,65 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4f75e8a6-8d75-4098-9ad3-7db8b994565a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Game stuff">
+      <UniqueIdentifier>{f305f5aa-7b96-4e8a-a90e-da9ae56ca0b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ressourcendateien">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Game stuff\Entites">
+      <UniqueIdentifier>{d7b4c76a-67ff-418a-88b4-7a100b21802b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\Generalized">
-      <UniqueIdentifier>{1a27c559-57c8-4884-b0d1-b4d636c701cc}</UniqueIdentifier>
+    <Filter Include="Game stuff\Misc managers">
+      <UniqueIdentifier>{b4363b12-b7f0-49ff-83b0-5c6ce275ff8a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headerdateien\Entities">
-      <UniqueIdentifier>{658a5f6e-6c84-49b6-a145-66e8c336b0fb}</UniqueIdentifier>
+    <Filter Include="Game stuff\Streaming">
+      <UniqueIdentifier>{36d79a9c-3ac7-483d-8766-67a8b560ff37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game stuff\GUI">
+      <UniqueIdentifier>{ad8d39da-b71b-4ff8-bc29-22b08325cb0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="src\class_hierarchy.txt">
+      <Filter>Common</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="src\CommonHeaders.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CNavigation.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="src\CSDSManager.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
-    </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="src\CHud.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
-=======
-    <ClInclude Include="src\CNavigation.hpp">
-      <Filter>Headerdateien</Filter>
->>>>>>> d6ab3100364a261d9ebf14e08d75305f5eb7092f
-    </ClInclude>
-    <ClInclude Include="src\CGameCameraMafia.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
+      <Filter>Game stuff\Streaming</Filter>
     </ClInclude>
     <ClInclude Include="src\CCameraModule.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
+      <Filter>Game stuff\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameCameraMafia.hpp">
+      <Filter>Game stuff\GUI</Filter>
     </ClInclude>
     <ClInclude Include="src\CGameGuiModule.hpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Game stuff\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\CHud.hpp">
-      <Filter>Headerdateien</Filter>
+    <ClInclude Include="src\CNavigation.hpp">
+      <Filter>Game stuff\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGame.hpp">
+      <Filter>Game stuff\Misc managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGfxEnvironmentEffects.hpp">
+      <Filter>Game stuff\Misc managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
-      <Filter>Headerdateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CGame.hpp">
-      <Filter>Headerdateien\Generalized</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\CEntityFactory.cpp">
-      <Filter>Headerdateien\Entities</Filter>
+      <Filter>Game stuff\Entites</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -18,6 +18,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\class_hierarchy.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CCameraModule.hpp" />
+    <ClInclude Include="src\CGame.hpp" />
+    <ClInclude Include="src\CGameCameraMafia.hpp" />
+    <ClInclude Include="src\CGameGuiModule.hpp" />
+    <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
+    <ClInclude Include="src\CNavigation.hpp" />
+    <ClInclude Include="src\CommonHeaders.h" />
+    <ClInclude Include="src\CSDSManager.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CEntityFactory.cpp" />
+    <ClCompile Include="src\forcebuild.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0AEA3DD3-811B-4CE3-8985-07654E2A0969}</ProjectGuid>
     <RootNamespace>Game</RootNamespace>
@@ -128,20 +145,6 @@ copy /B "$(ProjectDir)\src\*.hpp" "$(TargetDir)\include"</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="src\CCameraModule.hpp" />
-    <ClInclude Include="src\CGameCameraMafia.hpp" />
-    <ClInclude Include="src\CGameGuiModule.hpp" />
-    <ClInclude Include="src\CHud.hpp" />
-    <ClInclude Include="src\CNavigation.hpp" />
-    <ClInclude Include="src\CommonHeaders.h" />
-    <ClInclude Include="src\CSDSManager.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\CEntityFactory.cpp" />
-    <ClCompile Include="src\CGame.hpp" />
-    <ClCompile Include="src\forcebuild.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

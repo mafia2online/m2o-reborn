@@ -16,16 +16,9 @@ namespace M2
 		ICEnumator *m_pEnumerator; // 0004
 	};
 
-	class C_SDSLoadingTable : public GameClassWrapper<C_SDSLoadingTable, 0x1ABFE4C>
+	class C_SDSLoadingTable : public GameClassWrapper<C_SDSLoadingTable, ICSDSLoadingTable, 0x1ABFE4C>
 	{
 	public:
-		ICSDSLoadingTable* GetInterface() { return reinterpret_cast<ICSDSLoadingTable*>(this); }
-
-		/*
-		void _declspec(naked) (int un)
-		{
-			_asm jmp off
-		}*/
 
 		void ActivateStreamMapLine(char * szName)
 		{

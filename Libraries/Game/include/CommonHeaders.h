@@ -28,4 +28,13 @@ namespace M2
 			return reinterpret_cast<T*>(*(Address*)A);
 		}
 	};
+
+	template < typename T > class GameFakeClassWrapper
+	{
+	public:
+		static T *Get()
+		{
+			return reinterpret_cast<T*>(A);
+		}
+	};
 }
