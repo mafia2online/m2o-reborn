@@ -3,12 +3,6 @@
 
 namespace M2
 {
-	class ICGame
-	{
-	public:
-		void *m_pVFTable;
-	};
-
 	struct C_EntityFactoryBaseRecord {};
 
 	enum EntityTypes : int32_t

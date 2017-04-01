@@ -19,6 +19,7 @@
 #include <Libraries\Game\include\CGame.hpp>
 #include <Libraries\Game\include\CSDSManager.hpp>
 #include <Libraries\Game\include\CCameraModule.hpp>
+#include <Libraries\Game\include\CCamera.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -197,6 +198,16 @@ void CGame::OnGameLoop()
 				data.strength = 5;
 				data.duration = 3;
 				M2::C_CameraModule::Get()->GetCamera(1)->BroadcastCommand(M2::CAMCOMMAND_SHAKE, &data, 0);
+			});
+
+			CommandProcessor::RegisterCommand("fpv",
+				[=](const std::string& params)->void
+			{
+				M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
+				if (M2::C_CameraModule::Get()->GetCamera(1)->ModeGetActiveTypeTop() != M2::CAMMODE_FPV)
+					M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, entity, true, true);
+				else
+					M2::C_CameraModule::Get()->GetCamera(1)->ModePop(1, 1);
 			});
 		}
 	}

@@ -8,53 +8,27 @@
 #pragma once
 #include "CommonHeaders.h"
 
-#include "CCamera.hpp"
+#include "CRenderCamera.hpp"
 
 namespace M2
 {
-	struct ShakeCommandData
+	class ICGameCameraMafia
 	{
-		float speed;
-		float strength;
-		float duration;
+		pad(ICGameCameraMafia, pad0, 0x38);	// 0000 - 0038
+		Matrix43 m_worldMatrix;				// 0038 - 0068
+		pad(ICGameCameraMafia, pad1, 0x4);	// 0068 - 006C
+		C_RenderCamera* m_pRenderCamera;	// 006C - 0070
+		pad(ICGameCameraMafia, pad2, 0x14);	// 0070 - 0084
+		float m_fUnknown1;					// 0084 - 0088
+		float m_fNear;						// 0088 - 008C
+		float m_fFar;						// 008C - 0090
+		float m_fAspect;					// 0090 - 0094
+		pad(ICGameCameraMafia, pad3, 0x18);	// 0094 - 00AC
+		Matrix43 m_viewMatrix;				// 00AC - 00DC
 	};
 
-	enum eCameraCommand
+	class C_GameCameraMafia : public ICGameCameraMafia
 	{
-		CAMCOMMAND_LOCKC = 1282368363, //Lock control
-		CAMCOMMAND_GOVER = 1381191748, //Start game over sequence
-		CAMCOMMAND_SHAKE = 1399349587, //Shake the screen
-	};
 
-	class ICGameCameraMafiaModule
-	{
-	public:
-		void		*m_pVFTable;						// 0000 - 0008
-		Matrix43	m_matWorld;							// 0008 - 0038
-		Vector3		m_vecCamPos;						// 0038 - 0044
-		Vector3		m_vecCamUp;							// 0044 - 0050
-		pad(ICGameCameraMafiaModule, pad1, 0xC);		// 0050 - 005C
-		float		m_fFovAngle;						// 005C - 0060
-		pad(ICGameCameraMafiaModule, pad2, 0x8C);		// 0060 - 00EC
-		int			m_iUnknown1;						// 00EC - 00F0
-		pad(ICGameCameraMafiaModule, pad3, 0x34);		// 00F0 - 0124
-		int			m_iWindowWidth;						// 0124 - 0128
-		int			m_iWindowHeight;					// 0128 - 012C
-		C_Camera	*m_pCamera;							// 012C - 0130
-
-	};
-
-	class C_GameCameraMafia : public ICGameCameraMafiaModule
-	{
-	public:
-		int BroadcastCommand(eCameraCommand command, void *data, void *unknow)
-		{
-			return (Mem::InvokeFunction<Mem::call_this, int>(0x1082590, this, command, data, unknow));
-		}
-
-		int ModePop(int unk1, int unk2)
-		{
-			return (Mem::InvokeFunction<Mem::call_this, int>(0x1082B30, this, unk1, unk2));
-		}
 	};
 };
