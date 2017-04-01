@@ -18,6 +18,7 @@
 #include <Libraries\Game\include\CGameGuiModule.hpp>
 #include <Libraries\Game\include\CGame.hpp>
 #include <Libraries\Game\include\CSDSManager.hpp>
+#include <Libraries\Game\include\CCameraModule.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -72,10 +73,15 @@ DWORD dwLocalPlayer = false;
 class M2EntityVFTable
 {
 public:
-	pad(M2EntityVFTable, pad0, 0x40);
-	DWORD IsVisibleFromCamera;
-	pad(M2EntityVFTable, pad1, 0x38);
+	DWORD Constructor;
+	pad(M2EntityVFTable, pad0, 0x78);
 	DWORD SetPosition;
+	DWORD SetDirection;
+	DWORD SetRotation;
+	DWORD m88;
+	DWORD GetPosition;
+	DWORD GetDirection;
+	DWORD GetRotation;
 };
 
 class M2Entity
@@ -117,14 +123,51 @@ void CGame::OnGameLoop()
 					[](const std::string& params)->void
 				{
 					int c = atoi(params.c_str());
-					M2Entity *ent = Mem::InvokeFunction<Mem::call_std, M2Entity*>(0x9A45E0, c);
-					if (ent)
-					{
-						Mem::InvokeFunction<Mem::call_this, void>(0x1192170, ent); // activate
-						Mem::InvokeFunction<Mem::call_this, void>(ent->m_pVFTable->SetPosition, ent, &Vector3(-1334.6199, 1041.8342, -18.4722));
-					}
 
-					CCore::Instance().GetLogger().Writeln("Created at %x!", ent);
+					for (int i = 0; i != c; i++)
+					{
+						M2Entity *ent = M2::C_EntityFactory::Get()->CreateEntity<M2Entity>(M2::EntityTypes::Entity_Human);
+						DWORD dwPlayerModelMan = *(DWORD*)(0x1ABFE5C);
+						DWORD dwPlayerModel = *(DWORD*)(dwPlayerModelMan + 0x14);
+
+						if (ent)
+						{
+							DWORD coreInstance = *(DWORD*)(0x1AC2778);
+							void *own_model = Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+							Mem::InvokeFunction<Mem::call_this, void>(0x14EC8F0, own_model, dwPlayerModel);
+
+							//14BA350
+							Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, own_model, "lawl");
+							Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, own_model, 2);
+
+							// set model
+							//*(DWORD *)(ent + 0x60) = (DWORD)own_model;
+
+
+							Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)ent + 0xB0)), ent, own_model);
+
+							// setup?
+							Mem::InvokeFunction<Mem::call_this, void>(0x99F400, ent);
+
+							// set flags
+							DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFFBF | 0x4800;
+							*(DWORD *)(ent + 32) = flags;
+
+							if (flags & 0x20)
+								CCore::Instance().GetLogger().Writeln("Flags set sucessfully!");
+
+
+							Mem::InvokeFunction<Mem::call_this, void>(0x1192170, ent); // activate
+
+							Vector3 pos;
+							Mem::InvokeFunction<Mem::call_this, void>(((M2Entity*)dwLocalPlayer)->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
+							Mem::InvokeFunction<Mem::call_this, void>(ent->m_pVFTable->SetPosition, ent, &pos);
+						}
+
+
+
+						CCore::Instance().GetLogger().Writeln("Created at %x!", ent);
+					}
 				});
 
 				CommandProcessor::RegisterCommand("time",
@@ -142,8 +185,18 @@ void CGame::OnGameLoop()
 			CommandProcessor::RegisterCommand("spawn",
 				[=](const std::string& params)->void
 			{
-				M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
+					M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
 				Mem::InvokeFunction<Mem::call_this, void>(entity->m_pVFTable->SetPosition, entity, &Vector3(-1334.6199, 1041.8342, -18.4722));
+			});
+
+			CommandProcessor::RegisterCommand("shake", 
+				[=](const std::string& params)->void
+			{
+				M2::ShakeCommandData data;
+				data.speed = 50;
+				data.strength = 5;
+				data.duration = 3;
+				M2::C_CameraModule::Get()->GetCamera(1)->BroadcastCommand(M2::CAMCOMMAND_SHAKE, &data, 0);
 			});
 		}
 	}
