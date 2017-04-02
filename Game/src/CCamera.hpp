@@ -35,18 +35,8 @@ namespace M2
 	class ICCamera
 	{
 	public:
-		void				*m_pVFTable;						// 0000 - 0008
-		Matrix43			m_matWorld;							// 0008 - 0038
-		Vector3				m_vecCamPos;						// 0038 - 0044
-		Vector3				m_vecCamUp;							// 0044 - 0050
-		pad(ICCamera, pad1, 0xC);								// 0050 - 005C
-		float				m_fFovAngle;						// 005C - 0060
-		pad(ICCamera, pad2, 0x8C);								// 0060 - 00EC
-		int					m_iUnknown1;						// 00EC - 00F0
-		pad(ICCamera, pad3, 0x34);								// 00F0 - 0124
-		int					m_iWindowWidth;						// 0124 - 0128
-		int					m_iWindowHeight;					// 0128 - 012C
-		C_GameCameraMafia	*m_pCamera;							// 012C - 0130
+		pad(ICCamera, pad0, 0x12C);								// 0000 - 012C
+		C_GameCameraMafia	*m_pGameCamera;						// 012C - 0130
 
 	};
 
@@ -56,6 +46,21 @@ namespace M2
 		int BroadcastCommand(eCameraCommand command, void *data, void *unknow)
 		{
 			return (Mem::InvokeFunction<Mem::call_this, int>(0x1082590, this, command, data, unknow));
+		}
+
+		void EnableBlendMode(int mode, bool enable)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x1083060, this, mode, enable);
+		}
+
+		long double GetFOV()
+		{
+			return this->m_pGameCamera->m_fov * 57.29577791868205;
+		}
+
+		float *MapScreenTarget(float *x, float *y)
+		{
+			return Mem::InvokeFunction<Mem::call_this, float *>(0x107FB30, this, x, y);
 		}
 
 		int ModeChange(eCameraMode mode, void *actor, bool unk1, bool unk2)
@@ -71,6 +76,11 @@ namespace M2
 		int ModePop(int unk1, int unk2)
 		{
 			return (Mem::InvokeFunction<Mem::call_this, int>(0x1082B30, this, unk1, unk2));
+		}
+
+		void SetRotation(float x, float y, bool unk)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x1083010, x, y, unk);
 		}
 	};
 };

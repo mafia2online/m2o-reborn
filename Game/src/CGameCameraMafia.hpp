@@ -14,21 +14,30 @@ namespace M2
 {
 	class ICGameCameraMafia
 	{
-		pad(ICGameCameraMafia, pad0, 0x38);	// 0000 - 0038
-		Matrix43 m_worldMatrix;				// 0038 - 0068
-		pad(ICGameCameraMafia, pad1, 0x4);	// 0068 - 006C
-		C_RenderCamera* m_pRenderCamera;	// 006C - 0070
-		pad(ICGameCameraMafia, pad2, 0x14);	// 0070 - 0084
-		float m_fUnknown1;					// 0084 - 0088
-		float m_fNear;						// 0088 - 008C
-		float m_fFar;						// 008C - 0090
-		float m_fAspect;					// 0090 - 0094
-		pad(ICGameCameraMafia, pad3, 0x18);	// 0094 - 00AC
-		Matrix43 m_viewMatrix;				// 00AC - 00DC
+	public:
+		pad(ICGameCameraMafia, pad0, 0x84);		// 0000 - 0084
+		float m_fov;							// 0084 - 0088
+		float m_fNear;							// 0088 - 008C
+		float m_fFar;							// 008C - 0090
+		float m_fAspect;						// 0090 - 0094
 	};
 
 	class C_GameCameraMafia : public ICGameCameraMafia
 	{
+	public:
+		int ScriptCameraLockLookAt(const char *unk1, const char *unk2, float unk3)
+		{
+			return Mem::InvokeFunction<Mem::call_this, int>(0x0B3D900, this, unk1, unk2, unk3);
+		}
 
+		void ScriptCameraLockSetActorIntern(void *actor, float unk)
+		{
+			Mem::InvokeFunction<Mem::call_this, void>(0x0B3D730, this, actor, unk);
+		}
+
+		void ScriptSetCameraRotationTowards(Vector3 vec)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0B55B90, this, vec);
+		}
 	};
 };
