@@ -15,11 +15,17 @@
 
 #include <Shared\Math\Math.hpp>
 
+#include <Libraries\Game\include\CGfxEnvironmentEffects.hpp>
+#include <Libraries\Game\include\CEntityFactory.hpp>
+
 #include <Libraries\Game\include\CGameGuiModule.hpp>
 #include <Libraries\Game\include\CGame.hpp>
 #include <Libraries\Game\include\CSDSManager.hpp>
 #include <Libraries\Game\include\CCameraModule.hpp>
 #include <Libraries\Game\include\CCamera.hpp>
+
+#include <Libraries\Game\include\CEntity.hpp>
+#include <Libraries\Game\include\CHuman2.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -70,30 +76,10 @@ void CGame::OnGameInit()
 
 DWORD dwLocalPlayer = false;
 
-/* will move later just for testing.. */
-class M2EntityVFTable
-{
-public:
-	DWORD Constructor;
-	pad(M2EntityVFTable, pad0, 0x78);
-	DWORD SetPosition;
-	DWORD SetDirection;
-	DWORD SetRotation;
-	DWORD m88;
-	DWORD GetPosition;
-	DWORD GetDirection;
-	DWORD GetRotation;
-};
-
-class M2Entity
-{
-public:
-	M2EntityVFTable	* m_pVFTable;
-};
-
 float ztime = 0;
-#include <Libraries\Game\include\CGfxEnvironmentEffects.hpp>
-#include <Libraries\Game\include\CEntityFactory.hpp>
+
+M2::C_Human2 *ent = nullptr;
+
 void CGame::OnGameLoop()
 {
 	//CCore::Instance().GetLogger().Writeln("GameLooopy \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
@@ -123,52 +109,42 @@ void CGame::OnGameLoop()
 				CommandProcessor::RegisterCommand("ent",
 					[](const std::string& params)->void
 				{
-					int c = atoi(params.c_str());
+					ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
+					DWORD dwPlayerModelMan = *(DWORD*)(0x1ABFE5C);
+					DWORD dwPlayerModel = *(DWORD*)(dwPlayerModelMan + 0x14);
 
-					for (int i = 0; i != c; i++)
+					if (ent)
 					{
-						M2Entity *ent = M2::C_EntityFactory::Get()->CreateEntity<M2Entity>(M2::EntityTypes::Entity_Human);
-						DWORD dwPlayerModelMan = *(DWORD*)(0x1ABFE5C);
-						DWORD dwPlayerModel = *(DWORD*)(dwPlayerModelMan + 0x14);
+						DWORD coreInstance = *(DWORD*)(0x1AC2778);
+						void *own_model = Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+						Mem::InvokeFunction<Mem::call_this, void>(0x14EC8F0, own_model, dwPlayerModel);
 
-						if (ent)
-						{
-							DWORD coreInstance = *(DWORD*)(0x1AC2778);
-							void *own_model = Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-							Mem::InvokeFunction<Mem::call_this, void>(0x14EC8F0, own_model, dwPlayerModel);
+						//14BA350
+						Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, own_model, "lawl");
+						Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, own_model, 2);
 
-							//14BA350
-							Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, own_model, "lawl");
-							Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, own_model, 2);
+						Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)ent + 0xB0)), ent, own_model);
 
-							// set model
-							//*(DWORD *)(ent + 0x60) = (DWORD)own_model;
+						ent->Setup();
 
+						// set flagsF
+						DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
+						*(DWORD *)(ent + 32) = flags;
 
-							Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)ent + 0xB0)), ent, own_model);
+						if (flags & 0x20)
+							CCore::Instance().GetLogger().Writeln("Flags set sucessfully!");
 
-							// setup?
-							Mem::InvokeFunction<Mem::call_this, void>(0x99F400, ent);
+						ent->Activate();
 
-							// set flags
-							DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFFBF | 0x4800;
-							*(DWORD *)(ent + 32) = flags;
+						if(ent->IsActive())
+							CCore::Instance().GetLogger().Writeln("Entity active !");
 
-							if (flags & 0x20)
-								CCore::Instance().GetLogger().Writeln("Flags set sucessfully!");
-
-
-							Mem::InvokeFunction<Mem::call_this, void>(0x1192170, ent); // activate
-
-							Vector3 pos;
-							Mem::InvokeFunction<Mem::call_this, void>(((M2Entity*)dwLocalPlayer)->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
-							Mem::InvokeFunction<Mem::call_this, void>(ent->m_pVFTable->SetPosition, ent, &pos);
-						}
-
-
-
-						CCore::Instance().GetLogger().Writeln("Created at %x!", ent);
+						Vector3 pos;
+						Mem::InvokeFunction<Mem::call_this, void>(((M2::C_Entity*)dwLocalPlayer)->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
+						Mem::InvokeFunction<Mem::call_this, void>(ent->m_pVFTable->SetPosition, ent, &pos);
 					}
+
+					CCore::Instance().GetLogger().Writeln("Created at %x!", ent);
 				});
 
 				CommandProcessor::RegisterCommand("time",
@@ -180,13 +156,13 @@ void CGame::OnGameLoop()
 				});
 			}
 
-			M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
+			M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
 			Mem::InvokeFunction<Mem::call_this, void>(entity->m_pVFTable->SetPosition, entity, &Vector3(-1334.6199, 1041.8342, -18.4722));
 
 			CommandProcessor::RegisterCommand("spawn",
 				[=](const std::string& params)->void
 			{
-					M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
+					M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
 				Mem::InvokeFunction<Mem::call_this, void>(entity->m_pVFTable->SetPosition, entity, &Vector3(-1334.6199, 1041.8342, -18.4722));
 			});
 
@@ -203,7 +179,7 @@ void CGame::OnGameLoop()
 			CommandProcessor::RegisterCommand("fpv",
 				[=](const std::string& params)->void
 			{
-				M2Entity *entity = reinterpret_cast<M2Entity*>(dwLocalPlayer);
+				M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
 				if (M2::C_CameraModule::Get()->GetCamera(1)->ModeGetActiveTypeTop() != M2::CAMMODE_FPV)
 					M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, entity, true, true);
 				else

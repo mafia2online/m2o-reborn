@@ -56,6 +56,12 @@
     <ClInclude Include="src\CRenderCamera.hpp">
       <Filter>Game stuff\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\CEntity.hpp">
+      <Filter>Game stuff\Entites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHuman2.hpp">
+      <Filter>Game stuff\Entites</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">

@@ -39,11 +39,11 @@ namespace M2
 		Matrix43			m_matWorld;							// 0008 - 0038
 		Vector3				m_vecCamPos;						// 0038 - 0044
 		Vector3				m_vecCamUp;							// 0044 - 0050
-		pad(ICCamera, pad1, 0xC);		// 0050 - 005C
+		pad(ICCamera, pad1, 0xC);								// 0050 - 005C
 		float				m_fFovAngle;						// 005C - 0060
-		pad(ICCamera, pad2, 0x8C);		// 0060 - 00EC
+		pad(ICCamera, pad2, 0x8C);								// 0060 - 00EC
 		int					m_iUnknown1;						// 00EC - 00F0
-		pad(ICCamera, pad3, 0x34);		// 00F0 - 0124
+		pad(ICCamera, pad3, 0x34);								// 00F0 - 0124
 		int					m_iWindowWidth;						// 0124 - 0128
 		int					m_iWindowHeight;					// 0128 - 012C
 		C_GameCameraMafia	*m_pCamera;							// 012C - 0130

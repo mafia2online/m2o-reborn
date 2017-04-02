@@ -24,10 +24,12 @@
   <ItemGroup>
     <ClInclude Include="src\CCamera.hpp" />
     <ClInclude Include="src\CCameraModule.hpp" />
+    <ClInclude Include="src\CEntity.hpp" />
     <ClInclude Include="src\CGame.hpp" />
     <ClInclude Include="src\CGameCameraMafia.hpp" />
     <ClInclude Include="src\CGameGuiModule.hpp" />
     <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
+    <ClInclude Include="src\CHuman2.hpp" />
     <ClInclude Include="src\CNavigation.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
     <ClInclude Include="src\CRenderCamera.hpp" />
