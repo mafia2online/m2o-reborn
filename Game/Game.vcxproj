@@ -25,15 +25,21 @@
     <ClInclude Include="src\CCamera.hpp" />
     <ClInclude Include="src\CCameraModule.hpp" />
     <ClInclude Include="src\CEntity.hpp" />
+    <ClInclude Include="src\CFrame.hpp" />
     <ClInclude Include="src\CGame.hpp" />
     <ClInclude Include="src\CGameCameraMafia.hpp" />
     <ClInclude Include="src\CGameGuiModule.hpp" />
     <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
     <ClInclude Include="src\CHuman2.hpp" />
+    <ClInclude Include="src\CHumanInventory.hpp" />
+    <ClInclude Include="src\CHumanScript.hpp" />
+    <ClInclude Include="src\CModel.hpp" />
     <ClInclude Include="src\CNavigation.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
+    <ClInclude Include="src\CPlayer2.hpp" />
     <ClInclude Include="src\CRenderCamera.hpp" />
     <ClInclude Include="src\CSDSManager.hpp" />
+    <ClInclude Include="src\CSingleMesh.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CEntityFactory.hpp" />

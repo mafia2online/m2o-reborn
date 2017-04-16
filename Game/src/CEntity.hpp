@@ -7,6 +7,7 @@
 
 #pragma once
 #include "CommonHeaders.h"
+#include "CModel.hpp"
 
 namespace M2
 {
@@ -22,6 +23,11 @@ namespace M2
 		DWORD GetPosition;
 		DWORD GetDirection;
 		DWORD GetRotation;
+		DWORD GetScale;
+		pad(CEntityVFTable, pad1, 0x4);
+		DWORD GetModel;
+		pad(CEntityVFTable, pad2, 0xC);
+		DWORD SetModel;
 	};
 	class ICEntity
 	{
@@ -45,6 +51,16 @@ namespace M2
 		bool IsActive()
 		{
 			return (Mem::InvokeFunction<Mem::call_this, bool>(0x11665A0, this));
+		}
+
+		void SetModel(C_Model *model)
+		{
+			Mem::InvokeFunction<Mem::call_this, void*>(m_pVFTable->SetModel, this, model);
+		}
+
+		void SetPosition(Vector3 pos)
+		{
+			Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetPosition, this, &pos);
 		}
 
 		void Setup()

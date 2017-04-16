@@ -24,8 +24,12 @@
 #include <Libraries\Game\include\CCameraModule.hpp>
 #include <Libraries\Game\include\CCamera.hpp>
 
+#include <Libraries\Game\include\CModel.hpp>
+#include <Libraries\Game\include\CFrame.hpp>
+
 #include <Libraries\Game\include\CEntity.hpp>
 #include <Libraries\Game\include\CHuman2.hpp>
+#include <Libraries\Game\include\CPlayer2.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -61,8 +65,8 @@ void CGame::Patch()
 	// Disable loading screen
 	Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
 
-													  // Disable DLC loadings
-													  //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
+	// Disable DLC loadings
+	//Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
 }
 
 void CGame::OnGameInit()
@@ -74,11 +78,10 @@ void CGame::OnGameInit()
 	M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 }
 
-DWORD dwLocalPlayer = false;
+M2::C_Player2 *dwLocalPlayer = nullptr;
+M2::C_Human2 *ent = nullptr;
 
 float ztime = 0;
-
-M2::C_Human2 *ent = nullptr;
 
 void CGame::OnGameLoop()
 {
@@ -87,7 +90,7 @@ void CGame::OnGameLoop()
 	// testing dont complain bitch
 	if (!dwLocalPlayer)
 	{
-		dwLocalPlayer = M2::C_Game::Get()->GetEntityFromIndex(0);
+		dwLocalPlayer = reinterpret_cast<M2::C_Player2*>(M2::C_Game::Get()->GetEntityFromIndex(0));
 
 		if (dwLocalPlayer)
 		{
@@ -102,7 +105,7 @@ void CGame::OnGameLoop()
 					[](const std::string& params)->void
 				{
 					int lock = atoi(params.c_str());
-					Mem::InvokeFunction<Mem::call_this, void>(0x438230, dwLocalPlayer, lock);
+					dwLocalPlayer->LockControls(lock);
 					CCore::Instance().GetLogger().Writeln("Controls %s!", lock ? ("locked") : ("unlocked"));
 				});
 
@@ -116,14 +119,14 @@ void CGame::OnGameLoop()
 					if (ent)
 					{
 						DWORD coreInstance = *(DWORD*)(0x1AC2778);
-						void *own_model = Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-						Mem::InvokeFunction<Mem::call_this, void>(0x14EC8F0, own_model, dwPlayerModel);
 
-						//14BA350
-						Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, own_model, "lawl");
-						Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, own_model, 2);
+						M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+						own_model->CloneHierarchy(dwPlayerModel);
 
-						Mem::InvokeFunction<Mem::call_this, void*>((*(Address*)(*(DWORD*)ent + 0xB0)), ent, own_model);
+						own_model->SetName("lawl");
+						own_model->MarkForNotify(2);
+
+						ent->SetModel(own_model);
 
 						ent->Setup();
 
@@ -140,8 +143,8 @@ void CGame::OnGameLoop()
 							CCore::Instance().GetLogger().Writeln("Entity active !");
 
 						Vector3 pos;
-						Mem::InvokeFunction<Mem::call_this, void>(((M2::C_Entity*)dwLocalPlayer)->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
-						Mem::InvokeFunction<Mem::call_this, void>(ent->m_pVFTable->SetPosition, ent, &pos);
+						Mem::InvokeFunction<Mem::call_this, void>(dwLocalPlayer->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
+						ent->SetPosition(pos);
 					}
 
 					CCore::Instance().GetLogger().Writeln("Created at %x!", ent);
@@ -150,20 +153,16 @@ void CGame::OnGameLoop()
 				CommandProcessor::RegisterCommand("time",
 					[=](const std::string& params)->void
 				{
-										float time = atof(params.c_str());
+					float time = atof(params.c_str());
 					M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
 					CCore::Instance().GetLogger().Writeln("Set time to %f", time);
 				});
 			}
 
-			M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
-			Mem::InvokeFunction<Mem::call_this, void>(entity->m_pVFTable->SetPosition, entity, &Vector3(-1334.6199, 1041.8342, -18.4722));
-
 			CommandProcessor::RegisterCommand("spawn",
 				[=](const std::string& params)->void
 			{
-					M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
-				Mem::InvokeFunction<Mem::call_this, void>(entity->m_pVFTable->SetPosition, entity, &Vector3(-1334.6199, 1041.8342, -18.4722));
+				Mem::InvokeFunction<Mem::call_this, void>(dwLocalPlayer->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-1334.6199, 1041.8342, -18.4722));
 			});
 
 			CommandProcessor::RegisterCommand("shake", 
@@ -179,9 +178,8 @@ void CGame::OnGameLoop()
 			CommandProcessor::RegisterCommand("fpv",
 				[=](const std::string& params)->void
 			{
-				M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(dwLocalPlayer);
 				if (M2::C_CameraModule::Get()->GetCamera(1)->ModeGetActiveTypeTop() != M2::CAMMODE_FPV)
-					M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, entity, true, true);
+					M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, dwLocalPlayer, true, true);
 				else
 					M2::C_CameraModule::Get()->GetCamera(1)->ModePop(1, 1);
 			});
@@ -203,6 +201,18 @@ void CGame::OnGameLoop()
 			ztime = 1.0f;
 		M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
 		CCore::Instance().GetLogger().Writeln("Time shift!");
+	}
+
+	if (GetAsyncKeyState(VK_F4) & 0x1)
+	{
+		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(1, true);
+		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(2, true);
+	}
+
+	if (GetAsyncKeyState(VK_F5) & 0x1)
+	{
+		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(1, false);
+		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(2, false);
 	}
 }
 

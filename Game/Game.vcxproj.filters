@@ -7,9 +7,6 @@
     <Filter Include="Game stuff">
       <UniqueIdentifier>{f305f5aa-7b96-4e8a-a90e-da9ae56ca0b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game stuff\Entites">
-      <UniqueIdentifier>{d7b4c76a-67ff-418a-88b4-7a100b21802b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game stuff\Misc managers">
       <UniqueIdentifier>{b4363b12-b7f0-49ff-83b0-5c6ce275ff8a}</UniqueIdentifier>
     </Filter>
@@ -18,6 +15,15 @@
     </Filter>
     <Filter Include="Game stuff\GUI">
       <UniqueIdentifier>{ad8d39da-b71b-4ff8-bc29-22b08325cb0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game stuff\Entities">
+      <UniqueIdentifier>{d7b4c76a-67ff-418a-88b4-7a100b21802b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game stuff\EntitiesManagement">
+      <UniqueIdentifier>{c1c937a4-0603-4f40-be7c-74e79c9345ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game stuff\Models">
+      <UniqueIdentifier>{872e7cfd-1286-4b72-8c44-415472e96977}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,10 +63,28 @@
       <Filter>Game stuff\GUI</Filter>
     </ClInclude>
     <ClInclude Include="src\CEntity.hpp">
-      <Filter>Game stuff\Entites</Filter>
+      <Filter>Game stuff\Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\CHuman2.hpp">
-      <Filter>Game stuff\Entites</Filter>
+      <Filter>Game stuff\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CPlayer2.hpp">
+      <Filter>Game stuff\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHumanInventory.hpp">
+      <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CHumanScript.hpp">
+      <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CModel.hpp">
+      <Filter>Game stuff\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CFrame.hpp">
+      <Filter>Game stuff\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CSingleMesh.hpp">
+      <Filter>Game stuff\Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,7 +92,7 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\CEntityFactory.hpp">
-      <Filter>Game stuff\Entites</Filter>
+      <Filter>Game stuff\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
