@@ -86,6 +86,9 @@
     <ClInclude Include="src\CSingleMesh.hpp">
       <Filter>Game stuff\Models</Filter>
     </ClInclude>
+    <ClInclude Include="src\CHumanWeaponController.hpp">
+      <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">

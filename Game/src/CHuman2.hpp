@@ -11,6 +11,7 @@
 #include "CEntity.hpp"
 #include "CHumanInventory.hpp"
 #include "CHumanScript.hpp"
+#include "CHumanWeaponController.hpp"
 
 namespace M2
 {
@@ -20,12 +21,15 @@ namespace M2
 		pad(ICHuman2, pad0, 0xA0);
 		C_HumanInventory	*m_pInventory;
 		C_HumanScript		*m_pScript;
+		pad(ICHuman2, pad1, 0x10);
+		C_HumanWeaponController *m_pWeaponController;
 	};
 
 	class C_Human2 : public ICHuman2
 	{
 	public:
 		C_HumanInventory	*GetInventory() { return reinterpret_cast<ICHuman2 *>(this)->m_pInventory; }
-		C_HumanScript		*GetScript() { return reinterpret_cast<ICHuman2 *>(this)->m_pScript; }
+		C_HumanScript	*GetScript() { return reinterpret_cast<ICHuman2 *>(this)->m_pScript; }
+		C_HumanWeaponController	*GetWeaponController() { return reinterpret_cast<ICHuman2 *>(this)->m_pWeaponController; }
 	};
 };

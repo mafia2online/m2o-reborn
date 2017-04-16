@@ -205,14 +205,7 @@ void CGame::OnGameLoop()
 
 	if (GetAsyncKeyState(VK_F4) & 0x1)
 	{
-		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(1, true);
-		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(2, true);
-	}
-
-	if (GetAsyncKeyState(VK_F5) & 0x1)
-	{
-		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(1, false);
-		M2::C_CameraModule::Get()->GetCamera(1)->EnableBlendMode(2, false);
+		dwLocalPlayer->GetInventory()->AddWeapon(12, 150);
 	}
 }
 
