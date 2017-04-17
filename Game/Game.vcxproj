@@ -38,6 +38,7 @@
     <ClInclude Include="src\CNavigation.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
     <ClInclude Include="src\CPlayer2.hpp" />
+    <ClInclude Include="src\CPlayerModelManager.hpp" />
     <ClInclude Include="src\CRenderCamera.hpp" />
     <ClInclude Include="src\CSDSManager.hpp" />
     <ClInclude Include="src\CSingleMesh.hpp" />

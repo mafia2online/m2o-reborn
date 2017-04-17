@@ -27,6 +27,8 @@
 #include <Libraries\Game\include\CModel.hpp>
 #include <Libraries\Game\include\CFrame.hpp>
 
+#include <Libraries\Game\include\CPlayerModelManager.hpp>
+
 #include <Libraries\Game\include\CEntity.hpp>
 #include <Libraries\Game\include\CHuman2.hpp>
 #include <Libraries\Game\include\CPlayer2.hpp>
@@ -113,15 +115,12 @@ void CGame::OnGameLoop()
 					[](const std::string& params)->void
 				{
 					ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-					DWORD dwPlayerModelMan = *(DWORD*)(0x1ABFE5C);
-					DWORD dwPlayerModel = *(DWORD*)(dwPlayerModelMan + 0x14);
-
 					if (ent)
 					{
 						DWORD coreInstance = *(DWORD*)(0x1AC2778);
 
 						M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-						own_model->CloneHierarchy(dwPlayerModel);
+						own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
 
 						own_model->SetName("lawl");
 						own_model->MarkForNotify(2);
