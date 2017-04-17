@@ -30,6 +30,8 @@
     <ClInclude Include="src\CGameCameraMafia.hpp" />
     <ClInclude Include="src\CGameGuiModule.hpp" />
     <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
+    <ClInclude Include="src\CHud.hpp" />
+    <ClInclude Include="src\CHudScriptW.h" />
     <ClInclude Include="src\CHuman2.hpp" />
     <ClInclude Include="src\CHumanInventory.hpp" />
     <ClInclude Include="src\CHumanScript.hpp" />
@@ -43,6 +45,7 @@
     <ClInclude Include="src\CSDSManager.hpp" />
     <ClInclude Include="src\CSDSModelManager.hpp" />
     <ClInclude Include="src\CSingleMesh.hpp" />
+    <ClInclude Include="src\CTextDatabase.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CEntityFactory.hpp" />
