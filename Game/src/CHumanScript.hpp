@@ -26,6 +26,11 @@ namespace M2
 	class C_HumanScript : public ICHumanScript
 	{
 	public:
+		ePhysState GetPhysState()
+		{
+			return Mem::InvokeFunction<Mem::call_this, ePhysState>(0x091AB80, this);
+		}
+
 		void SetPhysState(ePhysState state)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x093B8A0, this, state);

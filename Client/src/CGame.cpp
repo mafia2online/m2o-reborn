@@ -18,8 +18,8 @@
 #include <Libraries\Game\include\CGfxEnvironmentEffects.hpp>
 #include <Libraries\Game\include\CEntityFactory.hpp>
 
-#include <Libraries\Game\include\CGameGuiModule.hpp>
 #include <Libraries\Game\include\CGame.hpp>
+#include <Libraries\Game\include\CGameGuiModule.hpp>
 #include <Libraries\Game\include\CSDSManager.hpp>
 #include <Libraries\Game\include\CCameraModule.hpp>
 #include <Libraries\Game\include\CCamera.hpp>
@@ -90,7 +90,7 @@ void CGame::OnGameLoop()
 	// testing dont complain bitch
 	if (!dwLocalPlayer)
 	{
-		dwLocalPlayer = reinterpret_cast<M2::C_Player2*>(M2::C_Game::Get()->GetEntityFromIndex(0));
+		dwLocalPlayer = reinterpret_cast<M2::C_Player2*>(M2::C_Game::Get()->GetLocalPed());
 
 		if (dwLocalPlayer)
 		{
@@ -203,9 +203,14 @@ void CGame::OnGameLoop()
 		CCore::Instance().GetLogger().Writeln("Time shift!");
 	}
 
-	if (GetAsyncKeyState(VK_F4) & 0x1)
+	if (GetAsyncKeyState(VK_F5) & 0x1)
 	{
 		dwLocalPlayer->GetInventory()->AddWeapon(12, 150);
+	}
+
+	if (GetAsyncKeyState(VK_F6) & 0x1)
+	{
+		ent->GetInventory()->AddWeapon(12, 150);
 	}
 }
 
