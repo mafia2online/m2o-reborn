@@ -8,13 +8,15 @@
 #pragma once
 #include "CommonHeaders.h"
 
+#include "CModel.hpp"
+
 namespace M2
 {
 	class ICPlayerModelManager
 	{
 	public:
 		pad(ICPlayerModelManager, pad0, 0x14);
-		DWORD localPlayerModel;
+		C_Model *localPlayerModel;
 	};
 
 

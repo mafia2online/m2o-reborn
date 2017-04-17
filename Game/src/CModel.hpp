@@ -24,7 +24,7 @@ namespace M2
 	class C_Model : public ICModel
 	{
 	public:
-		void CloneHierarchy(DWORD model)
+		void CloneHierarchy(C_Model *model)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x14EC8F0, this, model);
 		}
