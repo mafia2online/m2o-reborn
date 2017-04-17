@@ -41,6 +41,7 @@
     <ClInclude Include="src\CPlayerModelManager.hpp" />
     <ClInclude Include="src\CRenderCamera.hpp" />
     <ClInclude Include="src\CSDSManager.hpp" />
+    <ClInclude Include="src\CSDSModelManager.hpp" />
     <ClInclude Include="src\CSingleMesh.hpp" />
   </ItemGroup>
   <ItemGroup>

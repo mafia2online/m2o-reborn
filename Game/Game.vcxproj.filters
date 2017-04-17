@@ -92,6 +92,9 @@
     <ClInclude Include="src\CPlayerModelManager.hpp">
       <Filter>Game stuff\Models</Filter>
     </ClInclude>
+    <ClInclude Include="src\CSDSModelManager.hpp">
+      <Filter>Game stuff\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
