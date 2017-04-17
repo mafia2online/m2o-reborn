@@ -46,6 +46,7 @@
     <ClInclude Include="src\CSDSModelManager.hpp" />
     <ClInclude Include="src\CSingleMesh.hpp" />
     <ClInclude Include="src\CTextDatabase.hpp" />
+    <ClInclude Include="src\CTimer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CEntityFactory.hpp" />

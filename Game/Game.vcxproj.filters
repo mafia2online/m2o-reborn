@@ -104,6 +104,9 @@
     <ClInclude Include="src\CHudScriptW.h">
       <Filter>Game stuff\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\CTimer.hpp">
+      <Filter>Game stuff\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
