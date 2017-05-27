@@ -107,6 +107,12 @@
     <ClInclude Include="src\CTimer.hpp">
       <Filter>Game stuff\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\CCar.hpp">
+      <Filter>Game stuff\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CVehicle.hpp">
+      <Filter>Game stuff\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">

@@ -24,6 +24,7 @@
   <ItemGroup>
     <ClInclude Include="src\CCamera.hpp" />
     <ClInclude Include="src\CCameraModule.hpp" />
+    <ClInclude Include="src\CCar.hpp" />
     <ClInclude Include="src\CEntity.hpp" />
     <ClInclude Include="src\CFrame.hpp" />
     <ClInclude Include="src\CGame.hpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="src\CSingleMesh.hpp" />
     <ClInclude Include="src\CTextDatabase.hpp" />
     <ClInclude Include="src\CTimer.hpp" />
+    <ClInclude Include="src\CVehicle.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CEntityFactory.hpp" />

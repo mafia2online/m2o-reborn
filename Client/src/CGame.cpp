@@ -32,6 +32,7 @@
 #include <Libraries\Game\include\CEntity.hpp>
 #include <Libraries\Game\include\CHuman2.hpp>
 #include <Libraries\Game\include\CPlayer2.hpp>
+#include <Libraries\Game\include\CCar.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -81,7 +82,7 @@ void CGame::OnGameInit()
 }
 
 M2::C_Player2 *dwLocalPlayer = nullptr;
-M2::C_Human2 *ent = nullptr;
+M2::C_Entity *ent = nullptr;
 
 float ztime = 0;
 
@@ -114,7 +115,7 @@ void CGame::OnGameLoop()
 				CommandProcessor::RegisterCommand("ent",
 					[](const std::string& params)->void
 				{
-					ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
+					ent = reinterpret_cast<M2::C_Entity *>(M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human));
 					if (ent)
 					{
 						DWORD coreInstance = *(DWORD*)(0x1AC2778);
@@ -142,7 +143,7 @@ void CGame::OnGameLoop()
 							CCore::Instance().GetLogger().Writeln("Entity active !");
 
 						Vector3 pos;
-						Mem::InvokeFunction<Mem::call_this, void>(dwLocalPlayer->m_pVFTable->GetPosition, dwLocalPlayer, &pos);
+						Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
 						ent->SetPosition(pos);
 					}
 
@@ -161,7 +162,7 @@ void CGame::OnGameLoop()
 			CommandProcessor::RegisterCommand("spawn",
 				[=](const std::string& params)->void
 			{
-				Mem::InvokeFunction<Mem::call_this, void>(dwLocalPlayer->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-1334.6199, 1041.8342, -18.4722));
+				Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-421.758942, 479.316925, 0.051288));
 			});
 
 			CommandProcessor::RegisterCommand("shake", 
@@ -190,7 +191,7 @@ void CGame::OnGameLoop()
 		ztime -= 0.1f;
 		if (ztime < 0)
 			ztime = 0;
-		M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
+		M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime); 
 		CCore::Instance().GetLogger().Writeln("Time shift!");
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 0x1)
@@ -202,14 +203,24 @@ void CGame::OnGameLoop()
 		CCore::Instance().GetLogger().Writeln("Time shift!");
 	}
 
-	if (GetAsyncKeyState(VK_F5) & 0x1)
+	if (GetAsyncKeyState(VK_F2) & 0x1)
 	{
-		dwLocalPlayer->GetInventory()->AddWeapon(12, 150);
+		dwLocalPlayer->m_pCurrentCar->OpenHood();
 	}
 
-	if (GetAsyncKeyState(VK_F6) & 0x1)
+	if (GetAsyncKeyState(VK_F3) & 0x1)
 	{
-		ent->GetInventory()->AddWeapon(12, 150);
+		dwLocalPlayer->m_pCurrentCar->CloseHood();
+	}
+
+	if (GetAsyncKeyState(VK_F4) & 0x1)
+	{
+		dwLocalPlayer->m_pCurrentCar->OpenTrunk();
+	}
+
+	if (GetAsyncKeyState(VK_F5) & 0x1)
+	{
+		dwLocalPlayer->m_pCurrentCar->CloseTrunk();
 	}
 }
 

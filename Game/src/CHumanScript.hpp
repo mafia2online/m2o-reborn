@@ -35,5 +35,10 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x093B8A0, this, state);
 		}
+
+		void ShowHat(bool show)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x091DCC0, this, show);
+		}
 	};
 };

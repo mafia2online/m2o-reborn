@@ -12,17 +12,20 @@
 #include "CHumanInventory.hpp"
 #include "CHumanScript.hpp"
 #include "CHumanWeaponController.hpp"
+#include "CCar.hpp"
 
 namespace M2
 {
-	class ICHuman2 : public C_Entity
+	class ICHuman2
 	{
 	public:
-		pad(ICHuman2, pad0, 0xA0);
-		C_HumanInventory	*m_pInventory;
-		C_HumanScript		*m_pScript;
-		pad(ICHuman2, pad1, 0x10);
-		C_HumanWeaponController *m_pWeaponController;
+		pad(ICHuman2, pad0, 0x64);						//0000 - 0064
+		C_Car				*m_pCurrentCar;				//0064 - 0068
+		pad(ICHuman2, pad1, 0x38);
+		C_HumanInventory	*m_pInventory;				//00A0 - 00A4
+		C_HumanScript		*m_pScript;					//00A4 - 00A8
+		pad(ICHuman2, pad2, 0x8);						//00A8 - 00B0
+		C_HumanWeaponController *m_pWeaponController;	//00B0 - 00B4
 	};
 
 	class C_Human2 : public ICHuman2
