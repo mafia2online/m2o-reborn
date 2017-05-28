@@ -26,6 +26,8 @@
     <ClInclude Include="src\CCameraModule.hpp" />
     <ClInclude Include="src\CCar.hpp" />
     <ClInclude Include="src\CEntity.hpp" />
+    <ClInclude Include="src\CEntityMessage.hpp" />
+    <ClInclude Include="src\CEntityMessageDamage.hpp" />
     <ClInclude Include="src\CFrame.hpp" />
     <ClInclude Include="src\CGame.hpp" />
     <ClInclude Include="src\CGameCameraMafia.hpp" />

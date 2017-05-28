@@ -82,7 +82,7 @@ void CGame::OnGameInit()
 }
 
 M2::C_Player2 *dwLocalPlayer = nullptr;
-M2::C_Entity *ent = nullptr;
+M2::C_Human2 *ent = nullptr;
 
 float ztime = 0;
 
@@ -115,7 +115,7 @@ void CGame::OnGameLoop()
 				CommandProcessor::RegisterCommand("ent",
 					[](const std::string& params)->void
 				{
-					ent = reinterpret_cast<M2::C_Entity *>(M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human));
+					ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
 					if (ent)
 					{
 						DWORD coreInstance = *(DWORD*)(0x1AC2778);
@@ -126,9 +126,9 @@ void CGame::OnGameLoop()
 						own_model->SetName("lawl");
 						own_model->MarkForNotify(2);
 
-						ent->SetModel(own_model);
+						reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
 
-						ent->Setup();
+						reinterpret_cast<M2::C_Entity *>(ent)->Setup();
 
 						// set flagsF
 						DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
@@ -137,14 +137,14 @@ void CGame::OnGameLoop()
 						if (flags & 0x20)
 							CCore::Instance().GetLogger().Writeln("Flags set sucessfully!");
 
-						ent->Activate();
+						reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
-						if(ent->IsActive())
+						if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
 							CCore::Instance().GetLogger().Writeln("Entity active !");
 
 						Vector3 pos;
 						Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
-						ent->SetPosition(pos);
+						reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
 					}
 
 					CCore::Instance().GetLogger().Writeln("Created at %x!", ent);

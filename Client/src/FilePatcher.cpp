@@ -11,9 +11,9 @@
 #include <FilePatcher.h>
 
 SString szPatchFiles[] = {
-	/*"sdsconfig.bin",
+	"sdsconfig.bin",
 	"StreamMapa.bin",
-	"tables.sds",*/
+	"tables.sds",
 	"gui.sds",
 	"gui-main.sds"
 };

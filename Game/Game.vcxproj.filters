@@ -116,6 +116,12 @@
     <ClInclude Include="src\CSyncObject.hpp">
       <Filter>Game stuff\Misc managers</Filter>
     </ClInclude>
+    <ClInclude Include="src\CEntityMessage.hpp">
+      <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CEntityMessageDamage.hpp">
+      <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
