@@ -8,6 +8,7 @@
 #pragma once
 #include "CommonHeaders.h"
 #include "CEntity.hpp"
+#include "CSyncObject.hpp"
 
 namespace M2
 {
@@ -104,6 +105,26 @@ namespace M2
 		C_Entity *RegisterFollower(C_Entity *ent)
 		{
 			return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0x08F7B40, this, ent);
+		}
+
+		void ScriptAnimEffectStop()
+		{
+			Mem::InvokeFunction<Mem::call_this, unsigned int>(0x0D6D0D0, this);
+		}
+
+		void ScriptAnimPlay(C_SyncObject **syncObject, const char *const animName, const bool repeat, int unk, int unk2, float unk3, float unk4, float unk5)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0994630, this, syncObject, animName, repeat, unk, unk2, unk3, unk4, unk5);
+		}
+
+		void ScriptAnimPlayEffect(C_SyncObject **syncObject, const char *const effectName, const bool repeat, int unk)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0962AD0, this, syncObject, effectName, repeat, unk);
+		}
+
+		void ScriptAnimStop()
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D040, this);
 		}
 
 		void SetAnimDeathTag(char const *tag)

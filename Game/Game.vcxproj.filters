@@ -113,6 +113,9 @@
     <ClInclude Include="src\CVehicle.hpp">
       <Filter>Game stuff\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\CSyncObject.hpp">
+      <Filter>Game stuff\Misc managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
