@@ -25,6 +25,9 @@
     <Filter Include="Game stuff\Models">
       <UniqueIdentifier>{872e7cfd-1286-4b72-8c44-415472e96977}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game stuff\Sound">
+      <UniqueIdentifier>{52273226-2f06-45e0-b3ff-7331e0e9a1d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\class_hierarchy.txt">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="src\CEntityMessageDamage.hpp">
       <Filter>Game stuff\EntitiesManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CPlayerRadio.hpp">
+      <Filter>Game stuff\Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -82,6 +82,31 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, ePhysState>(0x091AB80, this);
 		}
 
+		void InventoryArmed(bool armed)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x09954A0, this, armed);
+		}
+
+		void InventoryDrop()
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D490, this);
+		}
+
+		void InventoryHolster(bool holster)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x0995560, this, holster);
+		}
+
+		void InventorySelect(int weapon, bool animation, bool unk)
+		{
+			Mem::InvokeFunction<Mem::call_this, int>(0x09953A0, this, weapon, animation, unk);
+		}
+
+		void InventorySetUnlimitedAmmo(bool set)
+		{
+			Mem::InvokeFunction<Mem::call_this, bool>(0x0924080, this, set);
+		}
+
 		bool IsCoverCrouch()
 		{
 			return Mem::InvokeFunction<Mem::call_this, bool>(0x091E190, this);
