@@ -128,6 +128,9 @@
     <ClInclude Include="src\CPlayerRadio.hpp">
       <Filter>Game stuff\Sound</Filter>
     </ClInclude>
+    <ClInclude Include="src\CSpeedometer.hpp">
+      <Filter>Game stuff\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">
