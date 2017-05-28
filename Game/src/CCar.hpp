@@ -13,8 +13,9 @@ namespace M2
 {
 	class ICCar
 	{
+	public:
 		pad(ICCar, pad0, 0xA8);
-		C_Vehicle		*m_pVehicle;
+		C_Vehicle		m_pVehicle;
 	};
 
 	class C_Car : public ICCar
