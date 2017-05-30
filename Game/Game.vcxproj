@@ -39,6 +39,7 @@
     <ClInclude Include="src\CHumanInventory.hpp" />
     <ClInclude Include="src\CHumanScript.hpp" />
     <ClInclude Include="src\CHumanWeaponController.hpp" />
+    <ClInclude Include="src\CMafiaFramework.hpp" />
     <ClInclude Include="src\CModel.hpp" />
     <ClInclude Include="src\CNavigation.hpp" />
     <ClInclude Include="src\CommonHeaders.h" />
