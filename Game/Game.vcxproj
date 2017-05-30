@@ -32,6 +32,7 @@
     <ClInclude Include="src\CGame.hpp" />
     <ClInclude Include="src\CGameCameraMafia.hpp" />
     <ClInclude Include="src\CGameGuiModule.hpp" />
+    <ClInclude Include="src\CGameRenderingSystemModule.hpp" />
     <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
     <ClInclude Include="src\CHud.hpp" />
     <ClInclude Include="src\CHudScriptW.h" />

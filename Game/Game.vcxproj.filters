@@ -28,6 +28,9 @@
     <Filter Include="Game stuff\Sound">
       <UniqueIdentifier>{52273226-2f06-45e0-b3ff-7331e0e9a1d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game stuff\Graphics">
+      <UniqueIdentifier>{3b321700-1983-4f9a-95e8-141eb1659368}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\class_hierarchy.txt">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="src\CMafiaFramework.hpp">
       <Filter>Game stuff\Misc managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CGameRenderingSystemModule.hpp">
+      <Filter>Game stuff\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
