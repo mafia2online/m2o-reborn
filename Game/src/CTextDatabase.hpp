@@ -22,5 +22,16 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x11EE4C0, this);
 		}
+
+		//Not fully working
+		char *GetString(char *number)
+		{
+			unsigned __int32 ulText = strtoul(number, 0, 10);
+			char *retn;
+
+			Mem::InvokeFunction<Mem::call_this, int>(0x11EF920, this, &retn, ulText);
+
+			return retn;
+		}
 	};
 };

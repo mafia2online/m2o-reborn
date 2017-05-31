@@ -34,6 +34,7 @@
     <ClInclude Include="src\CGameGuiModule.hpp" />
     <ClInclude Include="src\CGameRenderingSystemModule.hpp" />
     <ClInclude Include="src\CGfxEnvironmentEffects.hpp" />
+    <ClInclude Include="src\CHints.hpp" />
     <ClInclude Include="src\CHud.hpp" />
     <ClInclude Include="src\CHudScriptW.h" />
     <ClInclude Include="src\CHuman2.hpp" />
