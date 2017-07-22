@@ -26,6 +26,8 @@ bool CNetworkManager::Init()
 		return false;
 	}
 
+	m_PlayerManager = new CPlayerManager();
+
 	return true;
 }
 
@@ -37,12 +39,11 @@ void CNetworkManager::Pulse()
 	{
 		switch (event.type)
 		{
-		case ENET_EVENT_TYPE_CONNECT:
-			printf("A new client connected from %x:%u.\n",
-				event.peer->address.host,
-				event.peer->address.port);
-			/* Store any relevant client information here. */
-			event.peer->data = "Client information";
+			case ENET_EVENT_TYPE_CONNECT:
+			{
+				event.peer->data = "Client information";
+				m_PlayerManager->CreateEntity(0, event.peer);//TODO: Auto allocate networkID
+			}
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
 			printf("A packet of length %u containing %s was received from %s on channel %u.\n",
@@ -56,8 +57,7 @@ void CNetworkManager::Pulse()
 			break;
 
 		case ENET_EVENT_TYPE_DISCONNECT:
-			printf("%s disconnected.\n", event.peer->data);
-			/* Reset the peer's client information. */
+			m_PlayerManager->DeleteEntity(0);//TODO: Auto allocate networkID
 			event.peer->data = NULL;
 		}
 	}

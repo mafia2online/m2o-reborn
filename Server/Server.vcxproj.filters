@@ -25,6 +25,18 @@
     <Filter Include="Fichiers d%27en-tête\Network">
       <UniqueIdentifier>{2037e9d5-c82c-43ee-a60b-d627855d5642}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Network\Entities">
+      <UniqueIdentifier>{46cba33f-1880-433a-85be-2b0f95421e4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Network\Entities">
+      <UniqueIdentifier>{e2e38682-cace-40ce-945b-b9d1bad7b207}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Network\Managers">
+      <UniqueIdentifier>{4e3fed8b-1a1a-4c7d-bb76-2b5c6f5dbb3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Network\Managers">
+      <UniqueIdentifier>{f80c567e-bc85-4619-8cc1-8205e2933dbe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -38,6 +50,18 @@
     </ClCompile>
     <ClCompile Include="src\CNetworkManager.cpp">
       <Filter>Fichiers sources\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Network\CNetworkPlayer.cpp">
+      <Filter>Fichiers sources\Network\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPlayerManager.cpp">
+      <Filter>Fichiers sources\Network\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Network\CNetworkEntity.cpp">
+      <Filter>Fichiers sources\Network\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Network\CEntityManager.cpp">
+      <Filter>Fichiers sources\Network\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +91,18 @@
     </ClInclude>
     <ClInclude Include="src\CNetworkManager.h">
       <Filter>Fichiers d%27en-tête\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Network\CNetworkPlayer.h">
+      <Filter>Fichiers d%27en-tête\Network\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CPlayerManager.h">
+      <Filter>Fichiers d%27en-tête\Network\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Network\CNetworkEntity.h">
+      <Filter>Fichiers d%27en-tête\Network\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Network\CEntityManager.h">
+      <Filter>Fichiers d%27en-tête\Network\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -126,8 +126,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\FileLogger.cpp" />
+    <ClCompile Include="..\Shared\Network\CEntityManager.cpp" />
+    <ClCompile Include="..\Shared\Network\CNetworkEntity.cpp" />
+    <ClCompile Include="..\Shared\Network\CNetworkPlayer.cpp" />
     <ClCompile Include="src\CCore.cpp" />
     <ClCompile Include="src\CNetworkManager.cpp" />
+    <ClCompile Include="src\CPlayerManager.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -136,10 +140,14 @@
     <ClInclude Include="..\Shared\Constants.h" />
     <ClInclude Include="..\Shared\CSignelton.h" />
     <ClInclude Include="..\Shared\FileLogger.h" />
+    <ClInclude Include="..\Shared\Network\CEntityManager.h" />
+    <ClInclude Include="..\Shared\Network\CNetworkEntity.h" />
+    <ClInclude Include="..\Shared\Network\CNetworkPlayer.h" />
     <ClInclude Include="..\Shared\String.hpp" />
     <ClInclude Include="..\Shared\Types.h" />
     <ClInclude Include="src\CCore.h" />
     <ClInclude Include="src\CNetworkManager.h" />
+    <ClInclude Include="src\CPlayerManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
