@@ -85,6 +85,8 @@ void CGame::OnGameInit()
 {
 	CCore::Instance().GetLogger().Writeln("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
 
+	CNetworkManager::Instance().Init();
+
 	GameHooks::InstallLate();
 
 	M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
@@ -97,7 +99,7 @@ float ztime = 0;
 
 void CGame::OnGameLoop()
 {
-	//CCore::Instance().GetLogger().Writeln("GameLooopy \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
+	CNetworkManager::Instance().Pulse();
 
 	// testing dont complain bitch
 	if (!dwLocalPlayer)
@@ -233,7 +235,6 @@ void CGame::OnGameLoop()
 	}
 	if (GetAsyncKeyState(VK_F5) & 0x1)
 	{
-		CNetworkManager::Instance().Init();
 		if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
 			CCore::Instance().GetLogger().Writeln("Connection accepted");
 		}

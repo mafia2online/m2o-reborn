@@ -52,3 +52,21 @@ bool CNetworkManager::Disconnect()
 	enet_peer_disconnect(m_peer, 0);
 	return true;
 }
+
+void CNetworkManager::Pulse()
+{
+	ENetEvent event;
+
+	if (m_client == NULL) {
+		return;
+	}
+
+	if (m_peer == NULL) {
+		return;
+	}
+
+	while (enet_host_service(m_client, &event, 0) > 0)
+	{
+		//Do stuff here
+	}
+}

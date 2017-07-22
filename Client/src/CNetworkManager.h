@@ -13,6 +13,7 @@ public:
 	bool Init();
 	bool Connect(SString host, int port, SString password);
 	bool Disconnect();
+	void Pulse();
 
 private:
 	ENetHost	*m_client;
