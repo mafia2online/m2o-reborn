@@ -143,6 +143,9 @@
     <ClInclude Include="src\CHints.hpp">
       <Filter>Game stuff\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="src\CShotManager.hpp">
+      <Filter>Game stuff\Misc managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\forcebuild.cpp">

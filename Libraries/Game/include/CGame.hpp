@@ -1,5 +1,6 @@
 #pragma once
 #include "CommonHeaders.h"
+#include "CPlayer2.hpp"
 
 namespace M2
 {
@@ -37,11 +38,20 @@ namespace M2
 	{
 	public:
 		VCGame *m_pVFTable;
+		DWORD m_dwFlags;
+		DWORD m_dwRuntime;
+		pad(ICGame, pad0, 0x24);
+		void *unkClass;
+		pad(ICGame, pad1, 0xE4);
+		C_Player2 *m_pLocalPed;
+
 	};
 
 	class C_Game : public GameClassWrapper<C_Game, ICGame, 0x1ABFE14>
 	{
 	public:
+		C_Player2	*GetLocalPed() { return reinterpret_cast<ICGame *>(GetInterface())->m_pLocalPed; }
+
 		__forceinline DWORD GetEntityFromIndex(int index)
 		{
 			return VTBLCall(DWORD, GetEntityFromIndex, index);

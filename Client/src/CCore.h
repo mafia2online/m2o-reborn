@@ -4,6 +4,7 @@
 #include <Shared\FileLogger.h>
 #include <CGraphicsManager.h>
 #include <CMPStateManager.h>
+#include <CNetworkManager.h>
 
 class CCore : public Singleton<CCore>
 {
@@ -27,6 +28,7 @@ private:
 	SString m_strfilesdir;
 	CGraphicsManager m_graphicsmanager;
 	CMPStateManager m_statemanager;
+	CNetworkManager m_networkManager;
 
 	IO::CFileLogger m_debuglog;
 };

@@ -41,6 +41,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{97a4f0ec-3705-463a-a4c5-a79075a7f988}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Network">
+      <UniqueIdentifier>{7ecb0f3b-b1c5-48e9-af3f-d02852b95a30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\Client\CPatcher.cpp">
@@ -108,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="src\CDebugConsole.cpp">
       <Filter>Source Files\Graphics\GWen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CNetworkManager.cpp">
+      <Filter>Source Files\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="src\CDebugConsole.h">
       <Filter>Source Files\Graphics\GWen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNetworkManager.h">
+      <Filter>Source Files\Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -62,11 +62,13 @@ void CCore::OnAttach(HMODULE module)
 	if (ExceptionHandler::Install() == false)
 		ExitGame("Unable to install exception handler");
 
+
 	CDirectInput8Hook::Install();
 
 
 	m_statemanager.AddState(States::Menu, new CTitleState);
-	m_statemanager.ActivateState(States::Menu); // GO IN THE TITLE STATE! IMMEDIATEALY!
+	m_statemanager.AddState(States::MPGame, new CGameState);
+	m_statemanager.ActivateState(States::Menu);
 }
 
 void CCore::ExitGame(SString strreason)

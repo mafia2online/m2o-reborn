@@ -8,7 +8,7 @@
 #pragma once
 #include "CommonHeaders.h"
 
-#include "CGameCameraMafia.hpp"
+#include "CCamera.hpp"
 
 namespace M2
 {
@@ -16,16 +16,16 @@ namespace M2
 	{
 	public:
 		void *m_pVFTable;
-		C_GameCameraMafia *pCamera1;
-		C_GameCameraMafia *pCamera2;
+		C_Camera *pCamera1;
+		C_Camera *pCamera2;
 	};
 
 	class C_CameraModule : public GameClassWrapper<C_CameraModule, ICCameraModuleModule, 0x1ABCAAC>
 	{
 	public:
-		C_GameCameraMafia * GetCamera(int index)
+		C_Camera * GetCamera(int index)
 		{
-			return (Mem::InvokeFunction<Mem::call_this, C_GameCameraMafia *>(0x10822C0, this, index));
+			return (Mem::InvokeFunction<Mem::call_this, C_Camera *>(0x10822C0, this, index));
 		}
 	};
 };

@@ -13,6 +13,8 @@
 #include <GameHooks.h>
 #include "CGame.h"
 
+#include <CNetworkManager.h>
+
 #include <Shared\Math\Math.hpp>
 
 #include <Libraries\Game\include\CGfxEnvironmentEffects.hpp>
@@ -33,6 +35,13 @@
 #include <Libraries\Game\include\CHuman2.hpp>
 #include <Libraries\Game\include\CPlayer2.hpp>
 #include <Libraries\Game\include\CCar.hpp>
+
+#include <Libraries\Game\include\CHud.hpp>
+#include <Libraries\Game\include\CHints.hpp>
+#include <Libraries\Game\include\CTextDatabase.hpp>
+#include <Libraries\Game\include\CSyncObject.hpp>
+
+#include <Libraries\Game\include\CShotManager.hpp>
 
 #include <CGraphicsManager.h>
 
@@ -202,25 +211,42 @@ void CGame::OnGameLoop()
 		M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
 		CCore::Instance().GetLogger().Writeln("Time shift!");
 	}
-
 	if (GetAsyncKeyState(VK_F2) & 0x1)
 	{
-		dwLocalPlayer->m_pCurrentCar->OpenHood();
+		M2::C_SyncObject *pSyncObject = nullptr;
+		ent->GetScript()->LockControls(true, true);
+		ent->GetScript()->ScriptAnimPlay(&pSyncObject, "TAXI_CALL-A", true, 0, 0, 0.0f, 0.30000001f, 0.3000000f);
 	}
 
 	if (GetAsyncKeyState(VK_F3) & 0x1)
 	{
-		dwLocalPlayer->m_pCurrentCar->CloseHood();
+		M2::C_SyncObject *pSyncObject = nullptr;
+		ent->GetScript()->LockControls(true, true);
+		ent->GetScript()->ScriptAnimPlay(&pSyncObject, "TAXI_CALL-B", true, 0, 0, 0.0f, 0.30000001f, 0.3000000f);
 	}
 
 	if (GetAsyncKeyState(VK_F4) & 0x1)
 	{
-		dwLocalPlayer->m_pCurrentCar->OpenTrunk();
+		M2::S_ExplosionInit *fire = new M2::S_ExplosionInit;
+		M2::C_ShotManager::Get()->CreateExplosion(fire);
+		CCore::Instance().GetLogger().Writeln("Created fire!");
 	}
-
 	if (GetAsyncKeyState(VK_F5) & 0x1)
 	{
-		dwLocalPlayer->m_pCurrentCar->CloseTrunk();
+		CNetworkManager::Instance().Init();
+		if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
+			CCore::Instance().GetLogger().Writeln("Connection accepted");
+		}
+		else {
+			CCore::Instance().GetLogger().Writeln("Cannot connect");
+		}
+	}
+	if (GetAsyncKeyState(VK_F6) & 0x1)
+	{
+		if (CNetworkManager::Instance().Disconnect())
+			CCore::Instance().GetLogger().Writeln("Disconnected");
+		else
+			CCore::Instance().GetLogger().Writeln("Cannot disconnect");
 	}
 }
 

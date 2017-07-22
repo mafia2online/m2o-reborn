@@ -1,6 +1,5 @@
 #pragma once
 #define _SCL_SECURE_NO_WARNINGS // fak you i do what i want i am old enough
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <iostream>
 #include <Shared/Types.h>

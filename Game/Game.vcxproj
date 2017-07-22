@@ -51,6 +51,7 @@
     <ClInclude Include="src\CRenderCamera.hpp" />
     <ClInclude Include="src\CSDSManager.hpp" />
     <ClInclude Include="src\CSDSModelManager.hpp" />
+    <ClInclude Include="src\CShotManager.hpp" />
     <ClInclude Include="src\CSingleMesh.hpp" />
     <ClInclude Include="src\CSpeedometer.hpp" />
     <ClInclude Include="src\CSyncObject.hpp" />

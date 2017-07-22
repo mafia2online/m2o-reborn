@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Shared">
+      <UniqueIdentifier>{57a499a2-3634-4d4b-8457-99db2fda5da3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Shared\IO">
+      <UniqueIdentifier>{f41c76c5-ff8c-4b51-a689-3e0c0a7c7ae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Network">
+      <UniqueIdentifier>{1b8de5e1-d860-43b6-8023-d760651b9607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Network">
+      <UniqueIdentifier>{2037e9d5-c82c-43ee-a60b-d627855d5642}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CCore.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\FileLogger.cpp">
+      <Filter>Fichiers d%27en-tête\Shared\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CNetworkManager.cpp">
+      <Filter>Fichiers sources\Network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CCore.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\BuildVersion.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Common.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Constants.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\CSignelton.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\String.hpp">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Types.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\FileLogger.h">
+      <Filter>Fichiers d%27en-tête\Shared\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CNetworkManager.h">
+      <Filter>Fichiers d%27en-tête\Network</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

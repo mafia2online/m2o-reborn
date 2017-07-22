@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Shared\Common.h>
+
 class CGame : public Singleton<CGame>
 {
 public:
