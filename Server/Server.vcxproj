@@ -125,6 +125,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Libraries\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="..\Shared\AConfiguration.cpp" />
     <ClCompile Include="..\Shared\FileLogger.cpp" />
     <ClCompile Include="..\Shared\Network\CEntityManager.cpp" />
     <ClCompile Include="..\Shared\Network\CNetworkEntity.cpp" />
@@ -132,9 +134,12 @@
     <ClCompile Include="src\CCore.cpp" />
     <ClCompile Include="src\CNetworkManager.cpp" />
     <ClCompile Include="src\CPlayerManager.cpp" />
+    <ClCompile Include="src\CServerSettings.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Libraries\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="..\Shared\AConfiguration.h" />
     <ClInclude Include="..\Shared\BuildVersion.h" />
     <ClInclude Include="..\Shared\Common.h" />
     <ClInclude Include="..\Shared\Constants.h" />
@@ -148,6 +153,7 @@
     <ClInclude Include="src\CCore.h" />
     <ClInclude Include="src\CNetworkManager.h" />
     <ClInclude Include="src\CPlayerManager.h" />
+    <ClInclude Include="src\CServerSettings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

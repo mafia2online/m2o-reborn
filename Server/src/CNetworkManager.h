@@ -6,13 +6,15 @@
 
 #include <enet\enet.h>
 
+#include <string>
+
 class CNetworkManager : public Singleton<CNetworkManager>
 {
 public:
 	CNetworkManager();
 	~CNetworkManager();
 
-	bool Init();
+	bool Init(std::string& address, int port);
 	void Pulse();
 
 private:

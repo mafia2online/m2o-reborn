@@ -16,10 +16,12 @@ CNetworkManager::~CNetworkManager()
 	enet_deinitialize();
 }
 
-bool CNetworkManager::Init()
+bool CNetworkManager::Init(std::string& address, int port)
 {
 	m_address.host = ENET_HOST_ANY;
-	m_address.port = 1234;
+	m_address.port = port;
+
+	enet_address_set_host(&m_address, address.c_str());
 
 	m_host = enet_host_create(&m_address, 32, 2, 0, 0);
 	if (m_host == NULL) {

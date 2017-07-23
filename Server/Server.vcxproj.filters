@@ -37,6 +37,9 @@
     <Filter Include="Fichiers sources\Network\Managers">
       <UniqueIdentifier>{f80c567e-bc85-4619-8cc1-8205e2933dbe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Shared">
+      <UniqueIdentifier>{682c1a30-dea1-406e-a884-55408e03fba9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -62,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="..\Shared\Network\CEntityManager.cpp">
       <Filter>Fichiers sources\Network\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\tinyxml2\tinyxml2.cpp">
+      <Filter>Fichiers sources\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\AConfiguration.cpp">
+      <Filter>Fichiers sources\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CServerSettings.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +115,15 @@
     </ClInclude>
     <ClInclude Include="..\Shared\Network\CEntityManager.h">
       <Filter>Fichiers d%27en-tête\Network\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libraries\tinyxml2\tinyxml2.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\AConfiguration.h">
+      <Filter>Fichiers d%27en-tête\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CServerSettings.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
