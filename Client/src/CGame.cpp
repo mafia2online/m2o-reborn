@@ -85,8 +85,6 @@ void CGame::OnGameInit()
 {
 	CCore::Instance().GetLogger().Writeln("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
 
-	CNetworkManager::Instance().Init();
-
 	GameHooks::InstallLate();
 
 	M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.

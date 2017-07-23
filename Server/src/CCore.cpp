@@ -20,8 +20,6 @@ bool CCore::Init()
 		return false;
 	}
 
-	m_debuglog.Writeln("Bite");
-
 	printf("Server Name = %s\n", m_serverSettings.GetServerName().c_str());
 	printf("Server Address = %s\n", m_serverSettings.GetServerAddress().c_str());
 	printf("Server Port = %d\n", m_serverSettings.GetServerPort());

@@ -6,6 +6,8 @@
 #include <CMPStateManager.h>
 #include <CNetworkManager.h>
 
+#include <CClientSettings.h>
+
 class CCore : public Singleton<CCore>
 {
 public:
@@ -21,6 +23,8 @@ public:
 	IO::CFileLogger& GetLogger() { return m_debuglog; }
 	CGraphicsManager& GetGraphics() { return m_graphicsmanager; }
 	CMPStateManager& GetStateManager() { return m_statemanager; }
+	CNetworkManager& GetNetworkManager() { return m_networkManager; }
+	CClientSettings& GetClientSettings() { return m_clientSettings; }
 
 private:
 	HMODULE m_module;
@@ -29,6 +33,7 @@ private:
 	CGraphicsManager m_graphicsmanager;
 	CMPStateManager m_statemanager;
 	CNetworkManager m_networkManager;
+	CClientSettings m_clientSettings;
 
 	IO::CFileLogger m_debuglog;
 };

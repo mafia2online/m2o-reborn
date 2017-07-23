@@ -115,6 +115,15 @@
     <ClCompile Include="src\CNetworkManager.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="src\CClientSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\tinyxml2\tinyxml2.cpp">
+      <Filter>Source Files\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\AConfiguration.cpp">
+      <Filter>Source Files\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\Client\CPatcher.h">
@@ -212,6 +221,15 @@
     </ClInclude>
     <ClInclude Include="src\CNetworkManager.h">
       <Filter>Source Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CClientSettings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libraries\tinyxml2\tinyxml2.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\AConfiguration.h">
+      <Filter>Source Files\Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

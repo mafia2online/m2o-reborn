@@ -154,6 +154,8 @@ exit /b 0</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Libraries\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="..\Shared\AConfiguration.cpp" />
     <ClCompile Include="..\Shared\Client\CPatcher.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -162,6 +164,7 @@ exit /b 0</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\CClientSettings.cpp" />
     <ClCompile Include="src\CCore.cpp" />
     <ClCompile Include="src\CDebugConsole.cpp" />
     <ClCompile Include="src\CDirect3D9Hook.cpp" />
@@ -185,6 +188,8 @@ exit /b 0</Command>
     <ClCompile Include="src\SteamDRMPatch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Libraries\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="..\Shared\AConfiguration.h" />
     <ClInclude Include="..\Shared\Client\CPatcher.h" />
     <ClInclude Include="..\Shared\Common.h" />
     <ClInclude Include="..\Shared\Constants.h" />
@@ -196,6 +201,7 @@ exit /b 0</Command>
     <ClInclude Include="..\Shared\Math\vector3.hpp" />
     <ClInclude Include="..\Shared\String.hpp" />
     <ClInclude Include="..\Shared\Types.h" />
+    <ClInclude Include="src\CClientSettings.h" />
     <ClInclude Include="src\CCore.h" />
     <ClInclude Include="src\CDebugConsole.h" />
     <ClInclude Include="src\CDirect3D9Hook.h" />

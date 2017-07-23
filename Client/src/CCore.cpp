@@ -62,6 +62,14 @@ void CCore::OnAttach(HMODULE module)
 	if (ExceptionHandler::Install() == false)
 		ExitGame("Unable to install exception handler");
 
+	if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
+		ExitGame("Unable to parse config file");
+	}
+
+	if (CNetworkManager::Instance().Init() == false) {
+		ExitGame("Unable to init network manager");
+	}
+
 
 	CDirectInput8Hook::Install();
 
