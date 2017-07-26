@@ -1,127 +1,67 @@
 #define NOMINMAX // std::numeric_limits min&max
-#include <string>
-#include <limits>
-#include <algorithm>
-#include <memory>
-#include <list>
+
 #include <stdio.h>
-#include <iostream>
-#include <fstream>
+#include <stdint.h>
 #include <windows.h>
 
-#include "client.h"
-#include "disablescripts.hpp"
-#include "gtav_world.hpp"
+#if !defined(Address)
+#define Address unsigned long
+#define Byte    unsigned char
+#define Pointer unsigned int
+#endif
 
+// bla bla
+#include <memory>
+#include <limits>
+
+// steam stuff
+#include <iostream>
+#include <fstream>
+
+#include <algorithm>
+
+// container stuff
+#include <string>
+#include <vector>
+#include <list>
+
+// shared stuff
+#include <shared_defines.h>
+#include <messages.h>
+
+void game_init();
+void game_tick();
+
+// tool stuff
+#include <tools/patcher.h>
+#include <tools/steam_drm.h>
+#include <tools/game_hooks.h>
+
+// actual client stuff
+#include "init.h"
+#include "callbacks/tick.h"
+#include "callbacks/other.h"
+#include "callbacks/entity_create.h"
+#include "callbacks/entity_update.h"
+#include "callbacks/entity_interpolate.h"
+#include "callbacks/entity_remove.h"
+#include "callbacks/clientstream_update.h"
+
+
+// no
 std::ofstream debug;
+
+// super global var for our player
 librg::entity_t local_player;
 
-// End program execution
-void die(const char *why) {
-    printf("%s", why);
-    char r = getc(stdin);
-    exit(1);
-}
-
-void spawn_player(librg::entity_t entity)
-{
-    entity.assign<librg::streamable_t>();
-    entity.assign<gamedata_t>(PLAYER::PLAYER_PED_ID());
-    entity.assign<ped_t>();
-
-    librg::core::log("spawned player!");
-}
-
-void unspawn_player(librg::entity_t entity)
-{
-    entity.remove<ped_t>();
-    entity.remove<gamedata_t>();
-    entity.remove<librg::streamable_t>();
-
-    librg::core::log("unspawned player!");
-}
-
-void client_connect(librg::events::event_t* evt)
-{
-    auto event = (librg::events::event_entity_t*)evt;
-    auto entity = event->entity;
-
-    local_player = entity;
-
-    librg::core::log("connected to the server");
-    spawn_player(entity);
-}
-
-void client_disconnect(librg::events::event_t* evt)
-{
-    auto event = (librg::events::event_entity_t*)evt;
-    auto entity = event->entity;
-
-    librg::core::log("disconnected form the server");
-    unspawn_player(entity);
-}
-
-
-void init()
-{
-    // setup manual client mode
-    librg::core_initialize(librg::mode_client_manual);
-
-    librg::events::add(librg::events::on_log, [](librg::events::event_t* evt) {
-        auto event = (librg::events::event_log_t*) evt;
-        printf("%s", event->output);
-        debug << event->output;
-    });
-
-    // setup callbacks
-    librg::events::add(librg::events::on_tick, ontick);
-    librg::events::add(librg::events::on_inter, entity_inter);
-    librg::events::add(librg::events::on_create, entity_create);
-    librg::events::add(librg::events::on_update, entity_update);
-    librg::events::add(librg::events::on_remove, entity_remove);
-    librg::events::add(librg::events::on_connect, client_connect);
-    librg::events::add(librg::events::on_disconnect, client_disconnect);
-    librg::events::add(librg::events::on_client_stream_entity, clientstream_update);
-
-    auto cfg = librg::config_t{};
-    cfg.ip = "inlife.no-ip.org";
-    cfg.port = 27010;
-    cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
-    cfg.tick_delay = 64;
-    cfg.max_connections = 8;
-    cfg.platform_id = 1;
-    cfg.proto_version = 1;
-    cfg.build_version = 1;
-
-    // start the client (network connection)
-    librg::core::start(cfg);
-    librg::network::start();
-
-}
-
-void update()
-{
-    librg::core::tick();
-
-}
-
-// Main program
-void main()
-{
+void game_init() {
     debug.open("m2o_debug.log");
-    //debug.clear();
-
-    init();
-
-    while (true) {
-        update();
-        WAIT(0);
-    }
-
-
+    init_librg();
 }
 
-
+void game_tick() {
+    librg::core::tick();
+}
 
 void OnAttach(HMODULE module)
 {
@@ -139,10 +79,10 @@ void OnAttach(HMODULE module)
     CDirectInput8Hook::Install();
 }
 
-void ExitGame(SString strreason)
+void ExitGame(std::string strreason)
 {
     librg::core_terminate();
-    MessageBoxA(nullptr, strreason.GetCStr(), "Well.. Something went wrong!", MB_OK);
+    MessageBoxA(nullptr, strreason.c_str(), "Well.. Something went wrong!", MB_OK);
     debug.close();
     exit(0);
 }

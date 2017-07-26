@@ -5,7 +5,7 @@
 * to prevent connections from different games/mods, in future
 */
 #ifndef NETWORK_PLATFORM_ID
-#define NETWORK_PLATFORM_ID 1
+#define NETWORK_PLATFORM_ID 228
 #endif
 
 /**
@@ -22,6 +22,8 @@
 #ifndef NETWORK_BUILD_VERSION
 #define NETWORK_BUILD_VERSION 1
 #endif
+
+#define MOD_NAME "Mafia 2 Online - Reloaded";
 
 enum {
     TYPE_PLAYER,

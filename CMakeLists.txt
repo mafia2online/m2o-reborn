@@ -41,6 +41,7 @@ include_directories(
 link_directories(
     # vendor/M2SDK/include
     ${PROJECT_SOURCE_DIR}/vendor/SteamAPI/lib
+    ${PROJECT_SOURCE_DIR}/vendor/detours
 )
 
 
@@ -62,7 +63,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED "${PROJECT_SOURCE_DIR}/client/client.cpp")
-    target_link_libraries(client librg d3dx9 dxgi)
+    target_link_libraries(client librg d3dx9 dxgi detours)
 
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
