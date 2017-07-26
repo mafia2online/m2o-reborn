@@ -56,12 +56,12 @@ endif()
 
 ###
 # Adding executables
-###
-add_executable(server ${SERVER_FILES})
-add_library(client SHARED ${CLIENT_FILES})
-
-###
 # Linking libraries
 ###
+add_executable(server ${SERVER_FILES})
 target_link_libraries(server librg)
-target_link_libraries(client librg d3dx9 dxgi)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    add_library(client SHARED ${CLIENT_FILES})
+    target_link_libraries(client librg d3dx9 dxgi)
+endif()
