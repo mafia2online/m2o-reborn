@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@gitlab.com:reguider/lib-libuv-cmake.git
+	branch = v1.9.0
+	commit = d047d6d0b542905c078e692238f44ab45bc9bc45
+	parent = 012dbc37d174d5f82463733f177d00169c3bf75c
+	cmdver = 0.3.1

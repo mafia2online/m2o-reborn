@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/alecthomas/entityx.git
+	branch = master
+	commit = de3fd13d72d82b507469a3ed8798d483df6bc5d1
+	parent = 5124ff87585e53b269c4f9a4b3821b1538d10281
+	cmdver = 0.3.1

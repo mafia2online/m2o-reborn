@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:reguider/old_librg.git
+	branch = master
+	commit = e818925ca2ab6f9afbb4ac55817d2584593b0f88
+	parent = b63f44ce42e846506efc7cb77a0923de196e4133
+	cmdver = 0.3.1

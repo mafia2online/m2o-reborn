@@ -1,0 +1,26 @@
+Okay, there is the basic idea about streaming our entities over the network.
+
+We should start simply by describing 2 basic low-level API functions:
+- streamSetVisible(entityId, bool)
+=- Here we simply just tell globally about this entity's visibility.
+- streamSetVisibleForEntity(entityId, targetId, bool)
+=- In this case, we setup a visibility rule between two entities.
+
+Q: How to query for visible entities?
+A: We simply just use quad-trees to simplify our lookup.
+Our quad-tree consists of either 4 branches or represents a leaf.
+Our quad-tree lookup saves a lot of time by avoiding a lame linear search.
+
+Lame linear search always compares each entity with another entity, roughly
+speaking O(n^2 - n) time it takes to process our entities.
+
+Where-as quad-tree can give us a significant boost of speed O(n*sqrt(n)),
+taking unsuccessful hits into the account.
+
+The basic implementation of q-tree is available in Squirrel example code in
+resources folder.
+
+My task is to provide C++ version including the streaming pipeline, to
+let the network know which entities are being sent to the client.
+
+exit(0) // in peace...

@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@gitlab.com:reguider/lib-sqrat.git
+	branch = comp_hack
+	commit = b51f73bb8958ee80f5c29ed51efad7edbd1d7751
+	parent = 4d50562954eb585a1736298562beb75011901c41
+	cmdver = 0.3.1

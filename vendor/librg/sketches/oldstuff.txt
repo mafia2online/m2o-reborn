@@ -1,0 +1,205 @@
+
+// Server::AddLogger(printer);
+    // Server::AddLogger([](int type, std::string message) -> void {
+    //     printf(message.c_str());
+    // });
+
+    // Server::SetResourceFolder("resources");
+
+    // Server::Scripting::Registry::listeners.insert(sqinstall);
+
+    //NOTE(zaklaus): We can make vehicle dependant on Pos, Rot easily!
+    // Server::Entity::Manager::GetSystems()->add<entityx::deps::Dependency<Vehicle, Position, Rotation>>();
+
+    // now let's assume we have native.vehicleCreate(fuel)
+
+    // entityx::Entity entity = Server::Entity::Manager::Instance()->create();
+
+    // entity.assign<Vehicle>(80.f);
+
+    // Now, the entity also contains Pos and Rot, we just have to set it using let's say:
+    /*
+        native.movableSetPosition(x,y,z)
+        native.movableSetRotation(x,y,z)
+
+        We can also have native.movableCreate, which would add Position, Rotation and a Scale to the entity, but since Vehicle depends on them, they exist already
+
+        SQ process to create vehicle and move to 120, 40, 8:
+        - local fastcar = native.entityCreate()
+        - native.vehicleCreate(fastcar, 42.0f // fuel //)
+        - native.movableSetPosition(fastcar, [120, 40, 8])
+
+        which can be encapsulated in our SQ framework as:
+        - local fastcar = Vehicle(42.0f, [120, 40, 8])
+        - fastcar.Spawn()
+
+        -- zaklaus
+    */
+
+    // printf("created entity: %zd\n", entity.id().index());
+
+
+    // librg::core::client(argc, argv);
+
+    // while (true) {
+    //     librg::core::client_tick();
+    // }
+
+
+
+// function createVehicle(modelid, x,y,z) {
+//     local entity = null;
+
+//     native.createEntity("type", [], function(entity) {
+//         entity = entity;
+//     });
+
+//     while (!entity) {
+//         // do nothing
+//     }
+
+//     return entity.index;
+// }
+
+
+
+// void event_system_cpp_to_sq() {
+//     int amount = 666;
+//     std::string name = "Vlad";
+
+//     Event::Manager::Instance()->Dispatch("onDeveloperDrinksVodka", EVENT_PARAM_SQ([=](HSQUIRRELVM vm){
+//         auto array = new Sqrat::Array(vm);
+//         array->Append(amount);
+//         array->Append(name);
+//         return array;
+//     }));
+// }
+
+// // TODO(zaklaus): Move these test blocks somewhere, main.cpp just gets bloated by this.
+// struct VodkaEvent
+// {
+//     std::string amount;
+// };
+
+// void* VodkaEventResponse(const void* data, Sqrat::Array* array) {
+//     if(array!=0) {
+//         auto vodka = new VodkaEvent;
+//         std::string amount = array->Pop().Cast<char*>();
+//         vodka->amount = amount;
+//         return vodka;
+//     }
+//     return (void*)data;
+// }
+
+// void event_system_test() {
+//     size_t handlerId = Event::Manager::Instance()->AddListener("onVodkaTooWeak", [](const void* event, void* /* blob */){
+//         const VodkaEvent* vodka = (VodkaEvent*)event;
+//         Core::Log("We need %s of vodka!", vodka->amount.c_str());
+//     }, VodkaEventResponse);
+
+//     Event::Manager::Instance()->Dispatch("onVodkaTooWeak", EVENT_PARAM_CPP(new VodkaEvent{ "a lot" }));
+
+//     Event::Manager::Instance()->AddListener("onTestMessageRequested", [](const void* /* event */, void* /* blob */){
+//         Core::Log("This is a test message!");
+//     }, GenericNoResponse);
+// }
+
+// event_system_test();
+
+
+
+
+/*
+Async stuff
+
+// void async_cb(uv_async_t* async) {
+//     printf("async_cb %d\n", *((int*) async->data));
+//     uv_close((uv_handle_t*) async, NULL);
+// }
+
+
+    // // async test
+    // int a = 5;
+
+    // uv_async_t async;
+    // uv_async_init(uv_default_loop(), &async, async_cb);
+    // async.data = &a;
+    // uv_async_send(&async);
+
+    // int b = 6;
+
+    // uv_async_t async2;
+    // uv_async_init(uv_default_loop(), &async2, async_cb);
+    // async2.data = &b;
+    // uv_async_send(&async2);
+
+*/
+
+
+/*
+Squirrel stuff
+
+
+    // HSQUIRRELVM v;
+    // v = sq_open(1024); //creates a VM with initial stack size 1024
+
+    // //do some stuff with squirrel here
+
+    // sq_close(v);
+
+
+*/
+
+
+/*
+BEAUTUFL TTY
+ */
+// uv_loop_t *loop;
+// uv_tty_t tty;
+// uv_timer_t tick;
+// uv_write_t write_req;
+// int width, height;
+// int pos = 0;
+// char *message = "  Hello TTY  ";
+
+
+// void update(uv_timer_t *req)
+// {
+//     char data[500];
+
+//     uv_buf_t buf;
+//     buf.base = data;
+//     buf.len = sprintf(data, "\033[2J\033[H\033[%dB\033[%luC\033[42;37m%s",
+//                             pos,
+//                             (unsigned long) (width-strlen(message))/2,
+//                             message);
+
+//     uv_write(&write_req, (uv_stream_t*) &tty, &buf, 1, NULL);
+
+//     pos++;
+//     if (pos > height) {
+//         uv_tty_reset_mode();
+//         uv_timer_stop(&tick);
+//     }
+// }
+
+
+// int main() {
+//     loop = uv_default_loop();
+
+//     uv_tty_init(loop, &tty, 1, 0);
+//     uv_tty_set_mode(&tty, 0);
+
+//     if (uv_tty_get_winsize(&tty, &width, &height)) {
+//         fprintf(stderr, "Could not get TTY information\n");
+//         uv_tty_reset_mode();
+//         return 1;
+//     }
+
+//     fprintf(stderr, "Width %d, height %d\n", width, height);
+//     uv_timer_init(loop, &tick);
+//     uv_timer_start(&tick, update, 200, 200);
+//     return uv_run(loop, UV_RUN_DEFAULT);
+// }
+
+
