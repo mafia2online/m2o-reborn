@@ -2,7 +2,7 @@
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
-project (urgmp)
+project (m2o)
 
 
 ###
@@ -25,14 +25,13 @@ set(SDL_SHARED_ENABLED_BY_DEFAULT OFF CACHE BOOL "Generate the DLL project if tr
 ###
 # Compile vendor dependencies
 ###
-add_subdirectory(vendor/reguider)
+add_subdirectory(vendor/librg)
 
 ###
 # Includes for libs and remote sources
 ###
 include_directories(
-    vendor/reguider/include
-    client/hooking/MinHook/include
+    vendor/librg/include
     server/
     shared/
 )
@@ -65,4 +64,4 @@ add_library(client SHARED ${CLIENT_FILES})
 # Linking libraries
 ###
 target_link_libraries(server librg)
-target_link_libraries(client librg d3d11 dxgi)
+target_link_libraries(client librg d3dx9 dxgi)
