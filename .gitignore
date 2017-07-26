@@ -16,6 +16,7 @@ x64/*
 x86/*
 client.dir/*
 server.dir/*
+launcher.dir/*
 .vs/*
 
 !build-mac/.keep

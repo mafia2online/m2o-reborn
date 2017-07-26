@@ -20,8 +20,6 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SDL_SHARED_ENABLED_BY_DEFAULT OFF CACHE BOOL "Generate the DLL project if true.")
-
 ###
 # Compile vendor dependencies
 ###
@@ -32,36 +30,43 @@ add_subdirectory(vendor/librg)
 ###
 include_directories(
     vendor/librg/include
+    vendor/M2SDK/include
+    vendor/SteamAPI
     server/
     shared/
+    launcher/
 )
 
-###
-# Includes for current source executable
-###
-file(GLOB_RECURSE SERVER_FILES "${PROJECT_SOURCE_DIR}/server/*.cpp")
 
-file(GLOB_RECURSE CLIENT_FILES
-  "${PROJECT_SOURCE_DIR}/client/*.cpp"
-  "${PROJECT_SOURCE_DIR}/client/*.c"
-  "${PROJECT_SOURCE_DIR}/client/*.h"
-  "${PROJECT_SOURCE_DIR}/client/*.hpp"
+link_directories(
+    # vendor/M2SDK/include
+    ${PROJECT_SOURCE_DIR}/vendor/SteamAPI/lib
 )
+
 
 if(MSVC)
     GroupSources(client)
     GroupSources(server)
     GroupSources(shared)
+    GroupSources(launcher)
 endif()
 
 ###
 # Adding executables
 # Linking libraries
 ###
-add_executable(server ${SERVER_FILES})
+add_executable(server "${PROJECT_SOURCE_DIR}/server/server.cpp")
 target_link_libraries(server librg)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_library(client SHARED ${CLIENT_FILES})
+
+    ## tha clienta
+    add_library(client SHARED "${PROJECT_SOURCE_DIR}/client/client.cpp")
     target_link_libraries(client librg d3dx9 dxgi)
+
+    ## tha lancunha
+    add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
+    target_link_libraries(launcher Psapi steam_api)
+    set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+
 endif()

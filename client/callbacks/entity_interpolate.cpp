@@ -1,0 +1,19 @@
+﻿#include "../client.h"
+
+/**
+ * Entity interpolate callback
+ */
+void entity_inter(librg::events::event_t* evt)
+{
+    auto event = (librg::events::event_entity_t*) evt;
+
+    auto transform  = event->entity.component<librg::transform_t>();
+    auto inter      = event->entity.component<librg::interpolable_t>();
+    auto remote     = event->entity.component<gamedata_t>();
+
+    *transform = *(librg::transform_t*)event->data;
+
+    ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.X, transform->position.Y, transform->position.Z, true, true, true);
+    ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.X, transform->rotation.Y, transform->rotation.Z, transform->rotation.W);
+}
+
