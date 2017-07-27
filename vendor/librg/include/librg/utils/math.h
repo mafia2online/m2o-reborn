@@ -1,4 +1,4 @@
-#ifndef HANDMADE_NO_SSE
+﻿#ifndef HANDMADE_NO_SSE
 #include <xmmintrin.h>
 #endif
 
@@ -86,7 +86,7 @@ extern "C"
     {
         struct
         {
-            float X, Y;
+            float x, y;
         };
 
         struct
@@ -106,12 +106,12 @@ extern "C"
     {
         struct
         {
-            float X, Y, Z;
+            float x, y, z;
         };
 
         struct
         {
-            float U, V, W;
+            float U, V, w;
         };
 
         struct
@@ -155,11 +155,11 @@ extern "C"
                 hmm_vec3 XYZ;
                 struct
                 {
-                    float X, Y, Z;
+                    float x, y, z;
                 };
             };
 
-            float W;
+            float w;
         };
         struct
         {
@@ -213,11 +213,11 @@ extern "C"
                 hmm_vec3 XYZ;
                 struct
                 {
-                    float X, Y, Z;
+                    float x, y, z;
                 };
             };
 
-            float W;
+            float w;
         };
 
         float Elements[4];
@@ -264,13 +264,13 @@ extern "C"
 
     HMMDEF hmm_vec3 HMM_Cross(hmm_vec3 VecOne, hmm_vec3 VecTwo);
 
-    HMMDEF hmm_vec2 HMM_Vec2(float X, float Y);
-    HMMDEF hmm_vec2 HMM_Vec2i(int X, int Y);
-    HMMDEF hmm_vec3 HMM_Vec3(float X, float Y, float Z);
-    HMMDEF hmm_vec3 HMM_Vec3i(int X, int Y, int Z);
-    HMMDEF hmm_vec4 HMM_Vec4(float X, float Y, float Z, float W);
-    HMMDEF hmm_vec4 HMM_Vec4i(int X, int Y, int Z, int W);
-    HMMDEF hmm_vec4 HMM_Vec4v(hmm_vec3 Vector, float W);
+    HMMDEF hmm_vec2 HMM_Vec2(float x, float y);
+    HMMDEF hmm_vec2 HMM_Vec2i(int x, int y);
+    HMMDEF hmm_vec3 HMM_Vec3(float x, float y, float z);
+    HMMDEF hmm_vec3 HMM_Vec3i(int x, int y, int z);
+    HMMDEF hmm_vec4 HMM_Vec4(float x, float y, float z, float w);
+    HMMDEF hmm_vec4 HMM_Vec4i(int x, int y, int z, int w);
+    HMMDEF hmm_vec4 HMM_Vec4v(hmm_vec3 Vector, float w);
 
     HMMDEF hmm_vec2 HMM_AddVec2(hmm_vec2 Left, hmm_vec2 Right);
     HMMDEF hmm_vec3 HMM_AddVec3(hmm_vec3 Left, hmm_vec3 Right);
@@ -314,7 +314,7 @@ extern "C"
 
     HMMDEF hmm_mat4 HMM_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up);
 
-    HMMDEF hmm_quaternion HMM_Quaternion(float X, float Y, float Z, float W);
+    HMMDEF hmm_quaternion HMM_Quaternion(float x, float y, float z, float w);
     HMMDEF hmm_quaternion HMM_QuaternionV4(hmm_vec4 Vector);
     HMMDEF hmm_quaternion HMM_QuaternionFromVec3(hmm_vec3 Vector);
     HMMDEF hmm_quaternion HMM_AddQuaternion(hmm_quaternion Left, hmm_quaternion Right);

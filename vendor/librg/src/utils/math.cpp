@@ -1,4 +1,4 @@
-#include <librg/utils/math.h>
+﻿#include <librg/utils/math.h>
 
 HINLINE float
 HMM_SinF(float Angle)
@@ -178,16 +178,16 @@ HMM_Power(float Base, int Exponent)
 {
     float Result = 1.0f;
     float Mul = Exponent < 0 ? 1.f / Base : Base;
-    unsigned int X = Exponent < 0 ? -Exponent : Exponent;
-    while (X)
+    unsigned int x = Exponent < 0 ? -Exponent : Exponent;
+    while (x)
     {
-        if (X & 1)
+        if (x & 1)
         {
             Result *= Mul;
         }
 
         Mul *= Mul;
-        X >>= 1;
+        x >>= 1;
     }
 
     return (Result);
@@ -232,8 +232,8 @@ HMM_NormalizeVec2(hmm_vec2 A)
 
     float VectorLength = HMM_LengthVec2(A);
 
-    Result.X = A.X * (1.0f / VectorLength);
-    Result.Y = A.Y * (1.0f / VectorLength);
+    Result.x = A.x * (1.0f / VectorLength);
+    Result.y = A.y * (1.0f / VectorLength);
 
     return (Result);
 }
@@ -245,9 +245,9 @@ HMM_NormalizeVec3(hmm_vec3 A)
 
     float VectorLength = HMM_LengthVec3(A);
 
-    Result.X = A.X * (1.0f / VectorLength);
-    Result.Y = A.Y * (1.0f / VectorLength);
-    Result.Z = A.Z * (1.0f / VectorLength);
+    Result.x = A.x * (1.0f / VectorLength);
+    Result.y = A.y * (1.0f / VectorLength);
+    Result.z = A.z * (1.0f / VectorLength);
 
     return (Result);
 }
@@ -259,10 +259,10 @@ HMM_NormalizeVec4(hmm_vec4 A)
 
     float VectorLength = HMM_LengthVec4(A);
 
-    Result.X = A.X * (1.0f / VectorLength);
-    Result.Y = A.Y * (1.0f / VectorLength);
-    Result.Z = A.Z * (1.0f / VectorLength);
-    Result.W = A.W * (1.0f / VectorLength);
+    Result.x = A.x * (1.0f / VectorLength);
+    Result.y = A.y * (1.0f / VectorLength);
+    Result.z = A.z * (1.0f / VectorLength);
+    Result.w = A.w * (1.0f / VectorLength);
 
     return (Result);
 }
@@ -272,7 +272,7 @@ HMM_DotVec2(hmm_vec2 VecOne, hmm_vec2 VecTwo)
 {
     float Result = 0.0f;
 
-    Result = (VecOne.X * VecTwo.X) + (VecOne.Y * VecTwo.Y);
+    Result = (VecOne.x * VecTwo.x) + (VecOne.y * VecTwo.y);
 
     return (Result);
 }
@@ -282,7 +282,7 @@ HMM_DotVec3(hmm_vec3 VecOne, hmm_vec3 VecTwo)
 {
     float Result = 0.0f;
 
-    Result = (VecOne.X * VecTwo.X) + (VecOne.Y * VecTwo.Y) + (VecOne.Z * VecTwo.Z);
+    Result = (VecOne.x * VecTwo.x) + (VecOne.y * VecTwo.y) + (VecOne.z * VecTwo.z);
 
     return (Result);
 }
@@ -292,7 +292,7 @@ HMM_DotVec4(hmm_vec4 VecOne, hmm_vec4 VecTwo)
 {
     float Result = 0.0f;
 
-    Result = (VecOne.X * VecTwo.X) + (VecOne.Y * VecTwo.Y) + (VecOne.Z * VecTwo.Z) + (VecOne.W * VecTwo.W);
+    Result = (VecOne.x * VecTwo.x) + (VecOne.y * VecTwo.y) + (VecOne.z * VecTwo.z) + (VecOne.w * VecTwo.w);
 
     return (Result);
 }
@@ -302,92 +302,92 @@ HMM_Cross(hmm_vec3 VecOne, hmm_vec3 VecTwo)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = (VecOne.Y * VecTwo.Z) - (VecOne.Z * VecTwo.Y);
-    Result.Y = (VecOne.Z * VecTwo.X) - (VecOne.X * VecTwo.Z);
-    Result.Z = (VecOne.X * VecTwo.Y) - (VecOne.Y * VecTwo.X);
+    Result.x = (VecOne.y * VecTwo.z) - (VecOne.z * VecTwo.y);
+    Result.y = (VecOne.z * VecTwo.x) - (VecOne.x * VecTwo.z);
+    Result.z = (VecOne.x * VecTwo.y) - (VecOne.y * VecTwo.x);
 
     return (Result);
 }
 
 HINLINE hmm_vec2
-HMM_Vec2(float X, float Y)
+HMM_Vec2(float x, float y)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = X;
-    Result.Y = Y;
+    Result.x = x;
+    Result.y = y;
 
     return (Result);
 }
 
 HINLINE hmm_vec2
-HMM_Vec2i(int X, int Y)
+HMM_Vec2i(int x, int y)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
+    Result.x = (float)x;
+    Result.y = (float)y;
 
     return (Result);
 }
 
 HINLINE hmm_vec3
-HMM_Vec3(float X, float Y, float Z)
+HMM_Vec3(float x, float y, float z)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = X;
-    Result.Y = Y;
-    Result.Z = Z;
+    Result.x = x;
+    Result.y = y;
+    Result.z = z;
 
     return (Result);
 }
 
 HINLINE hmm_vec3
-HMM_Vec3i(int X, int Y, int Z)
+HMM_Vec3i(int x, int y, int z)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
-    Result.Z = (float)Z;
+    Result.x = (float)x;
+    Result.y = (float)y;
+    Result.z = (float)z;
 
     return (Result);
 }
 
 HINLINE hmm_vec4
-HMM_Vec4(float X, float Y, float Z, float W)
+HMM_Vec4(float x, float y, float z, float w)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = X;
-    Result.Y = Y;
-    Result.Z = Z;
-    Result.W = W;
+    Result.x = x;
+    Result.y = y;
+    Result.z = z;
+    Result.w = w;
 
     return (Result);
 }
 
 HINLINE hmm_vec4
-HMM_Vec4i(int X, int Y, int Z, int W)
+HMM_Vec4i(int x, int y, int z, int w)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = (float)X;
-    Result.Y = (float)Y;
-    Result.Z = (float)Z;
-    Result.W = (float)W;
+    Result.x = (float)x;
+    Result.y = (float)y;
+    Result.z = (float)z;
+    Result.w = (float)w;
 
     return (Result);
 }
 
 HINLINE hmm_vec4
-HMM_Vec4v(hmm_vec3 Vector, float W)
+HMM_Vec4v(hmm_vec3 Vector, float w)
 {
     hmm_vec4 Result = { 0 };
 
     Result.XYZ = Vector;
-    Result.W = W;
+    Result.w = w;
 
     return (Result);
 }
@@ -397,8 +397,8 @@ HMM_AddVec2(hmm_vec2 Left, hmm_vec2 Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X + Right.X;
-    Result.Y = Left.Y + Right.Y;
+    Result.x = Left.x + Right.x;
+    Result.y = Left.y + Right.y;
 
     return (Result);
 }
@@ -408,9 +408,9 @@ HMM_AddVec3(hmm_vec3 Left, hmm_vec3 Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X + Right.X;
-    Result.Y = Left.Y + Right.Y;
-    Result.Z = Left.Z + Right.Z;
+    Result.x = Left.x + Right.x;
+    Result.y = Left.y + Right.y;
+    Result.z = Left.z + Right.z;
 
     return (Result);
 }
@@ -420,10 +420,10 @@ HMM_AddVec4(hmm_vec4 Left, hmm_vec4 Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X + Right.X;
-    Result.Y = Left.Y + Right.Y;
-    Result.Z = Left.Z + Right.Z;
-    Result.W = Left.W + Right.W;
+    Result.x = Left.x + Right.x;
+    Result.y = Left.y + Right.y;
+    Result.z = Left.z + Right.z;
+    Result.w = Left.w + Right.w;
 
     return (Result);
 }
@@ -433,8 +433,8 @@ HMM_SubtractVec2(hmm_vec2 Left, hmm_vec2 Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X - Right.X;
-    Result.Y = Left.Y - Right.Y;
+    Result.x = Left.x - Right.x;
+    Result.y = Left.y - Right.y;
 
     return (Result);
 }
@@ -444,9 +444,9 @@ HMM_SubtractVec3(hmm_vec3 Left, hmm_vec3 Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X - Right.X;
-    Result.Y = Left.Y - Right.Y;
-    Result.Z = Left.Z - Right.Z;
+    Result.x = Left.x - Right.x;
+    Result.y = Left.y - Right.y;
+    Result.z = Left.z - Right.z;
 
     return (Result);
 }
@@ -456,10 +456,10 @@ HMM_SubtractVec4(hmm_vec4 Left, hmm_vec4 Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X - Right.X;
-    Result.Y = Left.Y - Right.Y;
-    Result.Z = Left.Z - Right.Z;
-    Result.W = Left.W - Right.W;
+    Result.x = Left.x - Right.x;
+    Result.y = Left.y - Right.y;
+    Result.z = Left.z - Right.z;
+    Result.w = Left.w - Right.w;
 
     return (Result);
 }
@@ -469,8 +469,8 @@ HMM_MultiplyVec2(hmm_vec2 Left, hmm_vec2 Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X * Right.X;
-    Result.Y = Left.Y * Right.Y;
+    Result.x = Left.x * Right.x;
+    Result.y = Left.y * Right.y;
 
     return (Result);
 }
@@ -480,8 +480,8 @@ HMM_MultiplyVec2f(hmm_vec2 Left, float Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X * Right;
-    Result.Y = Left.Y * Right;
+    Result.x = Left.x * Right;
+    Result.y = Left.y * Right;
 
     return (Result);
 }
@@ -491,9 +491,9 @@ HMM_MultiplyVec3(hmm_vec3 Left, hmm_vec3 Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X * Right.X;
-    Result.Y = Left.Y * Right.Y;
-    Result.Z = Left.Z * Right.Z;
+    Result.x = Left.x * Right.x;
+    Result.y = Left.y * Right.y;
+    Result.z = Left.z * Right.z;
 
     return (Result);
 }
@@ -503,9 +503,9 @@ HMM_MultiplyVec3f(hmm_vec3 Left, float Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X * Right;
-    Result.Y = Left.Y * Right;
-    Result.Z = Left.Z * Right;
+    Result.x = Left.x * Right;
+    Result.y = Left.y * Right;
+    Result.z = Left.z * Right;
 
     return (Result);
 }
@@ -515,10 +515,10 @@ HMM_MultiplyVec4(hmm_vec4 Left, hmm_vec4 Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X * Right.X;
-    Result.Y = Left.Y * Right.Y;
-    Result.Z = Left.Z * Right.Z;
-    Result.W = Left.W * Right.W;
+    Result.x = Left.x * Right.x;
+    Result.y = Left.y * Right.y;
+    Result.z = Left.z * Right.z;
+    Result.w = Left.w * Right.w;
 
     return (Result);
 }
@@ -528,10 +528,10 @@ HMM_MultiplyVec4f(hmm_vec4 Left, float Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X * Right;
-    Result.Y = Left.Y * Right;
-    Result.Z = Left.Z * Right;
-    Result.W = Left.W * Right;
+    Result.x = Left.x * Right;
+    Result.y = Left.y * Right;
+    Result.z = Left.z * Right;
+    Result.w = Left.w * Right;
 
     return (Result);
 }
@@ -541,8 +541,8 @@ HMM_DivideVec2(hmm_vec2 Left, hmm_vec2 Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X / Right.X;
-    Result.Y = Left.Y / Right.Y;
+    Result.x = Left.x / Right.x;
+    Result.y = Left.y / Right.y;
 
     return (Result);
 }
@@ -552,8 +552,8 @@ HMM_DivideVec2f(hmm_vec2 Left, float Right)
 {
     hmm_vec2 Result = { 0 };
 
-    Result.X = Left.X / Right;
-    Result.Y = Left.Y / Right;
+    Result.x = Left.x / Right;
+    Result.y = Left.y / Right;
 
     return (Result);
 }
@@ -563,9 +563,9 @@ HMM_DivideVec3(hmm_vec3 Left, hmm_vec3 Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X / Right.X;
-    Result.Y = Left.Y / Right.Y;
-    Result.Z = Left.Z / Right.Z;
+    Result.x = Left.x / Right.x;
+    Result.y = Left.y / Right.y;
+    Result.z = Left.z / Right.z;
 
     return (Result);
 }
@@ -575,9 +575,9 @@ HMM_DivideVec3f(hmm_vec3 Left, float Right)
 {
     hmm_vec3 Result = { 0 };
 
-    Result.X = Left.X / Right;
-    Result.Y = Left.Y / Right;
-    Result.Z = Left.Z / Right;
+    Result.x = Left.x / Right;
+    Result.y = Left.y / Right;
+    Result.z = Left.z / Right;
 
     return (Result);
 }
@@ -587,10 +587,10 @@ HMM_DivideVec4(hmm_vec4 Left, hmm_vec4 Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X / Right.X;
-    Result.Y = Left.Y / Right.Y;
-    Result.Z = Left.Z / Right.Z;
-    Result.W = Left.W / Right.W;
+    Result.x = Left.x / Right.x;
+    Result.y = Left.y / Right.y;
+    Result.z = Left.z / Right.z;
+    Result.w = Left.w / Right.w;
 
     return (Result);
 }
@@ -600,10 +600,10 @@ HMM_DivideVec4f(hmm_vec4 Left, float Right)
 {
     hmm_vec4 Result = { 0 };
 
-    Result.X = Left.X / Right;
-    Result.Y = Left.Y / Right;
-    Result.Z = Left.Z / Right;
-    Result.W = Left.W / Right;
+    Result.x = Left.x / Right;
+    Result.y = Left.y / Right;
+    Result.z = Left.z / Right;
+    Result.w = Left.w / Right;
 
     return (Result);
 }
@@ -802,9 +802,9 @@ HMM_Translate(hmm_vec3 Translation)
 {
     hmm_mat4 Result = HMM_Mat4d(1.0f);
 
-    Result.Elements[3][0] = Translation.X;
-    Result.Elements[3][1] = Translation.Y;
-    Result.Elements[3][2] = Translation.Z;
+    Result.Elements[3][0] = Translation.x;
+    Result.Elements[3][1] = Translation.y;
+    Result.Elements[3][2] = Translation.z;
 
     return (Result);
 }
@@ -820,17 +820,17 @@ HMM_Rotate(float Angle, hmm_vec3 Axis)
     float CosTheta = HMM_CosF(HMM_ToRadians(Angle));
     float CosValue = 1.0f - CosTheta;
 
-    Result.Elements[0][0] = (Axis.X * Axis.X * CosValue) + CosTheta;
-    Result.Elements[0][1] = (Axis.X * Axis.Y * CosValue) + (Axis.Z * SinTheta);
-    Result.Elements[0][2] = (Axis.X * Axis.Z * CosValue) - (Axis.Y * SinTheta);
+    Result.Elements[0][0] = (Axis.x * Axis.x * CosValue) + CosTheta;
+    Result.Elements[0][1] = (Axis.x * Axis.y * CosValue) + (Axis.z * SinTheta);
+    Result.Elements[0][2] = (Axis.x * Axis.z * CosValue) - (Axis.y * SinTheta);
 
-    Result.Elements[1][0] = (Axis.Y * Axis.X * CosValue) - (Axis.Z * SinTheta);
-    Result.Elements[1][1] = (Axis.Y * Axis.Y * CosValue) + CosTheta;
-    Result.Elements[1][2] = (Axis.Y * Axis.Z * CosValue) + (Axis.X * SinTheta);
+    Result.Elements[1][0] = (Axis.y * Axis.x * CosValue) - (Axis.z * SinTheta);
+    Result.Elements[1][1] = (Axis.y * Axis.y * CosValue) + CosTheta;
+    Result.Elements[1][2] = (Axis.y * Axis.z * CosValue) + (Axis.x * SinTheta);
 
-    Result.Elements[2][0] = (Axis.Z * Axis.X * CosValue) + (Axis.Y * SinTheta);
-    Result.Elements[2][1] = (Axis.Z * Axis.Y * CosValue) - (Axis.X * SinTheta);
-    Result.Elements[2][2] = (Axis.Z * Axis.Z * CosValue) + CosTheta;
+    Result.Elements[2][0] = (Axis.z * Axis.x * CosValue) + (Axis.y * SinTheta);
+    Result.Elements[2][1] = (Axis.z * Axis.y * CosValue) - (Axis.x * SinTheta);
+    Result.Elements[2][2] = (Axis.z * Axis.z * CosValue) + CosTheta;
 
     return (Result);
 }
@@ -840,9 +840,9 @@ HMM_Scale(hmm_vec3 Scale)
 {
     hmm_mat4 Result = HMM_Mat4d(1.0f);
 
-    Result.Elements[0][0] = Scale.X;
-    Result.Elements[1][1] = Scale.Y;
-    Result.Elements[2][2] = Scale.Z;
+    Result.Elements[0][0] = Scale.x;
+    Result.Elements[1][1] = Scale.y;
+    Result.Elements[2][2] = Scale.z;
 
     return (Result);
 }
@@ -856,17 +856,17 @@ HMM_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up)
     hmm_vec3 S = HMM_NormalizeVec3(HMM_Cross(F, Up));
     hmm_vec3 U = HMM_Cross(S, F);
 
-    Result.Elements[0][0] = S.X;
-    Result.Elements[0][1] = U.X;
-    Result.Elements[0][2] = -F.X;
+    Result.Elements[0][0] = S.x;
+    Result.Elements[0][1] = U.x;
+    Result.Elements[0][2] = -F.x;
 
-    Result.Elements[1][0] = S.Y;
-    Result.Elements[1][1] = U.Y;
-    Result.Elements[1][2] = -F.Y;
+    Result.Elements[1][0] = S.y;
+    Result.Elements[1][1] = U.y;
+    Result.Elements[1][2] = -F.y;
 
-    Result.Elements[2][0] = S.Z;
-    Result.Elements[2][1] = U.Z;
-    Result.Elements[2][2] = -F.Z;
+    Result.Elements[2][0] = S.z;
+    Result.Elements[2][1] = U.z;
+    Result.Elements[2][2] = -F.z;
 
     Result.Elements[3][0] = -HMM_DotVec3(S, Eye);
     Result.Elements[3][1] = -HMM_DotVec3(U, Eye);
@@ -878,14 +878,14 @@ HMM_LookAt(hmm_vec3 Eye, hmm_vec3 Center, hmm_vec3 Up)
 
 
 HINLINE hmm_quaternion
-HMM_Quaternion(float X, float Y, float Z, float W)
+HMM_Quaternion(float x, float y, float z, float w)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = X;
-    Result.Y = Y;
-    Result.Z = Z;
-    Result.W = W;
+    Result.x = x;
+    Result.y = y;
+    Result.z = z;
+    Result.w = w;
 
     return(Result);
 }
@@ -895,10 +895,10 @@ HMM_QuaternionV4(hmm_vec4 Vector)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = Vector.X;
-    Result.Y = Vector.Y;
-    Result.Z = Vector.Z;
-    Result.W = Vector.W;
+    Result.x = Vector.x;
+    Result.y = Vector.y;
+    Result.z = Vector.z;
+    Result.w = Vector.w;
 
     return(Result);
 }
@@ -908,10 +908,10 @@ HMM_AddQuaternion(hmm_quaternion Left, hmm_quaternion Right)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = Left.X + Right.X;
-    Result.Y = Left.Y + Right.Y;
-    Result.Z = Left.Z + Right.Z;
-    Result.W = Left.W + Right.W;
+    Result.x = Left.x + Right.x;
+    Result.y = Left.y + Right.y;
+    Result.z = Left.z + Right.z;
+    Result.w = Left.w + Right.w;
 
     return(Result);
 }
@@ -921,10 +921,10 @@ HMM_SubtractQuaternion(hmm_quaternion Left, hmm_quaternion Right)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = Left.X - Right.X;
-    Result.Y = Left.Y - Right.Y;
-    Result.Z = Left.Z - Right.Z;
-    Result.W = Left.W - Right.W;
+    Result.x = Left.x - Right.x;
+    Result.y = Left.y - Right.y;
+    Result.z = Left.z - Right.z;
+    Result.w = Left.w - Right.w;
 
     return(Result);
 }
@@ -934,10 +934,10 @@ HMM_MultiplyQuaternion(hmm_quaternion Left, hmm_quaternion Right)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = (Left.X * Right.W) + (Left.Y * Right.Z) - (Left.Z * Right.Y) + (Left.W * Right.X);
-    Result.Y = (-Left.X * Right.Z) + (Left.Y * Right.W) + (Left.Z * Right.X) + (Left.W * Right.Y);
-    Result.Z = (Left.X * Right.Y) - (Left.Y * Right.X) + (Left.Z * Right.W) + (Left.W * Right.Z);
-    Result.W = (-Left.X * Right.X) - (Left.Y * Right.Y) - (Left.Z * Right.Z) + (Left.W * Right.W);
+    Result.x = (Left.x * Right.w) + (Left.y * Right.z) - (Left.z * Right.y) + (Left.w * Right.x);
+    Result.y = (-Left.x * Right.z) + (Left.y * Right.w) + (Left.z * Right.x) + (Left.w * Right.y);
+    Result.z = (Left.x * Right.y) - (Left.y * Right.x) + (Left.z * Right.w) + (Left.w * Right.z);
+    Result.w = (-Left.x * Right.x) - (Left.y * Right.y) - (Left.z * Right.z) + (Left.w * Right.w);
 
     return(Result);
 }
@@ -947,10 +947,10 @@ HMM_MultiplyQuaternionF(hmm_quaternion Left, float Multiplicative)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = Left.X * Multiplicative;
-    Result.Y = Left.Y * Multiplicative;
-    Result.Z = Left.Z * Multiplicative;
-    Result.W = Left.W * Multiplicative;
+    Result.x = Left.x * Multiplicative;
+    Result.y = Left.y * Multiplicative;
+    Result.z = Left.z * Multiplicative;
+    Result.w = Left.w * Multiplicative;
 
     return(Result);
 }
@@ -960,10 +960,10 @@ HMM_DivideQuaternionF(hmm_quaternion Left, float Dividend)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = Left.X / Dividend;
-    Result.Y = Left.Y / Dividend;
-    Result.Z = Left.Z / Dividend;
-    Result.W = Left.W / Dividend;
+    Result.x = Left.x / Dividend;
+    Result.y = Left.y / Dividend;
+    Result.z = Left.z / Dividend;
+    Result.w = Left.w / Dividend;
 
     return(Result);
 }
@@ -976,18 +976,18 @@ HMM_InverseQuaternion(hmm_quaternion Left)
     float Norm = 0;
     float NormSquared = 0;
 
-    Conjugate.X = -Left.X;
-    Conjugate.Y = -Left.Y;
-    Conjugate.Z = -Left.Z;
-    Conjugate.W = Left.W;
+    Conjugate.x = -Left.x;
+    Conjugate.y = -Left.y;
+    Conjugate.z = -Left.z;
+    Conjugate.w = Left.w;
 
     Norm = HMM_SquareRootF(HMM_DotQuaternion(Left, Left));
     NormSquared = Norm * Norm;
 
-    Result.X = Conjugate.X / NormSquared;
-    Result.Y = Conjugate.Y / NormSquared;
-    Result.Z = Conjugate.Z / NormSquared;
-    Result.W = Conjugate.W / NormSquared;
+    Result.x = Conjugate.x / NormSquared;
+    Result.y = Conjugate.y / NormSquared;
+    Result.z = Conjugate.z / NormSquared;
+    Result.w = Conjugate.w / NormSquared;
 
     return(Result);
 }
@@ -997,7 +997,7 @@ HMM_DotQuaternion(hmm_quaternion Left, hmm_quaternion Right)
 {
     float Result = 0.0f;
 
-    Result = (Left.X * Right.X) + (Left.Y * Right.Y) + (Left.Z * Right.Z) + (Left.W * Right.W);
+    Result = (Left.x * Right.x) + (Left.y * Right.y) + (Left.z * Right.z) + (Left.w * Right.w);
 
     return(Result);
 }
@@ -1018,10 +1018,10 @@ HMM_NLerp(hmm_quaternion Left, float Time, hmm_quaternion Right)
 {
     hmm_quaternion Result = { 0 };
 
-    Result.X = HMM_Lerp(Left.X, Time, Right.X);
-    Result.Y = HMM_Lerp(Left.Y, Time, Right.Y);
-    Result.Z = HMM_Lerp(Left.Z, Time, Right.Z);
-    Result.W = HMM_Lerp(Left.W, Time, Right.W);
+    Result.x = HMM_Lerp(Left.x, Time, Right.x);
+    Result.y = HMM_Lerp(Left.y, Time, Right.y);
+    Result.z = HMM_Lerp(Left.z, Time, Right.z);
+    Result.w = HMM_Lerp(Left.w, Time, Right.w);
 
     Result = HMM_NormalizeQuaternion(Result);
 
@@ -1057,9 +1057,9 @@ HMM_QuaternionFromVec3(hmm_vec3 i)
 {
     hmm_quaternion q;
 
-    float pitch = i.X;
-    float roll  = i.Y;
-    float yaw   = i.Z;
+    float pitch = i.x;
+    float roll  = i.y;
+    float yaw   = i.z;
 
     float t0 = HMM_CosF(yaw * 0.5f);
     float t1 = HMM_SinF(yaw * 0.5f);
@@ -1068,10 +1068,10 @@ HMM_QuaternionFromVec3(hmm_vec3 i)
     float t4 = HMM_CosF(pitch * 0.5f);
     float t5 = HMM_SinF(pitch * 0.5f);
 
-    q.W = t0 * t2 * t4 + t1 * t3 * t5;
-    q.X = t0 * t3 * t4 - t1 * t2 * t5;
-    q.Y = t0 * t2 * t5 + t1 * t3 * t4;
-    q.Z = t1 * t2 * t4 - t0 * t3 * t5;
+    q.w = t0 * t2 * t4 + t1 * t3 * t5;
+    q.x = t0 * t3 * t4 - t1 * t2 * t5;
+    q.y = t0 * t2 * t5 + t1 * t3 * t4;
+    q.z = t1 * t2 * t4 - t0 * t3 * t5;
 
     return q;
 }
@@ -1099,7 +1099,7 @@ HMM_Slerp(hmm_quaternion v0, float t, hmm_quaternion v1) {
     // have opposite handed-ness and slerp won't take
     // the shorter path. Fix by reversing one quaternion.
     if (dot < 0.0f) {
-        v1 = HMM_Quaternion(-v1.X, -v1.Y, -v1.Z, -v1.W);
+        v1 = HMM_Quaternion(-v1.x, -v1.y, -v1.z, -v1.w);
         dot = -dot;
     }
 
@@ -1125,15 +1125,15 @@ HMM_QuaternionToMat4(hmm_quaternion Left)
         XY, XZ, YZ,
         WX, WY, WZ;
 
-    XX = NormalizedQuaternion.X * NormalizedQuaternion.X;
-    YY = NormalizedQuaternion.Y * NormalizedQuaternion.Y;
-    ZZ = NormalizedQuaternion.Z * NormalizedQuaternion.Z;
-    XY = NormalizedQuaternion.X * NormalizedQuaternion.Y;
-    XZ = NormalizedQuaternion.X * NormalizedQuaternion.Z;
-    YZ = NormalizedQuaternion.Y * NormalizedQuaternion.Z;
-    WX = NormalizedQuaternion.W * NormalizedQuaternion.X;
-    WY = NormalizedQuaternion.W * NormalizedQuaternion.Y;
-    WZ = NormalizedQuaternion.W * NormalizedQuaternion.Z;
+    XX = NormalizedQuaternion.x * NormalizedQuaternion.x;
+    YY = NormalizedQuaternion.y * NormalizedQuaternion.y;
+    ZZ = NormalizedQuaternion.z * NormalizedQuaternion.z;
+    XY = NormalizedQuaternion.x * NormalizedQuaternion.y;
+    XZ = NormalizedQuaternion.x * NormalizedQuaternion.z;
+    YZ = NormalizedQuaternion.y * NormalizedQuaternion.z;
+    WX = NormalizedQuaternion.w * NormalizedQuaternion.x;
+    WY = NormalizedQuaternion.w * NormalizedQuaternion.y;
+    WZ = NormalizedQuaternion.w * NormalizedQuaternion.z;
 
     Result.Elements[0][0] = 1.0f - 2.0f * (YY + ZZ);
     Result.Elements[0][1] = 2.0f * (XY + WZ);
@@ -1162,7 +1162,7 @@ HMM_QuaternionFromAxisAngle(hmm_vec3 Axis, float AngleOfRotation)
     SineOfRotation = HMM_SinF(AngleOfRotation / 2.0f);
     RotatedVector = HMM_MultiplyVec3f(Axis, SineOfRotation);
 
-    Result.W = HMM_CosF(AngleOfRotation / 2.0f);
+    Result.w = HMM_CosF(AngleOfRotation / 2.0f);
     Result.XYZ = HMM_DivideVec3f(RotatedVector, AxisNorm);
 
     return(Result);
@@ -1171,7 +1171,7 @@ HMM_QuaternionFromAxisAngle(hmm_vec3 Axis, float AngleOfRotation)
 HINLINE bool
 HMM_CompareQuaternion(hmm_quaternion q1, hmm_quaternion q2)
 {
-    return (q1.X == q2.X && q1.Y == q2.Y && q1.Z == q2.Z && q1.W == q2.W);
+    return (q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w);
 }
 
 #ifdef HANDMADE_MATH_CPP_MODE

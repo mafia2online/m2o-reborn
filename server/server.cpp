@@ -1,4 +1,4 @@
-#include <librg/librg.h>
+﻿#include <librg/librg.h>
 #include <librg/components/transform.h>
 #include <librg/components/interpolable.h>
 #include <librg/components/client.h>
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
         auto stream = entity.assign<streamable_t>(TYPE_VEHICLE);
         auto transf = entity.assign<transform_t>();
 
-        transf->position = HMM_Vec3(transform->position.X, transform->position.Y + 3.0f, transform->position.Z);
+        transf->position = HMM_Vec3(transform->position.x, transform->position.y + 3.0f, transform->position.z);
     });
 
 

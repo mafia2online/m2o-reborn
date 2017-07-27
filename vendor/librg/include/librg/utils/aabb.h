@@ -15,35 +15,35 @@ namespace librg
 
         bool contains_2d(hmm_vec3 point)
         {
-            return(center.X - halfdim.X <= point.X
-                && center.X + halfdim.X >= point.X
-                && center.Y - halfdim.Y <= point.Y
-                && center.Y + halfdim.Y >= point.Y);
+            return(center.x - halfdim.x <= point.x
+                && center.x + halfdim.x >= point.x
+                && center.y - halfdim.y <= point.y
+                && center.y + halfdim.y >= point.y);
         }
 
         bool contains_3d(hmm_vec3 point)
         {
-            return(center.X - halfdim.X <= point.X
-                && center.X + halfdim.X >= point.X
-                && center.Y - halfdim.Y <= point.Y
-                && center.Y + halfdim.Y >= point.Y
-                && center.Z - halfdim.Z <= point.Z
-                && center.Z + halfdim.Z >= point.Z);
+            return(center.x - halfdim.x <= point.x
+                && center.x + halfdim.x >= point.x
+                && center.y - halfdim.y <= point.y
+                && center.y + halfdim.y >= point.y
+                && center.z - halfdim.z <= point.z
+                && center.z + halfdim.z >= point.z);
         }
 
         bool intersects_2d(aabb_t rhs)
         {
-            if (HMM_ABS(center.X - rhs.center.X) > (halfdim.X + rhs.halfdim.X)) return false;
-            if (HMM_ABS(center.Y - rhs.center.Y) > (halfdim.Y + rhs.halfdim.Y)) return false;
+            if (HMM_ABS(center.x - rhs.center.x) > (halfdim.x + rhs.halfdim.x)) return false;
+            if (HMM_ABS(center.y - rhs.center.y) > (halfdim.y + rhs.halfdim.y)) return false;
 
             return true;
         }
 
         bool intersects_3d(aabb_t rhs)
         {
-            if (HMM_ABS(center.X - rhs.center.X) > (halfdim.X + rhs.halfdim.X)) return false;
-            if (HMM_ABS(center.Y - rhs.center.Y) > (halfdim.Y + rhs.halfdim.Y)) return false;
-            if (HMM_ABS(center.Z - rhs.center.Z) > (halfdim.Z + rhs.halfdim.Z)) return false;
+            if (HMM_ABS(center.x - rhs.center.x) > (halfdim.x + rhs.halfdim.x)) return false;
+            if (HMM_ABS(center.y - rhs.center.y) > (halfdim.y + rhs.halfdim.y)) return false;
+            if (HMM_ABS(center.z - rhs.center.z) > (halfdim.z + rhs.halfdim.z)) return false;
 
             return true;
         }

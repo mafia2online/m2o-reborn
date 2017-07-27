@@ -11,7 +11,7 @@ namespace unit
 
             it("should be able to create itself", [](vald_t validate) {
                 auto sample = aabb_t(hmm_vec3{5, 5, 5});
-                validate((sample.halfdim.X == 5));
+                validate((sample.halfdim.x == 5));
             });
 
             it("should be able to check if 2d point is inside", [pinside](vald_t validate) {

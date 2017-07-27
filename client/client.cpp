@@ -32,6 +32,10 @@
 #include <shared_defines.h>
 #include <messages.h>
 
+// proxy some stuff
+typedef hmm_vec2 Vector2;
+typedef hmm_vec3 Vector3;
+
 // public interface definitions
 void game_init();
 void game_exit();
@@ -47,6 +51,7 @@ librg::entity_t local_player;
 M2::C_Player2 *dwLocalPlayer = nullptr;
 M2::C_Human2 *ent = nullptr;
 float ztime = 0;
+
 
 #define corelog librg::core::log
 

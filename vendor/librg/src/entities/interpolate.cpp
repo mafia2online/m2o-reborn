@@ -20,15 +20,15 @@ void librg::entities_interpolate(double dt)
         auto lpos = inter.latest.position;
         auto tpos = inter.target.position;
 
-        auto posx = HMM_Lerp(lpos.X, t, tpos.X);
-        auto posy = HMM_Lerp(lpos.Y, t, tpos.Y);
-        auto posz = HMM_Lerp(lpos.Z, t, tpos.Z);
+        auto posx = HMM_Lerp(lpos.x, t, tpos.x);
+        auto posy = HMM_Lerp(lpos.y, t, tpos.y);
+        auto posz = HMM_Lerp(lpos.z, t, tpos.z);
         auto npos = hmm_vec3{ posx, posy, posz };
 
         auto v1   = inter.latest.rotation;
         auto v2   = inter.target.rotation;
-        auto lrot = HMM_Quaternion(v1.X, v1.Y, v1.Z, v1.W);
-        auto trot = HMM_Quaternion(v2.X, v2.Y, v2.Z, v2.W);
+        auto lrot = HMM_Quaternion(v1.x, v1.y, v1.z, v1.w);
+        auto trot = HMM_Quaternion(v2.x, v2.y, v2.z, v2.w);
         hmm_quaternion nrot;
 
         if (HMM_CompareQuaternion(lrot, trot)) {
@@ -42,7 +42,7 @@ void librg::entities_interpolate(double dt)
 
         // ...
 
-        auto new_transform = transform_t(npos, HMM_Vec4(nrot.X, nrot.Y, nrot.Z, nrot.W), trans.scale);
+        auto new_transform = transform_t(npos, HMM_Vec4(nrot.x, nrot.y, nrot.z, nrot.w), trans.scale);
         events::trigger(events::on_inter, new events::event_entity_t(
             (void *)&new_transform, entity, entity.id().id(), stream.type
         ));
