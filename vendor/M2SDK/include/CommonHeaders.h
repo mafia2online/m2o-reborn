@@ -1,11 +1,9 @@
-#pragma once
-#include <stdint.h>
+﻿#pragma once
 
-using Address = unsigned long;
-using Byte    = unsigned char;
-using Pointer = unsigned int;
-
-#include <Shared/Client/CPatcher.h>
+#if !defined(Address)
+#define Address unsigned long
+#define Pointer unsigned int
+#endif
 
 namespace M2
 {

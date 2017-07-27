@@ -32,6 +32,7 @@ include_directories(
     vendor/librg/include
     vendor/m2sdk/include
     vendor/SteamAPI
+    vendor/detours
     server/
     shared/
     launcher/
@@ -58,6 +59,7 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.hpp"
     "${PROJECT_SOURCE_DIR}/vendor/SteamAPI/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/detours/*.h"
 )
 
 ###
@@ -71,7 +73,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client librg d3dx9 dxgi detours)
+    target_link_libraries(client librg d3d9 dxgi detours)
 
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
@@ -85,6 +87,7 @@ if(MSVC)
     GroupSources(server)
     GroupSources(shared)
     GroupSources(vendor/SteamAPI)
+    GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)
     GroupSources(launcher)
 endif()

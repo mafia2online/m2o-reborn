@@ -1,5 +1,3 @@
-﻿#pragma once
-
 /**
 * Random number setting current game platform id
 * to prevent connections from different games/mods, in future
@@ -28,4 +26,15 @@
 enum {
     TYPE_PLAYER,
     TYPE_VEHICLE,
+};
+
+struct gamedata_t {
+    gamedata_t(int o) : object(o) {}
+
+    int object;
+    int state;
+};
+
+struct ped_t {
+    bool entering_vehicle;
 };

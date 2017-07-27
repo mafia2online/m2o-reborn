@@ -28,7 +28,7 @@ HANDLE WINAPI CreateFileAHooked(LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD
     }
 
     if (file_found) {
-        std::string strNewDir(CCore::Instance().GetModAppDir());
+        std::string strNewDir(mod_dir);
         strNewDir += "\\game_files\\";
         strNewDir += strFileName;
         corelog("FilePatcher: Redirecting game file %s to %s", strFileName.c_str(), strNewDir.c_str());

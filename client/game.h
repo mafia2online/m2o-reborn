@@ -80,85 +80,85 @@ void game_on_tick()
 
                 M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DTFreerideNight");
 
-                CommandProcessor::RegisterCommand("lock",
-                    [](const std::string& params)->void
-                {
-                    int lock = atoi(params.c_str());
-                    dwLocalPlayer->LockControls(lock);
-                    corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
-                });
+        //         CommandProcessor::RegisterCommand("lock",
+        //             [](const std::string& params)->void
+        //         {
+        //             int lock = atoi(params.c_str());
+        //             dwLocalPlayer->LockControls(lock);
+        //             corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
+        //         });
 
-                CommandProcessor::RegisterCommand("ent",
-                    [](const std::string& params)->void
-                {
-                    ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-                    if (ent)
-                    {
-                        DWORD coreInstance = *(DWORD*)(0x1AC2778);
+        //         CommandProcessor::RegisterCommand("ent",
+        //             [](const std::string& params)->void
+        //         {
+        //             ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
+        //             if (ent)
+        //             {
+        //                 DWORD coreInstance = *(DWORD*)(0x1AC2778);
 
-                        M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-                        own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
+        //                 M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+        //                 own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
 
-                        own_model->SetName("lawl");
-                        own_model->MarkForNotify(2);
+        //                 own_model->SetName("lawl");
+        //                 own_model->MarkForNotify(2);
 
-                        reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
+        //                 reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
 
-                        reinterpret_cast<M2::C_Entity *>(ent)->Setup();
+        //                 reinterpret_cast<M2::C_Entity *>(ent)->Setup();
 
-                        // set flagsF
-                        DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
-                        *(DWORD *)(ent + 32) = flags;
+        //                 // set flagsF
+        //                 DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
+        //                 *(DWORD *)(ent + 32) = flags;
 
-                        if (flags & 0x20)
-                            corelog("Flags set sucessfully!");
+        //                 if (flags & 0x20)
+        //                     corelog("Flags set sucessfully!");
 
-                        reinterpret_cast<M2::C_Entity *>(ent)->Activate();
+        //                 reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
-                        if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-                            corelog("Entity active !");
+        //                 if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
+        //                     corelog("Entity active !");
 
-                        Vector3 pos;
-                        Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
-                        reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
-                    }
+        //                 Vector3 pos;
+        //                 Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
+        //                 reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
+        //             }
 
-                    corelog("Created at %x!", ent);
-                });
+        //             corelog("Created at %x!", ent);
+        //         });
 
-                CommandProcessor::RegisterCommand("time",
-                    [=](const std::string& params)->void
-                {
-                    float time = atof(params.c_str());
-                    M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
-                    corelog("Set time to %f", time);
-                });
+        //         CommandProcessor::RegisterCommand("time",
+        //             [=](const std::string& params)->void
+        //         {
+        //             float time = atof(params.c_str());
+        //             M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
+        //             corelog("Set time to %f", time);
+        //         });
             }
 
-            CommandProcessor::RegisterCommand("spawn",
-                [=](const std::string& params)->void
-            {
-                Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-421.758942, 479.316925, 0.051288));
-            });
+        //     CommandProcessor::RegisterCommand("spawn",
+        //         [=](const std::string& params)->void
+        //     {
+        //         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-421.758942, 479.316925, 0.051288));
+        //     });
 
-            CommandProcessor::RegisterCommand("shake", 
-                [=](const std::string& params)->void
-            {
-                M2::ShakeCommandData data;
-                data.speed = 50;
-                data.strength = 5;
-                data.duration = 3;
-                M2::C_CameraModule::Get()->GetCamera(1)->BroadcastCommand(M2::CAMCOMMAND_SHAKE, &data, 0);
-            });
+        //     CommandProcessor::RegisterCommand("shake", 
+        //         [=](const std::string& params)->void
+        //     {
+        //         M2::ShakeCommandData data;
+        //         data.speed = 50;
+        //         data.strength = 5;
+        //         data.duration = 3;
+        //         M2::C_CameraModule::Get()->GetCamera(1)->BroadcastCommand(M2::CAMCOMMAND_SHAKE, &data, 0);
+        //     });
 
-            CommandProcessor::RegisterCommand("fpv",
-                [=](const std::string& params)->void
-            {
-                if (M2::C_CameraModule::Get()->GetCamera(1)->ModeGetActiveTypeTop() != M2::CAMMODE_FPV)
-                    M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, dwLocalPlayer, true, true);
-                else
-                    M2::C_CameraModule::Get()->GetCamera(1)->ModePop(1, 1);
-            });
+        //     CommandProcessor::RegisterCommand("fpv",
+        //         [=](const std::string& params)->void
+        //     {
+        //         if (M2::C_CameraModule::Get()->GetCamera(1)->ModeGetActiveTypeTop() != M2::CAMMODE_FPV)
+        //             M2::C_CameraModule::Get()->GetCamera(1)->ModeChange(M2::CAMMODE_FPV, dwLocalPlayer, true, true);
+        //         else
+        //             M2::C_CameraModule::Get()->GetCamera(1)->ModePop(1, 1);
+        //     });
         }
     }
 
@@ -200,19 +200,19 @@ void game_on_tick()
     }
     if (GetAsyncKeyState(VK_F5) & 0x1)
     {
-        if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
-            corelog("Connection accepted");
-        }
-        else {
-            corelog("Cannot connect");
-        }
+        // if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
+        //     corelog("Connection accepted");
+        // }
+        // else {
+        //     corelog("Cannot connect");
+        // }
     }
     if (GetAsyncKeyState(VK_F6) & 0x1)
     {
-        if (CNetworkManager::Instance().Disconnect())
-            corelog("Disconnected");
-        else
-            corelog("Cannot disconnect");
+        // if (CNetworkManager::Instance().Disconnect())
+        //     corelog("Disconnected");
+        // else
+        //     corelog("Cannot disconnect");
     }
 }
 

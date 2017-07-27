@@ -1,7 +1,8 @@
 void spawn_player(librg::entity_t entity)
 {
     entity.assign<librg::streamable_t>();
-    entity.assign<gamedata_t>(PLAYER::PLAYER_PED_ID());
+    // entity.assign<gamedata_t>(PLAYER::PLAYER_PED_ID());
+    entity.assign<gamedata_t>(1);
     entity.assign<ped_t>();
 
     librg::core::log("spawned player!");

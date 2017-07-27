@@ -9,11 +9,11 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include <steam_api.h>
 
-#ifdef _DEBUG
-static const char *const CORE_DLL_NAME("Client_d.dll");
-#else
-static const char *const CORE_DLL_NAME("Client.dll");
-#endif
+// #ifdef _DEBUG
+static const char *const CORE_DLL_NAME("client.dll");
+// #else
+// static const char *const CORE_DLL_NAME("client.dll");
+// #endif
 
 static const char*  GAME_NAME("Mafia 2");
 static const char*  GAME_EXE_NAME("mafia2.exe");

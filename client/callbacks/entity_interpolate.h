@@ -11,7 +11,7 @@ void entity_inter(librg::events::event_t* evt)
 
     *transform = *(librg::transform_t*)event->data;
 
-    // ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.X, transform->position.Y, transform->position.Z, true, true, true);
-    // ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.X, transform->rotation.Y, transform->rotation.Z, transform->rotation.W);
+    // ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.x, transform->position.y, transform->position.z, true, true, true);
+    // ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.X, transform->rotation.y, transform->rotation.z, transform->rotation.w);
 }
 

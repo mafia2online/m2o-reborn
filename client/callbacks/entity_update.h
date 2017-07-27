@@ -17,7 +17,7 @@ void entity_update(librg::events::event_t* evt)
     // if (distance > DISTANCE_BEFORE_TELEPORT) {
     //     inter->latest = *transform;
 
-    //     ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.X, transform->position.Y, transform->position.Z, true, true, true);
-    //     ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.X, transform->rotation.Y, transform->rotation.Z, transform->rotation.W);
+    //     ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.x, transform->position.y, transform->position.z, true, true, true);
+    //     ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.x, transform->rotation.y, transform->rotation.z, transform->rotation.w);
     // }
 }
