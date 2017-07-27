@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /**
 * Random number setting current game platform id
@@ -27,6 +27,5 @@
 
 enum {
     TYPE_PLAYER,
-    TYPE_BOMB,
-    TYPE_ENEMY,
+    TYPE_VEHICLE,
 };

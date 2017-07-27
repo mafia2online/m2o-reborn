@@ -2,7 +2,7 @@
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
-project (m2o)
+project (m2o-reborn)
 
 
 ###
@@ -30,13 +30,12 @@ add_subdirectory(vendor/librg)
 ###
 include_directories(
     vendor/librg/include
-    vendor/M2SDK/include
+    vendor/m2sdk/include
     vendor/SteamAPI
     server/
     shared/
     launcher/
 )
-
 
 link_directories(
     # vendor/M2SDK/include
@@ -44,25 +43,34 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/vendor/detours
 )
 
+file(GLOB_RECURSE SERVER_FILES
+    "${PROJECT_SOURCE_DIR}/server/*.cpp"
+    "${PROJECT_SOURCE_DIR}/server/*.h"
+    "${PROJECT_SOURCE_DIR}/shared/*.h"
+)
 
-if(MSVC)
-    GroupSources(client)
-    GroupSources(server)
-    GroupSources(shared)
-    GroupSources(launcher)
-endif()
+file(GLOB_RECURSE CLIENT_FILES
+    "${PROJECT_SOURCE_DIR}/client/*.cpp"
+    "${PROJECT_SOURCE_DIR}/client/*.c"
+    "${PROJECT_SOURCE_DIR}/client/*.h"
+    "${PROJECT_SOURCE_DIR}/client/*.hpp"
+    "${PROJECT_SOURCE_DIR}/shared/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.hpp"
+    "${PROJECT_SOURCE_DIR}/vendor/SteamAPI/*.h"
+)
 
 ###
 # Adding executables
 # Linking libraries
 ###
-add_executable(server "${PROJECT_SOURCE_DIR}/server/server.cpp")
+add_executable(server ${SERVER_FILES})
 target_link_libraries(server librg)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
-    add_library(client SHARED "${PROJECT_SOURCE_DIR}/client/client.cpp")
+    add_library(client SHARED ${CLIENT_FILES})
     target_link_libraries(client librg d3dx9 dxgi detours)
 
     ## tha lancunha
@@ -70,4 +78,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(launcher Psapi steam_api)
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
 
+endif()
+
+if(MSVC)
+    GroupSources(client)
+    GroupSources(server)
+    GroupSources(shared)
+    GroupSources(vendor/SteamAPI)
+    GroupSources(vendor/m2sdk)
+    GroupSources(launcher)
 endif()

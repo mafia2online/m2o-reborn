@@ -1,7 +1,7 @@
-using namespace librg;
-
-void ontick(librg::events::event_t* evt)
+﻿void ontick(librg::events::event_t* evt)
 {
+    using namespace librg;
+
     auto event = (events::event_tick_t*) evt;
 
     // if (local_player.valid()) {

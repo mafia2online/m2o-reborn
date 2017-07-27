@@ -25,20 +25,38 @@
 #include <vector>
 #include <list>
 
+#include <librg/librg.h>
+#include <m2sdk.h>
+
 // shared stuff
 #include <shared_defines.h>
 #include <messages.h>
 
+// public interface definitions
 void game_init();
-void game_tick();
+void game_exit();
+void game_on_init();
+void game_on_tick();
+bool game_on_wnd_proc();
+
+HMODULE dll_module;
+std::ofstream _debug_stream;
+
+// super global var for our player
+librg::entity_t local_player;
+M2::C_Player2 *dwLocalPlayer = nullptr;
+M2::C_Human2 *ent = nullptr;
+float ztime = 0;
+
+#define corelog librg::core::log
 
 // tool stuff
-#include <tools/patcher.h>
-#include <tools/steam_drm.h>
-#include <tools/game_hooks.h>
+#include "tools/patcher.h"
+#include "tools/steam_drm.h"
+#include "tools/game_hooks.h"
+#include "tools/file_patcher.h"
 
 // actual client stuff
-#include "init.h"
 #include "callbacks/tick.h"
 #include "callbacks/other.h"
 #include "callbacks/entity_create.h"
@@ -46,44 +64,50 @@ void game_tick();
 #include "callbacks/entity_interpolate.h"
 #include "callbacks/entity_remove.h"
 #include "callbacks/clientstream_update.h"
+#include "game.h"
 
-
-// no
-std::ofstream debug;
-
-// super global var for our player
-librg::entity_t local_player;
-
-void game_init() {
-    debug.open("m2o_debug.log");
-    init_librg();
-}
-
-void game_tick() {
-    librg::core::tick();
-}
-
-void OnAttach(HMODULE module)
+void mod_on_attach(HMODULE module)
 {
-    // plox maybe integrate in some util class latr kthx
-    char szRunPath[MAX_PATH] = { '\0' };
-    GetModuleFileName(module, szRunPath, MAX_PATH);
-    m_strappdir.Set(szRunPath);
-    size_t pos = m_strappdir.GetSTLString().rfind("\\");
-    m_strappdir.GetSTLString().erase(pos, std::string::npos);
+    dll_module = module;
 
-    m_strfilesdir = m_strappdir;
-    m_strfilesdir += "\\files";
+    char run_path[MAX_PATH] = { '\0' };
+    GetModuleFileName(module, run_path, MAX_PATH);
 
+    auto startup_dir = std::string(run_path);
+    size_t pos = startup_dir.rfind("\\");
+    startup_dir.erase(pos, std::string::npos);
+
+    auto files_dir = std::string(startup_dir + "\\files");
+
+    // if (m_graphicsmanager.Init() == false) {
+    //     ExitGame("Unable to init Graphics Manager");
+    // }
+
+    game_init();
+
+    // if (ExceptionHandler::Install() == false)
+    //     ExitGame("Unable to install exception handler");
+
+    // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
+    //     ExitGame("Unable to parse config file");
+    // }
+
+    // if (CNetworkManager::Instance().Init() == false) {
+    //     ExitGame("Unable to init network manager");
+    // }
 
     CDirectInput8Hook::Install();
+
+    // m_statemanager.AddState(States::Menu, new CTitleState);
+    // m_statemanager.AddState(States::MPGame, new CGameState);
+    // m_statemanager.ActivateState(States::Menu);
 }
 
-void ExitGame(std::string strreason)
+void game_exit(std::string strreason)
 {
     librg::core_terminate();
     MessageBoxA(nullptr, strreason.c_str(), "Well.. Something went wrong!", MB_OK);
-    debug.close();
+    _debug_stream.close();
     exit(0);
 }
 
@@ -93,12 +117,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        OnAttach(hModule);
+        mod_on_attach(hModule);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
-        ExitGame("deatch");
+        game_exit("deatch");
         break;
     }
     return TRUE;

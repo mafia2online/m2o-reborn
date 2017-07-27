@@ -1,14 +1,10 @@
-//todo
-//#include <CCore.h>
-//#include <CGame.h>
-
 DWORD GameLoopHook_1_Return;
 DWORD _call = 0x473D10;
 void __declspec(naked) GameLoopHook_1()
 {
     __asm call[_call];
     __asm pushad;
-    game_tick();
+    game_on_tick();
     __asm popad;
     __asm jmp[GameLoopHook_1_Return];
 }
@@ -19,7 +15,7 @@ void __declspec(naked) GameLoopHook_2()
     __asm fstp    dword ptr[esp+0x10];
     __asm fld     dword ptr[esp+0x10];
     __asm pushad;
-    game_tick();
+    game_on_tick();
     __asm popad;
     __asm jmp[GameLoopHook_2_Return];
 }
@@ -30,7 +26,7 @@ void __declspec(naked) GameInitHook()
 {
     __asm call[_C_PreloadSDS__FinishPendingSlots];
     __asm pushad;
-    game_init();
+    game_on_init();
     __asm popad;
     __asm jmp[GameInitHook_Return];
 }
@@ -39,9 +35,8 @@ WNDPROC _WndProc;
 
 LRESULT __stdcall WndProcHk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    // todo add handling for something
-    // if (CGame::Instance().WndProc(hWnd, uMsg, wParam, lParam))
-    //     return true; // handled by ourselves
+    if (game_on_wnd_proc(hWnd, uMsg, wParam, lParam))
+        return true; // handled by ourselves
 
     return CallWindowProc(_WndProc, hWnd, uMsg, wParam, lParam);
 }

@@ -18,6 +18,7 @@ client.dir/*
 server.dir/*
 launcher.dir/*
 .vs/*
+Win32/
 
 !build-mac/.keep
 !build-lin/.keep
@@ -29,5 +30,6 @@ launcher.dir/*
 # os stuff
 .DS_Store
 Thumbs.db
+.sync/
 
 *.swp
