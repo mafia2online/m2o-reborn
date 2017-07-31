@@ -1,12 +1,12 @@
-#define NOMINMAX // std::numeric_limits min&max
+﻿#define NOMINMAX // std::numeric_limits min&max
 
 #include <stdio.h>
 #include <stdint.h>
-//#include <windows.h>
 
 // bla bla
 #include <memory>
 #include <limits>
+#include <algorithm>
 
 // steam stuff
 #include <iostream>
@@ -14,15 +14,16 @@
 #include <fcntl.h>
 #include <io.h>
 
-#include <algorithm>
-
 // container stuff
 #include <string>
 #include <vector>
 #include <list>
+#include <unordered_map>
 
+// librg
 #include <librg/librg.h>
 
+// mod-level definition stuff
 #if !defined(Address)
 #define Address unsigned long
 #define Pointer unsigned int
@@ -41,17 +42,28 @@ void game_on_init();
 void game_on_tick();
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-HMODULE dll_module;
-std::ofstream _debug_stream;
 std::string mod_dir;
-
-// super global var for our player
-librg::entity_t local_player;
-float ztime = 0;
 
 #define corelog librg::core::log
 
+// dx stuff
+#define DIRECTINPUT_VERSION 0x0800
 #include <detours.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <dinput.h>
+
+// gwen
+#include <Gwen/Gwen.h>
+#include <Gwen/Skins/Simple.h>
+#include <Gwen/Skins/TexturedBase.h>
+#include <Gwen/Controls/Base.h>
+#include <Gwen/Controls/ListBox.h>
+#include <Gwen/Controls/TextBox.h>
+#include <Gwen/Controls/WindowControl.h>
+#include <Gwen/Input/Windows.h>
+#include <Gwen/Renderers/DirectX9.h>
+
 
 // tool stuff
 #include "tools/console.h"
@@ -62,6 +74,7 @@ float ztime = 0;
 
 #include <m2sdk.h>
 
+// todo: refactor
 M2::C_Player2 *dwLocalPlayer = nullptr;
 M2::C_Human2 *ent = nullptr;
 
@@ -77,7 +90,27 @@ M2::C_Human2 *ent = nullptr;
 #include "callbacks/entity_interpolate.h"
 #include "callbacks/entity_remove.h"
 #include "callbacks/clientstream_update.h"
+#include "gfx/dx/CDirect3DDevice9Proxy.h"
+#include "gfx/dx/CDirect3D9Proxy.h"
+#include "gfx/dx/CDirect3D9Hook.h"
+#include "gfx/dx/CDirectInputDevice8Proxy.h"
+#include "gfx/dx/CDirectInput8Proxy.h"
+#include "gfx/dx/CDirectInput8Hook.h"
+#include "gfx/CMPStateManager.h"
+#include "gfx/CDebugConsole.h"
+#include "gfx/CFontManager.h"
+#include "gfx/GwenManager.h"
+#include "gfx/CGraphicsManager.h"
 #include "game.h"
+
+HMODULE dll_module;
+std::ofstream _debug_stream;
+
+// super global var for our player
+librg::entity_t local_player;
+float ztime = 0;
+
+CGraphicsManager m_graphicsmanager;
 
 void mod_on_attach(HMODULE module)
 {
@@ -92,24 +125,24 @@ void mod_on_attach(HMODULE module)
 
     auto files_dir = std::string(mod_dir + "\\files");
 
-    // if (m_graphicsmanager.Init() == false) {
-    //     ExitGame("Unable to init Graphics Manager");
-    // }
+    if (m_graphicsmanager.Init() == false) {
+        game_exit("Unable to init Graphics Manager");
+    }
 
     game_init();
 
     // if (ExceptionHandler::Install() == false)
-    //     ExitGame("Unable to install exception handler");
+    //     game_exit("Unable to install exception handler");
 
     // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
-    //     ExitGame("Unable to parse config file");
+    //     game_exit("Unable to parse config file");
     // }
 
     // if (CNetworkManager::Instance().Init() == false) {
-    //     ExitGame("Unable to init network manager");
+    //     game_exit("Unable to init network manager");
     // }
 
-    //CDirectInput8Hook::Install();
+    CDirectInput8Hook::Install();
 
     // m_statemanager.AddState(States::Menu, new CTitleState);
     // m_statemanager.AddState(States::MPGame, new CGameState);

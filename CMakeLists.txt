@@ -31,6 +31,7 @@ add_subdirectory(vendor/librg)
 include_directories(
     vendor/librg/include
     vendor/m2sdk/include
+    vendor/GWen/include
     vendor/SteamAPI
     vendor/detours
     server/
@@ -52,7 +53,6 @@ file(GLOB_RECURSE SERVER_FILES
 
 file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/client/*.cpp"
-    "${PROJECT_SOURCE_DIR}/client/*.c"
     "${PROJECT_SOURCE_DIR}/client/*.h"
     "${PROJECT_SOURCE_DIR}/client/*.hpp"
     "${PROJECT_SOURCE_DIR}/shared/*.h"
@@ -60,6 +60,7 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.hpp"
     "${PROJECT_SOURCE_DIR}/vendor/SteamAPI/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/detours/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/GWen/*.h"
 )
 
 ###
@@ -73,7 +74,8 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client librg d3d9 dxgi detours)
+    target_link_libraries(client librg d3d9 dxgi dinput8 dxguid detours)
+    set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
 
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
@@ -89,5 +91,6 @@ if(MSVC)
     GroupSources(vendor/SteamAPI)
     GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)
+    GroupSources(vendor/GWen)
     GroupSources(launcher)
 endif()

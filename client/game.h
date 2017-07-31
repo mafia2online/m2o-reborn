@@ -1,15 +1,17 @@
-uint32_t game_base;
+﻿uint32_t game_base;
 
 void game_init()
 {
     game_base = Mem::GetModuleAddress(nullptr);
     Mem::Initialize();
 
-    corelog("<CGame::HirePreHookers> Current Thread ID: %x", GetCurrentThreadId());
+    printf("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
 
     FilePatcher_Initialize();
     SteamDRMPatch_Apply();
     GameHooks_Install();
+
+    printf("hey\n");
 
     // Disable loading screen
     Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
@@ -21,12 +23,14 @@ void game_init()
 
 void game_on_init()
 {
+    printf("game_on_init\n");
+
     // setup manual client mode
     librg::core_initialize(librg::mode_client_manual);
 
     librg::events::add(librg::events::on_log, [](librg::events::event_t* evt) {
         auto event = (librg::events::event_log_t*) evt;
-        printf("%s", event->output);
+        printf("%s", event->output.c_str());
         _debug_stream << event->output;
     });
 
