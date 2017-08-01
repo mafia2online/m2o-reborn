@@ -1,6 +1,6 @@
-struct Font
+﻿struct Font
 {
-    SString face;
+    std::string face;
     uint16_t size;
     bool bold;
 
@@ -13,10 +13,10 @@ public:
     CFontManager(IDirect3DDevice9* pDevice);
     ~CFontManager();
 
-    bool AddFont(SString strIdentifier, SString strFontFace, uint16_t size, bool bold);
-    Font* GetFont(SString strIdentifier) {
+    bool AddFont(std::string strIdentifier, std::string strFontFace, uint16_t size, bool bold);
+    Font* GetFont(std::string strIdentifier) {
 
-        const auto& font = m_fontmap.find(strIdentifier.GetSTLString());
+        const auto& font = m_fontmap.find(strIdentifier);
 
         if (font != m_fontmap.end())
             return &font->second;
@@ -74,7 +74,7 @@ private:
 private:
     IDirect3DDevice9 *m_pdevice;
     ID3DXSprite *m_pdxsprite;
-    SString m_strDefaultFont;
+    std::string m_strDefaultFont;
     std::unordered_map<std::string, Font> m_fontmap;
 };
 CFontManager::CFontManager(IDirect3DDevice9* pDevice) : m_pdevice(pDevice)
@@ -86,13 +86,13 @@ CFontManager::~CFontManager()
 {
 }
 
-bool CFontManager::AddFont(SString strIdentifier, SString strFontFace, uint16_t size, bool bold)
+bool CFontManager::AddFont(std::string strIdentifier, std::string strFontFace, uint16_t size, bool bold)
 {
-    const char *szIdentifier = strIdentifier.GetCStr();
+    const char *szIdentifier = strIdentifier.c_str();
     if (m_fontmap.find(szIdentifier) == m_fontmap.end())
     {
         Font &info = m_fontmap[szIdentifier] = Font{ strFontFace, size, bold, nullptr };
-        if (!SUCCEEDED(D3DXCreateFont(m_pdevice, info.size, 0, (info.bold ? FW_BOLD : FW_NORMAL), 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, (DEFAULT_PITCH | FF_DONTCARE), info.face.GetCStr(), &info.pfont)))
+        if (!SUCCEEDED(D3DXCreateFont(m_pdevice, info.size, 0, (info.bold ? FW_BOLD : FW_NORMAL), 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, (DEFAULT_PITCH | FF_DONTCARE), info.face.c_str(), &info.pfont)))
         {
             info.pfont = nullptr;
             return false;

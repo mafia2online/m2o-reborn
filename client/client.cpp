@@ -1,4 +1,4 @@
-﻿#define NOMINMAX // std::numeric_limits min&max
+#define NOMINMAX // std::numeric_limits min&max
 
 #include <stdio.h>
 #include <stdint.h>
@@ -43,6 +43,7 @@ void game_on_tick();
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 std::string mod_dir;
+std::string mod_files_dir;
 
 #define corelog librg::core::log
 
@@ -71,12 +72,17 @@ std::string mod_dir;
 #include "tools/steam_drm.h"
 #include "tools/game_hooks.h"
 #include "tools/file_patcher.h"
+#include "tools/singleton.h" // ohhh nooo
 
 #include <m2sdk.h>
 
 // todo: refactor
 M2::C_Player2 *dwLocalPlayer = nullptr;
 M2::C_Human2 *ent = nullptr;
+librg::entity_t local_player;
+std::ofstream _debug_stream;
+float ztime = 0;
+HMODULE dll_module;
 
 // shared stuff
 #include "shared_defines.h"
@@ -90,27 +96,50 @@ M2::C_Human2 *ent = nullptr;
 #include "callbacks/entity_interpolate.h"
 #include "callbacks/entity_remove.h"
 #include "callbacks/clientstream_update.h"
-#include "gfx/dx/CDirect3DDevice9Proxy.h"
-#include "gfx/dx/CDirect3D9Proxy.h"
-#include "gfx/dx/CDirect3D9Hook.h"
-#include "gfx/dx/CDirectInputDevice8Proxy.h"
-#include "gfx/dx/CDirectInput8Proxy.h"
-#include "gfx/dx/CDirectInput8Hook.h"
+#include "dx/CDirect3DDevice9Proxy.h"
+#include "dx/CDirect3D9Proxy.h"
+#include "dx/CDirect3D9Hook.h"
+#include "dx/CDirectInputDevice8Proxy.h"
+#include "dx/CDirectInput8Proxy.h"
+#include "dx/CDirectInput8Hook.h"
 #include "gfx/CMPStateManager.h"
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
 #include "gfx/GwenManager.h"
 #include "gfx/CGraphicsManager.h"
+#include "gfx/CTitleState.h"
 #include "game.h"
 
-HMODULE dll_module;
-std::ofstream _debug_stream;
-
-// super global var for our player
-librg::entity_t local_player;
-float ztime = 0;
-
 CGraphicsManager m_graphicsmanager;
+CMPStateManager m_statemanager;
+
+void GetStateAndInitialize(void *ptr) {
+    m_statemanager.InitializeResources(ptr);
+}
+
+void GetStateAndRender(void *ptr) {
+    m_statemanager.Render(ptr);
+}
+
+void gfx_OnDeviceCreate(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+    m_graphicsmanager.OnDeviceCreate(pDevice, pPresentationParameters);
+}
+
+void gfx_OnDevicePreRender() {
+    m_graphicsmanager.OnDevicePreRender();
+}
+
+void gfx_OnDeviceRender() {
+    m_graphicsmanager.OnDeviceRender();
+}
+
+void gfx_OnDeviceLost(IDirect3DDevice9* pDevice) {
+    m_graphicsmanager.OnDeviceLost(pDevice);
+}
+
+void gfx_OnDeviceReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+    m_graphicsmanager.OnDeviceReset(pDevice, pPresentationParameters);
+}
 
 void mod_on_attach(HMODULE module)
 {
@@ -123,7 +152,13 @@ void mod_on_attach(HMODULE module)
     SetTextFGColor(7);
     printf("starting...\n");
 
-    auto files_dir = std::string(mod_dir + "\\files");
+    char szRunPath[MAX_PATH] = { '\0' };
+    GetModuleFileName(module, szRunPath, MAX_PATH);
+    mod_dir = std::string(szRunPath);
+    size_t pos = mod_dir.rfind("\\");
+    mod_dir.erase(pos, std::string::npos);
+
+    mod_files_dir = std::string(mod_dir + "\\files");
 
     if (m_graphicsmanager.Init() == false) {
         game_exit("Unable to init Graphics Manager");
@@ -144,9 +179,9 @@ void mod_on_attach(HMODULE module)
 
     CDirectInput8Hook::Install();
 
-    // m_statemanager.AddState(States::Menu, new CTitleState);
+    m_statemanager.AddState(States::Menu, new CTitleState);
     // m_statemanager.AddState(States::MPGame, new CGameState);
-    // m_statemanager.ActivateState(States::Menu);
+    m_statemanager.ActivateState(States::Menu);
 }
 
 void game_exit(std::string reason)

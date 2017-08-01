@@ -28,6 +28,10 @@ private:
     IDirect3DDevice9* m_pdevice;
     D3DPRESENT_PARAMETERS m_presentparams;
 };
+
+void GetStateAndInitialize(void *);
+void GetStateAndRender(void *);
+
 CGraphicsManager::CGraphicsManager()
 {
     // derp
@@ -54,7 +58,7 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
     m_pdevice = pDevice;
     memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
 
-    CCore::Instance().GetStateManager().InitializeResources(this);
+    GetStateAndInitialize(this);
 }
 
 void CGraphicsManager::OnDeviceLost(IDirect3DDevice9 * pDevice)
@@ -82,6 +86,6 @@ void CGraphicsManager::OnDevicePreRender(void)
 
 void CGraphicsManager::OnDeviceRender(void)
 {
-    CCore::Instance().GetStateManager().Render(this);
+    GetStateAndRender(this);
     m_pGwenManager->OnDeviceRender();
 }

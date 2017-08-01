@@ -1,4 +1,4 @@
-class GwenManager
+﻿class GwenManager
 {
 public:
     GwenManager(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters);
@@ -25,7 +25,7 @@ GwenManager::GwenManager(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPr
 
     // Create a GWEN skin
     m_pskin = new Gwen::Skin::TexturedBase(m_prenderer);
-    m_pskin->Init((CCore::Instance().GetModFilesDir() + "\\DefaultSkin.png").GetCStr());
+    m_pskin->Init((mod_files_dir + "\\DefaultSkin.png").c_str());
 
     // Create a Canvas (it's root, on which all other GWEN panels are created)
     m_pcanvas = new Gwen::Controls::Canvas(m_pskin);

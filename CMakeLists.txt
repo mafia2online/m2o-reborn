@@ -20,6 +20,11 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "/MDd" CACHE STRING "Debug compiler flags" FORCE)
+endif()
+
+
 ###
 # Compile vendor dependencies
 ###
@@ -29,20 +34,20 @@ add_subdirectory(vendor/librg)
 # Includes for libs and remote sources
 ###
 include_directories(
+    vendor/steam_api/include
+    vendor/detours/include
     vendor/librg/include
     vendor/m2sdk/include
-    vendor/GWen/include
-    vendor/SteamAPI
-    vendor/detours
+    vendor/gwen/include
     server/
     shared/
     launcher/
 )
 
 link_directories(
-    # vendor/M2SDK/include
-    ${PROJECT_SOURCE_DIR}/vendor/SteamAPI/lib
-    ${PROJECT_SOURCE_DIR}/vendor/detours
+    ${PROJECT_SOURCE_DIR}/vendor/steam_api/lib
+    ${PROJECT_SOURCE_DIR}/vendor/detours/lib
+    ${PROJECT_SOURCE_DIR}/vendor/gwen/lib
 )
 
 file(GLOB_RECURSE SERVER_FILES
@@ -56,12 +61,17 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/client/*.h"
     "${PROJECT_SOURCE_DIR}/client/*.hpp"
     "${PROJECT_SOURCE_DIR}/shared/*.h"
-    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h"
-    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.hpp"
-    "${PROJECT_SOURCE_DIR}/vendor/SteamAPI/*.h"
-    "${PROJECT_SOURCE_DIR}/vendor/detours/*.h"
-    "${PROJECT_SOURCE_DIR}/vendor/GWen/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/steam_api/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/detours/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h*"
+    "${PROJECT_SOURCE_DIR}/vendor/gwen/include/*.h"
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(GWEN_LIBS gwen_static GWEN-Renderer-DirectX9)
+else()
+    set(GWEN_LIBS gwen_staticd GWEND-Renderer-DirectX9d)
+endif()
 
 ###
 # Adding executables
@@ -74,7 +84,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client librg d3d9 dxgi dinput8 dxguid detours)
+    target_link_libraries(client librg d3d9 dxgi dinput8 dxguid detours ${GWEN_LIBS})
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
 
     ## tha lancunha
@@ -84,13 +94,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 endif()
 
-if(MSVC)
+if (MSVC)
     GroupSources(client)
     GroupSources(server)
     GroupSources(shared)
-    GroupSources(vendor/SteamAPI)
+    GroupSources(vendor/steam_api)
     GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)
-    GroupSources(vendor/GWen)
+    GroupSources(vendor/gwen)
     GroupSources(launcher)
 endif()

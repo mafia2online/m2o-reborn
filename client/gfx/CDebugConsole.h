@@ -38,18 +38,16 @@ void CDebugConsole::RegisterComponents(Gwen::Controls::Canvas * pCanvas)
     Gwen::Controls::WindowControl *base = new Gwen::Controls::WindowControl(pCanvas);
     base->SetBounds(10, 10, 600, 300);
     base->SetTitle(L"Debug console ЧФчфв");
-    
+
     m_plistboxctrl = new Gwen::Controls::ListBox(base);
     m_plistboxctrl->Dock(Gwen::Pos::Top);
     m_plistboxctrl->SetHeight(m_plistboxctrl->GetParent()->Height() - 70);
 
-    CCore::Instance().GetLogger().SetCallback(
-        [=](const char *pszText)->void
-    {
-        m_plistboxctrl->AddItem(pszText);
+    librg::events::add(librg::events::on_log, [=](librg::events::event_t* evt) {
+        auto event = (librg::events::event_log_t*) evt;
+        m_plistboxctrl->AddItem(event->output);
         m_plistboxctrl->ScrollToBottom();
-    }
-    );
+    });
 
     m_inputbox = new Gwen::Controls::TextBox(base);
     m_inputbox->Dock(Gwen::Pos::Bottom);
@@ -62,7 +60,7 @@ void CDebugConsole::RegisterComponents(Gwen::Controls::Canvas * pCanvas)
 void CDebugConsole::OnSubmit(Gwen::Controls::Base* pControl)
 {
     Gwen::Controls::TextBox* textbox = (Gwen::Controls::TextBox*)(pControl);
-    
+
     if (textbox->GetText().m_String[0] == '/')
     {
         if (!CommandProcessor::ProcessCommand(textbox->GetText().m_String))
