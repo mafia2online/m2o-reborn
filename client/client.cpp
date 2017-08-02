@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+//#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
 #include <stdio.h>
@@ -159,8 +161,45 @@ void mod_on_attach(HMODULE module)
     mod_dir.erase(pos, std::string::npos);
 
     mod_files_dir = std::string(mod_dir + "\\files");
+    _debug_stream.open(mod_dir + "\\m2o_debug.log");
+
+    printf("attaching librg\n");
+
+    // setup manual client mode
+    librg::core_initialize(librg::mode_client_manual);
+
+    librg::events::add(librg::events::on_log, [](librg::events::event_t* evt) {
+        auto event = (librg::events::event_log_t*) evt;
+        printf("%s", event->output.c_str());
+        _debug_stream << event->output;
+    });
+
+    // setup callbacks
+    librg::events::add(librg::events::on_tick, ontick);
+    librg::events::add(librg::events::on_inter, entity_inter);
+    librg::events::add(librg::events::on_create, entity_create);
+    librg::events::add(librg::events::on_update, entity_update);
+    librg::events::add(librg::events::on_remove, entity_remove);
+    librg::events::add(librg::events::on_connect, client_connect);
+    librg::events::add(librg::events::on_disconnect, client_disconnect);
+    librg::events::add(librg::events::on_client_stream_entity, clientstream_update);
+
+    auto cfg = librg::config_t{};
+    cfg.ip = "inlife.no-ip.org";
+    cfg.port = 27010;
+    cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
+    cfg.tick_delay = 64;
+    cfg.max_connections = 8;
+    cfg.platform_id = 1;
+    cfg.proto_version = 1;
+    cfg.build_version = 1;
+
+    // start the client (network connection)
+    librg::core::start(cfg);
+    // librg::network::start();
 
     if (m_graphicsmanager.Init() == false) {
+        corelog("Unable to init Graphics Manager");
         game_exit("Unable to init Graphics Manager");
     }
 
@@ -186,6 +225,7 @@ void mod_on_attach(HMODULE module)
 
 void game_exit(std::string reason)
 {
+    corelog("exiting %s", reason.c_str());
     librg::core_terminate();
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
     _debug_stream.close();
@@ -203,7 +243,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
-        game_exit("deatch");
+        // game_exit("deatch");
         break;
     }
     return TRUE;
