@@ -1,4 +1,4 @@
-﻿#include <librg/librg.h>
+#include <librg/librg.h>
 #include <librg/components/transform.h>
 #include <librg/components/interpolable.h>
 #include <librg/components/client.h>
@@ -69,7 +69,7 @@ void clientstreamer_update(events::event_t* evt)
         break;
         case TYPE_PLAYER: {
             auto object = event->entity.component<ped_t>();
-            object->speed = event->data->read_float();
+            // object->speed = event->data->read_float();
         }
         break;
     }
@@ -152,7 +152,6 @@ int main(int argc, char** argv)
     events::set(events::on_connect, client_connect);
     events::set(events::on_disconnect, client_disconnect);
 
-
     librg::network::set(GAME_SPAWN_VEHICLE, [](network::peer_t* peer, network::packet_t* packet, network::bitstream_t* data) {
         auto transform = network::connected_peers[peer].component<transform_t>();
         core::log("spawning vehicle!");
@@ -163,7 +162,6 @@ int main(int argc, char** argv)
 
         transf->position = HMM_Vec3(transform->position.x, transform->position.y + 3.0f, transform->position.z);
     });
-
 
     network::set(GAME_PED_ENTER_VEHICLE, [](network::peer_t *peer, network::packet_t *packet, network::bitstream_t *data) {
         auto guid = data->read_uint64();
@@ -182,7 +180,6 @@ int main(int argc, char** argv)
         // set current player as entity streamer
         streamer::client::set(entity, peer);
     });
-
 
     auto cfg = librg::config_t{};
     cfg.ip = "localhost";

@@ -55,51 +55,51 @@ void game_on_tick()
                     corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
                 });
 
-        //         CommandProcessor::RegisterCommand("ent",
-        //             [](const std::string& params)->void
-        //         {
-        //             ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-        //             if (ent)
-        //             {
-        //                 DWORD coreInstance = *(DWORD*)(0x1AC2778);
+                CommandProcessor::RegisterCommand("ent",
+                    [](const std::string& params)->void
+                {
+                    ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
+                    if (ent)
+                    {
+                        DWORD coreInstance = *(DWORD*)(0x1AC2778);
 
-        //                 M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-        //                 own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
+                        M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+                        own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
 
-        //                 own_model->SetName("lawl");
-        //                 own_model->MarkForNotify(2);
+                        own_model->SetName("lawl");
+                        own_model->MarkForNotify(2);
 
-        //                 reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
+                        reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
 
-        //                 reinterpret_cast<M2::C_Entity *>(ent)->Setup();
+                        reinterpret_cast<M2::C_Entity *>(ent)->Setup();
 
-        //                 // set flagsF
-        //                 DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
-        //                 *(DWORD *)(ent + 32) = flags;
+                        // set flagsF
+                        DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
+                        *(DWORD *)(ent + 32) = flags;
 
-        //                 if (flags & 0x20)
-        //                     corelog("Flags set sucessfully!");
+                        if (flags & 0x20)
+                            corelog("Flags set sucessfully!");
 
-        //                 reinterpret_cast<M2::C_Entity *>(ent)->Activate();
+                        reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
-        //                 if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-        //                     corelog("Entity active !");
+                        if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
+                            corelog("Entity active !");
 
-        //                 Vector3 pos;
-        //                 Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
-        //                 reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
-        //             }
+                        Vector3 pos;
+                        Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
+                        reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
+                    }
 
-        //             corelog("Created at %x!", ent);
-        //         });
+                    corelog("Created at %x!", ent);
+                });
 
-        //         CommandProcessor::RegisterCommand("time",
-        //             [=](const std::string& params)->void
-        //         {
-        //             float time = atof(params.c_str());
-        //             M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
-        //             corelog("Set time to %f", time);
-        //         });
+                CommandProcessor::RegisterCommand("time",
+                    [=](const std::string& params)->void
+                {
+                    float time = atof(params.c_str());
+                    M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
+                    corelog("Set time to %f", time);
+                });
             }
 
             CommandProcessor::RegisterCommand("spawn",

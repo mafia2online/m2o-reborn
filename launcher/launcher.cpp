@@ -394,8 +394,7 @@ namespace Launcher
 
         const InjectLibraryResults moduleInjectResult = InjectLibraryIntoProcess(piProcessInfo.hProcess, dllPath.c_str());
 
-        if (moduleInjectResult != INJECT_LIBRARY_RESULT_OK)
-        {
+        if (moduleInjectResult != INJECT_LIBRARY_RESULT_OK) {
             std::string error = Format("Failed to inject module into game process\nCore : %s (%i)", InjectLibraryResultToString(moduleInjectResult), moduleInjectResult);
             Launcher::HandleError(error);
 

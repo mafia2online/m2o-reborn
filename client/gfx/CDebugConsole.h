@@ -37,7 +37,7 @@ void CDebugConsole::RegisterComponents(Gwen::Controls::Canvas * pCanvas)
 {
     Gwen::Controls::WindowControl *base = new Gwen::Controls::WindowControl(pCanvas);
     base->SetBounds(10, 10, 600, 300);
-    base->SetTitle(L"Debug console ЧФчфв");
+    base->SetTitle("Debug console сука");
 
     m_plistboxctrl = new Gwen::Controls::ListBox(base);
     m_plistboxctrl->Dock(Gwen::Pos::Top);
