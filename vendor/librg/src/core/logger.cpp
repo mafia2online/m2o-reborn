@@ -28,7 +28,7 @@ void core::error(const char* format, ...)
     char output[2048] = { 0 };
 
     // TODO(inlife): move to async trigger -> callback
-    sprintf(output, "[SERVER][%s] - %s\n", buf, message);
+    sprintf(output, "[%s] - %s\n", buf, message);
     events::trigger(events::on_log, new events::event_log_t(output));
 }
 
@@ -55,6 +55,6 @@ void core::log(const char* format, ...)
     char output[2048] = { 0 };
 
     // TODO(inlife): move to async trigger -> callback
-    sprintf(output, "[SERVER][%s] - %s\n", buf, message);
+    sprintf(output, "[%s] - %s\n", buf, message);
     events::trigger(events::on_log, new events::event_log_t(output));
 }

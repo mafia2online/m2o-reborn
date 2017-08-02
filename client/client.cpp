@@ -110,37 +110,13 @@ HMODULE dll_module;
 #include "gfx/GwenManager.h"
 #include "gfx/CGraphicsManager.h"
 #include "gfx/CTitleState.h"
+#include "proxies.h"
 #include "game.h"
 
-CGraphicsManager m_graphicsmanager;
-CMPStateManager m_statemanager;
-
-void GetStateAndInitialize(void *ptr) {
-    m_statemanager.InitializeResources(ptr);
-}
-
-void GetStateAndRender(void *ptr) {
-    m_statemanager.Render(ptr);
-}
-
-void gfx_OnDeviceCreate(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-    m_graphicsmanager.OnDeviceCreate(pDevice, pPresentationParameters);
-}
-
-void gfx_OnDevicePreRender() {
-    m_graphicsmanager.OnDevicePreRender();
-}
-
-void gfx_OnDeviceRender() {
-    m_graphicsmanager.OnDeviceRender();
-}
-
-void gfx_OnDeviceLost(IDirect3DDevice9* pDevice) {
-    m_graphicsmanager.OnDeviceLost(pDevice);
-}
-
-void gfx_OnDeviceReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-    m_graphicsmanager.OnDeviceReset(pDevice, pPresentationParameters);
+void mod_onlog(librg::events::event_t* evt) {
+    auto event = (librg::events::event_log_t*) evt;
+    _debug_stream << event->output;
+    printf("%s", event->output.c_str());
 }
 
 void mod_on_attach(HMODULE module)
@@ -168,13 +144,8 @@ void mod_on_attach(HMODULE module)
     // setup manual client mode
     librg::core_initialize(librg::mode_client_manual);
 
-    librg::events::add(librg::events::on_log, [](librg::events::event_t* evt) {
-        auto event = (librg::events::event_log_t*) evt;
-        printf("%s", event->output.c_str());
-        _debug_stream << event->output;
-    });
-
     // setup callbacks
+    librg::events::add(librg::events::on_log, mod_onlog);
     librg::events::add(librg::events::on_tick, ontick);
     librg::events::add(librg::events::on_inter, entity_inter);
     librg::events::add(librg::events::on_create, entity_create);
@@ -185,7 +156,7 @@ void mod_on_attach(HMODULE module)
     librg::events::add(librg::events::on_client_stream_entity, clientstream_update);
 
     auto cfg = librg::config_t{};
-    cfg.ip = "inlife.no-ip.org";
+    cfg.ip = "localhost";
     cfg.port = 27010;
     cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
     cfg.tick_delay = 64;
@@ -196,7 +167,6 @@ void mod_on_attach(HMODULE module)
 
     // start the client (network connection)
     librg::core::start(cfg);
-    // librg::network::start();
 
     if (m_graphicsmanager.Init() == false) {
         corelog("Unable to init Graphics Manager");

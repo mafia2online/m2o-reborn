@@ -47,13 +47,13 @@ void game_on_tick()
 
                 M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DTFreerideNight");
 
-        //         CommandProcessor::RegisterCommand("lock",
-        //             [](const std::string& params)->void
-        //         {
-        //             int lock = atoi(params.c_str());
-        //             dwLocalPlayer->LockControls(lock);
-        //             corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
-        //         });
+                CommandProcessor::RegisterCommand("lock",
+                    [](const std::string& params)->void
+                {
+                    int lock = atoi(params.c_str());
+                    dwLocalPlayer->LockControls(lock);
+                    corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
+                });
 
         //         CommandProcessor::RegisterCommand("ent",
         //             [](const std::string& params)->void
@@ -102,11 +102,11 @@ void game_on_tick()
         //         });
             }
 
-        //     CommandProcessor::RegisterCommand("spawn",
-        //         [=](const std::string& params)->void
-        //     {
-        //         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &Vector3(-421.758942, 479.316925, 0.051288));
-        //     });
+            CommandProcessor::RegisterCommand("spawn",
+                [=](const std::string& params)->void
+            {
+                Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &HMM_Vec3(-421.758942, 479.316925, 0.051288));
+            });
 
         //     CommandProcessor::RegisterCommand("shake", 
         //         [=](const std::string& params)->void
@@ -167,6 +167,7 @@ void game_on_tick()
     }
     if (GetAsyncKeyState(VK_F5) & 0x1)
     {
+        librg::network::start();
         // if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
         //     corelog("Connection accepted");
         // }
@@ -191,15 +192,15 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     msg.wParam = wParam;
     msg.message = uMsg;
 
-    // if (uMsg == WM_KEYDOWN) {
-    //     if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {
-    //         CDebugConsole::Instance().Focus();
-    //         return true;
-    //     }
-    // }
+    if (uMsg == WM_KEYDOWN) {
+        if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {
+            CDebugConsole::Instance().Focus();
+            return true;
+        }
+    }
 
-    // if (CCore::Instance().GetGraphics().GetGwenManager()->GetInput().ProcessMessage(msg))
-    //     return true;
+    if (m_graphicsmanager.GetGwenManager()->GetInput().ProcessMessage(msg))
+        return true;
 
     return false; // not handled
 }
