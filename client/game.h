@@ -1,4 +1,4 @@
-﻿uint32_t game_base;
+uint32_t game_base;
 
 void game_init()
 {
@@ -28,6 +28,8 @@ void game_on_init()
 
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 }
+
+bool spawned = false;
 
 void game_on_tick()
 {
@@ -165,19 +167,15 @@ void game_on_tick()
         M2::C_ShotManager::Get()->CreateExplosion(fire);
         corelog("Created fire!");
     }
-    if (GetAsyncKeyState(VK_F5) & 0x1)
+    if (GetAsyncKeyState(VK_F5) & 0x1 && !spawned)
     {
         corelog("spawning and connecting...");
         dwLocalPlayer->LockControls(false);
         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &HMM_Vec3(-421.758942, 479.316925, 0.051288));
 
         librg::network::start();
-        // if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
-        //     corelog("Connection accepted");
-        // }
-        // else {
-        //     corelog("Cannot connect");
-        // }
+
+        spawned = true;
     }
     if (GetAsyncKeyState(VK_F6) & 0x1)
     {
@@ -199,14 +197,13 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     msg.message = uMsg;
 
     return false; // todo
-    
+
 
     if (uMsg == WM_LBUTTONDOWN) {
         corelog("Pojeb sa ty pica!");
     }
 
     if (nk_ctx) {
-        
         if (uMsg == WM_MOUSEMOVE) {
             mouse_pos pos = *(mouse_pos *)lParam;
             // we shall call it in a tight loop since WM_MOUSEMOVE IS not triggered by the game...

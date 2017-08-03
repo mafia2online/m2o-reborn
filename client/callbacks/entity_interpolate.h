@@ -12,6 +12,7 @@ void entity_inter(librg::events::event_t* evt)
     *transform = *(librg::transform_t*)event->data;
     
     remote->object->SetPosition(transform->position);
+    //remote->object->SetRotation(HMM_QuaternionToEuler(HMM_QuaternionV4(transform->rotation)));
     
 }
 

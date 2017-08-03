@@ -65,6 +65,10 @@ extern "C"
 #define HMM_ACOSF acosf
 #endif
 
+#ifndef HMM_ASINF
+#define HMM_ASINF asinf
+#endif
+
 #ifndef HMM_ATANF
 #define HMM_ATANF atanf
 #endif
@@ -329,7 +333,9 @@ extern "C"
     HMMDEF hmm_quaternion HMM_NLerp(hmm_quaternion Left, float Time, hmm_quaternion Right);
     HMMDEF hmm_quaternion HMM_Slerp(hmm_quaternion Left, float Time, hmm_quaternion Right);
     HMMDEF hmm_mat4 HMM_QuaternionToMat4(hmm_quaternion Left);
+    HMMDEF hmm_vec4 HMM_QuaternionToVec4(hmm_quaternion Quaternion);
     HMMDEF hmm_quaternion HMM_QuaternionFromAxisAngle(hmm_vec3 Axis, float AngleOfRotation);
+    HMMDEF hmm_vec3 HMM_QuaternionToEuler(hmm_quaternion Quaternion);
 
 #ifdef __cplusplus
 }

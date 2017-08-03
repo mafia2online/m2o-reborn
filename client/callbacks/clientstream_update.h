@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Entity remove from streamer
  */
 void clientstream_update(librg::events::event_t* evt)
@@ -13,7 +13,7 @@ void clientstream_update(librg::events::event_t* evt)
         case TYPE_VEHICLE: {
             float x, y, z, w;
             hmm_v3 position;
-            hmm_v3 position;
+            hmm_v3 rotation;
 
             Mem::InvokeFunction<Mem::call_this, void>(
                 game_entity->object->m_pVFTable->GetPosition,
@@ -21,7 +21,14 @@ void clientstream_update(librg::events::event_t* evt)
                 &position
             );
 
+            // Mem::InvokeFunction<Mem::call_this, void>(
+            //     game_entity->object->m_pVFTable->GetRotation,
+            //     reinterpret_cast<M2::C_Entity*>(game_entity->object),
+            //     &rotation
+            // );
+
             transform->position = position;
+            //transform->rotation = HMM_QuaternionToVec4(HMM_QuaternionFromVec3(rotation));
         }
     }
 }
