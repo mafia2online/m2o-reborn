@@ -37,6 +37,10 @@ using Byte = unsigned char;
 typedef hmm_vec2 Vector2;
 typedef hmm_vec3 Vector3;
 
+struct mouse_pos {
+    BYTE x, y;
+};
+
 // public interface definitions
 void game_init();
 void game_exit(std::string reason);
@@ -80,6 +84,7 @@ struct nk_context* nk_ctx;
 #include "tools/steam_drm.h"
 #include "tools/game_hooks.h"
 #include "tools/file_patcher.h"
+#include "tools/raw_input.h"
 #include "tools/singleton.h" // ohhh nooo
 
 #include <m2sdk.h>
@@ -91,6 +96,14 @@ librg::entity_t local_player;
 std::ofstream _debug_stream;
 float ztime = 0;
 HMODULE dll_module;
+
+struct mouse_state {
+    int x;
+    int y;
+    short flags;
+};
+
+static mouse_state global_mouse_state;
 
 // shared stuff
 #include "shared_defines.h"
@@ -117,6 +130,7 @@ HMODULE dll_module;
 #include "gfx/CTitleState.h"
 #include "proxies.h"
 #include "game.h"
+
 
 void mod_onlog(librg::events::event_t* evt) {
     auto event = (librg::events::event_log_t*) evt;
@@ -187,11 +201,14 @@ void mod_on_attach(HMODULE module)
     //     game_exit("Unable to parse config file");
     // }
 
-    // if (CNetworkManager::Instance().Init() == false) {
-    //     game_exit("Unable to init network manager");
-    // }
+    rawinput::on_mousemove = [&](RAWMOUSE me) {
+        global_mouse_state.x += me.lLastX;
+        global_mouse_state.y += me.lLastY;
+        global_mouse_state.flags = me.usButtonFlags;
+    };
 
     CDirectInput8Hook::Install();
+    rawinput::hook();
 
     global_state.AddState(States::Menu, new CTitleState);
     // global_state.AddState(States::MPGame, new CGameState);
@@ -223,3 +240,4 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     }
     return TRUE;
 }
+

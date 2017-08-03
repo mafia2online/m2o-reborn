@@ -35,14 +35,19 @@ WNDPROC _WndProc;
 
 LRESULT __stdcall WndProcHk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    bool result = false;
+
     if (nk_ctx)
         nk_input_begin(nk_ctx);
 
-    if (game_on_wnd_proc(hWnd, uMsg, wParam, lParam))
-        return true; // handled by ourselves
-    
+    result = game_on_wnd_proc(hWnd, uMsg, wParam, lParam);
+
     if (nk_ctx)
         nk_input_end(nk_ctx);
+
+    if (result) {
+        return true; // handled by us
+    }
 
     return CallWindowProc(_WndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -79,6 +84,8 @@ void GameHooks_Install()
 
     GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
 
+    // noop the CreateMutex, allow to run multiple instances
+    Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
     /*
         * Disabled hooks
         AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);

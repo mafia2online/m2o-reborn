@@ -56,6 +56,11 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
     m_pdevice = pDevice;
     memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
     
+    // todo: refactor
+    // very important, centers initial mouse position on the zkreen
+    global_mouse_state.x = pPresentationParameters->BackBufferWidth / 2;
+    global_mouse_state.y = pPresentationParameters->BackBufferHeight / 2;
+
     GetStateAndInitialize(this);
 }
 
@@ -85,7 +90,6 @@ void CGraphicsManager::OnDevicePreRender(void)
 void CGraphicsManager::OnDeviceRender(void)
 {
     GetStateAndRender(this);
-    //m_pGwenManager->OnDeviceRender();
 
     if (!gui_initialized && global_window) {
         nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
@@ -94,23 +98,64 @@ void CGraphicsManager::OnDeviceRender(void)
         {
             // custom font
         }
-
+        nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
         nk_d3d9_font_stash_end();
 
         gui_initialized = true;
     }
 
     if (gui_initialized) {
-        if (nk_begin(nk_ctx, "Demo", nk_rect(50, 50, 230, 250),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-            NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE))
+
+        // THIS IS A HACK AND NEEDS ACTUAL PROPER PLACE
+        // It will fuck up button press states and whatnot.
+        if (0)
         {
-            nk_label(nk_ctx, "background:", NK_TEXT_LEFT);
+            nk_input_begin(nk_ctx);
+            
+            nk_input_end(nk_ctx);
+        }
+
+        enum { EASY, HARD };
+        static int op = EASY;
+        static float value = 0.6f;
+        static int i = 20;
+
+        if (nk_begin(nk_ctx, "Show", nk_rect(50, 50, 220, 220),
+            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
+            /* fixed widget pixel width */
+            nk_layout_row_static(nk_ctx, 30, 80, 1);
+            if (nk_button_label(nk_ctx, "button")) {
+                /* event handling */
+            }
+
+            /* fixed widget window ratio width */
+            nk_layout_row_dynamic(nk_ctx, 30, 2);
+            if (nk_option_label(nk_ctx, "easy", op == EASY)) op = EASY;
+            if (nk_option_label(nk_ctx, "hard", op == HARD)) op = HARD;
+
+            /* custom widget pixel width */
+            nk_layout_row_begin(nk_ctx, NK_STATIC, 30, 2);
+            {
+                nk_layout_row_push(nk_ctx, 50);
+
+                POINT pica;
+                GetCursorPos(&pica);
+                ScreenToClient(global_window, &pica);
+
+                char cipa[64] = { 0 };
+                sprintf(cipa, "X: %d, Y: %d", pica.x, pica.y);
+
+                nk_label(nk_ctx, cipa, NK_TEXT_LEFT);
+                nk_layout_row_push(nk_ctx, 110);
+                nk_slider_float(nk_ctx, 0, &value, 1.0f, 0.1f);
+            }
+            nk_layout_row_end(nk_ctx);
         }
         nk_end(nk_ctx);
 
+
         
-        nk_d3d9_render(NK_ANTI_ALIASING_OFF);
+        nk_d3d9_render(NK_ANTI_ALIASING_ON);
         m_pdevice->Present(0, 0, 0, 0);
     }
 }

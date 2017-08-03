@@ -194,8 +194,23 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     msg.wParam = wParam;
     msg.message = uMsg;
 
-    if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam))
-        return 0;
+    
+
+    if (uMsg == WM_LBUTTONDOWN) {
+        corelog("Pojeb sa ty pica!");
+    }
+
+    if (nk_ctx) {
+        
+        if (uMsg == WM_MOUSEMOVE) {
+            mouse_pos pos = *(mouse_pos *)lParam;
+            // we shall call it in a tight loop since WM_MOUSEMOVE IS not triggered by the game...
+            nk_input_motion(nk_ctx, pos.x, pos.y);
+            return true;
+        }
+        else if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam))
+            return true;
+    }
 
     if (uMsg == WM_KEYDOWN) {
         if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {
