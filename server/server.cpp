@@ -63,11 +63,11 @@ void clientstreamer_update(events::event_t* evt)
     auto event = (events::event_bs_entity_t*) evt;
     auto trans = event->entity.component<transform_t>();
 
-    core::log("received pos %f %f %f", 
-        trans->position.x,
-        trans->position.y,
-        trans->position.z
-    );
+    // core::log("received pos %f %f %f", 
+    //     trans->position.x,
+    //     trans->position.y,
+    //     trans->position.z
+    // );
 
     switch (event->type) {
         case TYPE_VEHICLE: {

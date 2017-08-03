@@ -167,6 +167,7 @@ void game_on_tick()
     }
     if (GetAsyncKeyState(VK_F5) & 0x1)
     {
+        corelog("spawning and connecting...");
         dwLocalPlayer->LockControls(false);
         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &HMM_Vec3(-421.758942, 479.316925, 0.051288));
 

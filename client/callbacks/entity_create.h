@@ -11,6 +11,7 @@ void entity_create(librg::events::event_t* evt)
     switch (event->type)
     {
         case TYPE_PLAYER: {
+            corelog("creating player");
 
             M2::C_Human2 *ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
             if (ent)

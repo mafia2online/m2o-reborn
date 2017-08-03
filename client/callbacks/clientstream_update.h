@@ -22,12 +22,6 @@ void clientstream_update(librg::events::event_t* evt)
 
             transform->position = position;
 
-            corelog("sending my position %f %f %f",
-                position.x,
-                position.y,
-                position.z
-            );
-
             // Vector3 position = ENTITY::GET_ENTITY_COORDS(game_entity->object, true);
             // ENTITY::GET_ENTITY_QUATERNION(game_entity->object, &x, &y, &z, &w);
 

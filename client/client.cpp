@@ -134,7 +134,7 @@ static mouse_state global_mouse_state;
 
 void mod_onlog(librg::events::event_t* evt) {
     auto event = (librg::events::event_log_t*) evt;
-    //_debug_stream << event->output;
+    _debug_stream << event->output;
     printf("%s", event->output.c_str());
 }
 
@@ -156,7 +156,7 @@ void mod_on_attach(HMODULE module)
     mod_dir.erase(pos, std::string::npos);
 
     mod_files_dir = std::string(mod_dir + "\\files");
-    //_debug_stream.open(mod_dir + "\\m2o_debug.log");
+    _debug_stream.open(mod_dir + "\\m2o_debug.log");
 
     printf("attaching librg\n");
 
@@ -220,7 +220,7 @@ void game_exit(std::string reason)
     corelog("exiting %s", reason.c_str());
     librg::core_terminate();
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
-    //_debug_stream.close();
+    _debug_stream.close();
     exit(0);
 }
 
