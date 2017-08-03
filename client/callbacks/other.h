@@ -1,16 +1,13 @@
-void spawn_player(librg::entity_t entity)
+﻿void spawn_player(librg::entity_t entity)
 {
     entity.assign<librg::streamable_t>();
-    // entity.assign<gamedata_t>(PLAYER::PLAYER_PED_ID());
-    entity.assign<gamedata_t>(1);
-    entity.assign<ped_t>();
+    entity.assign<gamedata_t>(reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed()));
 
     librg::core::log("spawned player!");
 }
 
 void unspawn_player(librg::entity_t entity)
 {
-    entity.remove<ped_t>();
     entity.remove<gamedata_t>();
     entity.remove<librg::streamable_t>();
 

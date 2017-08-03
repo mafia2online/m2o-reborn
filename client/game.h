@@ -45,7 +45,7 @@ void game_on_tick()
                 M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
                 M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
 
-                M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DTFreerideNight");
+                M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
 
                 CommandProcessor::RegisterCommand("lock",
                     [](const std::string& params)->void
@@ -167,6 +167,9 @@ void game_on_tick()
     }
     if (GetAsyncKeyState(VK_F5) & 0x1)
     {
+        dwLocalPlayer->LockControls(false);
+        Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &HMM_Vec3(-421.758942, 479.316925, 0.051288));
+
         librg::network::start();
         // if (CNetworkManager::Instance().Connect("127.0.0.1", 1234, "")) {
         //     corelog("Connection accepted");
@@ -194,6 +197,7 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     msg.wParam = wParam;
     msg.message = uMsg;
 
+    return false; // todo
     
 
     if (uMsg == WM_LBUTTONDOWN) {

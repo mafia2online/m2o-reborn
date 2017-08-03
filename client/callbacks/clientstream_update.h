@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Entity remove from streamer
  */
 void clientstream_update(librg::events::event_t* evt)
@@ -12,6 +12,22 @@ void clientstream_update(librg::events::event_t* evt)
         case TYPE_PLAYER:
         case TYPE_VEHICLE: {
             float x, y, z, w;
+            hmm_v3 position;
+
+            Mem::InvokeFunction<Mem::call_this, void>(
+                game_entity->object->m_pVFTable->GetPosition,
+                reinterpret_cast<M2::C_Entity*>(game_entity->object),
+                &position
+            );
+
+            transform->position = position;
+
+            corelog("sending my position %f %f %f",
+                position.x,
+                position.y,
+                position.z
+            );
+
             // Vector3 position = ENTITY::GET_ENTITY_COORDS(game_entity->object, true);
             // ENTITY::GET_ENTITY_QUATERNION(game_entity->object, &x, &y, &z, &w);
 

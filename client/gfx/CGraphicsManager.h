@@ -153,9 +153,13 @@ void CGraphicsManager::OnDeviceRender(void)
         }
         nk_end(nk_ctx);
 
+        IDirect3DStateBlock9* pStateBlock = NULL;
+        m_pdevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
 
-        
         nk_d3d9_render(NK_ANTI_ALIASING_ON);
         m_pdevice->Present(0, 0, 0, 0);
+
+        pStateBlock->Apply();
+        pStateBlock->Release();
     }
 }

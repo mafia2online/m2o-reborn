@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Random number setting current game platform id
 * to prevent connections from different games/mods, in future
 */
@@ -29,12 +29,6 @@ enum {
 };
 
 struct gamedata_t {
-    gamedata_t(int o) : object(o) {}
-
-    int object;
-    int state;
-};
-
-struct ped_t {
-    bool entering_vehicle;
+    gamedata_t(M2::C_Entity *o) : object(o) {}
+    M2::C_Entity *object;
 };
