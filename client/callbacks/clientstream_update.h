@@ -13,6 +13,7 @@ void clientstream_update(librg::events::event_t* evt)
         case TYPE_VEHICLE: {
             float x, y, z, w;
             hmm_v3 position;
+            hmm_v3 position;
 
             Mem::InvokeFunction<Mem::call_this, void>(
                 game_entity->object->m_pVFTable->GetPosition,
@@ -21,20 +22,6 @@ void clientstream_update(librg::events::event_t* evt)
             );
 
             transform->position = position;
-
-            // Vector3 position = ENTITY::GET_ENTITY_COORDS(game_entity->object, true);
-            // ENTITY::GET_ENTITY_QUATERNION(game_entity->object, &x, &y, &z, &w);
-
-            // transform->position = HMM_Vec3(
-            //     position.x,
-            //     position.y,
-            //     position.z
-            // );
-
-            // transform->rotation = HMM_Vec4(x, y, z, w);
-
-            // // write custom stuff
-            // event->data->write_float(ENTITY::GET_ENTITY_SPEED(game_entity->object));
         }
     }
 }

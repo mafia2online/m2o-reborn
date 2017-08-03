@@ -14,34 +14,35 @@ void entity_create(librg::events::event_t* evt)
             corelog("creating player");
 
             M2::C_Human2 *ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-            if (ent)
-            {
-                DWORD coreInstance = *(DWORD*)(0x1AC2778);
+            
+            librg_assert(ent, "player entity should be created!");
 
-                M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-                own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
+            DWORD coreInstance = *(DWORD*)(0x1AC2778);
 
-                own_model->SetName("lawl");
-                own_model->MarkForNotify(2);
+            M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+            own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
 
-                reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
+            own_model->SetName("lawl");
+            own_model->MarkForNotify(2);
 
-                reinterpret_cast<M2::C_Entity *>(ent)->Setup();
+            reinterpret_cast<M2::C_Entity *>(ent)->SetModel(own_model);
+            reinterpret_cast<M2::C_Entity *>(ent)->Setup();
 
-                // set flagsF
-                DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
-                *(DWORD *)(ent + 32) = flags;
+            // set flagsF
+            DWORD flags = *(DWORD *)(ent + 32) & 0xFFFFFBF | 0x4800;
+            *(DWORD *)(ent + 32) = flags;
 
-                if (flags & 0x20)
-                    corelog("Flags set sucessfully!");
+            if (flags & 0x20)
+                corelog("Flags set sucessfully!");
 
-                reinterpret_cast<M2::C_Entity *>(ent)->Activate();
+            reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
-                if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-                    corelog("Entity active !");
+            if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
+                corelog("Entity active !");
 
-                reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(transform->position);
-            }
+            reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(transform->position);
+
+            event->entity.assign<gamedata_t>((M2::C_Entity*)ent);
 
             corelog("Created at %x!", ent);
 

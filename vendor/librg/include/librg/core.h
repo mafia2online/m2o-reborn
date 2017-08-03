@@ -1,4 +1,4 @@
-// Copyright ReGuider Team, 2016-2017
+﻿// Copyright ReGuider Team, 2016-2017
 //
 #ifndef librg_core_h
 #define librg_core_h
@@ -9,7 +9,7 @@
 #define librg_trap() __builtin_trap()
 #endif
 
-#define librg_assert(expr, errmsg) if (!(expr)) { core::error(errmsg); librg_trap(); }
+#define librg_assert(expr, errmsg) if (!(expr)) { librg::core::error(errmsg); librg_trap(); }
 
 #include <stdio.h>
 #include <stdlib.h>

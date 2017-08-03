@@ -10,9 +10,8 @@ void entity_inter(librg::events::event_t* evt)
     auto remote     = event->entity.component<gamedata_t>();
 
     *transform = *(librg::transform_t*)event->data;
-
-    //reinterpret_cast<M2::C_Entity *>(remote->object)->SetPosition(transform->position);
-    // ENTITY::SET_ENTITY_COORDS_NO_OFFSET(remote->object, transform->position.x, transform->position.y, transform->position.z, true, true, true);
-    // ENTITY::SET_ENTITY_QUATERNION(remote->object, transform->rotation.X, transform->rotation.y, transform->rotation.z, transform->rotation.w);
+    
+    remote->object->SetPosition(transform->position);
+    
 }
 
