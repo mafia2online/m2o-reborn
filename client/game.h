@@ -186,15 +186,14 @@ void game_on_tick()
 
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    global_window = hWnd;
-    if (ImGui_ImplDX9_WndProcHandler(hWnd, uMsg, wParam, lParam))
-        return true;
-
     MSG msg;
     msg.hwnd = hWnd;
     msg.lParam = lParam;
     msg.wParam = wParam;
     msg.message = uMsg;
+
+    if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam))
+        return 0;
 
     if (uMsg == WM_KEYDOWN) {
         if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {

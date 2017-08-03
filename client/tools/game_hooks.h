@@ -1,4 +1,4 @@
-DWORD GameLoopHook_1_Return;
+﻿DWORD GameLoopHook_1_Return;
 DWORD _call = 0x473D10;
 void __declspec(naked) GameLoopHook_1()
 {
@@ -35,8 +35,14 @@ WNDPROC _WndProc;
 
 LRESULT __stdcall WndProcHk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    if (nk_ctx)
+        nk_input_begin(nk_ctx);
+
     if (game_on_wnd_proc(hWnd, uMsg, wParam, lParam))
         return true; // handled by ourselves
+    
+    if (nk_ctx)
+        nk_input_end(nk_ctx);
 
     return CallWindowProc(_WndProc, hWnd, uMsg, wParam, lParam);
 }

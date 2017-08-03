@@ -77,8 +77,6 @@ void CGraphicsManager::OnDeviceReset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARA
     m_pdevice = pDevice;
     m_presentparams = *pPresentationParameters;
 
-    ImGui_ImplDX9_Shutdown();
-
     if (m_pfontmanager)
         m_pfontmanager->OnDeviceReset();
 }
@@ -92,32 +90,33 @@ void CGraphicsManager::OnDeviceRender(void)
     GetStateAndRender(this);
     //m_pGwenManager->OnDeviceRender();
 
-    if (!gui_initialized && global_window) {
-        ImGui_ImplDX9_Init(global_window, m_pdevice);
+    if (!gui_initialized && nk_ctx) {
+        nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
+       
+        nk_d3d9_font_stash_begin(&nk_atlas);
+        {
+            // custom font
+        }
+        nk_d3d9_font_stash_end();
+
         gui_initialized = true;
     }
 
     if (gui_initialized) {
-        ImGui_ImplDX9_NewFrame();
-
-        ImGui::ShowTestWindow();
+        if (nk_begin(nk_ctx, "Demo", nk_rect(50, 50, 230, 250),
+            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+            NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE))
         {
-            static bool show_test_window, show_another_window;
-            static float f = 0.0f;
-            ImGui::Text("Hello, world!");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            nk_label(nk_ctx, "background:", NK_TEXT_LEFT);
         }
+        nk_end(nk_ctx);
 
-        g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, false);
-        g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-        g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
-
-        //m_pdevice->BeginScene();
-        ImGui::Render();
-        //m_pdevice->EndScene();
+        m_pdevice->SetRenderState(D3DRS_ZENABLE, false);
+        m_pdevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+        m_pdevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
+        D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(255.0f), (int)(255.0f), (int)(255.0f), (int)(255.0f));
+        m_pdevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_col_dx, 1.0f, 0);
+        nk_d3d9_render(NK_ANTI_ALIASING_ON);
         m_pdevice->Present(0, 0, 0, 0);
     }
 }
