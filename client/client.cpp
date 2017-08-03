@@ -58,17 +58,6 @@ std::string mod_files_dir;
 #include <d3dx9.h>
 #include <dinput.h>
 
-// gwen
-#include <Gwen/Gwen.h>
-#include <Gwen/Skins/Simple.h>
-#include <Gwen/Skins/TexturedBase.h>
-#include <Gwen/Controls/Base.h>
-#include <Gwen/Controls/ListBox.h>
-#include <Gwen/Controls/TextBox.h>
-#include <Gwen/Controls/WindowControl.h>
-#include <Gwen/Input/Windows.h>
-#include <Gwen/Renderers/DirectX9.h>
-
 // nuklear 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -124,7 +113,6 @@ HMODULE dll_module;
 #include "gfx/CMPStateManager.h"
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
-#include "gfx/GwenManager.h"
 #include "gfx/CGraphicsManager.h"
 #include "gfx/CTitleState.h"
 #include "proxies.h"

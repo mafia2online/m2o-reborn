@@ -1,4 +1,4 @@
-###
+﻿###
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
@@ -29,7 +29,6 @@ endif()
 # Compile vendor dependencies
 ###
 add_subdirectory(vendor/librg)
-add_subdirectory(vendor/gwen)
 
 ###
 # Includes for libs and remote sources
@@ -39,7 +38,6 @@ include_directories(
     vendor/detours/include
     vendor/librg/include
     vendor/m2sdk/include
-    vendor/gwen/gwen/include # toto pojde do pice TRAN(EN): This will be fucked out
     vendor/nuklear/include
     server/
     shared/
@@ -49,7 +47,6 @@ include_directories(
 link_directories(
     ${PROJECT_SOURCE_DIR}/vendor/steam_api/lib
     ${PROJECT_SOURCE_DIR}/vendor/detours/lib
-    ${PROJECT_SOURCE_DIR}/vendor/gwen/gwen/lib
 )
 
 file(GLOB_RECURSE SERVER_FILES
@@ -66,8 +63,7 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h*"
-    "${PROJECT_SOURCE_DIR}/vendor/gwen/include/*.h"
-    "${PROJECT_SOURCE_DIR}/vendor/gwen/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
 )
 
 ###
@@ -81,7 +77,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client librg gwen d3d9 dxgi dinput8 dxguid detours)
+    target_link_libraries(client librg d3d9 d3dx9 dxgi dinput8 dxguid detours)
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
 
     ## tha lancunha
@@ -98,6 +94,6 @@ if (MSVC)
     GroupSources(vendor/steam_api)
     GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)
-    GroupSources(vendor/gwen)
+    GroupSources(vendor/nuklear)
     GroupSources(launcher)
 endif()

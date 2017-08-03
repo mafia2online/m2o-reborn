@@ -204,8 +204,6 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
     }
 
-    if (global_gfx.GetGwenManager()->GetInput().ProcessMessage(msg))
-        return true;
 
     return false; // not handled
 }

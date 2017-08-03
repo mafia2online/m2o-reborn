@@ -1,4 +1,4 @@
-class CommandProcessor
+﻿class CommandProcessor
 {
 public:
     using CommandProcedure = std::function<void(const std::string&)>;
@@ -17,70 +17,21 @@ public:
     static std::vector<stCommand>   commands;
 };
 
-class CDebugConsole : public Singleton<CDebugConsole>, public Gwen::Event::Handler
+class CDebugConsole : public Singleton<CDebugConsole>
 {
 public:
-    void RegisterComponents(Gwen::Controls::Canvas *pCanvas);
-
-    void OnSubmit(Gwen::Controls::Base* pControl);
 
     void Focus();
-    bool HasFocus() { return m_inputbox->HasFocus(); }
+    bool HasFocus() { return false; }
 
 private:
-    Gwen::Controls::ListBox *m_plistboxctrl = nullptr;
-    Gwen::Controls::TextBox *m_inputbox = nullptr;
 };
 
 
-void CDebugConsole::RegisterComponents(Gwen::Controls::Canvas * pCanvas)
-{
-    Gwen::Controls::WindowControl *base = new Gwen::Controls::WindowControl(pCanvas);
-    base->SetBounds(10, 10, 600, 300);
-    base->SetTitle("Debug console сука");
-
-    m_plistboxctrl = new Gwen::Controls::ListBox(base);
-    m_plistboxctrl->Dock(Gwen::Pos::Top);
-    m_plistboxctrl->SetHeight(m_plistboxctrl->GetParent()->Height() - 70);
-
-    librg::events::add(librg::events::on_log, [=](librg::events::event_t* evt) {
-        auto event = (librg::events::event_log_t*) evt;
-        m_plistboxctrl->AddItem(event->output);
-        m_plistboxctrl->ScrollToBottom();
-    });
-
-    m_inputbox = new Gwen::Controls::TextBox(base);
-    m_inputbox->Dock(Gwen::Pos::Bottom);
-    m_inputbox->SetHeight(30);
-    m_inputbox->onReturnPressed.Add(this, &CDebugConsole::OnSubmit);
-
-    Focus();
-}
-
-void CDebugConsole::OnSubmit(Gwen::Controls::Base* pControl)
-{
-    Gwen::Controls::TextBox* textbox = (Gwen::Controls::TextBox*)(pControl);
-
-    if (textbox->GetText().m_String[0] == '/')
-    {
-        if (!CommandProcessor::ProcessCommand(textbox->GetText().m_String))
-        {
-            m_plistboxctrl->AddItem("> Unknown command.");
-            m_plistboxctrl->ScrollToBottom();
-        }
-    }
-    textbox->SetText("");
-    m_inputbox->SetKeyboardInputEnabled(false);
-
-}
 
 void CDebugConsole::Focus()
 {
-    m_inputbox->Focus();
-    m_inputbox->SetKeyboardInputEnabled(true);
-    m_inputbox->SetText("/");
-    m_inputbox->SetCursorPos(1);
-    m_inputbox->SetCursorEnd(1);
+    // todo focus
 }
 
 // dirty mafaka

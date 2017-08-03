@@ -13,7 +13,6 @@ public:
     void OnDeviceRender(void);
 
     CFontManager* GetFontManager() { return m_pfontmanager; }
-    GwenManager* GetGwenManager() { return m_pGwenManager; }
 
 
     void GetScreenDimensions(int *w, int *h)
@@ -24,7 +23,6 @@ public:
 
 private:
     bool         gui_initialized;
-    GwenManager* m_pGwenManager;
     CFontManager* m_pfontmanager;
     IDirect3DDevice9* m_pdevice;
     D3DPRESENT_PARAMETERS m_presentparams;
@@ -54,7 +52,6 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
 {
     corelog("CGraphicsManager::OnDeviceCreate(%x, %x)", pDevice, pPresentationParameters);
     m_pfontmanager = new CFontManager(pDevice);
-    m_pGwenManager = new GwenManager(pDevice, pPresentationParameters);
 
     m_pdevice = pDevice;
     memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
