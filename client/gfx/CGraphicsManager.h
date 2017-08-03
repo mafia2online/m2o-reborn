@@ -90,13 +90,14 @@ void CGraphicsManager::OnDeviceRender(void)
     GetStateAndRender(this);
     //m_pGwenManager->OnDeviceRender();
 
-    if (!gui_initialized && nk_ctx) {
+    if (!gui_initialized && global_window) {
         nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
        
         nk_d3d9_font_stash_begin(&nk_atlas);
         {
             // custom font
         }
+
         nk_d3d9_font_stash_end();
 
         gui_initialized = true;
@@ -111,12 +112,8 @@ void CGraphicsManager::OnDeviceRender(void)
         }
         nk_end(nk_ctx);
 
-        m_pdevice->SetRenderState(D3DRS_ZENABLE, false);
-        m_pdevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-        m_pdevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
-        D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(255.0f), (int)(255.0f), (int)(255.0f), (int)(255.0f));
-        m_pdevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_col_dx, 1.0f, 0);
-        nk_d3d9_render(NK_ANTI_ALIASING_ON);
+        
+        nk_d3d9_render(NK_ANTI_ALIASING_OFF);
         m_pdevice->Present(0, 0, 0, 0);
     }
 }

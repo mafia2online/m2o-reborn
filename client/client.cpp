@@ -44,6 +44,8 @@ void game_on_init();
 void game_on_tick();
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+HWND global_window;
+
 std::string mod_dir;
 std::string mod_files_dir;
 

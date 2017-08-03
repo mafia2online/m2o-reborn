@@ -186,6 +186,8 @@ void game_on_tick()
 
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    global_window = hWnd;
+
     MSG msg;
     msg.hwnd = hWnd;
     msg.lParam = lParam;

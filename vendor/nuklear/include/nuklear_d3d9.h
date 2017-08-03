@@ -69,6 +69,26 @@ nk_d3d9_render(enum nk_anti_aliasing AA)
 {
     HRESULT hr;
 
+    d3d9.device->SetPixelShader(NULL);
+    d3d9.device->SetVertexShader(NULL);
+    d3d9.device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    d3d9.device->SetRenderState(D3DRS_LIGHTING, false);
+    d3d9.device->SetRenderState(D3DRS_ZENABLE, false);
+    d3d9.device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+    d3d9.device->SetRenderState(D3DRS_ALPHATESTENABLE, false);
+    d3d9.device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+    d3d9.device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    d3d9.device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    d3d9.device->SetRenderState(D3DRS_SCISSORTESTENABLE, true);
+    d3d9.device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    d3d9.device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3d9.device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    d3d9.device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    d3d9.device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+    d3d9.device->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+    d3d9.device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    d3d9.device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+
     hr = IDirect3DStateBlock9_Apply(d3d9.state);
     NK_ASSERT(SUCCEEDED(hr));
 
