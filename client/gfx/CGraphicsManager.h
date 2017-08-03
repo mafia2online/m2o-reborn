@@ -1,4 +1,4 @@
-class CGraphicsManager
+﻿class CGraphicsManager
 {
 public:
     CGraphicsManager();
@@ -23,6 +23,7 @@ public:
     }
 
 private:
+    bool         gui_initialized;
     GwenManager* m_pGwenManager;
     CFontManager* m_pfontmanager;
     IDirect3DDevice9* m_pdevice;
@@ -34,7 +35,7 @@ void GetStateAndRender(void *);
 
 CGraphicsManager::CGraphicsManager()
 {
-    // derp
+    gui_initialized = false;
 }
 
 CGraphicsManager::~CGraphicsManager()
@@ -57,7 +58,7 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
 
     m_pdevice = pDevice;
     memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
-
+    
     GetStateAndInitialize(this);
 }
 
@@ -74,7 +75,9 @@ void CGraphicsManager::OnDeviceReset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARA
     corelog("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
     m_pdevice = pDevice;
-    memcpy(&m_presentparams, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
+    m_presentparams = *pPresentationParameters;
+
+    ImGui_ImplDX9_Shutdown();
 
     if (m_pfontmanager)
         m_pfontmanager->OnDeviceReset();
@@ -87,5 +90,34 @@ void CGraphicsManager::OnDevicePreRender(void)
 void CGraphicsManager::OnDeviceRender(void)
 {
     GetStateAndRender(this);
-    m_pGwenManager->OnDeviceRender();
+    //m_pGwenManager->OnDeviceRender();
+
+    if (!gui_initialized && global_window) {
+        ImGui_ImplDX9_Init(global_window, m_pdevice);
+        gui_initialized = true;
+    }
+
+    if (gui_initialized) {
+        ImGui_ImplDX9_NewFrame();
+
+        ImGui::ShowTestWindow();
+        {
+            static bool show_test_window, show_another_window;
+            static float f = 0.0f;
+            ImGui::Text("Hello, world!");
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            if (ImGui::Button("Test Window")) show_test_window ^= 1;
+            if (ImGui::Button("Another Window")) show_another_window ^= 1;
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
+
+        g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, false);
+        g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+        g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
+
+        //m_pdevice->BeginScene();
+        ImGui::Render();
+        //m_pdevice->EndScene();
+        m_pdevice->Present(0, 0, 0, 0);
+    }
 }

@@ -1,30 +1,30 @@
-CGraphicsManager m_graphicsmanager;
-CMPStateManager m_statemanager;
+﻿CGraphicsManager global_gfx;
+CMPStateManager global_state;
 
 void GetStateAndInitialize(void *ptr) {
-    m_statemanager.InitializeResources(ptr);
+    global_state.InitializeResources(ptr);
 }
 
 void GetStateAndRender(void *ptr) {
-    m_statemanager.Render(ptr);
+    global_state.Render(ptr);
 }
 
 void gfx_OnDeviceCreate(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-    m_graphicsmanager.OnDeviceCreate(pDevice, pPresentationParameters);
+    global_gfx.OnDeviceCreate(pDevice, pPresentationParameters);
 }
 
 void gfx_OnDevicePreRender() {
-    m_graphicsmanager.OnDevicePreRender();
+    global_gfx.OnDevicePreRender();
 }
 
 void gfx_OnDeviceRender() {
-    m_graphicsmanager.OnDeviceRender();
+    global_gfx.OnDeviceRender();
 }
 
 void gfx_OnDeviceLost(IDirect3DDevice9* pDevice) {
-    m_graphicsmanager.OnDeviceLost(pDevice);
+    global_gfx.OnDeviceLost(pDevice);
 }
 
 void gfx_OnDeviceReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-    m_graphicsmanager.OnDeviceReset(pDevice, pPresentationParameters);
+    global_gfx.OnDeviceReset(pDevice, pPresentationParameters);
 }

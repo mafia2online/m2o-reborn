@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -44,6 +44,8 @@ void game_on_init();
 void game_on_tick();
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+HWND global_window = 0;
+
 std::string mod_dir;
 std::string mod_files_dir;
 
@@ -67,6 +69,13 @@ std::string mod_files_dir;
 #include <Gwen/Input/Windows.h>
 #include <Gwen/Renderers/DirectX9.h>
 
+// dear imgui
+#include <imgui.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_draw.cpp>
+#include <imgui_demo.cpp>
+#include <imgui.cpp>
+#include <imgui_impl_dx9.cpp>
 
 // tool stuff
 #include "tools/console.h"
@@ -168,7 +177,7 @@ void mod_on_attach(HMODULE module)
     // start the client (network connection)
     librg::core::start(cfg);
 
-    if (m_graphicsmanager.Init() == false) {
+    if (global_gfx.Init() == false) {
         corelog("Unable to init Graphics Manager");
         game_exit("Unable to init Graphics Manager");
     }
@@ -188,9 +197,9 @@ void mod_on_attach(HMODULE module)
 
     CDirectInput8Hook::Install();
 
-    m_statemanager.AddState(States::Menu, new CTitleState);
-    // m_statemanager.AddState(States::MPGame, new CGameState);
-    m_statemanager.ActivateState(States::Menu);
+    global_state.AddState(States::Menu, new CTitleState);
+    // global_state.AddState(States::MPGame, new CGameState);
+    global_state.ActivateState(States::Menu);
 }
 
 void game_exit(std::string reason)

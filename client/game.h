@@ -1,4 +1,4 @@
-uint32_t game_base;
+﻿uint32_t game_base;
 
 void game_init()
 {
@@ -186,6 +186,10 @@ void game_on_tick()
 
 bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    global_window = hWnd;
+    if (ImGui_ImplDX9_WndProcHandler(hWnd, uMsg, wParam, lParam))
+        return true;
+
     MSG msg;
     msg.hwnd = hWnd;
     msg.lParam = lParam;
@@ -199,7 +203,7 @@ bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
     }
 
-    if (m_graphicsmanager.GetGwenManager()->GetInput().ProcessMessage(msg))
+    if (global_gfx.GetGwenManager()->GetInput().ProcessMessage(msg))
         return true;
 
     return false; // not handled

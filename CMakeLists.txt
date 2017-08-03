@@ -39,7 +39,8 @@ include_directories(
     vendor/detours/include
     vendor/librg/include
     vendor/m2sdk/include
-    vendor/gwen/gwen/include
+    vendor/gwen/gwen/include # toto pojde do pice TRAN(EN): This will be fucked out
+    vendor/dear_imgui/include
     server/
     shared/
     launcher/
