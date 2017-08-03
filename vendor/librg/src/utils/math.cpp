@@ -1,4 +1,4 @@
-﻿#include <librg/utils/math.h>
+#include <librg/utils/math.h>
 
 HINLINE float
 HMM_SinF(float Angle)
@@ -1200,9 +1200,9 @@ HMM_QuaternionToEuler(hmm_quaternion q)
 
     // yaw (z-axis rotation)
     double t3 = +2.0 * (q.w * q.z + q.x * q.y);
-    double t4 = +1.0 - 2.0 * (ysqr + q.z * q.z);  
+    double t4 = +1.0 - 2.0 * (ysqr + q.z * q.z);
     result.z = HMM_ATAN2F(t3, t4);
-   
+
     return result;
 }
 
