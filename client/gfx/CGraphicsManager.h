@@ -1,4 +1,4 @@
-﻿class CGraphicsManager
+class CGraphicsManager
 {
 public:
     CGraphicsManager();
@@ -87,19 +87,56 @@ void CGraphicsManager::OnDevicePreRender(void)
 {
 }
 
+struct nk_font_config conf = nk_font_config(22);
+
+
 void CGraphicsManager::OnDeviceRender(void)
 {
     GetStateAndRender(this);
 
     if (!gui_initialized && global_window) {
         nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
-       
-        nk_d3d9_font_stash_begin(&nk_atlas);
-        {
-            // custom font
-        }
-        nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
+
+        conf.range = nk_font_cyrillic_glyph_ranges();
+        conf.oversample_h = 1;
+        conf.oversample_v = 1;
+
+        // nk_d3d9_font_stash_begin(&nk_atlas);
+        // {
+        //     // custom font
+        // }
+        // nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
+        // nk_d3d9_font_stash_end();
+
+        // nk_d3d9_font_stash_begin(&nk_atlas);
+        // struct nk_font *font = nk_font_atlas_add_from_file(nk_atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
+        // nk_d3d9_font_stash_end();
+        // nk_style_set_font(nk_ctx, &font->handle);
+
+
+        // {struct nk_font_atlas *atlas;
+        // nk_d3d9_font_stash_begin(&atlas);
+
+        // struct nk_font *genshin = nk_font_atlas_add_from_file(atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
+        // nk_d3d9_font_stash_end();
+        // nk_style_set_font(nk_ctx, &genshin->handle);}
+
+        // corelog((mod_files_dir + "\\Roboto-Regular.ttf").c_str());
+
+        /* Load Fonts: if none of these are loaded a default font will be used  */
+        /* Load Cursor: if you uncomment cursor loading please hide the cursor */
+        {nk_d3d9_font_stash_begin(&nk_atlas);
+        /*struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../extra_font/DroidSans.ttf", 14, 0);*/
+        struct nk_font *robot = nk_font_atlas_add_from_file(nk_atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 14, &conf);
+        /*struct nk_font *future = nk_font_atlas_add_from_file(atlas, "../../extra_font/kenvector_future_thin.ttf", 13, 0);*/
+        /*struct nk_font *clean = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyClean.ttf", 12, 0);*/
+        /*struct nk_font *tiny = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyTiny.ttf", 10, 0);*/
+        /*struct nk_font *cousine = nk_font_atlas_add_from_file(atlas, "../../extra_font/Cousine-Regular.ttf", 13, 0);*/
         nk_d3d9_font_stash_end();
+        nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
+        nk_style_set_font(nk_ctx, &robot->handle);}
+
+
 
         gui_initialized = true;
     }
@@ -120,7 +157,7 @@ void CGraphicsManager::OnDeviceRender(void)
         static float value = 0.6f;
         static int i = 20;
 
-        if (nk_begin(nk_ctx, "Show", nk_rect(50, 50, 220, 220),
+        if (nk_begin(nk_ctx, "Show Привет", nk_rect(50, 50, 220, 220),
             NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
             /* fixed widget pixel width */
             nk_layout_row_static(nk_ctx, 30, 80, 1);

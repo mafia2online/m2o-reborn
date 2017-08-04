@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -9,6 +9,9 @@
 #include <memory>
 #include <limits>
 #include <algorithm>
+#include <tchar.h>
+#include <mutex>
+#include <iomanip>
 
 // steam stuff
 #include <iostream>
@@ -61,8 +64,9 @@ std::string mod_files_dir;
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dinput.h>
+#include <TlHelp32.h>
 
-// nuklear 
+// nuklear
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
@@ -84,8 +88,10 @@ struct nk_context* nk_ctx;
 #include "tools/steam_drm.h"
 #include "tools/game_hooks.h"
 #include "tools/file_patcher.h"
+#include "tools/file_logger.h"
 #include "tools/raw_input.h"
 #include "tools/singleton.h" // ohhh nooo
+#include "tools/exception_handler.h"
 
 #include <m2sdk.h>
 
@@ -194,8 +200,8 @@ void mod_on_attach(HMODULE module)
 
     game_init();
 
-    // if (ExceptionHandler::Install() == false)
-    //     game_exit("Unable to install exception handler");
+    if (ExceptionHandler::Install() == false)
+        game_exit("Unable to install exception handler");
 
     // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
     //     game_exit("Unable to parse config file");
