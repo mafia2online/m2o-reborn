@@ -1,15 +1,20 @@
-const float DISTANCE_BEFORE_TELEPORT = 50 * 50;
+﻿const float DISTANCE_BEFORE_TELEPORT = 50 * 50;
 
 /**
 * Entity update in streamer
 */
 void entity_update(librg::events::event_t* evt)
 {
-    // auto event = (librg::events::event_bs_entity_t*) evt;
+    auto event = (librg::events::event_entity_t*) evt;
 
-    // auto transform  = event->entity.component<librg::transform_t>();
-    // auto inter      = event->entity.component<librg::interpolable_t>();
-    // auto remote     = event->entity.component<gamedata_t>();
+    auto transform  = event->entity.component<librg::transform_t>();
+    auto remote     = event->entity.component<gamedata_t>();
+
+    if (transform && remote && remote->object) {
+        remote->object->SetRotation(HMM_Quaternion(0, 0, 0, 1));
+    }
+
+    // remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
 
     // auto distance   = HMM_LengthSquaredVec3(HMM_SubtractVec3(inter->latest.position, transform->position));
 

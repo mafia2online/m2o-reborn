@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -184,7 +184,7 @@ void mod_on_attach(HMODULE module)
     cfg.ip = "localhost";
     cfg.port = 27010;
     cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
-    cfg.tick_delay = 64;
+    cfg.tick_delay = 32;
     cfg.max_connections = 8;
     cfg.platform_id = 1;
     cfg.proto_version = 1;

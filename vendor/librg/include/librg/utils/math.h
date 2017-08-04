@@ -86,6 +86,7 @@ extern "C"
 #define HMM_MOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
 #define HMM_SQUARE(x) ((x) * (x))
 
+#pragma pack(push,1)
     typedef union hmm_vec2
     {
         struct
@@ -226,6 +227,7 @@ extern "C"
 
         float Elements[4];
     } hmm_quaternion;
+#pragma pack(pop)
 
     typedef hmm_vec2 hmm_v2;
     typedef hmm_vec3 hmm_v3;

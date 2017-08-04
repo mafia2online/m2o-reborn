@@ -1,4 +1,4 @@
-/** @file CEntity.hpp
+﻿/** @file CEntity.hpp
 *  @brief Game's Entity class
 *
 *
@@ -58,12 +58,12 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void*>(m_pVFTable->SetModel, this, model);
         }
 
-        void SetPosition(Vector3 pos)
+        void SetPosition(hmm_vec3 pos)
         {
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetPosition, this, &pos);
         }
 
-        void SetRotation(Vector3 rot)
+        void SetRotation(hmm_quaternion rot)
         {
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetRotation, this, &rot);
         }

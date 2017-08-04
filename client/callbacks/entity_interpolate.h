@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Entity interpolate callback
  */
 void entity_inter(librg::events::event_t* evt)
@@ -10,9 +10,8 @@ void entity_inter(librg::events::event_t* evt)
     auto remote     = event->entity.component<gamedata_t>();
 
     *transform = *(librg::transform_t*)event->data;
-    
+
     remote->object->SetPosition(transform->position);
-    //remote->object->SetRotation(HMM_QuaternionToEuler(HMM_QuaternionV4(transform->rotation)));
-    
+    // remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
 }
 

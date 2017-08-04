@@ -1,4 +1,4 @@
-#include <librg/librg.h>
+﻿#include <librg/librg.h>
 #include <librg/components/transform.h>
 #include <librg/components/interpolable.h>
 #include <librg/components/client.h>
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
     cfg.ip = "localhost";
     cfg.port = 27010;
     cfg.world_size = HMM_Vec3(5000, 5000, 5000);
-    cfg.tick_delay = 64;
+    cfg.tick_delay = 32;
     cfg.max_connections = 32;
     cfg.platform_id = 1;
     cfg.proto_version = 1;
