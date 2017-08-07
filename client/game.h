@@ -63,6 +63,7 @@ void game_tick(librg::events::event_t* evt)
             &HMM_Vec3(-421.758942, 479.316925, 0.051288)
         );
 
+        mod.state = MOD_DEBUG_STATE;
         librg::network::start();
         spawned = true;
     }

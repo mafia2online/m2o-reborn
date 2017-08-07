@@ -29,12 +29,6 @@
 #include <librg/librg.h>
 #include <librg/utils/fs.h>
 
-#define define_callback(name, event_type, code) \
-    void name(librg::events::event_t* evt) { \
-        auto event = (event_type*) evt; \
-        code; \
-    }
-
 // mod-level definition stuff
 #if !defined(Address)
 #define Address unsigned long
@@ -160,7 +154,7 @@ struct nk_context* nk_ctx;
 #include "gfx/CFontManager.h"
 #include "gfx/CGraphicsManager.h"
 #include "states/title.h"
-#include "states/game.h"
+#include "states/debug.h"
 #include "entities/ped.h"
 #include "entities/vehicle.h"
 #include "proxies.h" // todo: remove
