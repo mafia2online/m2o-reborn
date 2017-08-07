@@ -1,15 +1,6 @@
 ﻿// todo: remove
 
 CGraphicsManager global_gfx;
-CMPStateManager global_state;
-
-void GetStateAndInitialize(void *ptr) {
-    global_state.InitializeResources(ptr);
-}
-
-void GetStateAndRender(void *ptr) {
-    global_state.Render(ptr);
-}
 
 void gfx_OnDeviceCreate(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
     global_gfx.OnDeviceCreate(pDevice, pPresentationParameters);

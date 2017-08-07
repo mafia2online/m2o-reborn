@@ -1,7 +1,6 @@
 ﻿void title_state_init(void *userptr)
 {
-    if (!userptr)
-        return;
+    librg_assert(userptr, "title_state_init");
 
     CGraphicsManager *pGraphicsManager = reinterpret_cast<CGraphicsManager*>(userptr);
     CFontManager *pFontManager = pGraphicsManager->GetFontManager();
@@ -14,7 +13,7 @@
 
 void title_state_render(void * userptr)
 {
-    librg_assert(userptr, "title_state_render fuck");
+    librg_assert(userptr, "title_state_render");
 
     CGraphicsManager *pGraphicsManager = reinterpret_cast<CGraphicsManager*>(userptr);
     CFontManager *pFontManager = pGraphicsManager->GetFontManager();

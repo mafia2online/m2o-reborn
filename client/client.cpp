@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -140,7 +140,7 @@ struct nk_context* nk_ctx;
 #include "tools/game_hooks.h"
 #include "tools/file_logger.h"
 #include "tools/raw_input.h"
-#include "tools/singleton.h" // ohhh nooo
+#include "tools/singleton.h" // ohhh nooo, soon we will get rid of you! >:D
 #include "tools/exception_handler.h"
 #include "tools/dx/CDirect3DDevice9Proxy.h"
 #include "tools/dx/CDirect3D9Proxy.h"
@@ -150,12 +150,6 @@ struct nk_context* nk_ctx;
 #include "tools/dx/CDirectInput8Hook.h"
 
 #include <m2sdk.h>
-
-// todo: refactor
-M2::C_Player2 *dwLocalPlayer = nullptr;
-M2::C_Human2 *ent = nullptr;
-librg::entity_t local_player;
-float ztime = 0;
 
 // shared stuff
 #include "shared_defines.h"
