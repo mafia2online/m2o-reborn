@@ -61,6 +61,22 @@ struct mouse_state_t {
     struct raw { BYTE x, y; } raw;
 };
 
+#define STATE_CB(name) void name(void *)
+typedef STATE_CB(state_callback_t);
+
+struct mod_state_t {
+    union {
+        struct {
+            state_callback_t *init;
+            state_callback_t *tick;
+            state_callback_t *render;
+        };
+
+        state_callback_t *callbacks[3];
+    };
+};
+#undef STATE_CB
+
 // base mod data structure
 struct mod_t {
     // win
@@ -72,6 +88,7 @@ struct mod_t {
 
     // containers
     librg::entity_t player;
+    mod_state_t     state;
 
     // other
     mouse_state_t   mouse;
@@ -145,11 +162,11 @@ float ztime = 0;
 #include "messages.h"
 
 // actual client stuff
-#include "gfx/CMPStateManager.h"
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
 #include "gfx/CGraphicsManager.h"
-#include "gfx/CTitleState.h"
+#include "states/title.h"
+#include "states/game.h"
 #include "entities/ped.h"
 #include "entities/vehicle.h"
 #include "proxies.h" // todo: remove

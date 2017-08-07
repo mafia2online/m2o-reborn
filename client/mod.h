@@ -105,9 +105,7 @@ void mod_attach(HMODULE module)
     CDirectInput8Hook::Install();
     rawinput::hook();
 
-    global_state.AddState(States::Menu, new CTitleState);
-    // global_state.AddState(States::MPGame, new CGameState);
-    global_state.ActivateState(States::Menu);
+    mod.state = MOD_TITLE_STATE;
 }
 
 /**

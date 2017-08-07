@@ -61,7 +61,9 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
     mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
     mod.mouse.y = pPresentationParameters->BackBufferHeight / 2;
 
-    GetStateAndInitialize(this);
+    if (mod.state.init) {
+        mod.state.init(this);
+    }
 }
 
 void CGraphicsManager::OnDeviceLost(IDirect3DDevice9 * pDevice)
@@ -92,7 +94,9 @@ struct nk_font_config conf = nk_font_config(22);
 
 void CGraphicsManager::OnDeviceRender(void)
 {
-    GetStateAndRender(this);
+    if (mod.state.render) {
+        mod.state.render(this);
+    }
 
     if (!gui_initialized && mod.window) {
         nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
