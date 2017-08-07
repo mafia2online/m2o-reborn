@@ -1,4 +1,21 @@
-﻿/**
+﻿void mod_init()
+{
+    Mem::Initialize();
+
+    printf("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
+
+    tools::filepatcher_install();
+    tools::steam_drm_install();
+    tools::gamehooks_install();
+
+    // Disable loading screen
+    Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
+
+    // Disable DLC loadings
+    //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
+}
+
+/**
  * Register all current mod paths
  * @param module
  */
@@ -42,8 +59,8 @@ void mod_attach(HMODULE module)
     librg::core_initialize(librg::mode_client_manual);
 
     // setup callbacks
-    librg::events::add(librg::events::on_log, mod_onlog);
-    librg::events::add(librg::events::on_tick, ontick);
+    librg::events::add(librg::events::on_log, on_mod_log);
+    librg::events::add(librg::events::on_tick, game_tick);
     librg::events::add(librg::events::on_inter, entity_inter);
     librg::events::add(librg::events::on_create, entity_create);
     librg::events::add(librg::events::on_update, entity_update);
@@ -111,6 +128,9 @@ bool mod_wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     return false; // todo
 
+    // it was not there
+    // but its part of the stuff
+    // ZAK do it
 
     // if (uMsg == WM_LBUTTONDOWN) {
     //     mod_log("Pojeb sa ty pica!");

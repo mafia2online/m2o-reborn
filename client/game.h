@@ -1,22 +1,5 @@
 ﻿void game_init()
 {
-    Mem::Initialize();
-
-    printf("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
-
-    tools::filepatcher_install();
-    tools::steam_drm_install();
-    tools::gamehooks_install();
-
-    // Disable loading screen
-    Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
-
-    // Disable DLC loadings
-    //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
-}
-
-void game_on_init()
-{
     mod_log("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
     tools::gamehooks_install_late();
 
@@ -25,9 +8,9 @@ void game_on_init()
 
 bool spawned = false;
 
-void game_on_tick()
+void game_tick(librg::events::event_t* evt)
 {
-    librg::core::tick();
+    auto event = (librg::events::event_tick_t*) evt;
 
     // testing dont complain bitch
     if (!dwLocalPlayer)

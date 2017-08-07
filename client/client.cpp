@@ -58,6 +58,7 @@ struct mouse_state_t {
     int x;
     int y;
     short flags;
+    struct raw { BYTE x, y; } raw;
 };
 
 // base mod data structure
@@ -80,19 +81,15 @@ struct mod_t {
 // public interface definitions
 static mod_t mod;
 
-void game_init();
-void game_on_init();
-void game_on_tick();
-
+void mod_init();
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 
 #define mod_log librg::core::log
 
-struct mouse_pos {
-    BYTE x, y;
-};
-
+// game events
+void game_init();
+void game_tick(librg::events::event_t*);
 
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
@@ -128,6 +125,12 @@ struct nk_context* nk_ctx;
 #include "tools/raw_input.h"
 #include "tools/singleton.h" // ohhh nooo
 #include "tools/exception_handler.h"
+#include "tools/dx/CDirect3DDevice9Proxy.h"
+#include "tools/dx/CDirect3D9Proxy.h"
+#include "tools/dx/CDirect3D9Hook.h"
+#include "tools/dx/CDirectInputDevice8Proxy.h"
+#include "tools/dx/CDirectInput8Proxy.h"
+#include "tools/dx/CDirectInput8Hook.h"
 
 #include <m2sdk.h>
 
@@ -142,25 +145,14 @@ float ztime = 0;
 #include "messages.h"
 
 // actual client stuff
-#include "dx/CDirect3DDevice9Proxy.h"
-#include "dx/CDirect3D9Proxy.h"
-#include "dx/CDirect3D9Hook.h"
-#include "dx/CDirectInputDevice8Proxy.h"
-#include "dx/CDirectInput8Proxy.h"
-#include "dx/CDirectInput8Hook.h"
 #include "gfx/CMPStateManager.h"
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
 #include "gfx/CGraphicsManager.h"
 #include "gfx/CTitleState.h"
-#include "callbacks/tick.h"
-#include "callbacks/other.h"
-#include "callbacks/entity_create.h"
-#include "callbacks/entity_update.h"
-#include "callbacks/entity_interpolate.h"
-#include "callbacks/entity_remove.h"
-#include "callbacks/clientstream_update.h"
-#include "proxies.h"
+#include "entities/ped.h"
+#include "entities/vehicle.h"
+#include "proxies.h" // todo: remove
 #include "game.h"
 #include "callbacks.h"
 #include "mod.h"

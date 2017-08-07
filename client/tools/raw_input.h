@@ -1,4 +1,4 @@
-namespace rawinput
+﻿namespace rawinput
 {
     typedef BOOL(WINAPI* fPeekMessage)(
         _Out_     LPMSG lpMsg,
@@ -29,23 +29,23 @@ namespace rawinput
         POINT mpos;
         GetCursorPos(&mpos);
         ScreenToClient(mod.window, &mpos);
-        mouse_pos pos = {mpos.x, mpos.y};
+        mod.mouse.raw = {(BYTE)mpos.x, (BYTE)mpos.y};
 
 
         // mouse buttons
 
         if (GetAsyncKeyState(VK_LBUTTON)) {
-            mod_wndproc(message->hwnd, WM_LBUTTONDOWN, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_LBUTTONDOWN, 0, (LPARAM)&mod.mouse.raw);
         }
         else {
-            mod_wndproc(message->hwnd, WM_LBUTTONUP, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_LBUTTONUP, 0, (LPARAM)&mod.mouse.raw);
         }
 
         if (GetAsyncKeyState(VK_RBUTTON)) {
-            mod_wndproc(message->hwnd, WM_RBUTTONDOWN, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_RBUTTONDOWN, 0, (LPARAM)&mod.mouse.raw);
         }
         else {
-            mod_wndproc(message->hwnd, WM_RBUTTONUP, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_RBUTTONUP, 0, (LPARAM)&mod.mouse.raw);
         }
 
         // mouse move
