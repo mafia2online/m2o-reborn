@@ -27,9 +27,7 @@ void title_state_render(void * userptr)
     auto font = pFontManager->GetFont("TitleUIFont");
     auto iFontHeight = pFontManager->GetFontHeight(*font) + 5; // lawl +5
 
-    if (font != nullptr)
-    {
-
+    if (font != nullptr) {
         int iYOffset = iScreenH - 50;
 
         pFontManager->DrawTextA("Q", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *font, true);
@@ -53,4 +51,4 @@ void title_state_render(void * userptr)
     }
 }
 
-#define MOD_TITLE_STATE { title_state_init, title_state_render, nullptr }
+#define MOD_TITLE_STATE { title_state_init, nullptr, title_state_render }

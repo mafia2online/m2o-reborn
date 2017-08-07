@@ -140,8 +140,6 @@ void CGraphicsManager::OnDeviceRender(void)
         nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
         nk_style_set_font(nk_ctx, &robot->handle);}
 
-
-
         gui_initialized = true;
     }
 

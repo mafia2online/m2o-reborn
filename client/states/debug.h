@@ -1,4 +1,4 @@
-﻿void debug_state_render(void * usrptr)
+void debug_state_render(void * usrptr)
 {
     enum { EASY, HARD };
     static int op = EASY;
@@ -39,4 +39,4 @@
     nk_end(nk_ctx);
 }
 
-#define MOD_DEBUG_STATE { nullptr, debug_state_render, nullptr }
+#define MOD_DEBUG_STATE { nullptr, nullptr, debug_state_render }

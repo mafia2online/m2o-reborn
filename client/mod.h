@@ -1,4 +1,4 @@
-﻿void mod_init()
+﻿bool mod_init()
 {
     Mem::Initialize();
 
@@ -13,6 +13,8 @@
 
     // Disable DLC loadings
     //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
+
+    return true;
 }
 
 /**
@@ -86,11 +88,13 @@ void mod_attach(HMODULE module)
         return mod_exit("Unable to init Graphics Manager");
     }
 
+    if (mod_init() == false) {
+        return mod_exit("unable to initialize the mod");
+    }
+
     if (ExceptionHandler::Install() == false) {
         return mod_exit("Unable to install exception handler");
     }
-
-    game_init();
 
     // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
     //     mod_exit("Unable to parse config file");

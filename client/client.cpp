@@ -58,17 +58,15 @@ struct mouse_state_t {
 #define STATE_CB(name) void name(void *)
 typedef STATE_CB(state_callback_t);
 
-struct mod_state_t {
-    union {
-        struct {
-            state_callback_t *init;
-            state_callback_t *tick;
-            state_callback_t *render;
-        };
-
-        state_callback_t *callbacks[3];
+typedef union mod_state_t {
+    struct {
+        state_callback_t *init;
+        state_callback_t *tick;
+        state_callback_t *render;
     };
-};
+
+    state_callback_t *callbacks[3];
+} mod_state_t;
 #undef STATE_CB
 
 // base mod data structure
@@ -92,7 +90,7 @@ struct mod_t {
 // public interface definitions
 static mod_t mod;
 
-void mod_init();
+bool mod_init();
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 
