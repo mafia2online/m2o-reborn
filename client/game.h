@@ -1,17 +1,12 @@
-uint32_t game_base;
-
-void game_init()
+﻿void game_init()
 {
-    game_base = Mem::GetModuleAddress(nullptr);
     Mem::Initialize();
 
     printf("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
 
-    FilePatcher_Initialize();
-    SteamDRMPatch_Apply();
-    GameHooks_Install();
-
-    printf("hey\n");
+    tools::filepatcher_install();
+    tools::steam_drm_install();
+    tools::gamehooks_install();
 
     // Disable loading screen
     Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
@@ -20,11 +15,10 @@ void game_init()
     //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
 }
 
-
 void game_on_init()
 {
-    corelog("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
-    GameHooks_InstallLate();
+    mod_log("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
+    tools::gamehooks_install_late();
 
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 }
@@ -54,7 +48,7 @@ void game_on_tick()
                 {
                     int lock = atoi(params.c_str());
                     dwLocalPlayer->LockControls(lock);
-                    corelog("Controls %s!", lock ? ("locked") : ("unlocked"));
+                    mod_log("Controls %s!", lock ? ("locked") : ("unlocked"));
                 });
 
                 CommandProcessor::RegisterCommand("ent",
@@ -80,19 +74,19 @@ void game_on_tick()
                         *(DWORD *)(ent + 32) = flags;
 
                         if (flags & 0x20)
-                            corelog("Flags set sucessfully!");
+                            mod_log("Flags set sucessfully!");
 
                         reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
                         if(reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-                            corelog("Entity active !");
+                            mod_log("Entity active !");
 
                         Vector3 pos;
                         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity *>(dwLocalPlayer)->m_pVFTable->GetPosition, reinterpret_cast<M2::C_Entity*>(dwLocalPlayer), &pos);
                         reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(pos);
                     }
 
-                    corelog("Created at %x!", ent);
+                    mod_log("Created at %x!", ent);
                 });
 
                 CommandProcessor::RegisterCommand("time",
@@ -100,7 +94,7 @@ void game_on_tick()
                 {
                     float time = atof(params.c_str());
                     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(time);
-                    corelog("Set time to %f", time);
+                    mod_log("Set time to %f", time);
                 });
             }
 
@@ -137,7 +131,7 @@ void game_on_tick()
         if (ztime < 0)
             ztime = 0;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        corelog("Time shift!");
+        mod_log("Time shift!");
     }
     if (GetAsyncKeyState(VK_RIGHT) & 0x1)
     {
@@ -145,7 +139,7 @@ void game_on_tick()
         if (ztime > 1.0f)
             ztime = 1.0f;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        corelog("Time shift!");
+        mod_log("Time shift!");
     }
     if (GetAsyncKeyState(VK_F2) & 0x1)
     {
@@ -165,11 +159,11 @@ void game_on_tick()
     {
         M2::S_ExplosionInit *fire = new M2::S_ExplosionInit;
         M2::C_ShotManager::Get()->CreateExplosion(fire);
-        corelog("Created fire!");
+        mod_log("Created fire!");
     }
     if (GetAsyncKeyState(VK_F5) & 0x1 && !spawned)
     {
-        corelog("spawning and connecting...");
+        mod_log("spawning and connecting...");
         dwLocalPlayer->LockControls(false);
         Mem::InvokeFunction<Mem::call_this, void>(reinterpret_cast<M2::C_Entity*>(dwLocalPlayer)->m_pVFTable->SetPosition, dwLocalPlayer, &HMM_Vec3(-421.758942, 479.316925, 0.051288));
 
@@ -180,47 +174,8 @@ void game_on_tick()
     if (GetAsyncKeyState(VK_F6) & 0x1)
     {
         // if (CNetworkManager::Instance().Disconnect())
-        //     corelog("Disconnected");
+        //     mod_log("Disconnected");
         // else
-        //     corelog("Cannot disconnect");
+        //     mod_log("Cannot disconnect");
     }
-}
-
-bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    global_window = hWnd;
-
-    MSG msg;
-    msg.hwnd = hWnd;
-    msg.lParam = lParam;
-    msg.wParam = wParam;
-    msg.message = uMsg;
-
-    return false; // todo
-
-
-    if (uMsg == WM_LBUTTONDOWN) {
-        corelog("Pojeb sa ty pica!");
-    }
-
-    if (nk_ctx) {
-        if (uMsg == WM_MOUSEMOVE) {
-            mouse_pos pos = *(mouse_pos *)lParam;
-            // we shall call it in a tight loop since WM_MOUSEMOVE IS not triggered by the game...
-            nk_input_motion(nk_ctx, pos.x, pos.y);
-            return true;
-        }
-        else if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam))
-            return true;
-    }
-
-    if (uMsg == WM_KEYDOWN) {
-        if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {
-            CDebugConsole::Instance().Focus();
-            return true;
-        }
-    }
-
-
-    return false; // not handled
 }

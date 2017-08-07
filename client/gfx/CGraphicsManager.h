@@ -1,4 +1,4 @@
-class CGraphicsManager
+﻿class CGraphicsManager
 {
 public:
     CGraphicsManager();
@@ -43,14 +43,14 @@ CGraphicsManager::~CGraphicsManager()
 
 bool CGraphicsManager::Init()
 {
-    corelog("CGraphicsManager::Init()");
+    mod_log("CGraphicsManager::Init()");
     CDirect3D9Hook::Install();
     return true;
 }
 
 void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
-    corelog("CGraphicsManager::OnDeviceCreate(%x, %x)", pDevice, pPresentationParameters);
+    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)", pDevice, pPresentationParameters);
     m_pfontmanager = new CFontManager(pDevice);
 
     m_pdevice = pDevice;
@@ -58,15 +58,15 @@ void CGraphicsManager::OnDeviceCreate(IDirect3DDevice9 * pDevice, D3DPRESENT_PAR
     
     // todo: refactor
     // very important, centers initial mouse position on the zkreen
-    global_mouse_state.x = pPresentationParameters->BackBufferWidth / 2;
-    global_mouse_state.y = pPresentationParameters->BackBufferHeight / 2;
+    mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
+    mod.mouse.y = pPresentationParameters->BackBufferHeight / 2;
 
     GetStateAndInitialize(this);
 }
 
 void CGraphicsManager::OnDeviceLost(IDirect3DDevice9 * pDevice)
 {
-    corelog("CGraphicsManager::OnDeviceLost(%x)", pDevice);
+    mod_log("CGraphicsManager::OnDeviceLost(%x)", pDevice);
 
     if (m_pfontmanager)
         m_pfontmanager->OnDeviceLost();
@@ -74,7 +74,7 @@ void CGraphicsManager::OnDeviceLost(IDirect3DDevice9 * pDevice)
 
 void CGraphicsManager::OnDeviceReset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
-    corelog("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
+    mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
     m_pdevice = pDevice;
     m_presentparams = *pPresentationParameters;
@@ -94,7 +94,7 @@ void CGraphicsManager::OnDeviceRender(void)
 {
     GetStateAndRender(this);
 
-    if (!gui_initialized && global_window) {
+    if (!gui_initialized && mod.window) {
         nk_ctx = nk_d3d9_init(m_pdevice, m_presentparams.BackBufferWidth, m_presentparams.BackBufferHeight);
 
         conf.range = nk_font_cyrillic_glyph_ranges();
@@ -109,7 +109,7 @@ void CGraphicsManager::OnDeviceRender(void)
         // nk_d3d9_font_stash_end();
 
         // nk_d3d9_font_stash_begin(&nk_atlas);
-        // struct nk_font *font = nk_font_atlas_add_from_file(nk_atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
+        // struct nk_font *font = nk_font_atlas_add_from_file(nk_atlas, (mod.paths.files + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
         // nk_d3d9_font_stash_end();
         // nk_style_set_font(nk_ctx, &font->handle);
 
@@ -117,17 +117,17 @@ void CGraphicsManager::OnDeviceRender(void)
         // {struct nk_font_atlas *atlas;
         // nk_d3d9_font_stash_begin(&atlas);
 
-        // struct nk_font *genshin = nk_font_atlas_add_from_file(atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
+        // struct nk_font *genshin = nk_font_atlas_add_from_file(atlas, (mod.paths.files + "\\Roboto-Regular.ttf").c_str(), 22, &conf);
         // nk_d3d9_font_stash_end();
         // nk_style_set_font(nk_ctx, &genshin->handle);}
 
-        // corelog((mod_files_dir + "\\Roboto-Regular.ttf").c_str());
+        // mod_log((mod.paths.files + "\\Roboto-Regular.ttf").c_str());
 
         /* Load Fonts: if none of these are loaded a default font will be used  */
         /* Load Cursor: if you uncomment cursor loading please hide the cursor */
         {nk_d3d9_font_stash_begin(&nk_atlas);
         /*struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../extra_font/DroidSans.ttf", 14, 0);*/
-        struct nk_font *robot = nk_font_atlas_add_from_file(nk_atlas, (mod_files_dir + "\\Roboto-Regular.ttf").c_str(), 14, &conf);
+        struct nk_font *robot = nk_font_atlas_add_from_file(nk_atlas, (mod.paths.files + "\\Roboto-Regular.ttf").c_str(), 14, &conf);
         /*struct nk_font *future = nk_font_atlas_add_from_file(atlas, "../../extra_font/kenvector_future_thin.ttf", 13, 0);*/
         /*struct nk_font *clean = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyClean.ttf", 12, 0);*/
         /*struct nk_font *tiny = nk_font_atlas_add_from_file(atlas, "../../extra_font/ProggyTiny.ttf", 10, 0);*/
@@ -177,7 +177,7 @@ void CGraphicsManager::OnDeviceRender(void)
 
                 POINT pica;
                 GetCursorPos(&pica);
-                ScreenToClient(global_window, &pica);
+                ScreenToClient(mod.window, &pica);
 
                 char cipa[64] = { 0 };
                 sprintf(cipa, "X: %d, Y: %d", pica.x, pica.y);

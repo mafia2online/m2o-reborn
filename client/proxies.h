@@ -1,4 +1,6 @@
-﻿CGraphicsManager global_gfx;
+﻿// todo: remove
+
+CGraphicsManager global_gfx;
 CMPStateManager global_state;
 
 void GetStateAndInitialize(void *ptr) {

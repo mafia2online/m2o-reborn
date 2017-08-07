@@ -30,7 +30,7 @@ void clientstream_update(librg::events::event_t* evt)
             transform->position = position;
             transform->rotation = rotation;
 
-            corelog("rotation: %f %f %f %f",
+            mod_log("rotation: %f %f %f %f",
                 rotation.x,
                 rotation.y,
                 rotation.z,

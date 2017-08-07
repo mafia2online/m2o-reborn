@@ -1,4 +1,4 @@
-﻿namespace rawinput
+namespace rawinput
 {
     typedef BOOL(WINAPI* fPeekMessage)(
         _Out_     LPMSG lpMsg,
@@ -24,32 +24,32 @@
     inline void ProcessMessage(LPMSG message)
     {
         // foreign events
-        game_on_wnd_proc(message->hwnd, message->message, message->wParam, message->lParam);
+        mod_wndproc(message->hwnd, message->message, message->wParam, message->lParam);
 
         POINT mpos;
         GetCursorPos(&mpos);
-        ScreenToClient(global_window, &mpos);
+        ScreenToClient(mod.window, &mpos);
         mouse_pos pos = {mpos.x, mpos.y};
 
 
         // mouse buttons
 
         if (GetAsyncKeyState(VK_LBUTTON)) {
-            game_on_wnd_proc(message->hwnd, WM_LBUTTONDOWN, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_LBUTTONDOWN, 0, (LPARAM)&pos);
         }
         else {
-            game_on_wnd_proc(message->hwnd, WM_LBUTTONUP, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_LBUTTONUP, 0, (LPARAM)&pos);
         }
 
         if (GetAsyncKeyState(VK_RBUTTON)) {
-            game_on_wnd_proc(message->hwnd, WM_RBUTTONDOWN, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_RBUTTONDOWN, 0, (LPARAM)&pos);
         }
         else {
-            game_on_wnd_proc(message->hwnd, WM_RBUTTONUP, 0, (LPARAM)&pos);
+            mod_wndproc(message->hwnd, WM_RBUTTONUP, 0, (LPARAM)&pos);
         }
 
         // mouse move
-        //game_on_wnd_proc(message->hwnd, WM_MOUSEMOVE, 0, (LPARAM)&pos);
+        //mod_wndproc(message->hwnd, WM_MOUSEMOVE, 0, (LPARAM)&pos);
 
     }
 

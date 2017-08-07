@@ -11,7 +11,7 @@ void entity_create(librg::events::event_t* evt)
     switch (event->type)
     {
         case TYPE_PLAYER: {
-            corelog("creating player");
+            mod_log("creating player");
 
             M2::C_Human2 *ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
             
@@ -33,18 +33,18 @@ void entity_create(librg::events::event_t* evt)
             *(DWORD *)(ent + 32) = flags;
 
             if (flags & 0x20)
-                corelog("Flags set sucessfully!");
+                mod_log("Flags set sucessfully!");
 
             reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
             if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-                corelog("Entity active !");
+                mod_log("Entity active !");
 
             reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(transform->position);
 
             event->entity.assign<gamedata_t>((M2::C_Entity*)ent);
 
-            corelog("Created at %x!", ent);
+            mod_log("Created at %x!", ent);
 
         } break;
         case TYPE_VEHICLE: {

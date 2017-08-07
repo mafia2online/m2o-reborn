@@ -21,7 +21,7 @@ long WINAPI ExceptionHandler::ExceptionHandlerCallback(_EXCEPTION_POINTERS *pExc
 
     char szFileName[MAX_PATH];
     /// \todo Stop that hardcoding oh... and standardize with our SString class - myu
-    sprintf(szFileName, "%s\\Exceptions\\%04d-%02d-%02d_%02d-%02d-%02d.txt", mod_dir, systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
+    sprintf(szFileName, "%s\\Exceptions\\%04d-%02d-%02d_%02d-%02d-%02d.txt", mod.paths.index, systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
 
     HANDLE hModuleSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetCurrentProcessId());
 

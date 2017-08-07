@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -27,36 +27,72 @@
 
 // librg
 #include <librg/librg.h>
+#include <librg/utils/fs.h>
+
+#define define_callback(name, event_type, code) \
+    void name(librg::events::event_t* evt) { \
+        auto event = (event_type*) evt; \
+        code; \
+    }
 
 // mod-level definition stuff
 #if !defined(Address)
 #define Address unsigned long
 #define Pointer unsigned int
+#define Byte    unsigned char
 #endif
-
-using Byte = unsigned char;
 
 // proxy some stuff
 typedef hmm_vec2 Vector2;
 typedef hmm_vec3 Vector3;
 
+// tools
+struct mod_path_t {
+    std::string index;
+    std::string files;
+    std::string debug;
+    std::string game_files;
+};
+
+struct mouse_state_t {
+    int x;
+    int y;
+    short flags;
+};
+
+// base mod data structure
+struct mod_t {
+    // win
+    HWND            window;
+    HMODULE         module;
+
+    // settings
+    mod_path_t      paths;
+
+    // containers
+    librg::entity_t player;
+
+    // other
+    mouse_state_t   mouse;
+    std::ofstream   debug_steam;
+};
+
+// public interface definitions
+static mod_t mod;
+
+void game_init();
+void game_on_init();
+void game_on_tick();
+
+void mod_exit(std::string);
+bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
+
+#define mod_log librg::core::log
+
 struct mouse_pos {
     BYTE x, y;
 };
 
-// public interface definitions
-void game_init();
-void game_exit(std::string reason);
-void game_on_init();
-void game_on_tick();
-bool game_on_wnd_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-HWND global_window;
-
-std::string mod_dir;
-std::string mod_files_dir;
-
-#define corelog librg::core::log
 
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
@@ -85,9 +121,9 @@ struct nk_context* nk_ctx;
 // tool stuff
 #include "tools/console.h"
 #include "tools/patcher.h"
+#include "tools/file_patcher.h"
 #include "tools/steam_drm.h"
 #include "tools/game_hooks.h"
-#include "tools/file_patcher.h"
 #include "tools/file_logger.h"
 #include "tools/raw_input.h"
 #include "tools/singleton.h" // ohhh nooo
@@ -99,30 +135,13 @@ struct nk_context* nk_ctx;
 M2::C_Player2 *dwLocalPlayer = nullptr;
 M2::C_Human2 *ent = nullptr;
 librg::entity_t local_player;
-std::ofstream _debug_stream;
 float ztime = 0;
-HMODULE dll_module;
-
-struct mouse_state {
-    int x;
-    int y;
-    short flags;
-};
-
-static mouse_state global_mouse_state;
 
 // shared stuff
 #include "shared_defines.h"
 #include "messages.h"
 
 // actual client stuff
-#include "callbacks/tick.h"
-#include "callbacks/other.h"
-#include "callbacks/entity_create.h"
-#include "callbacks/entity_update.h"
-#include "callbacks/entity_interpolate.h"
-#include "callbacks/entity_remove.h"
-#include "callbacks/clientstream_update.h"
 #include "dx/CDirect3DDevice9Proxy.h"
 #include "dx/CDirect3D9Proxy.h"
 #include "dx/CDirect3D9Hook.h"
@@ -134,116 +153,33 @@ static mouse_state global_mouse_state;
 #include "gfx/CFontManager.h"
 #include "gfx/CGraphicsManager.h"
 #include "gfx/CTitleState.h"
+#include "callbacks/tick.h"
+#include "callbacks/other.h"
+#include "callbacks/entity_create.h"
+#include "callbacks/entity_update.h"
+#include "callbacks/entity_interpolate.h"
+#include "callbacks/entity_remove.h"
+#include "callbacks/clientstream_update.h"
 #include "proxies.h"
 #include "game.h"
+#include "callbacks.h"
+#include "mod.h"
 
-
-void mod_onlog(librg::events::event_t* evt) {
-    auto event = (librg::events::event_log_t*) evt;
-    _debug_stream << event->output;
-    printf("%s", event->output.c_str());
-}
-
-void mod_on_attach(HMODULE module)
-{
-    dll_module = module;
-
-    ConsoleAttach();
-    SetTextFGColor(3);
-    printf("the\n");
-    printf("m2o-reborn\n");
-    SetTextFGColor(7);
-    printf("starting...\n");
-
-    char szRunPath[MAX_PATH] = { '\0' };
-    GetModuleFileName(module, szRunPath, MAX_PATH);
-    mod_dir = std::string(szRunPath);
-    size_t pos = mod_dir.rfind("\\");
-    mod_dir.erase(pos, std::string::npos);
-
-    mod_files_dir = std::string(mod_dir + "\\files");
-    _debug_stream.open(mod_dir + "\\m2o_debug.log");
-
-    printf("attaching librg\n");
-
-    // setup manual client mode
-    librg::core_initialize(librg::mode_client_manual);
-
-    // setup callbacks
-    librg::events::add(librg::events::on_log, mod_onlog);
-    librg::events::add(librg::events::on_tick, ontick);
-    librg::events::add(librg::events::on_inter, entity_inter);
-    librg::events::add(librg::events::on_create, entity_create);
-    librg::events::add(librg::events::on_update, entity_update);
-    librg::events::add(librg::events::on_remove, entity_remove);
-    librg::events::add(librg::events::on_connect, client_connect);
-    librg::events::add(librg::events::on_disconnect, client_disconnect);
-    librg::events::add(librg::events::on_client_stream_entity, clientstream_update);
-
-    auto cfg = librg::config_t{};
-    cfg.ip = "localhost";
-    cfg.port = 27010;
-    cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
-    cfg.tick_delay = 32;
-    cfg.max_connections = 8;
-    cfg.platform_id = 1;
-    cfg.proto_version = 1;
-    cfg.build_version = 1;
-
-    // start the client (network connection)
-    librg::core::start(cfg);
-
-    if (global_gfx.Init() == false) {
-        corelog("Unable to init Graphics Manager");
-        game_exit("Unable to init Graphics Manager");
-    }
-
-    game_init();
-
-    if (ExceptionHandler::Install() == false)
-        game_exit("Unable to install exception handler");
-
-    // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
-    //     game_exit("Unable to parse config file");
-    // }
-
-    rawinput::on_mousemove = [&](RAWMOUSE me) {
-        global_mouse_state.x += me.lLastX;
-        global_mouse_state.y += me.lLastY;
-        global_mouse_state.flags = me.usButtonFlags;
-    };
-
-    CDirectInput8Hook::Install();
-    rawinput::hook();
-
-    global_state.AddState(States::Menu, new CTitleState);
-    // global_state.AddState(States::MPGame, new CGameState);
-    global_state.ActivateState(States::Menu);
-}
-
-void game_exit(std::string reason)
-{
-    corelog("exiting %s", reason.c_str());
-    librg::core_terminate();
-    MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
-    _debug_stream.close();
-    exit(0);
-}
-
+/**
+ * Our main process function
+ */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-        DisableThreadLibraryCalls(hModule);
-        mod_on_attach(hModule);
-        break;
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        // game_exit("deatch");
-        break;
+    switch (ul_reason_for_call) {
+        case DLL_PROCESS_ATTACH:
+            DisableThreadLibraryCalls(hModule);
+            mod_attach(hModule);
+            break;
+        case DLL_THREAD_ATTACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
+            break;
     }
+
     return TRUE;
 }
-
