@@ -2,6 +2,10 @@
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
+/**
+ * Third party dependencies
+ * and definitions
+ */
 #include <stdio.h>
 #include <stdint.h>
 
@@ -29,77 +33,6 @@
 #include <librg/librg.h>
 #include <librg/utils/fs.h>
 
-// mod-level definition stuff
-#if !defined(Address)
-#define Address unsigned long
-#define Pointer unsigned int
-#define Byte    unsigned char
-#endif
-
-// proxy some stuff
-typedef hmm_vec2 Vector2;
-typedef hmm_vec3 Vector3;
-
-// tools
-struct mod_path_t {
-    std::string index;
-    std::string files;
-    std::string debug;
-    std::string game_files;
-};
-
-struct mouse_state_t {
-    int x;
-    int y;
-    short flags;
-    struct raw { BYTE x, y; } raw;
-};
-
-#define STATE_CB(name) void name(void *)
-typedef STATE_CB(state_callback_t);
-
-typedef union mod_state_t {
-    struct {
-        state_callback_t *init;
-        state_callback_t *tick;
-        state_callback_t *render;
-    };
-
-    state_callback_t *callbacks[3];
-} mod_state_t;
-#undef STATE_CB
-
-// base mod data structure
-struct mod_t {
-    // win
-    HWND            window;
-    HMODULE         module;
-
-    // settings
-    mod_path_t      paths;
-
-    // containers
-    librg::entity_t player;
-    mod_state_t     state;
-
-    // other
-    mouse_state_t   mouse;
-    std::ofstream   debug_steam;
-};
-
-// public interface definitions
-static mod_t mod;
-
-bool mod_init();
-void mod_exit(std::string);
-bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
-
-#define mod_log librg::core::log
-
-// game events
-void game_init();
-void game_tick(librg::events::event_t*);
-
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
 #include <detours.h>
@@ -121,26 +54,111 @@ void game_tick(librg::events::event_t*);
 #include <nuklear.h>
 #include <nuklear_d3d9.h>
 
-struct nk_font_atlas* nk_atlas;
-struct nk_context* nk_ctx;
+/**
+ * Internal dependencies
+ * and definitions (mod)
+ */
+#if !defined(Address)
+#define Address unsigned long
+#define Pointer unsigned int
+#define Byte    unsigned char
+#endif
+
+// global vars for nk
+struct nk_context*      nk_ctx;
+struct nk_font_atlas*   nk_atlas;
+
+// proxy some stuff
+typedef hmm_vec2 Vector2;
+typedef hmm_vec3 Vector3;
+
+// tools
+struct mod_path_t {
+    std::string index;
+    std::string files;
+    std::string debug;
+    std::string game_files;
+};
+
+struct mouse_state_t {
+    int x;
+    int y;
+    short flags;
+    struct raw { BYTE x, y; } raw;
+};
+
+// simple FSM system
+#define STATE_CB(name) void name(void *)
+typedef STATE_CB(state_callback_t);
+
+typedef union mod_state_t {
+    struct {
+        state_callback_t *init;
+        state_callback_t *tick;
+        state_callback_t *render;
+    };
+
+    state_callback_t *callbacks[3];
+} mod_state_t;
+#undef STATE_CB
+
+// base mod data structure
+struct mod_t {
+    // win stuff
+    HMODULE module;
+    HWND    window;
+
+    // storage
+    mod_path_t  paths;
+    mod_state_t state;
+
+    mouse_state_t   mouse;
+    librg::entity_t player;
+
+    // other
+    std::ofstream   debug_steam;
+};
+
+// public interface definitions
+static mod_t mod;
+
+bool mod_init();
+void mod_exit(std::string);
+bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
+
+#define mod_log librg::core::log
+
+// game events
+void game_init();
+void game_tick(librg::events::event_t*);
+
+// dx events
+void graphics_device_create(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+void graphics_device_prerender();
+void graphics_device_render();
+void graphics_device_lost(IDirect3DDevice9*);
+void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 // tool stuff
 #include "tools/console.h"
-#include "tools/patcher.h"
-#include "tools/file_patcher.h"
-#include "tools/steam_drm.h"
-#include "tools/game_hooks.h"
-#include "tools/file_logger.h"
 #include "tools/raw_input.h"
 #include "tools/singleton.h" // ohhh nooo, soon we will get rid of you! >:D
+#include "tools/file_logger.h"
 #include "tools/exception_handler.h"
-#include "tools/dx/CDirect3DDevice9Proxy.h"
-#include "tools/dx/CDirect3D9Proxy.h"
-#include "tools/dx/CDirect3D9Hook.h"
-#include "tools/dx/CDirectInputDevice8Proxy.h"
-#include "tools/dx/CDirectInput8Proxy.h"
-#include "tools/dx/CDirectInput8Hook.h"
 
+#include "hooks/memory.h"
+#include "hooks/steamdrm.h"
+#include "hooks/gamehooks.h"
+#include "hooks/filepatcher.h"
+#include "hooks/dx/CDirect3DDevice9Proxy.h"
+#include "hooks/dx/CDirect3D9Proxy.h"
+#include "hooks/dx/CDirect3D9Hook.h"
+#include "hooks/dx/CDirectInputDevice8Proxy.h"
+#include "hooks/dx/CDirectInput8Proxy.h"
+#include "hooks/dx/CDirectInput8Hook.h"
+
+// we need to include sdk
+// after memory hooks :C
 #include <m2sdk.h>
 
 // shared stuff
@@ -151,14 +169,17 @@ struct nk_context* nk_ctx;
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
 #include "gfx/CGraphicsManager.h"
+
 #include "states/title.h"
 #include "states/debug.h"
+
 #include "entities/ped.h"
 #include "entities/vehicle.h"
-#include "proxies.h" // todo: remove
-#include "game.h"
-#include "callbacks.h"
-#include "mod.h"
+
+#include "core/callbacks.h"
+#include "core/graphics.h"
+#include "core/game.h"
+#include "core/mod.h"
 
 /**
  * Our main process function

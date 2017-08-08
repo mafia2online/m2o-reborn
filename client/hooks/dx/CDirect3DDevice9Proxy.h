@@ -142,12 +142,6 @@ public:
     HRESULT STDMETHODCALLTYPE CreateQuery(D3DQUERYTYPE Type, IDirect3DQuery9 ** ppQuery);
 };
 
-void gfx_OnDeviceCreate(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
-void gfx_OnDevicePreRender();
-void gfx_OnDeviceRender();
-void gfx_OnDeviceLost(IDirect3DDevice9* pDevice);
-void gfx_OnDeviceReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
-
 CDirect3DDevice9Proxy::CDirect3DDevice9Proxy(IDirect3D9 * pD3D, IDirect3DDevice9 * pDevice)
 {
     m_pD3D = pD3D;
