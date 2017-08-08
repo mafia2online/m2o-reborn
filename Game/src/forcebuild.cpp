@@ -1,2 +1,0 @@
-// mneh
-#include "CGame.hpp"

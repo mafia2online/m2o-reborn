@@ -1,3 +1,0 @@
-[submodule "Libraries/SteamAPI"]
-	path = Libraries/SteamAPI
-	url = git@gitlab.com:Mafia2Online/lib-steam-api.git
