@@ -20,12 +20,12 @@ launcher.dir/*
 .vs/*
 Win32/
 
-!build-mac/.keep
-!build-lin/.keep
-!build-win/.keep
-!build-mac/resources
-!build-lin/resources
-!build-win/Debug/resources
+binary/*
+!binary/files/
+!binary/game_files/
+!binary/resources/
+!binary/steam_appid.txt
+!binary/steam_api.dll
 
 # os stuff
 .DS_Store

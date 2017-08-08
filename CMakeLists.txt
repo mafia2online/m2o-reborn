@@ -1,4 +1,4 @@
-﻿###
+###
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
@@ -73,6 +73,10 @@ file(GLOB_RECURSE CLIENT_FILES
 add_executable(server ${SERVER_FILES})
 target_link_libraries(server librg)
 
+add_custom_command(TARGET server POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
+)
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
@@ -85,6 +89,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(launcher Psapi steam_api)
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
 
+    add_custom_command(TARGET client POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
+    )
+
+    add_custom_command(TARGET launcher POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/launcher.exe" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
+    )
 endif()
 
 if (MSVC)
@@ -97,3 +108,4 @@ if (MSVC)
     GroupSources(vendor/nuklear)
     GroupSources(launcher)
 endif()
+
