@@ -1,4 +1,4 @@
-﻿bool mod_init()
+bool mod_init()
 {
     Mem::Initialize();
 
@@ -84,7 +84,7 @@ void mod_attach(HMODULE module)
     // start the client
     librg::core::start(cfg);
 
-    if (global_gfx.Init() == false) {
+    if (graphics_init() == false) {
         return mod_exit("Unable to init Graphics Manager");
     }
 

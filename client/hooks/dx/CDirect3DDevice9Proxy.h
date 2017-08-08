@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
 *
 * Solution   : Mafia 2 Multiplayer
 * Project    : Client
@@ -240,12 +240,12 @@ UINT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetNumberOfSwapChains()
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
-    gfx_OnDeviceLost( m_pD3DDevice );
+    graphics_device_lost(m_pD3DDevice);
 
-    HRESULT hResult = m_pD3DDevice->Reset( pPresentationParameters );
+    HRESULT hResult = m_pD3DDevice->Reset(pPresentationParameters);
 
     if (SUCCEEDED(hResult)) {
-        gfx_OnDeviceReset( m_pD3DDevice, pPresentationParameters);
+        graphics_device_reset(m_pD3DDevice, pPresentationParameters);
     }
 
     return hResult;
@@ -386,14 +386,14 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene( )
     m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);*/
 
-    gfx_OnDevicePreRender();
+    graphics_device_prerender();
 
     return hr;
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::EndScene( )
 {
-    gfx_OnDeviceRender();
+    graphics_device_render();
     return m_pD3DDevice->EndScene();
 }
 

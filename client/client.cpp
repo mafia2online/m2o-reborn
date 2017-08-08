@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -87,8 +87,14 @@ struct mouse_state_t {
     struct raw { BYTE x, y; } raw;
 };
 
+struct mod_graphics_t {
+    IDirect3DDevice9 *device;
+    D3DPRESENT_PARAMETERS present_params;
+    void *font_manager;
+};
+
 // simple FSM system
-#define STATE_CB(name) void name(void *)
+#define STATE_CB(name) void name()
 typedef STATE_CB(state_callback_t);
 
 typedef union mod_state_t {
@@ -113,6 +119,7 @@ struct mod_t {
     mod_state_t state;
 
     mouse_state_t   mouse;
+    mod_graphics_t  graphics;
     librg::entity_t player;
 
     // other
@@ -132,7 +139,10 @@ bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 void game_init();
 void game_tick(librg::events::event_t*);
 
-// dx events
+// graphics stuff, including dx callbacks
+bool graphics_init();
+void graphics_terminate();
+void graphics_dimensions(int *w, int *h);
 void graphics_device_create(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 void graphics_device_prerender();
 void graphics_device_render();
@@ -168,7 +178,6 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // actual client stuff
 #include "gfx/CDebugConsole.h"
 #include "gfx/CFontManager.h"
-#include "gfx/CGraphicsManager.h"
 
 #include "states/title.h"
 #include "states/debug.h"

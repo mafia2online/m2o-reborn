@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
 *
 * Solution   : Mafia 2 Multiplayer
 * Project    : Client
@@ -133,7 +133,7 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 
     if(SUCCEEDED(hr))
     {
-        gfx_OnDeviceCreate( *ppReturnedDeviceInterface, pPresentationParameters );
+        graphics_device_create(*ppReturnedDeviceInterface, pPresentationParameters);
         *ppReturnedDeviceInterface = new CDirect3DDevice9Proxy( this, *ppReturnedDeviceInterface );
     }
 

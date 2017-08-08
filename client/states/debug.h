@@ -1,4 +1,4 @@
-void debug_state_render(void * usrptr)
+void debug_state_render()
 {
     enum { EASY, HARD };
     static int op = EASY;
