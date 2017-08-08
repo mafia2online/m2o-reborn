@@ -149,13 +149,7 @@ void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
-// tool stuff
-#include "tools/console.h"
-#include "tools/raw_input.h"
-#include "tools/singleton.h" // ohhh nooo, soon we will get rid of you! >:D
-#include "tools/file_logger.h"
-#include "tools/exception_handler.h"
-
+// hooks
 #include "hooks/memory.h"
 #include "hooks/steamdrm.h"
 #include "hooks/gamehooks.h"
@@ -167,6 +161,13 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "hooks/dx/CDirectInput8Proxy.h"
 #include "hooks/dx/CDirectInput8Hook.h"
 
+// tool stuff
+#include "tools/console.h"
+#include "tools/raw_input.h"
+#include "tools/file_logger.h"
+#include "tools/font_manager.h"
+#include "tools/exception_handler.h"
+
 // we need to include sdk
 // after memory hooks :C
 #include <m2sdk.h>
@@ -176,15 +177,10 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "messages.h"
 
 // actual client stuff
-#include "gfx/CDebugConsole.h"
-#include "gfx/CFontManager.h"
-
 #include "states/title.h"
 #include "states/debug.h"
-
 #include "entities/ped.h"
 #include "entities/vehicle.h"
-
 #include "core/callbacks.h"
 #include "core/graphics.h"
 #include "core/game.h"

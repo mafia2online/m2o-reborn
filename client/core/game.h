@@ -50,7 +50,7 @@ void game_tick(librg::events::event_t* evt)
 
         Mem::InvokeFunction<Mem::call_this, void>(
             ped->m_pVFTable->SetPosition, ped,
-            &HMM_Vec3(-421.7589, 479.3165, 0.0518)
+            &HMM_Vec3(-421.75f, 479.31f, 0.05f)
         );
 
         mod.state = MOD_DEBUG_STATE;

@@ -1,4 +1,4 @@
-﻿class CommandProcessor
+class CommandProcessor
 {
 public:
     using CommandProcedure = std::function<void(const std::string&)>;
