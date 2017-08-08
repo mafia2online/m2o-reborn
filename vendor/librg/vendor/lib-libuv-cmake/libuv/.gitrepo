@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/libuv/libuv
+	branch = v1.x
+	commit = 52ae826492f50f151138ed115faa5e0ac8c803ce
+	parent = 1091cd0880a722002760cd8fb2097428fc6000d1
+	cmdver = 0.3.1

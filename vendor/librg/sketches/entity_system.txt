@@ -1,0 +1,9 @@
+entity system sketch:
+
+
+createEntity:
+    - find unused/free'd entity
+    - return entity_id
+    
+destroyEntity:
+    - use entity handle to find and increment the genid.

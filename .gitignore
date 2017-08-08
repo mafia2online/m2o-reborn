@@ -1,0 +1,35 @@
+# binaries
+**/*.dll
+**/*.exe
+
+# directories
+bin-*/*
+distrib/build_*/*
+
+# building stuff
+build/*
+build-mac/*
+build-lin/*
+build-win/*
+*.dir/*
+x64/*
+x86/*
+client.dir/*
+server.dir/*
+launcher.dir/*
+.vs/*
+Win32/
+
+!build-mac/.keep
+!build-lin/.keep
+!build-win/.keep
+!build-mac/resources
+!build-lin/resources
+!build-win/Debug/resources
+
+# os stuff
+.DS_Store
+Thumbs.db
+.sync/
+
+*.swp
