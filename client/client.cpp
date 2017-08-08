@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // std::numeric_limits min&max
 
@@ -17,7 +17,7 @@
 #include <mutex>
 #include <iomanip>
 
-// steam stuff
+// stream stuff
 #include <iostream>
 #include <fstream>
 #include <fcntl.h>
@@ -123,7 +123,7 @@ struct mod_t {
     librg::entity_t player;
 
     // other
-    std::ofstream   debug_steam;
+    std::ofstream   debug_stream;
 };
 
 // public interface definitions

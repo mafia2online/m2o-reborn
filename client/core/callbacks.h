@@ -8,7 +8,7 @@ void on_mod_log(librg::events::event_t* evt)
 {
     auto event  = (librg::events::event_log_t*)evt;
 
-    mod.debug_steam << event->output;
+    mod.debug_stream << event->output;
     printf("%s", event->output.c_str());
 }
 

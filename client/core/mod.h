@@ -1,4 +1,4 @@
-bool mod_init()
+﻿bool mod_init()
 {
     Mem::Initialize();
 
@@ -54,7 +54,7 @@ void mod_attach(HMODULE module)
 
     // path n basics
     mod_path_register(module);
-    mod.debug_steam.open(mod.paths.debug);
+    mod.debug_stream.open(mod.paths.debug);
     mod.module = module;
 
     // setup manual client mode
@@ -169,7 +169,7 @@ void mod_exit(std::string reason)
     mod_log("exiting %s", reason.c_str());
 
     librg::core_terminate();
-    mod.debug_steam.close();
+    mod.debug_stream.close();
 
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
 
