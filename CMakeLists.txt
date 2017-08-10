@@ -4,6 +4,9 @@
 cmake_minimum_required (VERSION 2.8)
 project (m2o-reborn)
 
+include(misc/cmake/FindDirectX.cmake)
+
+# set(WIN32 ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ###
 # Predefines to block make at the root
@@ -24,11 +27,22 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "/MDd" CACHE STRING "Debug compiler flags" FORCE)
 endif()
 
+set(CMAKE_BUILD_TYPE "Debug")
 
 ###
 # Compile vendor dependencies
 ###
 add_subdirectory(vendor/librg)
+
+if (WIN32)
+    if (NOT DirectX_D3D9_INCLUDE_FOUND)
+        message(FATAL_ERROR "Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
+    endif()
+
+    find_path (D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
+    find_path (D3DX9_LIBRARY d3dx9.lib HINTS ${DirectX_LIB_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
+endif()
+
 
 ###
 # Includes for libs and remote sources
@@ -42,11 +56,13 @@ include_directories(
     server/
     shared/
     launcher/
+    ${D3DX9_INCLUDE}
 )
 
 link_directories(
     ${PROJECT_SOURCE_DIR}/vendor/steam_api/lib
     ${PROJECT_SOURCE_DIR}/vendor/detours/lib
+    ${D3DX9_LIBRARY}
 )
 
 file(GLOB_RECURSE SERVER_FILES
