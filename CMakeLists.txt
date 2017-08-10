@@ -35,7 +35,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 add_subdirectory(vendor/librg)
 
 if (WIN32)
-    if (NOT DirectX_D3D9_INCLUDE_FOUND)
+    if (NOT DirectX_D3DX9_INCLUDE_FOUND)
         message(FATAL_ERROR "Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
     endif()
 
@@ -82,12 +82,16 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
 )
 
+set(SERVER_LIBRARIES librg)
+set(CLIENT_LIBRARIES librg d3d9 d3dx9 dxgi dinput8 dxguid detours)
+set(LAUNCHER_LIBRARIES Psapi steam_api)
+
 ###
 # Adding executables
 # Linking libraries
 ###
 add_executable(server ${SERVER_FILES})
-target_link_libraries(server librg)
+target_link_libraries(server ${SERVER_LIBRARIES})
 
 add_custom_command(TARGET server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
@@ -97,12 +101,12 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client librg d3d9 d3dx9 dxgi dinput8 dxguid detours)
+    target_link_libraries(client ${CLIENT_LIBRARIES})
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
 
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
-    target_link_libraries(launcher Psapi steam_api)
+    target_link_libraries(launcher ${LAUNCHER_LIBRARIES})
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
 
     add_custom_command(TARGET client POST_BUILD
