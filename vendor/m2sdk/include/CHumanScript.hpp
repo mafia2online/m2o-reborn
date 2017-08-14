@@ -1,4 +1,4 @@
-/** @file CHumanScript.hpp
+﻿/** @file CHumanScript.hpp
 *  @brief Game's Entity class
 *
 *
@@ -19,6 +19,17 @@ namespace M2
 		E_KINEMATIC = 2,
 		E_DISABLED = 3
 	};
+
+    enum eHumanMoveMode
+    {
+        HUMAN_MOVE_MODE_NONE = -1,
+        HUMAN_MOVE_MODE_BREATH = 0,
+        HUMAN_MOVE_MODE_STEP = 1,
+        HUMAN_MOVE_MODE_WALK = 2,
+        HUMAN_MOVE_MODE_RUN = 3,
+        HUMAN_MOVE_MODE_SPRINT = 4,
+        HUMAN_MOVE_MODE_END = 5
+    };
 
 	class ICHumanScript
 	{
@@ -151,6 +162,26 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D040, this);
 		}
+
+        void ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+        {
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0982190, this, syncObject, ent, pos, smooth);
+        }
+
+        void ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+        {
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0981860, this, syncObject, ent, pos, smooth);
+        }
+
+        void ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop)
+        {
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x097F740, this, begin, moveMode, target, smoothStop);
+        }
+
+        void ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth)
+        {
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x09822C0, this, syncObject, ent, dir, smooth);
+        }
 
 		void SetAnimDeathTag(char const *tag)
 		{
