@@ -44,7 +44,6 @@ namespace librg
 
                     memcpy(var, reinterpret_cast<char*>(raw_buffer) + read_offset, variable_size);
                     read_offset += variable_size;
-                    buffer_size -= variable_size;
                 }
 
                 /**

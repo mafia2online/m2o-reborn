@@ -48,6 +48,14 @@ void game_tick(librg::events::event_t* evt)
         auto ped = (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed();
         ((M2::C_Player2*)ped)->LockControls(false);
 
+        auto human = (M2::C_Human2*)ped;
+        auto original = HMM_Vec3(-421.75f, 479.31f, 0.05f);
+        auto target   = HMM_Vec3(-421.75f, 489.31f, 0.05f);
+
+        M2::C_SyncObject* foo;
+
+        human->GetScript()->ScrMoveV(&foo, original, M2::HUMAN_MOVE_MODE_RUN, target, true);
+
         Mem::InvokeFunction<Mem::call_this, void>(
             ped->m_pVFTable->SetPosition, ped,
             &HMM_Vec3(-421.75f, 479.31f, 0.05f)
