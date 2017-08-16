@@ -163,26 +163,6 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D040, this);
 		}
 
-        void ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
-        {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0993B00, this, syncObject, ent, pos, smooth);
-        }
-
-        void ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
-        {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9931D0, this, syncObject, ent, pos, smooth);
-        }
-
-        void ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop)
-        {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9910B0, this, syncObject, begin, moveMode, target, smoothStop);
-        }
-
-        void ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth)
-        {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x993C30, this, syncObject, ent, dir, smooth);
-        }
-
 		void SetAnimDeathTag(char const *tag)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x09221A0, this, tag);
@@ -212,5 +192,52 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0x093B830, this, ent);
 		}
+
+        /*C_SyncObject *ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+        {
+            return Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0993B00, this, syncObject, ent, pos, smooth);
+        }
+
+        C_SyncObject *ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+        {
+            return Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9931D0, this, syncObject, ent, pos, smooth);
+        }
+
+        C_SyncObject *ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop)
+        {
+            return Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9910B0, this, *syncObject, begin, moveMode, target, smoothStop);
+        }
+
+        C_SyncObject *ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth)
+        {
+            return Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x993C30, this, syncObject, ent, dir, smooth);
+        }*/
+
+        C_SyncObject *ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth);
+        C_SyncObject *ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth);
+        C_SyncObject *ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop);
+        C_SyncObject *ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth);
 	};
+
+    /* TODO: Fix previous natives and delete those ones */
+    DWORD dwAddress = 0x0993B00;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+    {
+        _asm jmp dwAddress
+    }
+    DWORD dwAddress2 = 0x9931D0;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
+    {
+        _asm jmp dwAddress2;
+    }
+    DWORD dwAddress3 = 0x9910B0;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop)
+    {
+        _asm jmp dwAddress3;
+    }
+    DWORD dwAddress4 = 0x993C30;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth)
+    {
+        _asm jmp dwAddress4;
+    }
 };

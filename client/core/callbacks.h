@@ -56,9 +56,11 @@ void clientstream_update(librg::events::event_t* evt)
 
     hmm_v3 position;
     hmm_v4 rotation;
+    hmm_v3 direction;
 
     Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetPosition, remote->object, &position);
     Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetRotation, remote->object, &rotation);
+    Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetDirection, remote->object, &direction);
 
     transform->position = position;
     transform->rotation = rotation;
@@ -125,5 +127,5 @@ void entity_inter(librg::events::event_t* evt)
     *transform = *(librg::transform_t*)event->data;
 
     remote->object->SetPosition(transform->position);
-    // remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
+    //remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
 }
