@@ -165,22 +165,22 @@ namespace M2
 
         void ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
         {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0982190, this, syncObject, ent, pos, smooth);
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0993B00, this, syncObject, ent, pos, smooth);
         }
 
         void ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
         {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0981860, this, syncObject, ent, pos, smooth);
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9931D0, this, syncObject, ent, pos, smooth);
         }
 
         void ScrMoveV(C_SyncObject **syncObject, const hmm_vec3 &begin, const eHumanMoveMode moveMode, const hmm_vec3 &target, const bool smoothStop)
         {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x097F740, this, begin, moveMode, target, smoothStop);
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x9910B0, this, syncObject, begin, moveMode, target, smoothStop);
         }
 
         void ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &dir, const bool smooth)
         {
-            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x09822C0, this, syncObject, ent, dir, smooth);
+            Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x993C30, this, syncObject, ent, dir, smooth);
         }
 
 		void SetAnimDeathTag(char const *tag)
