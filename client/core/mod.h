@@ -62,7 +62,6 @@ void mod_attach(HMODULE module)
 
     // setup callbacks
     librg::events::add(librg::events::on_log, on_mod_log);
-    librg::events::add(librg::events::on_tick, game_tick);
     librg::events::add(librg::events::on_inter, entity_inter);
     librg::events::add(librg::events::on_create, entity_create);
     librg::events::add(librg::events::on_update, entity_update);
