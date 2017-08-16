@@ -36,7 +36,7 @@ add_subdirectory(vendor/librg)
 
 if (WIN32)
     if (NOT DirectX_D3DX9_INCLUDE_FOUND)
-        message(FATAL_ERROR "Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
+        #message(FATAL_ERROR "Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
     endif()
 
     find_path (D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)

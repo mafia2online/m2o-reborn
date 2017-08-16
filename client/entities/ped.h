@@ -8,9 +8,7 @@
 
     librg_assert(ent, "player entity should be created!");
 
-    DWORD coreInstance = *(DWORD*)(0x1AC2778);
-
-    M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
+    M2::C_Model *own_model = M2::C_Core::Get()->AllocateModel(2);
     own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
 
     own_model->SetName("lawl");
