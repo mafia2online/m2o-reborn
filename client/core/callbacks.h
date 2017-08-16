@@ -1,4 +1,4 @@
-﻿const float DISTANCE_BEFORE_TELEPORT = 50 * 50;
+const float DISTANCE_BEFORE_TELEPORT = 50 * 50;
 
 /**
  * On something getting logged
@@ -64,6 +64,7 @@ void clientstream_update(librg::events::event_t* evt)
 
     transform->position = position;
     transform->rotation = rotation;
+    transform->scale = direction;
 }
 
 /**
@@ -99,7 +100,8 @@ void entity_update(librg::events::event_t* evt)
     auto remote     = event->entity.component<gamedata_t>();
 
     if (transform && remote && remote->object) {
-        remote->object->SetRotation(HMM_Quaternion(0, 0, 0, 1));
+        // remote->object->SetRotation(HMM_Quaternion(0, 0, 0, 1));
+        // remote->object->SetDirection(transform->scale);
     }
 }
 
@@ -127,5 +129,6 @@ void entity_inter(librg::events::event_t* evt)
     *transform = *(librg::transform_t*)event->data;
 
     remote->object->SetPosition(transform->position);
-    //remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
+    // remote->object->SetRotation(HMM_QuaternionV4(transform->rotation));
+    // remote->object->SetDirection(transform->scale);
 }
