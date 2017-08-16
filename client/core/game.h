@@ -5,49 +5,6 @@ void game_init()
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 }
 
-
-
-void game_debug_stuff()
-{
-    auto human = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-
-    DWORD coreInstance = *(DWORD*)(0x1AC2778);
-
-    M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-    own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
-
-    own_model->SetName("lawl");
-    own_model->MarkForNotify(2);
-
-    reinterpret_cast<M2::C_Entity *>(human)->SetModel(own_model);
-    reinterpret_cast<M2::C_Entity *>(human)->Setup();
-
-    // set flagsF
-    DWORD flags = *(DWORD *)(human + 32) & 0xFFFFFBF | 0x4800;
-    *(DWORD *)(human + 32) = flags;
-
-    if (flags & 0x20)
-        mod_log("Flags set sucessfully!");
-
-    reinterpret_cast<M2::C_Entity *>(human)->Activate();
-
-    if (reinterpret_cast<M2::C_Entity *>(human)->IsActive())
-        mod_log("Entity active !");
-
-    reinterpret_cast<M2::C_Entity *>(human)->SetPosition(HMM_Vec3(-421.75f, 479.31f, 0.05f));
-
-    auto entity = (M2::C_Entity *)human;
-    auto original = HMM_Vec3(-421.75f, 479.31f, 0.05f);
-    auto target = HMM_Vec3(-421.75f, 489.31f, 0.05f);
-
-    M2::C_SyncObject *foo = nullptr;
-
-    // will crash
-    human->GetScript()->ScrAimAt(&foo, entity, target, true);
-}
-
-
-
 void game_connect()
 {
     mod_log("spawning and connecting...");
@@ -76,10 +33,6 @@ float ztime = 0; // debugging time stuff, nice to have for now
 void game_tick()
 {
     librg::core::tick();
-
-    if (GetAsyncKeyState(VK_F4) & 0x1) {
-        game_debug_stuff();
-    }
 
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;
