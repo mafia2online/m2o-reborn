@@ -24,7 +24,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "/MDd" CACHE STRING "Debug compiler flags" FORCE)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi" CACHE STRING "Debug compiler flags" FORCE)
 endif()
 
 set(CMAKE_BUILD_TYPE "Debug")
