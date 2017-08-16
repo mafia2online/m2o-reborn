@@ -1,17 +1,12 @@
 ﻿namespace tools {
 
-    // todo: refactor
-    void gamehooks_ontick() {
-        librg::core::tick();
-    }
-
     DWORD GameLoopHook_1_Return;
     DWORD _call = 0x473D10;
     void __declspec(naked) GameLoopHook_1()
     {
         __asm call[_call];
         __asm pushad;
-        gamehooks_ontick();
+        game_tick();
         __asm popad;
         __asm jmp[GameLoopHook_1_Return];
     }
@@ -22,7 +17,7 @@
         __asm fstp    dword ptr[esp + 0x10];
         __asm fld     dword ptr[esp + 0x10];
         __asm pushad;
-        gamehooks_ontick();
+        game_tick();
         __asm popad;
         __asm jmp[GameLoopHook_2_Return];
     }

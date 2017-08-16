@@ -137,7 +137,7 @@ bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 
 // game events
 void game_init();
-void game_tick(librg::events::event_t*);
+void game_tick();
 
 // graphics stuff, including dx callbacks
 bool graphics_init();
