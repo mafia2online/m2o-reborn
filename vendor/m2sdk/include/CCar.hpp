@@ -1,4 +1,4 @@
-/** @file CCar.hpp
+﻿/** @file CCar.hpp
 *  @brief Game's Entity class
 *
 *
@@ -100,6 +100,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x0D6B500, this, siren);
 		}
+
+        void Setup()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x0A151F0, this);
+        }
 
 		void UnlockEntryPoints()
 		{

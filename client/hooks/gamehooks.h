@@ -1,5 +1,49 @@
 ﻿namespace tools {
 
+    DWORD GameStartDrive__Return;
+    DWORD GameStartDrive_2__Return;
+    DWORD GameStartDrive_3__Return;
+    DWORD GameEndDrive__Return;
+    DWORD _callDrive = 0x042CAC0;
+    DWORD _callEnd = 0x99CE70;
+
+    //TODO Reverse properly to get the vehicle where the player enter in : waiting vehicle creation method
+    void __declspec(naked) GameStartDriveHook__1()
+    {
+        __asm call[_callDrive];
+        __asm pushad;
+        mod_log("Break in car1");
+        __asm popad;
+        __asm jmp[GameStartDrive__Return];
+    }
+
+    void __declspec(naked) GameStartDriveHook__2()
+    {
+        __asm call[_callDrive];
+        __asm pushad;
+        mod_log("Break in car2");
+        __asm popad;
+        __asm jmp[GameStartDrive_2__Return];
+    }
+
+    void __declspec(naked) GameStartDriveHook__3()
+    {
+        __asm call[_callDrive];
+        __asm pushad;
+        mod_log("Entered car");
+        __asm popad;
+        __asm jmp[GameStartDrive_3__Return];
+    }
+
+    void __declspec(naked) GameEndDriveHook()
+    {
+        __asm call[_callEnd];
+        __asm pushad;
+        mod_log("Leaved car");
+        __asm popad;
+        __asm jmp[GameEndDrive__Return];
+    }
+
     DWORD GameLoopHook_1_Return;
     DWORD _call = 0x473D10;
     void __declspec(naked) GameLoopHook_1()
@@ -84,6 +128,11 @@
         GameLoopHook_2_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED04D, (DWORD)GameLoopHook_2, 8);
 
         GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
+
+        GameStartDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x043B305, (Address)GameStartDriveHook__1);
+        GameStartDrive_2__Return = Mem::Hooks::InstallNotDumbJMP(0x43B394, (Address)GameStartDriveHook__2);
+        GameStartDrive_3__Return = Mem::Hooks::InstallNotDumbJMP(0x437940, (Address)GameStartDriveHook__3);
+        GameEndDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x43BAAD, (Address)GameEndDriveHook);
 
         // noop the CreateMutex, allow to run multiple instances
         Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);

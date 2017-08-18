@@ -1,4 +1,4 @@
-/** @file CVehicle.hpp
+﻿/** @file CVehicle.hpp
 *  @brief Game's Entity class
 *
 *
@@ -15,6 +15,14 @@ namespace M2
 		GEARBOX_HALF_AUTO = 1,
 		GEARBOX_AUTO = 2
 	};
+    enum E_VehicleSeat
+    {
+        E_SEAT_DRIVER = 1,
+        E_SEAT_PASSENGER_FRONT,
+        E_SEAT_PASSENGER_BACK_1,
+        E_SEAT_PASSENGER_BACK_2
+    };
+
 	class ICVehicle
 	{
 

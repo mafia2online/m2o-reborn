@@ -193,6 +193,24 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0x093B830, this, ent);
 		}
 
+        void UseAB(C_SyncObject **syncObject, M2::C_Vehicle *veh, bool bEnter, M2::E_VehicleSeat seat, int iAnimate)
+        {
+            int iEnter = (bEnter) ? 1 : 0;
+            bool bAnimate = (int)!iAnimate;
+            int iSeat = (int)seat;
+
+            /* Are we exiting the vehicle ? */
+            if (!bEnter) {
+                iSeat = 0;
+            }
+            else {
+                iSeat -= 1;
+                iSeat = (iSeat < 0) ? 0 : iSeat;
+            }
+
+            Mem::InvokeFunction<Mem::call_this, int>(0x099E1E0, this, syncObject, veh, iEnter, iSeat, bAnimate, 0, 2);
+        }
+
         /*C_SyncObject *ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
         {
             return Mem::InvokeFunction<Mem::call_this, C_SyncObject *>(0x0993B00, this, syncObject, ent, pos, smooth);
