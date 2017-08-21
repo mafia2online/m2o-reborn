@@ -25,6 +25,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /Zi" CACHE STRING "Debug compiler flags" FORCE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /Zi" CACHE STRING "Release compiler flags" FORCE)
 endif()
 
 set(CMAKE_BUILD_TYPE "Debug")
@@ -103,11 +104,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_library(client SHARED ${CLIENT_FILES})
     target_link_libraries(client ${CLIENT_LIBRARIES})
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
+    set_target_properties(client PROPERTIES LINK_FLAGS_RELEASE "/SAFESEH:NO")
 
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
     target_link_libraries(launcher ${LAUNCHER_LIBRARIES})
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+    set_target_properties(launcher PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
 
     add_custom_command(TARGET client POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
