@@ -1,0 +1,31 @@
+{
+  "name": "zpl_math.c",
+  "version": "1.0.1",
+  "description": "Vector math library that is gamedev friendly.",
+  "main": "include/zpl_math.h",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-math.git"
+  },
+  "keywords": [
+    "c",
+    "c++",
+    "cpp",
+    "zpl",
+    "native",
+    "library",
+    "math"
+  ],
+  "author": "Dominik Madarasz <zaklaus@outlook.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-math/issues"
+  },
+  "homepage": "https://github.com/zpl-c/zpl-math#readme"
+}
