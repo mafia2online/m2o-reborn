@@ -1,6 +1,6 @@
 {
   "name": "zpl_json.c",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Small, fast and standard-friendly JSON parser.",
   "main": "include/zpl_json.h",
   "directories": {
