@@ -1,0 +1,32 @@
+{
+  "name": "zpl_event.c",
+  "version": "1.0.7",
+  "description": "Event handler library.",
+  "main": "include/zpl_event.h",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-event.git"
+  },
+  "keywords": [
+    "zpl",
+    "header-only",
+    "c",
+    "c++",
+    "small"
+  ],
+  "author": "Dominik Madarasz <zaklaus@outlook.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-event/issues"
+  },
+  "homepage": "https://github.com/zpl-c/zpl-event#readme",
+  "dependencies": {
+    "zpl.c": "^3.0.0"
+  }
+}
