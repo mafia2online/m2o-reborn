@@ -1,0 +1,34 @@
+{
+  "name": "zpl_json.c",
+  "version": "2.0.3",
+  "description": "Small, fast and standard-friendly JSON parser.",
+  "main": "include/zpl_json.h",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-json.git"
+  },
+  "keywords": [
+    "c",
+    "c++",
+    "cpp",
+    "zpl",
+    "native",
+    "library",
+    "json"
+  ],
+  "author": "Dominik Madarasz <zaklaus@outlook.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-json/issues"
+  },
+  "homepage": "https://github.com/zpl-c/zpl-json#readme",
+  "dependencies": {
+    "zpl.c": "^3.0.0"
+  }
+}

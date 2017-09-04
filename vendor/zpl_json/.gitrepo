@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:zpl-c/zpl-json.git
+	branch = master
+	commit = ae7bcec247b87b761fe7e1890a243faa03c9aadf
+	parent = c3b3c3a8e1228759422252c209a5b2d910f8d903
+	cmdver = 0.3.1
