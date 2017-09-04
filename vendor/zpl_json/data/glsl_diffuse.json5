@@ -1,8 +1,8 @@
 {
 	$api: "opengl",
+	name: "Diffuse shader",
 	version: "150",
 	type: "fragment",
-	name: "Diffuse shader",
 	// These are shader uniforms
 	uniforms: [
 		{ name: 'l_pos', type: 'vec3'}, 
