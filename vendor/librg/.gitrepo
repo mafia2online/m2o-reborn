@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:librg/librg.git
 	branch = master
-	commit = 13c1821a44142a718d1e33a17a240f5112435775
-	parent = 2a2e15ffa3ea55099429a7bac1708d62d8f1bc09
+	commit = 12325b13a1eb4fadf53b3b774765cfb03da4d94f
+	parent = ee9a537e132a335852034fd87c9529e32b8f8d32
 	cmdver = 0.3.1
