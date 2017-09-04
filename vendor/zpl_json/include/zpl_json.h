@@ -20,6 +20,7 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
+    2.0.5 - Fix for bad access on deallocation
     2.0.4 - Small fix for cpp issues
     2.0.3 - Small bugfix in name with underscores
     2.0.1 - Catch error in name
@@ -195,14 +196,14 @@ extern "C" {
     }
 
     void zplj_free(zplj_object_t *obj) {
-        /**/ if (obj->type == zplj_type_array_ev) {
+        /**/ if (obj->type == zplj_type_array_ev && obj->elements) {
             for (isize i = 0; i < zpl_array_count(obj->elements); ++i) {
                 zplj_free(obj->elements+i);
             }
 
             zpl_array_free(obj->elements);
         }
-        else if (obj->type == zplj_type_object_ev) {
+        else if (obj->type == zplj_type_object_ev && obj->nodes) {
             for (isize i = 0; i < zpl_array_count(obj->nodes); ++i) {
                 zplj_free(obj->nodes+i);
             }
