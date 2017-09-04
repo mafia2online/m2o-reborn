@@ -8,7 +8,7 @@ void client_connect(librg_event_t *event)
     mod.player = entity;
     mod_log("connected to the server\n");
 
-    // entity.assign<gamedata_t>(reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed()));
+    librg_attach_gamedata(event->entity, { (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed() });
 
     mod_log("spawned player!\n");
 }
@@ -22,8 +22,7 @@ void client_disconnect(librg_event_t *event)
 
     mod_log("disconnected form the server\n");
 
-    // entity.remove<gamedata_t>();
-    // entity.remove<librg::streamable_t>();
+    librg_detach_gamedata(event->entity);
 
     mod_log("unspawned player!\n");
 }
@@ -34,18 +33,19 @@ void client_disconnect(librg_event_t *event)
 void clientstream_update(librg_event_t *event)
 {
     // auto remote     = event->entity.component<gamedata_t>();
-    auto transform  = librg_fetch_transform(event->entity);
+    auto transform = librg_fetch_transform(event->entity);
+    auto gamedata  = librg_fetch_gamedata(event->entity);
 
     zplm_vec3_t position;
     zplm_quat_t rotation;
     zplm_vec3_t direction;
 
-    // Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetPosition, remote->object, &position);
-    // Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetRotation, remote->object, &rotation);
-    // Mem::InvokeFunction<Mem::call_this, void>(remote->object->m_pVFTable->GetDirection, remote->object, &direction);
+    Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetPosition, gamedata->object, &position);
+    Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetRotation, gamedata->object, &rotation);
+    Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetDirection, gamedata->object, &direction);
 
-    // transform->position = position;
-    // transform->rotation = rotation;
+    transform->position = position;
+    transform->rotation = rotation;
     // transform->scale = direction;
 }
 
@@ -76,21 +76,16 @@ void entity_create(librg_event_t *event)
  */
 void entity_update(librg_event_t *event)
 {
+    auto transform = librg_fetch_transform(event->entity);
+    auto gamedata  = librg_fetch_gamedata(event->entity);
 
+    gamedata->object->SetPosition(transform->position);
 }
 
 /**
  * Remote entity is removed from our local streamer
  */
 void entity_remove(librg_event_t *event)
-{
-
-}
-
-/**
- * Entity interpolation callback
- */
-void entity_inter(librg_event_t *event)
 {
 
 }

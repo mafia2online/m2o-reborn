@@ -6,7 +6,7 @@
 
     M2::C_Human2 *ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
 
-    librg_assert(ent, "player entity should be created!");
+    librg_assert_msg(ent, "player entity should be created!");
 
     M2::C_Model *own_model = M2::C_Core::Get()->AllocateModel(2);
     own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
@@ -31,7 +31,7 @@
 
     reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(transform->position);
 
-    //event->entity.assign<gamedata_t>((M2::C_Entity*)ent);
+    librg_attach_gamedata(event->entity, { (M2::C_Entity*)ent });
 
     mod_log("Created at %x!\n", ent);
 }

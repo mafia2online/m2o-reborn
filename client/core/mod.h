@@ -62,6 +62,7 @@ void mod_attach(HMODULE module)
     config.tick_delay = 32;
     config.mode = LIBRG_MODE_CLIENT;
     config.world_size = zplm_vec2(5000.0f, 5000.0f);
+    config.max_entities = 16000;
 
     librg_init(config);
 
