@@ -33,7 +33,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 ###
 # Compile vendor dependencies
 ###
-add_subdirectory(vendor/librg)
+add_subdirectory(vendor/enet)
 
 if (WIN32)
     if (NOT DirectX_D3DX9_INCLUDE_FOUND)
@@ -49,9 +49,14 @@ endif()
 # Includes for libs and remote sources
 ###
 include_directories(
+    vendor/enet/include
+    vendor/zpl/include
+    vendor/zpl_cull/include
+    vendor/zpl_math/include
+    vendor/zpl_event/include
+    vendor/librg/include
     vendor/steam_api/include
     vendor/detours/include
-    vendor/librg/include
     vendor/m2sdk/include
     vendor/nuklear/include
     server/
@@ -77,14 +82,20 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/client/*.h"
     "${PROJECT_SOURCE_DIR}/client/*.hpp"
     "${PROJECT_SOURCE_DIR}/shared/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/enet/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/zpl/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/zpl_cull/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/zpl_math/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/zpl_event/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/librg/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h*"
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
 )
 
-set(SERVER_LIBRARIES librg)
-set(CLIENT_LIBRARIES librg d3d9 d3dx9 dxgi dinput8 dxguid detours)
+set(SERVER_LIBRARIES winmm psapi ws2_32 enet)
+set(CLIENT_LIBRARIES winmm psapi ws2_32 enet d3d9 d3dx9 dxgi dinput8 dxguid detours)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 ###
@@ -121,10 +132,28 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     )
 endif()
 
-if (MSVC)
+macro(GroupSources curdir)
+    file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
+    foreach (child ${children})
+        if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+            GroupSources(${curdir}/${child})
+        else()
+            string(REPLACE "/" "\\" groupname ${curdir})
+            source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+        endif()
+    endforeach()
+endmacro()
+
+if(MSVC)
     GroupSources(client)
     GroupSources(server)
     GroupSources(shared)
+    GroupSources(vendor/enet)
+    GroupSources(vendor/zpl)
+    GroupSources(vendor/zpl_cull)
+    GroupSources(vendor/zpl_math)
+    GroupSources(vendor/zpl_event)
+    GroupSources(vendor/librg)
     GroupSources(vendor/steam_api)
     GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)

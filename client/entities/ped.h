@@ -1,8 +1,8 @@
-﻿void ped_oncreate(librg::events::event_entity_t* event)
+﻿void ped_oncreate(librg_event_t *event)
 {
-    auto transform = event->entity.component<librg::transform_t>();
+    auto transform = librg_fetch_transform(event->entity);
 
-    mod_log("creating player");
+    mod_log("creating player\n");
 
     M2::C_Human2 *ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
 
@@ -22,16 +22,16 @@
     *(DWORD *)(ent + 32) = flags;
 
     if (flags & 0x20)
-        mod_log("Flags set sucessfully!");
+        mod_log("Flags set sucessfully!\n");
 
     reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
     if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-        mod_log("Entity active !");
+        mod_log("Entity active !\n");
 
     reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(transform->position);
 
-    event->entity.assign<gamedata_t>((M2::C_Entity*)ent);
+    //event->entity.assign<gamedata_t>((M2::C_Entity*)ent);
 
-    mod_log("Created at %x!", ent);
+    mod_log("Created at %x!\n", ent);
 }

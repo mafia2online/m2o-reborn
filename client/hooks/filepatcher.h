@@ -47,7 +47,7 @@
         }
 
         if (file_found) {
-            std::string newfilename = librg::fs::path(mod.paths.game_files, filename);
+            std::string newfilename = mod.paths.game_files + "\\" + filename;
 
             // substiture the file
             mod_log("file_patcher: redirecting game file %s to %s", filename.c_str(), newfilename.c_str());

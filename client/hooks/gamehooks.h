@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
 
     DWORD GameStartDrive__Return;
     DWORD GameStartDrive_2__Return;
@@ -12,7 +12,7 @@
     {
         __asm call[_callDrive];
         __asm pushad;
-        mod_log("Break in car1");
+        mod_log("Break in car1\n");
         __asm popad;
         __asm jmp[GameStartDrive__Return];
     }
@@ -21,7 +21,7 @@
     {
         __asm call[_callDrive];
         __asm pushad;
-        mod_log("Break in car2");
+        mod_log("Break in car2\n");
         __asm popad;
         __asm jmp[GameStartDrive_2__Return];
     }
@@ -30,7 +30,7 @@
     {
         __asm call[_callDrive];
         __asm pushad;
-        mod_log("Entered car");
+        mod_log("Entered car\n");
         __asm popad;
         __asm jmp[GameStartDrive_3__Return];
     }
@@ -39,7 +39,7 @@
     {
         __asm call[_callEnd];
         __asm pushad;
-        mod_log("Leaved car");
+        mod_log("Leaved car\n");
         __asm popad;
         __asm jmp[GameEndDrive__Return];
     }

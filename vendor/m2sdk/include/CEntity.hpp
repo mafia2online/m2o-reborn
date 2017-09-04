@@ -58,12 +58,12 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void*>(m_pVFTable->SetModel, this, model);
         }
 
-        void SetPosition(hmm_vec3 pos)
+        void SetPosition(zplm_vec3_t pos)
         {
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetPosition, this, &pos);
         }
 
-        void SetRotation(hmm_quaternion rot)
+        void SetRotation(zplm_quat_t rot)
         {
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetRotation, this, &rot);
         }

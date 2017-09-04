@@ -30,8 +30,9 @@
 #include <unordered_map>
 
 // librg
-#include <librg/librg.h>
-#include <librg/utils/fs.h>
+#define LIBRG_DEBUG
+#define LIBRG_IMPLEMENTATION
+#include <librg.h>
 
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
@@ -69,8 +70,10 @@ struct nk_context*      nk_ctx;
 struct nk_font_atlas*   nk_atlas;
 
 // proxy some stuff
-typedef hmm_vec2 Vector2;
-typedef hmm_vec3 Vector3;
+typedef zplm_vec2_t Vector2;
+typedef zplm_vec3_t Vector3;
+typedef zplm_vec2_t vec2_t;
+typedef zplm_vec3_t vec3_t;
 
 // tools
 struct mod_path_t {
@@ -120,7 +123,7 @@ struct mod_t {
 
     mouse_state_t   mouse;
     mod_graphics_t  graphics;
-    librg::entity_t player;
+    librg_entity_t  player;
 
     // other
     std::ofstream   debug_stream;
@@ -133,7 +136,7 @@ bool mod_init();
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 
-#define mod_log librg::core::log
+#define mod_log zpl_printf
 
 // game events
 void game_init();

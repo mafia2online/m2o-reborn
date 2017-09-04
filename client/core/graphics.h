@@ -4,7 +4,7 @@
  */
 bool graphics_init()
 {
-    mod_log("graphics_init");
+    mod_log("graphics_init\n");
     CDirect3D9Hook::Install();
     return true;
 }

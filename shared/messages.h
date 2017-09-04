@@ -1,5 +1,5 @@
 enum {
-    GAME_ON_SHOOT = librg::network::last_packet_number,
+    GAME_ON_SHOOT = LIBRG_LAST_ENUM_NUMBER,
     GAME_SYNC_PACKET,
     GAME_SPAWN_VEHICLE,
     GAME_PED_ENTER_VEHICLE,

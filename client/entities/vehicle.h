@@ -1,4 +1,4 @@
-void vehicle_oncreate(librg::events::event_entity_t* event)
+﻿void vehicle_oncreate(librg_event_t *event)
 {
-    mod_log("creating vehicle (no)");
+    mod_log("creating vehicle (no)\n");
 }

@@ -32,9 +32,9 @@ void mod_path_register(HMODULE module)
     temp_path.erase(temp_pos, std::string::npos);
 
     mod.paths.index = temp_path;
-    mod.paths.files = librg::fs::path(temp_path, "files");
-    mod.paths.debug = librg::fs::path(temp_path, "debug.log");
-    mod.paths.game_files = librg::fs::path(temp_path, "game_files");
+    mod.paths.files = temp_path + "\\files";
+    mod.paths.debug = temp_path + "\\debug.log";
+    mod.paths.game_files = temp_path + "\\game_files";
 }
 
 /**
@@ -58,30 +58,20 @@ void mod_attach(HMODULE module)
     mod.module = module;
 
     // setup manual client mode
-    librg::core_initialize(librg::mode_client_manual);
+    librg_config_t config;
+    config.tick_delay = 32;
+    config.mode = LIBRG_MODE_CLIENT;
+    config.world_size = zplm_vec2(5000.0f, 5000.0f);
+
+    librg_init(config);
 
     // setup callbacks
-    librg::events::add(librg::events::on_log, on_mod_log);
-    librg::events::add(librg::events::on_inter, entity_inter);
-    librg::events::add(librg::events::on_create, entity_create);
-    librg::events::add(librg::events::on_update, entity_update);
-    librg::events::add(librg::events::on_remove, entity_remove);
-    librg::events::add(librg::events::on_connect, client_connect);
-    librg::events::add(librg::events::on_disconnect, client_disconnect);
-    librg::events::add(librg::events::on_client_stream_entity, clientstream_update);
-
-    auto cfg = librg::config_t{};
-    cfg.ip = "localhost";
-    cfg.port = 27010;
-    cfg.world_size = HMM_Vec3(5000.00, 5000.00, 5000.00);
-    cfg.tick_delay = 32;
-    cfg.max_connections = 8;
-    cfg.platform_id = 1;
-    cfg.proto_version = 1;
-    cfg.build_version = 1;
-
-    // start the client
-    librg::core::start(cfg);
+    librg_event_add(LIBRG_CONNECTION_ACCEPT, client_connect);
+    librg_event_add(LIBRG_CONNECTION_REFUSE, client_disconnect);
+    librg_event_add(LIBRG_ENTITY_CREATE, entity_create);
+    librg_event_add(LIBRG_ENTITY_UPDATE, entity_update);
+    librg_event_add(LIBRG_ENTITY_REMOVE, entity_remove);
+    librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, clientstream_update);
 
     if (graphics_init() == false) {
         return mod_exit("Unable to init Graphics Manager");
@@ -165,9 +155,9 @@ bool mod_wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
  */
 void mod_exit(std::string reason)
 {
-    mod_log("exiting %s", reason.c_str());
+    mod_log("exiting %s\n", reason.c_str());
 
-    librg::core_terminate();
+    librg_free();
     mod.debug_stream.close();
 
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);

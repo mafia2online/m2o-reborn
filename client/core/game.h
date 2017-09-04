@@ -1,13 +1,13 @@
-void game_init()
+﻿void game_init()
 {
-    mod_log("GameInit \\(^o^)/ (Thread: %x)", GetCurrentThreadId());
+    mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 }
 
 void game_connect()
 {
-    mod_log("spawning and connecting...");
+    mod_log("spawning and connecting...\n");
 
     if (M2::C_SDSLoadingTable::Get()) {
         M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
@@ -21,18 +21,19 @@ void game_connect()
 
     Mem::InvokeFunction<Mem::call_this, void>(
         ped->m_pVFTable->SetPosition, ped,
-        &HMM_Vec3(-421.75f, 479.31f, 0.05f)
-        );
+        &zplm_vec3(-421.75f, 479.31f, 0.05f)
+    );
 
     mod.state = MOD_DEBUG_STATE;
-    librg::network::start();
+
+    librg_network_start({ "localhost", 27010 });
 }
 
 bool spawned = false;
 float ztime = 0; // debugging time stuff, nice to have for now
 void game_tick()
 {
-    librg::core::tick();
+    librg_tick();
 
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;
@@ -86,7 +87,7 @@ void game_tick()
         if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
             mod_log("Entity active !");
 
-        reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(HMM_Vec3(-421.75f, 479.31f, 0.05f));
+        reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(zplm_vec3(-421.75f, 479.31f, 0.05f));
 
 
         mod_log("Created at %x!", ent);
@@ -97,8 +98,8 @@ void game_tick()
 
         mod_log("Trying to move vec");
         if (ent != nullptr) {
-            auto vecPosition = HMM_Vec3(-421.75f, 479.31f, 0.05f);
-            auto vecDirection = HMM_Vec3(-421.75f, 489.31f, 0.05f);
+            auto vecPosition = zplm_vec3(-421.75f, 479.31f, 0.05f);
+            auto vecDirection = zplm_vec3(-421.75f, 489.31f, 0.05f);
             ent->GetScript()->ScrLookAt(&pSyncObject, reinterpret_cast<M2::C_Entity *>(ent), vecDirection, true);
         }
     }
