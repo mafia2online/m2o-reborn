@@ -35,7 +35,7 @@ void graphics_dimensions(int *w, int *h)
  */
 void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
-    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)", pDevice, pPresentationParameters);
+    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)\n", pDevice, pPresentationParameters);
 
     mod.graphics.font_manager = (void *)new CFontManager(pDevice);
     mod.graphics.device = pDevice;

@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
 
     /**
      * Callback type
@@ -50,7 +50,7 @@
             std::string newfilename = mod.paths.game_files + "\\" + filename;
 
             // substiture the file
-            mod_log("file_patcher: redirecting game file %s to %s", filename.c_str(), newfilename.c_str());
+            mod_log("file_patcher: redirecting game file %s to %s\n", filename.c_str(), newfilename.c_str());
             hFile = filepatcher__original(newfilename.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 
             if (hFile == INVALID_HANDLE_VALUE) {
