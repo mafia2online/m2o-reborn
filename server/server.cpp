@@ -1,6 +1,9 @@
-﻿#define LIBRG_DEBUG
+#define LIBRG_DEBUG
 #define LIBRG_IMPLEMENTATION
 #include <librg.h>
+
+#define ZPLJ_IMPLEMENTATION
+#include <zpl_json.h>
 
 void on_connect_accepted(librg_event_t *event) {
     librg_log("on_connect_accepted\n");
@@ -19,11 +22,12 @@ void on_connect_accepted(librg_event_t *event) {
 }
 
 int main() {
-    librg_config_t config;
+    librg_config_t config = {0};
     config.tick_delay = 32;
     config.mode = LIBRG_MODE_SERVER;
     config.world_size = zplm_vec2(5000.0f, 5000.0f);
     config.max_entities = 16000;
+    config.max_connections = 100;
     librg_init(config);
 
     librg_event_add(LIBRG_CONNECTION_ACCEPT, on_connect_accepted);

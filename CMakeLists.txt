@@ -53,6 +53,7 @@ include_directories(
     vendor/zpl/include
     vendor/zpl_cull/include
     vendor/zpl_math/include
+    vendor/zpl_json/include
     vendor/zpl_event/include
     vendor/librg/include
     vendor/steam_api/include
@@ -86,6 +87,7 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/zpl/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/zpl_cull/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/zpl_math/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/zpl_json/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/zpl_event/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/librg/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/steam_api/include/*.h"
@@ -94,16 +96,10 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
 )
 
-set(SERVER_LIBRARIES winmm psapi ws2_32 enet)
-set(CLIENT_LIBRARIES winmm psapi ws2_32 enet d3d9 d3dx9 dxgi dinput8 dxguid detours)
+set(SERVER_LIBRARIES enet)
+set(CLIENT_LIBRARIES enet d3d9 d3dx9 dxgi dinput8 dxguid detours)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
-###
-# Adding executables
-# Linking libraries
-###
-add_executable(server ${SERVER_FILES})
-target_link_libraries(server ${SERVER_LIBRARIES})
 
 add_custom_command(TARGET server POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
@@ -111,9 +107,11 @@ add_custom_command(TARGET server POST_BUILD
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
+    set(SERVER_LIBRARIES ${SERVER_LIBRARIES} winmm psapi ws2_32)
+
     ## tha clienta
     add_library(client SHARED ${CLIENT_FILES})
-    target_link_libraries(client ${CLIENT_LIBRARIES})
+    target_link_libraries(client winmm psapi ws2_32 ${CLIENT_LIBRARIES})
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
     set_target_properties(client PROPERTIES LINK_FLAGS_RELEASE "/SAFESEH:NO")
 
@@ -131,6 +129,14 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/launcher.exe" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
     )
 endif()
+
+
+###
+# Adding executables
+# Linking libraries
+###
+add_executable(server ${SERVER_FILES})
+target_link_libraries(server ${SERVER_LIBRARIES})
 
 macro(GroupSources curdir)
     file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
@@ -152,6 +158,7 @@ if(MSVC)
     GroupSources(vendor/zpl)
     GroupSources(vendor/zpl_cull)
     GroupSources(vendor/zpl_math)
+    GroupSources(vendor/zpl_json)
     GroupSources(vendor/zpl_event)
     GroupSources(vendor/librg)
     GroupSources(vendor/steam_api)
