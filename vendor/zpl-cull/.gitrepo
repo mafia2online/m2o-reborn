@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:zpl-c/zpl-cull.git
+	branch = master
+	commit = 5ad6653142e0ee743d16a023a4ff514f79cdf682
+	parent = 06744165c3434e67a2b34916ece04112db1afdc9
+	cmdver = 0.3.1

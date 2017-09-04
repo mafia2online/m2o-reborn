@@ -1,0 +1,35 @@
+{
+  "name": "zpl_cull.c",
+  "version": "2.1.1",
+  "description": "Tree culling library.",
+  "main": "include/zpl_cull.h",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-cull.git"
+  },
+  "keywords": [
+    "c",
+    "c++",
+    "cpp",
+    "zpl",
+    "native",
+    "library",
+    "culling"
+  ],
+  "author": "Dominik Madarasz <zaklaus@outlook.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-cull/issues"
+  },
+  "homepage": "https://github.com/zpl-c/zpl-cull#readme",
+  "dependencies": {
+    "zpl.c": "^3.0.0",
+    "zpl_math.c": "^1.0.1"
+  }
+}
