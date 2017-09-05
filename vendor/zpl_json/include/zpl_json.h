@@ -20,7 +20,7 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
-    2.0.6 - Small fixes for tiny cpp warnings
+    2.0.7 - Small fixes for tiny cpp warnings
     2.0.5 - Fix for bad access on deallocation
     2.0.4 - Small fix for cpp issues
     2.0.3 - Small bugfix in name with underscores
