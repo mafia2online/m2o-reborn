@@ -1,4 +1,6 @@
-﻿#ifdef DEBUG
+#define _CRT_SECURE_NO_WARNINGS
+
+#ifdef DEBUG
 #define LIBRG_DEBUG
 #endif
 
