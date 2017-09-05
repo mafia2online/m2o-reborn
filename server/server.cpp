@@ -1,5 +1,4 @@
-#define LIBRG_DEBUG
-#define LIBRG_IMPLEMENTATION
+﻿#include "defines.h"
 #include <librg.h>
 
 #define ZPLJ_IMPLEMENTATION
@@ -24,7 +23,7 @@ void on_connection_request(librg_event_t *event) {
     // read password
     u32 size = librg_data_ru32(&event->data);
     std::string password = "";
-    for (isize i = 0; i < size; ++i) {
+    for (usize i = 0; i < size; ++i) {
         password += librg_data_ru8(&event->data);
     }
 

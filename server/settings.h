@@ -1,4 +1,4 @@
-#define settings_default                \
+﻿#define settings_default                \
     "{\n"                               \
     "   hostname: \"my m2o server\",\n" \
     "   password: \"\",\n"              \
@@ -38,7 +38,7 @@ void settings_read(librg_config_t *config, librg_address_t *address, mod_setting
     }
 
     // read and copy the data
-    isize file_size = zpl_file_size(&file);
+    isize file_size = (isize)zpl_file_size(&file);
     char *content = (char *)zpl_malloc(file_size+1);
     zpl_file_read(&file, content, file_size);
     content[file_size] = 0;

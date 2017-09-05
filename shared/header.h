@@ -1,7 +1,0 @@
-#define _CRT_SECURE_NO_WARNINGS
-
-#ifdef DEBUG
-#define LIBRG_DEBUG
-#endif
-
-#define LIBRG_IMPLEMENTATION
