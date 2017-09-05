@@ -62,7 +62,7 @@ void game_tick()
     if (GetAsyncKeyState(VK_F6) & 0x1 && spawned) {
         ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
 
-        librg_assert(ent, "player entity should be created!");
+        librg_assert_msg(ent, "player entity should be created!");
 
         DWORD coreInstance = *(DWORD*)(0x1AC2778);
 

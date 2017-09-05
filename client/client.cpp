@@ -1,6 +1,6 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-//#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX // std::numeric_limits min&max
+﻿// librg
+#include "header.h"
+#include <librg.h>
 
 /**
  * Third party dependencies
@@ -29,10 +29,6 @@
 #include <list>
 #include <unordered_map>
 
-// librg
-#define LIBRG_DEBUG
-#define LIBRG_IMPLEMENTATION
-#include <librg.h>
 
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
