@@ -1,4 +1,4 @@
-###
+﻿###
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
@@ -33,7 +33,9 @@ set(CMAKE_BUILD_TYPE "Debug")
 ###
 # Compile vendor dependencies
 ###
+add_definitions(-D_WINSOCK_DEPRECATED_NO_WARNINGS)
 add_subdirectory(vendor/enet)
+remove_definitions(-D_WINSOCK_DEPRECATED_NO_WARNINGS)
 
 if (WIN32)
     if (NOT DirectX_D3DX9_INCLUDE_FOUND)
@@ -101,12 +103,11 @@ set(CLIENT_LIBRARIES enet d3d9 d3dx9 dxgi dinput8 dxguid detours)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 
-add_custom_command(TARGET server POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
-)
-
+###
+# Adding executables
+# Linking libraries
+###
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-
     set(SERVER_LIBRARIES ${SERVER_LIBRARIES} winmm psapi ws2_32)
 
     ## tha clienta
@@ -120,7 +121,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(launcher ${LAUNCHER_LIBRARIES})
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
     set_target_properties(launcher PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+endif()
 
+## tha servera
+add_executable(server ${SERVER_FILES})
+target_link_libraries(server ${SERVER_LIBRARIES})
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_custom_command(TARGET client POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
     )
@@ -130,13 +137,9 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     )
 endif()
 
-
-###
-# Adding executables
-# Linking libraries
-###
-add_executable(server ${SERVER_FILES})
-target_link_libraries(server ${SERVER_LIBRARIES})
+add_custom_command(TARGET server POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
+)
 
 macro(GroupSources curdir)
     file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
