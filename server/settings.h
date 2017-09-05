@@ -5,7 +5,6 @@
     "   port: 27010,\n\n"               \
                                         \
     "   /* settings for amounts */\n"   \
-    "   max_entities: 16384,\n"         \
     "   max_connections: 128,\n"        \
     "   resources: [],\n"               \
     "}\n"
@@ -50,7 +49,6 @@ void settings_read(librg_config_t *config, librg_address_t *address, mod_setting
 
     // read up the data
     settings_readto(&root, "port", integer, address->port);
-    settings_readto(&root, "max_entities", integer, config->max_entities);
     settings_readto(&root, "max_connections", integer, config->max_connections);
 
     settings_readto(&root, "hostname", string, settings->hostname);
