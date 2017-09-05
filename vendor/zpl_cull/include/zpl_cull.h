@@ -23,6 +23,7 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
+    2.1.2 - Small fixes for tiny cpp warnings
     2.0.0 - Slight fixes and design changes
     1.0.2 - Small oversight fixed
     1.0.1 - Fixes.
@@ -165,7 +166,7 @@ extern "C" {
             zpl_array_init(c->nodes, c->allocator);
         }
 
-        if(zpl_array_count(c->nodes) < c->max_nodes) {
+        if((usize)zpl_array_count(c->nodes) < c->max_nodes) {
             zpl_array_append(c->nodes, node);
             return true;
         }

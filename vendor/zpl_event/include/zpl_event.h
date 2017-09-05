@@ -24,7 +24,8 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
-    1.00 - Initial version
+    1.0.7 - Small fixes for tiny cpp warnings
+    1.0.0 - Initial version
 
 */
 
@@ -122,7 +123,7 @@ extern "C" {
         zplev_block *block = zplev_pool_get(pool, slot);
 
         if (block) {
-            zpl_array_remove_at(*block, index);
+            zpl_array_remove_at(*block, (isize)index);
         }
     }
 

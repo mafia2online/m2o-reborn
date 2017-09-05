@@ -20,6 +20,7 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
+    2.0.6 - Small fixes for tiny cpp warnings
     2.0.5 - Fix for bad access on deallocation
     2.0.4 - Small fix for cpp issues
     2.0.3 - Small bugfix in name with underscores
@@ -393,7 +394,7 @@ extern "C" {
                 ++e;
                 if (*e == '+' || *e == '-' || zpl_char_is_digit(*e)) {
                     if (*e == '-') {
-                        eb = 0.1;
+                        eb = 0.1f;
                     }
 
                     if (!zpl_char_is_digit(*e)) {
@@ -418,7 +419,7 @@ extern "C" {
                 obj->integer = zpl_str_to_i64(buf, 0, 0);
 
                 while(--exp > 0) {
-                    obj->integer *= eb;
+                    obj->integer *= (i64)eb;
                 }
             }
             else {
