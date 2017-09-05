@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:zpl-c/zpl-json.git
 	branch = master
-	commit = 65d71b248e34a3463956b01f8161911ccfe0f1a5
-	parent = 29c76b694e49850611b719d5a356d6159ef62fa7
+	commit = f63d4319473da8ca4d94d9f9a589de465deaf725
+	parent = f8238032a0314c6d6606eb3805a2a7d355de5bcc
 	cmdver = 0.3.1
