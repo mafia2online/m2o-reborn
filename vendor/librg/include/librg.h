@@ -24,6 +24,7 @@
  * sdl2.h
  *
  * Version History:
+ * 2.0.2 - C++ and MSVC related fixes
  * 2.0.0 - Initial C version rewrite
  *
  * Copyright 2017 Vladislav Gritsenko
@@ -87,7 +88,7 @@ extern "C" {
     #define LIBRG_NETWORK_STREAM_SECONDARY_CHANNEL 1
     #define LIBRG_NETWORK_MESSAGE_CHANNEL 2
 
-    #ifdef __cplusplus
+    #if defined(__cplusplus) || defined(_MSC_VER)
     #define librg_void char
     #else
     #define librg_void void
