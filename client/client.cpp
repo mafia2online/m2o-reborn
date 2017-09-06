@@ -1,6 +1,4 @@
-﻿// librg
-#include "defines.h"
-#include <librg.h>
+#include "includes.h"
 
 /**
  * Third party dependencies
@@ -121,6 +119,12 @@ struct mod_t {
     mod_graphics_t  graphics;
     librg_entity_t  player;
 
+    b32 spawned;
+
+    struct {
+        zpl_mutex_t log;
+    } mutexes;
+
     // other
     std::ofstream   debug_stream;
 };
@@ -132,7 +136,17 @@ bool mod_init();
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 
-#define mod_log zpl_printf
+void mod_log(const char* format, ...) {
+    va_list ap;
+    char message[1024] = { 0 };
+    va_start(ap, format);
+    vsprintf(message, format, ap);
+    va_end(ap);
+
+    zpl_mutex_lock(&mod.mutexes.log);
+    zpl_printf(message);
+    zpl_mutex_unlock(&mod.mutexes.log);
+}
 
 // game events
 void game_init();
@@ -172,14 +186,15 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include <m2sdk.h>
 
 // shared stuff
-#include "shared_defines.h"
+#include "components.h"
 #include "messages.h"
 
 // actual client stuff
 #include "states/title.h"
 #include "states/debug.h"
-#include "entities/ped.h"
+#include "entities/components.h"
 #include "entities/vehicle.h"
+#include "entities/ped.h"
 #include "core/callbacks.h"
 #include "core/graphics.h"
 #include "core/game.h"

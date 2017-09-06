@@ -2,7 +2,7 @@
 {
     Mem::Initialize();
 
-    printf("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
+    mod_log("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
 
     tools::filepatcher_install();
     tools::steam_drm_install();
@@ -43,12 +43,14 @@ void mod_path_register(HMODULE module)
  */
 void mod_attach(HMODULE module)
 {
+    zpl_mutex_init(&mod.mutexes.log);
+
     // console, yay
     tools::console_attach();
     tools::console_color_fg(3);
     {
-        printf("the\nm2o-reborn\n");
-        printf("starting...\n");
+        mod_log("the\nm2o-reborn\n");
+        mod_log("starting...\n");
     }
     tools::console_color_fg(7);
 
@@ -160,6 +162,8 @@ void mod_exit(std::string reason)
 
     librg_free();
     mod.debug_stream.close();
+
+    zpl_mutex_destroy(&mod.mutexes.log);
 
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
 

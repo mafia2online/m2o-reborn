@@ -1,10 +1,4 @@
-﻿#include "defines.h"
-#include <librg.h>
-
-#define ZPLJ_IMPLEMENTATION
-#include <zpl_json.h>
-
-#include <string>
+#include "includes.h"
 
 typedef struct {
     std::string hostname;
@@ -13,41 +7,14 @@ typedef struct {
 
 mod_settings_t mod_settings;
 
+// shared stuff
+#include "components.h"
+#include "messages.h"
+
+#include "entities/ped.h"
+#include "core/callbacks.h"
 #include "settings.h"
 
-void on_connection_request(librg_event_t *event) {
-    if (mod_settings.password.size() == 0) {
-        return;
-    }
-
-    // read password
-    u32 size = librg_data_ru32(&event->data);
-    std::string password = "";
-    for (usize i = 0; i < size; ++i) {
-        password += librg_data_ru8(&event->data);
-    }
-
-    // if not matches - reject
-    if (password != mod_settings.password) {
-        librg_event_reject(event);
-    }
-}
-
-void on_connect_accepted(librg_event_t *event) {
-    librg_log("on_connect_accepted\n");
-
-    librg_transform_t *transform = librg_fetch_transform(event->entity);
-    librg_client_t *client = librg_fetch_client(event->entity);
-
-    librg_log("spawning player %u at: %f %f %f\n",
-        event->entity,
-        transform->position.x,
-        transform->position.y,
-        transform->position.z
-    );
-
-    librg_streamer_client_set(event->entity, client->peer);
-}
 
 int main() {
     librg_config_t config = {0};
@@ -66,8 +33,14 @@ int main() {
     librg_log("my hostname: %s, my password: %s\n", mod_settings.hostname.c_str(), mod_settings.password.c_str());
 
     librg_init(config);
+
     librg_event_add(LIBRG_CONNECTION_REQUEST, on_connection_request);
     librg_event_add(LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
+    librg_event_add(LIBRG_ENTITY_CREATE, entity_create);
+    librg_event_add(LIBRG_ENTITY_UPDATE, entity_update);
+    librg_event_add(LIBRG_ENTITY_REMOVE, entity_remove);
+    librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, clientstream_update);
+
     librg_network_start(address);
 
     while (true) {

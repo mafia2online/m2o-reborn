@@ -1,4 +1,6 @@
-﻿void game_init()
+float ztime = 0; // debugging time stuff, nice to have for now
+
+void game_init()
 {
     mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
     tools::gamehooks_install_late();
@@ -26,11 +28,15 @@ void game_connect()
 
     mod.state = MOD_DEBUG_STATE;
 
-    librg_network_start({ "localhost", 27010 });
+    librg_network_start({ "inlife.no-ip.org", 27010 });
 }
 
-bool spawned = false;
-float ztime = 0; // debugging time stuff, nice to have for now
+void game_disconnect()
+{
+    mod_log("disconnecting...\n");
+    librg_network_stop();
+}
+
 void game_tick()
 {
     librg_tick();
@@ -40,7 +46,7 @@ void game_tick()
         if (ztime < 0)
             ztime = 0;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        mod_log("Time shift!");
+        mod_log("Time shift!\n");
     }
 
     if (GetAsyncKeyState(VK_RIGHT) & 0x1) {
@@ -48,18 +54,18 @@ void game_tick()
         if (ztime > 1.0f)
             ztime = 1.0f;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        mod_log("Time shift!");
+        mod_log("Time shift!\n");
     }
 
     if (GetAsyncKeyState(VK_F4) & 0x1) {
         M2::S_ExplosionInit *fire = new M2::S_ExplosionInit;
         M2::C_ShotManager::Get()->CreateExplosion(fire);
-        mod_log("Created fire!");
+        mod_log("Created fire!\n");
     }
 
     static M2::C_Human2 *ent = nullptr;
 
-    if (GetAsyncKeyState(VK_F6) & 0x1 && spawned) {
+    if (GetAsyncKeyState(VK_F6) & 0x1 && mod.spawned) {
         ent = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
 
         librg_assert_msg(ent, "player entity should be created!");
@@ -80,23 +86,23 @@ void game_tick()
         *(DWORD *)(ent + 32) = flags;
 
         if (flags & 0x20)
-            mod_log("Flags set sucessfully!");
+            mod_log("Flags set sucessfully!\n");
 
         reinterpret_cast<M2::C_Entity *>(ent)->Activate();
 
         if (reinterpret_cast<M2::C_Entity *>(ent)->IsActive())
-            mod_log("Entity active !");
+            mod_log("Entity active !\n");
 
         reinterpret_cast<M2::C_Entity *>(ent)->SetPosition(zplm_vec3(-421.75f, 479.31f, 0.05f));
 
 
-        mod_log("Created at %x!", ent);
+        mod_log("Created at %x!\n", ent);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
         M2::C_SyncObject *pSyncObject = nullptr;
 
-        mod_log("Trying to move vec");
+        mod_log("Trying to move vec\n");
         if (ent != nullptr) {
             auto vecPosition = zplm_vec3(-421.75f, 479.31f, 0.05f);
             auto vecDirection = zplm_vec3(-421.75f, 489.31f, 0.05f);
@@ -104,8 +110,8 @@ void game_tick()
         }
     }
 
-    if (GetAsyncKeyState(VK_F5) & 0x1 && !spawned) {
+    if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
         game_connect();
-        spawned = true;
+        mod.spawned = true;
     }
 }
