@@ -1,3 +1,5 @@
+/* Classes */
+
 #include "CActor.hpp"
 #include "ccamera.hpp"
 #include "CCameraModule.hpp"
@@ -40,3 +42,6 @@
 #include "CTextDatabase.hpp"
 #include "CTimer.hpp"
 #include "CVehicle.hpp"
+
+/* Wrappers */
+#include "../wrappers/models.hpp"

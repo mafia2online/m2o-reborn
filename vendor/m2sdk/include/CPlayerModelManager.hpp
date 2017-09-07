@@ -22,6 +22,9 @@ namespace M2
         pad(ICPlayerModelManager, pad0, 0x4);   // 000C - 0010
         C_Entity    *m_pEntity;                 // 0010 - 0014
         C_Model     *m_pModel;                  // 0014 - 0018
+        void        *m_pUnknown;                // 0018 - 001C
+        pad(ICPlayerModelManager, pad1, 0x10);  // 001C - 002C
+        char        m_sModelName[32];           // 002C - 004C
 	};
 
 

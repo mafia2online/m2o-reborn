@@ -1,4 +1,4 @@
-﻿/** @file CCore.cpp
+/** @file CCore.cpp
 *  @brief Game's CameraModule wrapper
 *
 *
@@ -12,6 +12,37 @@
 
 namespace M2
 {
+    void *Alloc(int iSize)
+    {
+        void *retn = nullptr;
+
+        DWORD address = 0x401830;
+
+        __asm
+        {
+            push iSize;
+            call address;
+            add esp, 4;
+            mov retn, eax;
+        }
+
+        return retn;
+    }
+
+    void Free(void *pointer)
+    {
+        DWORD address = 0x4019F0;
+
+        __asm
+        {
+            push pointer;
+            call address;
+            add esp, 4;
+        }
+        pointer = nullptr;
+    }
+
+
     class ICCoreModule
     {
     public:
