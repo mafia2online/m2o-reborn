@@ -1,4 +1,4 @@
-namespace tools {
+﻿namespace tools {
 
     DWORD GameStartDrive__Return;
     DWORD GameStartDrive_2__Return;
@@ -152,7 +152,6 @@ namespace tools {
 
         // blocking the input
         if (mod.input_blocked && lpMsg->message == WM_INPUT) {
-            mod_mouse_stuff();
             return false;
         }
 

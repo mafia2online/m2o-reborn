@@ -1,4 +1,4 @@
-void ped_oncreate(librg_event_t *event)
+﻿void ped_oncreate(librg_event_t *event)
 {
     auto transform = librg_fetch_transform(event->entity);
 
@@ -53,10 +53,14 @@ void ped_onupdate(librg_event_t *event)
 {
     auto transform = librg_fetch_transform(event->entity);
     auto gamedata  = librg_fetch_gamedata(event->entity);
-    librg_assert(gamedata && gamedata->object);
 
     zplm_vec3_t direction;
     librg_data_rptr(&event->data, &direction, sizeof(direction));
+
+    if (!gamedata || !gamedata->object) {
+        librg_log("no gamedata attached!\n");
+        return;
+    }
 
     gamedata->object->SetPosition(transform->position);
     gamedata->object->SetDirection(direction);
