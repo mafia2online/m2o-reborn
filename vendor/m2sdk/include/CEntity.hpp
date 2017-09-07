@@ -38,6 +38,12 @@ namespace M2
     {
     public:
 
+        //TODO: Put in vTable
+        void Destructor()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x11A76D0, this);
+        }
+
         void Activate()
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x1192170, this);

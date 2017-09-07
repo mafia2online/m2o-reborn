@@ -1,4 +1,4 @@
-﻿/** @file CVehicle.hpp
+/** @file CVehicle.hpp
 *  @brief Game's Entity class
 *
 *
@@ -7,6 +7,8 @@
 
 #pragma once
 #include "CommonHeaders.h"
+
+#include "CActorVehicle.hpp"
 
 namespace M2
 {
@@ -23,7 +25,7 @@ namespace M2
         E_SEAT_PASSENGER_BACK_2
     };
 
-	class ICVehicle
+	class ICVehicle : public C_ActorVehicle
 	{
 
 	};

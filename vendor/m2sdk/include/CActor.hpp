@@ -7,11 +7,11 @@
 
 #pragma once
 #include "CommonHeaders.h"
-#include "CVehicle.hpp"
+#include "CEntityPos.hpp"
 
 namespace M2
 {
-	class ICActor
+	class ICActor : public C_EntityPos
 	{
 	public:
 	};

@@ -8,6 +8,7 @@
 #pragma once
 #include "CommonHeaders.h"
 
+#include "CActor.hpp"
 #include "CEntity.hpp"
 #include "CHumanInventory.hpp"
 #include "CHumanScript.hpp"
@@ -16,7 +17,7 @@
 
 namespace M2
 {
-	class ICHuman2
+	class ICHuman2 : public C_Actor
 	{
 	public:
 		pad(ICHuman2, pad0, 0x64);						//0000 - 0064

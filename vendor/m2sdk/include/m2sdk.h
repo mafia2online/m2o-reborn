@@ -1,6 +1,7 @@
 /* Classes */
 
 #include "CActor.hpp"
+#include "CActorVehicle.hpp"
 #include "ccamera.hpp"
 #include "CCameraModule.hpp"
 #include "CCar.hpp"
@@ -9,6 +10,7 @@
 #include "CEntityFactory.hpp"
 #include "CEntityMessage.hpp"
 #include "CEntityMessageDamage.hpp"
+#include "CEntityPos.hpp"
 #include "CFrame.hpp"
 #include "CGame.hpp"
 #include "CGameCameraMafia.hpp"
