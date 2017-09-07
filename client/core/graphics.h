@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Graphics init
  * @return
  */
@@ -42,6 +42,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
 
     memcpy(&mod.graphics.present_params, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
 
+
     // todo: refactor
     // very important, centers initial mouse position on the zkreen
     mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
@@ -81,6 +82,8 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice)
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceLost();
     }
+
+    nk_d3d9_shutdown();
 }
 
 /**
@@ -98,6 +101,8 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceReset();
     }
+
+    nk_d3d9_shutdown();
 }
 
 /**
