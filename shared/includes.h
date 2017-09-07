@@ -5,7 +5,7 @@
 #define LIBRG_DEBUG
 #endif
 
-#define MOD_NAME "Mafia 2 Online - Reloaded";
+#define MOD_NAME "Mafia 2 Online - Reloaded"
 
 #define LIBRG_PLATFORM_ID 5
 #define LIBRG_PLATFORM_PROTOCOL 2

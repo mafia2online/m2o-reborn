@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Graphics init
  * @return
  */
@@ -42,6 +42,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
 
     memcpy(&mod.graphics.present_params, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
 
+
     // todo: refactor
     // very important, centers initial mouse position on the zkreen
     mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
@@ -62,7 +63,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
     nk_d3d9_font_stash_begin(&nk_atlas);
     struct nk_font *robot = nk_font_atlas_add_from_file(nk_atlas, (mod.paths.files + "\\Roboto-Regular.ttf").c_str(), 14, &conf);
     nk_d3d9_font_stash_end();
-    nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
+    // nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
     nk_style_set_font(nk_ctx, &robot->handle);
 
     if (mod.state.init) {

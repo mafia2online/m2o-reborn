@@ -7,6 +7,44 @@ namespace tools {
     DWORD _callDrive = 0x042CAC0;
     DWORD _callEnd = 0x99CE70;
 
+    /**
+     * Game hooking methods
+     */
+
+    DWORD GameLoopHook_1_Return;
+    DWORD _call = 0x473D10;
+    void __declspec(naked) GameLoopHook_1()
+    {
+        __asm call[_call];
+        __asm pushad;
+        game_tick();
+        __asm popad;
+        __asm jmp[GameLoopHook_1_Return];
+    }
+
+    DWORD GameLoopHook_2_Return;
+    void __declspec(naked) GameLoopHook_2()
+    {
+        __asm fstp    dword ptr[esp + 0x10];
+        __asm fld     dword ptr[esp + 0x10];
+        __asm pushad;
+        game_tick();
+        __asm popad;
+        __asm jmp[GameLoopHook_2_Return];
+    }
+
+    DWORD GameInitHook_Return = 0x4ECFC0;
+    DWORD _C_PreloadSDS__FinishPendingSlots = 0x4E2690;
+    void __declspec(naked) GameInitHook()
+    {
+        __asm call[_C_PreloadSDS__FinishPendingSlots];
+        __asm pushad;
+        game_init();
+        __asm popad;
+        __asm jmp[GameInitHook_Return];
+    }
+
+
     //TODO Reverse properly to get the vehicle where the player enter in : waiting vehicle creation method
     void __declspec(naked) GameStartDriveHook__1()
     {
@@ -44,91 +82,20 @@ namespace tools {
         __asm jmp[GameEndDrive__Return];
     }
 
-    DWORD GameLoopHook_1_Return;
-    DWORD _call = 0x473D10;
-    void __declspec(naked) GameLoopHook_1()
-    {
-        __asm call[_call];
-        __asm pushad;
-        game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_1_Return];
-    }
-
-    DWORD GameLoopHook_2_Return;
-    void __declspec(naked) GameLoopHook_2()
-    {
-        __asm fstp    dword ptr[esp + 0x10];
-        __asm fld     dword ptr[esp + 0x10];
-        __asm pushad;
-        game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_2_Return];
-    }
-
-    DWORD GameInitHook_Return = 0x4ECFC0;
-    DWORD _C_PreloadSDS__FinishPendingSlots = 0x4E2690;
-    void __declspec(naked) GameInitHook()
-    {
-        __asm call[_C_PreloadSDS__FinishPendingSlots];
-        __asm pushad;
-        game_init();
-        __asm popad;
-        __asm jmp[GameInitHook_Return];
-    }
-
-    WNDPROC _WndProc;
-
-    LRESULT __stdcall WndProcHk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
-        bool result = false;
-
-        if (nk_ctx)
-            nk_input_begin(nk_ctx);
-
-        result = mod_wndproc(hWnd, uMsg, wParam, lParam);
-
-        if (nk_ctx)
-            nk_input_end(nk_ctx);
-
-        if (result) {
-            return true; // handled by us
-        }
-
-        return CallWindowProc(_WndProc, hWnd, uMsg, wParam, lParam);
-    }
-
-    typedef BOOL(WINAPI *tPeekMessageA)(LPMSG pMsg, HWND  hwnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax, UINT  wRemoveMsg);
-    tPeekMessageA orig_PeekMessageA;
-    BOOL WINAPI PeekMessageAhk(LPMSG pMsg, HWND  hwnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax, UINT  wRemoveMsg)
-    {
-
-        // todoo add gui hook
-        // if(CCore::Instance().GetGraphics().GetGwenManager() != nullptr)
-        //     CCore::Instance().GetGraphics().GetGwenManager()->GetInput().ProcessMessage(*pMsg);
-
-        return orig_PeekMessageA(pMsg, hwnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
-    }
-
-    void gamehooks_install_late()
-    {
-        HWND hWnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
-
-        SetWindowText(hWnd, "Mafia II Online: Reborn");
-        _WndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(hWnd, GWL_WNDPROC, (LONG_PTR)WndProcHk));
-        SetWindowLongW(hWnd, GWL_WNDPROC, GetWindowLong(hWnd, GWL_WNDPROC));
-
-        //orig_PeekMessageA = reinterpret_cast<tPeekMessageA>(Mem::Hooks::InstallDetourPatch("user32.dll", "PeekMessageA", (DWORD)PeekMessageAhk));
-
-    }
+    /**
+     * Game hooking calls
+     */
 
     void gamehooks_install()
     {
+        // main game loops
         GameLoopHook_1_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED614, (Address)GameLoopHook_1);
         GameLoopHook_2_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED04D, (DWORD)GameLoopHook_2, 8);
 
+        // game init
         GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
 
+        // vehicle hooks
         GameStartDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x043B305, (Address)GameStartDriveHook__1);
         GameStartDrive_2__Return = Mem::Hooks::InstallNotDumbJMP(0x43B394, (Address)GameStartDriveHook__2);
         GameStartDrive_3__Return = Mem::Hooks::InstallNotDumbJMP(0x437940, (Address)GameStartDriveHook__3);
@@ -136,16 +103,88 @@ namespace tools {
 
         // noop the CreateMutex, allow to run multiple instances
         Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
-        /*
-            * Disabled hooks
-            AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);
-            CallEvent = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199B40, (DWORD)C_TickedModuleManager__CallEvent);
-            CallEvents = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199BA0, (DWORD)C_TickedModuleManager__CallEvents);
-            CallEventByIndex = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199960, (DWORD)C_TickedModuleManager__CallEventByIndex);
 
-            Mem::Hooks::InstallJmpPatch(0x5CFCD0, (DWORD)HOOK_C_SDSManager__ActivateStreamMapLine);
-        */
+        // Disabled hooks (last edited by MyU)
+        // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);
+        // CallEvent = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199B40, (DWORD)C_TickedModuleManager__CallEvent);
+        // CallEvents = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199BA0, (DWORD)C_TickedModuleManager__CallEvents);
+        // CallEventByIndex = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199960, (DWORD)C_TickedModuleManager__CallEventByIndex);
+        // Mem::Hooks::InstallJmpPatch(0x5CFCD0, (DWORD)HOOK_C_SDSManager__ActivateStreamMapLine);
     }
+
+    /**
+     * Hooking os provided event loop
+     * (to block mouse or keyboard events)
+     */
+
+    #define mod_peekmsg_args            \
+        _Out_     LPMSG lpMsg,          \
+        _In_opt_  HWND hWnd,            \
+        _In_      UINT wMsgFilterMin,   \
+        _In_      UINT wMsgFilterMax,   \
+        _In_      UINT wRemoveMsg
+
+    typedef BOOL(WINAPI *wnd_peekmsg_cb)(mod_peekmsg_args);
+    typedef WNDPROC wnd_wndproc_cb;
+
+    wnd_peekmsg_cb mod_peekmsg_original;
+    wnd_wndproc_cb mod_wndproc_original;
+
+    LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        // TODO: remove?
+        // mod_log("%u\n", uMsg);
+
+        // if (nk_ctx) {
+        //     nk_input_begin(nk_ctx);
+
+        //     if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam)) {
+        //         return 1;
+        //     }
+
+        //     nk_input_end(nk_ctx);
+        // }
+
+        return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
+    }
+
+    BOOL WINAPI mod_peekmsg_hook(mod_peekmsg_args)
+    {
+        if (!mod.window) {
+            mod.window = hWnd;
+            mod.input_blocked = true; // TODO: remove
+        }
+
+        mod_wndproc_hook(hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
+
+        // blocking the input
+        if (mod.input_blocked && lpMsg->message == WM_INPUT) {
+            return false;
+        }
+
+        return mod_peekmsg_original(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
+    }
+
+    void gamehooks_install_late()
+    {
+        HWND hWnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
+        SetWindowText(hWnd, MOD_NAME);
+
+        // hook the wind proc
+        mod_wndproc_original = (wnd_wndproc_cb)SetWindowLongPtr(hWnd, GWL_WNDPROC, (LONG_PTR)mod_wndproc_hook);
+        SetWindowLongW(hWnd, GWL_WNDPROC, GetWindowLong(hWnd, GWL_WNDPROC));
+
+        // hook the peek msg
+        mod_peekmsg_original = (wnd_peekmsg_cb)DetourFunction(
+            DetourFindFunction("USER32.DLL", "PeekMessageW"),
+            reinterpret_cast<PBYTE>(mod_peekmsg_hook)
+        );
+    }
+
+
+    /**
+     * Archieve
+     */
 
 
     /*

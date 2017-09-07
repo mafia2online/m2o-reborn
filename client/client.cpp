@@ -109,6 +109,7 @@ struct mod_t {
     mod_graphics_t  graphics;
     librg_entity_t  player;
 
+    b32 input_blocked;
     b32 spawned;
 
     struct {
@@ -120,7 +121,7 @@ struct mod_t {
 };
 
 // public interface definitions
-static mod_t mod;
+static mod_t mod = {0};
 
 bool mod_init();
 void mod_exit(std::string);
@@ -166,7 +167,6 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 // tool stuff
 #include "tools/console.h"
-#include "tools/raw_input.h"
 #include "tools/file_logger.h"
 #include "tools/font_manager.h"
 #include "tools/exception_handler.h"

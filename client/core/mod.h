@@ -1,4 +1,4 @@
-﻿bool mod_init()
+bool mod_init()
 {
     Mem::Initialize();
 
@@ -92,64 +92,8 @@ void mod_attach(HMODULE module)
     //     mod_exit("Unable to parse config file");
     // }
 
-    rawinput::on_mousemove = [&](RAWMOUSE me) {
-        mod.mouse.x += me.lLastX;
-        mod.mouse.y += me.lLastY;
-        mod.mouse.flags = me.usButtonFlags;
-    };
-
     CDirectInput8Hook::Install();
-    rawinput::hook();
-
     mod.state = MOD_TITLE_STATE;
-}
-
-/**
- * Windows window message handler
- * @return if message has been handled
- */
-bool mod_wndproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    if (!mod.window) {
-        mod.window = hWnd;
-    }
-
-    // MSG msg;
-    // msg.hwnd = hWnd;
-    // msg.lParam = lParam;
-    // msg.wParam = wParam;
-    // msg.message = uMsg;
-
-    return false; // todo
-
-    // it was not there
-    // but its part of the stuff
-    // ZAK do it
-
-    // if (uMsg == WM_LBUTTONDOWN) {
-    //     mod_log("Pojeb sa ty pica!");
-    // }
-
-    // if (nk_ctx) {
-    //     if (uMsg == WM_MOUSEMOVE) {
-    //         mouse_pos pos = *(mouse_pos *)lParam;
-    //         // we shall call it in a tight loop since WM_MOUSEMOVE IS not triggered by the game...
-    //         nk_input_motion(nk_ctx, pos.x, pos.y);
-    //         return true;
-    //     }
-    //     else if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam))
-    //         return true;
-    // }
-
-    // if (uMsg == WM_KEYDOWN) {
-    //     if (wParam == VK_RETURN && !CDebugConsole::Instance().HasFocus()) {
-    //         CDebugConsole::Instance().Focus();
-    //         return true;
-    //     }
-    // }
-
-
-    // return false; // not handled
 }
 
 /**
