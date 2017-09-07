@@ -132,33 +132,27 @@ namespace tools {
 
     LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
-        // TODO: remove?
-        // mod_log("%u\n", uMsg);
+        if (!mod.window) {
+            mod.window = hWnd;
+            mod.input_blocked = false;
+        }
 
-        // if (nk_ctx) {
-        //     nk_input_begin(nk_ctx);
-
-        //     if (nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam)) {
-        //         return 1;
-        //     }
-
-        //     nk_input_end(nk_ctx);
-        // }
+        if (nk_ctx) {
+            nk_input_begin(nk_ctx);
+            nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam);
+            nk_input_end(nk_ctx);
+        }
 
         return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
     }
 
     BOOL WINAPI mod_peekmsg_hook(mod_peekmsg_args)
     {
-        if (!mod.window) {
-            mod.window = hWnd;
-            mod.input_blocked = true; // TODO: remove
-        }
-
         mod_wndproc_hook(hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
 
         // blocking the input
         if (mod.input_blocked && lpMsg->message == WM_INPUT) {
+            mod_mouse_stuff();
             return false;
         }
 

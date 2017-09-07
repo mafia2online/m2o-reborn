@@ -63,7 +63,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
     nk_d3d9_font_stash_begin(&nk_atlas);
     struct nk_font *robot = nk_font_atlas_add_from_file(nk_atlas, (mod.paths.files + "\\Roboto-Regular.ttf").c_str(), 14, &conf);
     nk_d3d9_font_stash_end();
-    // nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
+    nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
     nk_style_set_font(nk_ctx, &robot->handle);
 
     if (mod.state.init) {
@@ -82,6 +82,8 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice)
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceLost();
     }
+
+    nk_d3d9_shutdown();
 }
 
 /**
@@ -99,6 +101,8 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceReset();
     }
+
+    nk_d3d9_shutdown();
 }
 
 /**
