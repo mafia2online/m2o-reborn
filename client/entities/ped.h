@@ -9,7 +9,7 @@ void ped_oncreate(librg_event_t *event)
     librg_assert_msg(ent, "player entity should be created!");
 
     M2::C_Model *own_model = M2::C_Core::Get()->AllocateModel(2);
-    own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
+    own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->m_pModel);
 
     own_model->SetName("lawl");
     own_model->MarkForNotify(2);

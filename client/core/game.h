@@ -73,7 +73,7 @@ void game_tick()
         DWORD coreInstance = *(DWORD*)(0x1AC2778);
 
         M2::C_Model *own_model = Mem::InvokeFunction<Mem::call_this, M2::C_Model*>((*(Address*)(*(DWORD*)coreInstance + 0x94)), coreInstance, 2);
-        own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->localPlayerModel);
+        own_model->CloneHierarchy(M2::C_PlayerModelManager::Get()->GetInterface()->m_pModel);
 
         own_model->SetName("lawl");
         own_model->MarkForNotify(2);
@@ -100,14 +100,6 @@ void game_tick()
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
-        M2::C_SyncObject *pSyncObject = nullptr;
-
-        mod_log("Trying to move vec\n");
-        if (ent != nullptr) {
-            auto vecPosition = zplm_vec3(-421.75f, 479.31f, 0.05f);
-            auto vecDirection = zplm_vec3(-421.75f, 489.31f, 0.05f);
-            ent->GetScript()->ScrLookAt(&pSyncObject, reinterpret_cast<M2::C_Entity *>(ent), vecDirection, true);
-        }
     }
 
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
