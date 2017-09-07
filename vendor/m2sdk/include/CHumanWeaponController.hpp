@@ -29,7 +29,7 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x0431300, this, unk, unk2, unk3, unk4);
 		}
 
-		void DoShot(bool unk, Vector3 const *from, Vector3 const *to)
+		void DoShot(bool unk, vec3_t const *from, vec3_t const *to)
 		{
 			Mem::InvokeFunction<Mem::call_this, bool>(0x0438790, this, unk, from, to);
 		}

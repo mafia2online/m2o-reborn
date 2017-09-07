@@ -1,3 +1,6 @@
+/**
+ * On entity is created for player
+ */
 void ped_oncreate(librg_event_t *event)
 {
 

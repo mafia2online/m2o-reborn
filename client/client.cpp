@@ -1,9 +1,7 @@
+// common shared stuff
 #include "includes.h"
 
-/**
- * Third party dependencies
- * and definitions
- */
+// system libs
 #include <stdio.h>
 #include <stdint.h>
 
@@ -22,11 +20,9 @@
 #include <io.h>
 
 // container stuff
-#include <string>
-#include <vector>
 #include <list>
+#include <vector>
 #include <unordered_map>
-
 
 // dx stuff
 #define DIRECTINPUT_VERSION 0x0800
@@ -62,12 +58,6 @@
 // global vars for nk
 struct nk_context*      nk_ctx;
 struct nk_font_atlas*   nk_atlas;
-
-// proxy some stuff
-typedef zplm_vec2_t Vector2;
-typedef zplm_vec3_t Vector3;
-typedef zplm_vec2_t vec2_t;
-typedef zplm_vec3_t vec3_t;
 
 // tools
 struct mod_path_t {

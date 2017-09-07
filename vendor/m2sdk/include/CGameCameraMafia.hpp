@@ -35,7 +35,7 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x0B3D730, this, actor, unk);
 		}
 
-		void ScriptSetCameraRotationTowards(Vector3 vec)
+		void ScriptSetCameraRotationTowards(vec3_t vec)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x0B55B90, this, vec);
 		}

@@ -24,7 +24,7 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, bool>(0x4566F0, this);
 		}
 
-		void SetMarkUser(const Vector2& vecPosition)
+		void SetMarkUser(const vec2_t &vecPosition)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x4E6A70, this, &vecPosition);
 		}

@@ -28,7 +28,7 @@ void game_connect()
 
     mod.state = MOD_DEBUG_STATE;
 
-    librg_network_start({ "inlife.no-ip.org", 27010 });
+    librg_network_start({ "localhost", 27010 });
 }
 
 void game_disconnect()
