@@ -1,4 +1,6 @@
-﻿#include "CActor.hpp"
+/* Classes */
+
+#include "CActor.hpp"
 #include "ccamera.hpp"
 #include "CCameraModule.hpp"
 #include "CCar.hpp"
@@ -33,8 +35,13 @@
 #include "CSDSModelManager.hpp"
 #include "CShotManager.hpp"
 #include "CSingleMesh.hpp"
+#include "CSlot.hpp"
+#include "CSlotManager.hpp"
 #include "CSpeedometer.hpp"
 #include "CSyncObject.hpp"
 #include "CTextDatabase.hpp"
 #include "CTimer.hpp"
 #include "CVehicle.hpp"
+
+/* Wrappers */
+#include "../wrappers/models.hpp"
