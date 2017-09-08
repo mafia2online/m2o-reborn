@@ -9,6 +9,7 @@ void game_init()
 
 void game_connect()
 {
+    mod.state = MOD_DEBUG_STATE;
     mod_log("spawning and connecting...\n");
 
     if (M2::C_SDSLoadingTable::Get()) {
@@ -20,14 +21,7 @@ void game_connect()
 
     auto ped = (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed();
     ((M2::C_Player2*)ped)->LockControls(false);
-
-    Mem::InvokeFunction<Mem::call_this, void>(
-        ped->m_pVFTable->SetPosition, ped,
-        &zplm_vec3(-421.75f, 479.31f, 0.05f)
-    );
-
-    mod.state = MOD_DEBUG_STATE;
-
+    ped->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
     librg_network_start({ "localhost", 27010 });
 }
 
