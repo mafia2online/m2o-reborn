@@ -68,11 +68,11 @@ void ped_onclient(librg_event_t *event)
     transform->position = gamedata->object->GetPosition();
     transform->rotation = gamedata->object->GetRotation();
 
-    zplm_vec4_t direction;// = ((M2::C_Human2 *)gamedata->object)->GetDirection();
+    zplm_vec3_t direction;// = ((M2::C_Human2 *)gamedata->object)->GetDirection();
     Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetDirection, (M2::C_Player2 *)gamedata->object, &direction);
-    // direction.x = 0.0f;
+    direction.x = 0.0f;
 
-    librg_log("%f\n", direction.w);
+    // librg_log("%f\n", direction.w);
     librg_data_wptr(event->data, &direction, sizeof(direction));
 }
 

@@ -30,3 +30,10 @@ typedef zplm_quat_t quat_t;
 // helpers
 #define when(init, name) auto name = init; if (name)
 #define when_assert(init, name) auto name = init; librg_assert(name); if (name)
+
+#ifdef MOD_SERVER
+#define mod_log librg_log
+#endif
+
+#define print_posm(vec, msg) mod_log("%s %f %f %f\n", msg, vec.x, vec.y, vec.z)
+#define print_pos(vec) print_posm(vec, "print_pos: ")

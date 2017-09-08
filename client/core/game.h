@@ -22,7 +22,8 @@ void game_connect()
     auto ped = (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed();
     ((M2::C_Player2*)ped)->LockControls(false);
     ped->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
-    librg_network_start({ "localhost", 27010 });
+
+    librg_network_start({ "inlife.no-ip.org", 27010 });
 }
 
 void game_disconnect()
@@ -51,10 +52,14 @@ void game_tick()
         mod_log("Time shift!\n");
     }
 
+    if (GetAsyncKeyState(VK_F8) & 0x1) {
+        // send vehicle create request onto server
+        librg_send(MOD_VEHICLE_CREATE, data, {});
+    }
 
-    if (GetAsyncKeyState(VK_F8) & 0x1)
-    {
-
+    if (GetAsyncKeyState(VK_F9) & 0x1) {
+        // send vehicle create request onto server
+        librg_send(MOD_VEHICLE_ENTER, data, {});
     }
 
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {

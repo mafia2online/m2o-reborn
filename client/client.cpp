@@ -1,3 +1,5 @@
+#define MOD_CLIENT
+
 // common shared stuff
 #include "includes.h"
 

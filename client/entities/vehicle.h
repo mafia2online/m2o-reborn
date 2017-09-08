@@ -62,10 +62,15 @@ void vehicle_oncreate(librg_event_t *event)
     mod_log("Created at %x!\n", car);
 }
 
-
 void vehicle_onclient(librg_event_t *event)
 {
+    auto transform = librg_fetch_transform(event->entity);
+    auto gamedata  = librg_fetch_gamedata(event->entity);
 
+    librg_assert(gamedata && gamedata->object);
+
+    transform->position = gamedata->object->GetPosition();
+    transform->rotation = gamedata->object->GetRotation();
 }
 
 
@@ -77,4 +82,5 @@ void vehicle_onupdate(librg_event_t *event)
     librg_assert(gamedata && gamedata->object);
 
     gamedata->object->SetPosition(transform->position);
+    gamedata->object->SetRotation(transform->rotation);
 }

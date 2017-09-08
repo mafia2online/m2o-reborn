@@ -1,4 +1,6 @@
-﻿#include "includes.h"
+#define MOD_SERVER
+
+#include "includes.h"
 
 typedef struct {
     std::string hostname;
@@ -12,9 +14,14 @@ mod_settings_t mod_settings;
 #include "messages.h"
 
 #include "entities/ped.h"
+#include "entities/vehicle.h"
 #include "core/callbacks.h"
 #include "settings.h"
 
+void register_messages() {
+    librg_network_add(MOD_VEHICLE_CREATE, mod_vehicle_crate);
+    librg_network_add(MOD_VEHICLE_ENTER, mod_vehicle_enter);
+}
 
 int main() {
     librg_config_t config = {0};
@@ -40,6 +47,8 @@ int main() {
     librg_event_add(LIBRG_ENTITY_UPDATE, entity_update);
     librg_event_add(LIBRG_ENTITY_REMOVE, entity_remove);
     librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, clientstream_update);
+
+    register_messages();
 
     librg_network_start(address);
 
