@@ -24,7 +24,7 @@ void clientstream_update(librg_event_t *event)
 {
     switch (librg_entity_type(event->entity)) {
         case TYPE_PLAYER:  return ped_onclient(event);
-        // case TYPE_VEHICLE: return vehicle_onclient(event);
+        case TYPE_VEHICLE: return vehicle_onclient(event);
     }
 }
 

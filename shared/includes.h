@@ -25,6 +25,8 @@ typedef zplm_vec2_t vec2_t;
 typedef zplm_vec3_t vec3_t;
 typedef zplm_quat_t quat_t;
 
+#define vec3 zplm_vec3
+
 // helpers
 #define when(init, name) auto name = init; if (name)
 #define when_assert(init, name) auto name = init; librg_assert(name); if (name)

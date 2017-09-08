@@ -1,3 +1,5 @@
+typedef struct { vec3_t position; u8 step; } librg_component(lastdata);
+
 void ped_oncreate(librg_event_t *event)
 {
     auto transform = librg_fetch_transform(event->entity);
@@ -55,6 +57,7 @@ void ped_oncreate(librg_event_t *event)
     mod_log("Created at %x!\n", human);
 
     librg_attach_gamedata(event->entity, { (M2::C_Entity*)human, pPedModelManager });
+    librg_attach_lastdata(event->entity, {transform->position});
 }
 
 void ped_onclient(librg_event_t *event)
@@ -65,8 +68,11 @@ void ped_onclient(librg_event_t *event)
     transform->position = gamedata->object->GetPosition();
     transform->rotation = gamedata->object->GetRotation();
 
-    vec3_t direction = gamedata->object->GetDirection();
-    direction.x = 0.0f;
+    zplm_vec4_t direction;// = ((M2::C_Human2 *)gamedata->object)->GetDirection();
+    Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetDirection, (M2::C_Player2 *)gamedata->object, &direction);
+    // direction.x = 0.0f;
+
+    librg_log("%f\n", direction.w);
     librg_data_wptr(&event->data, &direction, sizeof(direction));
 }
 
@@ -74,17 +80,24 @@ void ped_onupdate(librg_event_t *event)
 {
     auto transform = librg_fetch_transform(event->entity);
     auto gamedata  = librg_fetch_gamedata(event->entity);
+    auto lastdata  = librg_fetch_lastdata(event->entity);
+    librg_assert(gamedata && gamedata->object);
 
-    zplm_vec3_t direction;
+    vec3_t direction;
     librg_data_rptr(&event->data, &direction, sizeof(direction));
 
-    if (!gamedata || !gamedata->object) {
-        librg_log("no gamedata attached!\n");
-        return;
-    }
+    // trying out scripted movement
+    // its shit, dont use it
+    // if (lastdata->step++ > 16) {
+    //     // gamedata->object->SetDirection(direction);
+    //     auto ped = ((M2::C_Human2*)gamedata->object);
+    //     M2::C_SyncObject *pSyncObject = nullptr;
+    //     ped->GetScript()->ScrMoveV(&pSyncObject, lastdata->position, M2::HUMAN_MOVE_MODE_WALK, transform->position, true);
+    //     lastdata->position = transform->position;
+    //     lastdata->step = 0;
+    // }
 
     gamedata->object->SetPosition(transform->position);
-    gamedata->object->SetDirection(direction);
 
     // TODO: look at
     // M2::C_SyncObject *pSyncObject = nullptr;
