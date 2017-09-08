@@ -62,14 +62,15 @@ void game_tick()
     if (GetAsyncKeyState(VK_F8) & 0x1)
     {
         const char *directory = SDS_LOAD_DIR_CARS;
-        const char *model = "walker_rocket";
+        std::string model;
+        M2::Models::GetVehicleModelFromID(0, &model);
 
         M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
         if (!pModelManager) {
             return;
         }
 
-        M2::Wrappers::GameModelManager *pPedModelManager = pModelManager->Load(directory, model);
+        M2::Wrappers::GameModelManager *pPedModelManager = pModelManager->Load(directory, model.c_str());
         if (!pPedModelManager) {
             return;
         }
