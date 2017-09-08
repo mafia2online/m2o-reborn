@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:zpl-c/zpl-event.git
 	branch = master
-	commit = 434e16a004d010db1a151a3628a0083b217c4804
-	parent = d02faff3340c386232fb6ec15172c35b217c3053
+	commit = f66f950c592dc53baa6c0f37f8479dbba490f596
+	parent = 26e2d4dad7f065c73d1e95ab9b24d2887e79bd4b
 	cmdver = 0.3.1
