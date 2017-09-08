@@ -72,7 +72,7 @@ void ped_onclient(librg_event_t *event)
     Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetDirection, (M2::C_Player2 *)gamedata->object, &direction);
     direction.x = 0.0f;
 
-    // librg_log("%f\n", direction.w);
+    // mod_log("%f\n", direction.w);
     librg_data_wptr(event->data, &direction, sizeof(direction));
 }
 
@@ -98,8 +98,8 @@ void ped_onupdate(librg_event_t *event)
     // }
 
     gamedata->object->SetPosition(transform->position);
+}
 
-    // TODO: look at
-    // M2::C_SyncObject *pSyncObject = nullptr;
-    // ((M2::C_Human2*)gamedata->object)->GetScript()->ScrLookAt(&pSyncObject, (M2::C_Entity *)gamedata->object, direction, true);
+void ped_onremove(librg_event_t *event) {
+
 }

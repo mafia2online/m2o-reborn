@@ -19,7 +19,7 @@ mod_settings_t mod_settings;
 #include "settings.h"
 
 void register_messages() {
-    librg_network_add(MOD_VEHICLE_CREATE, mod_vehicle_crate);
+    librg_network_add(MOD_VEHICLE_CREATE, mod_vehicle_create);
     librg_network_add(MOD_VEHICLE_ENTER, mod_vehicle_enter);
 }
 

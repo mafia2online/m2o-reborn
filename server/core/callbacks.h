@@ -26,7 +26,7 @@ void on_connect_accepted(librg_event_t *event) {
     auto transform = librg_fetch_transform(event->entity);
     auto client    = librg_fetch_client(event->entity);
 
-    librg_log("spawning player %u at: %f %f %f\n",
+    mod_log("spawning player %u at: %f %f %f\n",
         event->entity,
         transform->position.x,
         transform->position.y,

@@ -1,6 +1,6 @@
 librg_entity_t lastcar;
 
-void mod_vehicle_crate(librg_message_t *msg) {
+void mod_vehicle_create(librg_message_t *msg) {
     auto player  = librg_get_client_entity(msg->peer);
     auto vehicle = librg_entity_create(TYPE_VEHICLE);
 
@@ -16,10 +16,6 @@ void mod_vehicle_crate(librg_message_t *msg) {
     lastcar = vehicle;
 
     // log
-    librg_log("creating a vehicle at %f %f %f\n",
-        vt->position.x, vt->position.y, vt->position.z
-    );
-
     print_posm(vt->position, "creating vehicle at: ");
 }
 
