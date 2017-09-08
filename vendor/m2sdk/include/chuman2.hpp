@@ -15,12 +15,22 @@
 #include "CHumanWeaponController.hpp"
 #include "CCar.hpp"
 
+#include "CScene.hpp"
+
 namespace M2
 {
-	class ICHuman2 : public C_Actor
+    class unknow
+    {
+    public:
+        pad(unknow, pad0, 0x1C);                        //0000 - 001C
+        C_Scene             *m_pCurrentScene;
+    };
+	class ICHuman2
 	{
 	public:
-		pad(ICHuman2, pad0, 0x64);						//0000 - 0064
+        pad(ICHuman2, pad3, 0x18);                      //0000 - 0018
+        unknow              *m_pUnk;                    //0018 - 001C
+		pad(ICHuman2, pad0, 0x48);						//001C - 0064
 		C_Car				*m_pCurrentCar;				//0064 - 0068
 		pad(ICHuman2, pad1, 0x38);
 		C_HumanInventory	*m_pInventory;				//00A0 - 00A4

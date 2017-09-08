@@ -5,6 +5,7 @@
 #include "ccamera.hpp"
 #include "CCameraModule.hpp"
 #include "CCar.hpp"
+#include "CCarManager.hpp"
 #include "CCore.hpp"
 #include "CEntity.hpp"
 #include "CEntityFactory.hpp"
@@ -33,6 +34,7 @@
 #include "CPlayerRadio.hpp"
 #include "CPoliceWanted.hpp"
 #include "CRenderCamera.hpp"
+#include "CScene.hpp"
 #include "CSDSManager.hpp"
 #include "CSDSModelManager.hpp"
 #include "CShotManager.hpp"
@@ -43,6 +45,7 @@
 #include "CSyncObject.hpp"
 #include "CTextDatabase.hpp"
 #include "CTimer.hpp"
+#include "CTrafficStreaming.hpp"
 #include "CVehicle.hpp"
 
 /* Wrappers */

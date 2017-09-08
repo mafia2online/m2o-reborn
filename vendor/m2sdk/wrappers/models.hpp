@@ -44,7 +44,7 @@ namespace M2
         public:
             GameModelManager(): m_pModelManager(nullptr)
             {
-                ICPlayerModelManager *pModelManager = (ICPlayerModelManager *)M2::Alloc(0x50);
+                ICPlayerModelManager *pModelManager = (ICPlayerModelManager *)M2::Alloc(0xA0);
                 if (pModelManager)
                 {
                     DWORD address = 0x5B6680;

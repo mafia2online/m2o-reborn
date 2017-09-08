@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
 
     DWORD GameStartDrive__Return;
     DWORD GameStartDrive_2__Return;
@@ -82,6 +82,33 @@
         __asm jmp[GameEndDrive__Return];
     }
 
+    void *_this;
+    void _declspec(naked) FrameReleaseFix()
+    {
+        __asm
+        {
+            pushad;
+            mov _this, esi;
+        }
+
+        //TODO: Check if _this != nullptr
+
+        __asm
+        {
+            popad;
+            retn;
+        }
+    }
+
+    void _declspec(naked) FrameReleaseFix2()
+    {
+        //TODO: Check if _this != nullptr
+        __asm
+        {
+            retn;
+        }
+    }
+
     /**
      * Game hooking calls
      */
@@ -101,8 +128,16 @@
         GameStartDrive_3__Return = Mem::Hooks::InstallNotDumbJMP(0x437940, (Address)GameStartDriveHook__3);
         GameEndDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x43BAAD, (Address)GameEndDriveHook);
 
+        // Crash fix on C_Frame::Release
+        Mem::Hooks::InstallJmpPatch(0x14E5BC0, (DWORD)FrameReleaseFix);
+        Mem::Hooks::InstallJmpPatch(0x12F0DB0, (DWORD)FrameReleaseFix2);
+
         // noop the CreateMutex, allow to run multiple instances
         Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
+
+        // Always use vec3
+        *(BYTE *)0x09513EB = 0x75;
+        *(BYTE *)0x0950D61 = 0x75;
 
         // Disabled hooks (last edited by MyU)
         // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);

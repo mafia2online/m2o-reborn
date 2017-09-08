@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
 
     /**
      * Callback type
@@ -10,7 +10,7 @@
      * Array of files to patch
      */
     std::string filepatcher_sds_files[] = {
-        //"sdsconfig.bin",
+        "sdsconfig.bin",
         "StreamMapa.bin",
         "tables.sds",
         "gui.sds",

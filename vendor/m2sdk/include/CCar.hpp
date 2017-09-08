@@ -1,4 +1,4 @@
-﻿/** @file CCar.hpp
+/** @file CCar.hpp
 *  @brief Game's Entity class
 *
 *
@@ -14,7 +14,9 @@ namespace M2
 	class ICCar
 	{
 	public:
-		pad(ICCar, pad0, 0xA8);
+        pad(ICCar, pad0, 0x78);         // 0000 - 0078
+        int             m_nSlotSDS;     // 0078 - 007C
+		pad(ICCar, pad1, 0x2C);         // 007C - 00A8
 		C_Vehicle		m_pVehicle;
 	};
 
@@ -55,6 +57,11 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, double>(0x04476E0, this);
 		}
+
+        void Init(int initProps)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x9A1E40, this, initProps);
+        }
 
 		bool IsSeatWindowOpen(int seat)
 		{

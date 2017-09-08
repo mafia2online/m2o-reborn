@@ -32,7 +32,12 @@ namespace M2
     class ICEntity
     {
     public:
-        CEntityVFTable  * m_pVFTable;
+        CEntityVFTable  *m_pVFTable;            // 0000 - 0004
+        pad(ICEntity, pad0, 0x18);              // 0004 - 001C
+        DWORD           m_dwGUID;               // 001C - 0020
+        DWORD           m_dwFlags;              // 0020 - 0024
+        pad(ICEntity, pad1, 0x3C);              // 0024 - 0060
+        M2::C_Model     *m_pModel;              // 0060 - 0064
     };
     class C_Entity : public ICEntity
     {
@@ -52,6 +57,27 @@ namespace M2
         void Deactivate()
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x11921C0, this);
+        }
+
+        vec3_t GetPosition()
+        {
+            vec3_t position;
+            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetPosition, this, &position);
+            return position;
+        }
+
+        quat_t GetRotation()
+        {
+            quat_t rotation;
+            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetRotation, this, &rotation);
+            return rotation;
+        }
+
+        vec3_t GetDirection()
+        {
+            vec3_t direction;
+            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetDirection, this, &direction);
+            return direction;
         }
 
         bool IsActive()
@@ -79,25 +105,9 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetDirection, this, &dir);
         }
 
-        vec3_t GetPosition()
+        void Release()
         {
-            vec3_t position;
-            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetPosition, this, &position);
-            return position;
-        }
-
-        quat_t GetRotation()
-        {
-            quat_t rotation;
-            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetRotation, this, &rotation);
-            return rotation;
-        }
-
-        vec3_t GetDirection()
-        {
-            vec3_t direction;
-            Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->GetDirection, this, &direction);
-            return direction;
+            Mem::InvokeFunction<Mem::call_this, int>(0x119DDD0, this);
         }
 
         void Setup()

@@ -8,6 +8,7 @@
 #pragma once
 #include "CommonHeaders.h"
 #include "CFrame.hpp"
+#include "CScene.hpp"
 #include "CSingleMesh.hpp"
 
 namespace M2
@@ -19,6 +20,8 @@ namespace M2
 		DWORD m_dwFlags;
 		pad(ICModel, pad1, 0x14);
 		C_SingleMesh* m_pSingleMesh;
+        pad(ICModel, pad2, 0x8);
+        C_Scene* m_pScene;
 	};
 
 	class C_Model : public ICModel

@@ -18,6 +18,11 @@ namespace M2
 	class C_Frame : public ICFrame
 	{
 	public:
+        int Clone()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x14DADC0, this);
+        }
+
 		void MarkForNotify(int unk)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, this, unk);
@@ -27,5 +32,10 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, this, name);
 		}
+
+        void Release()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x14E5BC0, this);
+        }
 	};
 };
