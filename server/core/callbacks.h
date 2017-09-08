@@ -7,10 +7,10 @@ void on_connection_request(librg_event_t *event) {
     }
 
     // read password
-    u32 size = librg_data_ru32(&event->data);
+    u32 size = librg_data_ru32(event->data);
     std::string password = "";
     for (usize i = 0; i < size; ++i) {
-        password += librg_data_ru8(&event->data);
+        password += librg_data_ru8(event->data);
     }
 
     // if not matches - reject

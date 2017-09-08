@@ -73,7 +73,7 @@ void ped_onclient(librg_event_t *event)
     // direction.x = 0.0f;
 
     librg_log("%f\n", direction.w);
-    librg_data_wptr(&event->data, &direction, sizeof(direction));
+    librg_data_wptr(event->data, &direction, sizeof(direction));
 }
 
 void ped_onupdate(librg_event_t *event)
@@ -84,7 +84,7 @@ void ped_onupdate(librg_event_t *event)
     librg_assert(gamedata && gamedata->object);
 
     vec3_t direction;
-    librg_data_rptr(&event->data, &direction, sizeof(direction));
+    librg_data_rptr(event->data, &direction, sizeof(direction));
 
     // trying out scripted movement
     // its shit, dont use it
