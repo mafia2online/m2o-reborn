@@ -34,6 +34,7 @@
 #include "CPlayerRadio.hpp"
 #include "CPoliceWanted.hpp"
 #include "CRenderCamera.hpp"
+#include "CResources.hpp"
 #include "CScene.hpp"
 #include "CSDSManager.hpp"
 #include "CSDSModelManager.hpp"
