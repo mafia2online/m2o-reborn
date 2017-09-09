@@ -44,6 +44,7 @@ void mod_path_register(HMODULE module)
 void mod_attach(HMODULE module)
 {
     zpl_mutex_init(&mod.mutexes.log);
+    zpl_mutex_init(&mod.mutexes.wnd_msg);
 
     // console, yay
     tools::console_attach();
@@ -108,6 +109,7 @@ void mod_exit(std::string reason)
     mod.debug_stream.close();
 
     zpl_mutex_destroy(&mod.mutexes.log);
+    zpl_mutex_destroy(&mod.mutexes.wnd_msg);
 
     MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
 

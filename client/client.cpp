@@ -1,4 +1,4 @@
-#define MOD_CLIENT
+﻿#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -23,6 +23,7 @@
 
 // container stuff
 #include <list>
+#include <queue>
 #include <vector>
 #include <unordered_map>
 
@@ -76,6 +77,18 @@ typedef struct {
 } mod_mousebtn_t;
 
 typedef struct {
+    int id;
+    int state;
+} mod_keybtn_t;
+
+typedef struct {
+    HWND hWnd;
+    UINT uMsg;
+    WPARAM wParam;
+    LPARAM lParam;
+} mod_wndmsg_t;
+
+typedef struct {
     int x;
     int y;
 
@@ -88,6 +101,8 @@ typedef struct {
 
         mod_mousebtn_t buttons[3];
     };
+
+    // mod_keybtn_t keys[256];
 
     struct _DIMOUSESTATE state;
 } mod_mouse_t;
@@ -123,6 +138,7 @@ struct mod_t {
     mod_path_t  paths;
     mod_state_t state;
 
+    std::queue<mod_wndmsg_t> wnd_msg;
     mod_mouse_t     mouse;
     mod_graphics_t  graphics;
     librg_entity_t  player;
@@ -132,6 +148,7 @@ struct mod_t {
 
     struct {
         zpl_mutex_t log;
+        zpl_mutex_t wnd_msg;
     } mutexes;
 
     // other

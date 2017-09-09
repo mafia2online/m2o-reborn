@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
 *
 * Solution   : Mafia 2 Multiplayer
 * Project    : Client
@@ -137,6 +137,10 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceInfo(LPDIDEVICEINSTANCE pdid
     return m_pIDirectInputDevice8->GetDeviceInfo(pdidi);
 }
 
+struct mod_di_keys_t {
+    byte state[256];
+};
+
 HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID lpvData)
 {
     HRESULT hResult = m_pIDirectInputDevice8->GetDeviceState(cbData, lpvData);
@@ -189,6 +193,14 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
 
                 for (usize i = 0; i < 4; i++) {
                     ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;
+                }
+            }
+        }
+
+        if (nk_ctx && m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
+            if (mod.input_blocked && nk_ctx->active && nk_ctx->active->edit.active) {
+                for (usize i = 0; i < 256; i++) {
+                    ((mod_di_keys_t*)lpvData)->state[i] = 0;
                 }
             }
         }

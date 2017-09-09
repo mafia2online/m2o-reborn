@@ -59,7 +59,6 @@ void game_tick()
 {
     librg_tick();
 
-
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;
         if (ztime < 0)

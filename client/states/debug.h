@@ -36,7 +36,7 @@ void debug_state_render()
         nk_layout_row_end(nk_ctx);
 
         nk_layout_row_dynamic(nk_ctx, 30, 2);
-        nk_check_label(nk_ctx, "AAAAAa", active);
+        active = nk_check_label(nk_ctx, "AAAAAa", active);
     }
     nk_end(nk_ctx);
 }
