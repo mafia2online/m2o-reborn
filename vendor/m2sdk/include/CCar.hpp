@@ -17,7 +17,11 @@ namespace M2
         pad(ICCar, pad0, 0x78);         // 0000 - 0078
         int             m_nSlotSDS;     // 0078 - 007C
 		pad(ICCar, pad1, 0x2C);         // 007C - 00A8
-		C_Vehicle		m_pVehicle;
+		C_Vehicle		m_pVehicle;     // 00A8 - 00CC
+        pad(ICCar, pad2, 0x1BC);        // 00CC - 0288
+        vec3_t          m_vecMoveSpeed; // 0288 - 0294
+        float           m_fSpeed;       // 0294 - 0298
+        float           m_fSpeedDir;    // 0298 - 029C
 	};
 
 	class C_Car : public ICCar
@@ -107,6 +111,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x0D6B500, this, siren);
 		}
+
+        void SetSpeedFloat(float speed)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9A01A0, this, speed);
+        }
 
         void Setup()
         {
