@@ -1,4 +1,4 @@
-static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
+﻿static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
 
 void vehicle_oncreate(librg_event_t *event)
 {
@@ -79,11 +79,16 @@ void vehicle_onupdate(librg_event_t *event) {
     auto transform   = librg_fetch_transform(event->entity);
     auto interpolate = librg_fetch_interpolate(event->entity);
 
+    // if this car is not interpolable
+    if (!interpolate) return;
+
     interpolate->lposition = interpolate->tposition;
     interpolate->lrotation = interpolate->trotation;
 
     interpolate->tposition = transform->position;
     interpolate->trotation = transform->rotation;
+
+    interpolate->delta = 0.0f;
 }
 
 void vehicle_onremove(librg_event_t *event) {
@@ -93,30 +98,28 @@ void vehicle_onremove(librg_event_t *event) {
 }
 
 void module_vehicle_interpolate_each(librg_entity_t entity) {
-    // auto vehicle     = librg_fetch_vehicle(entity);
     auto transform   = librg_fetch_transform(entity);
     auto interpolate = librg_fetch_interpolate(entity);
-    auto gamedata  = librg_fetch_gamedata(entity);
+    auto gamedata    = librg_fetch_gamedata(entity);
+
+    // last delta tick against constant tick delay
+    interpolate->delta += (mod.last_delta / 16.666f);
+    // mod_log("%f\n", interpolate->delta);
 
     librg_assert(gamedata && gamedata->object);
 
     vec3_t dposition;
-    zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, 0.4f);
+    zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, interpolate->delta);
+    gamedata->object->SetPosition(dposition);
 
-    quat_t calc;
-    auto last = zplm_quat(interpolate->lrotation.z, interpolate->lrotation.w, interpolate->lrotation.x, interpolate->lrotation.y);
-    auto dest = zplm_quat(interpolate->trotation.z, interpolate->trotation.w, interpolate->trotation.x, interpolate->trotation.y);
+    auto last = interpolate->lrotation;
+    auto dest = interpolate->trotation;
 
     if (last == dest) return;
 
-    zplm_quat_nlerp(&calc, last, dest, 0.4f);
-
-    //mod_log("last: %f %f %f %f\n", interpolate->lrotation.x, interpolate->lrotation.y, interpolate->lrotation.z, interpolate->lrotation.w);
-    //mod_log("next: %f %f %f %f\n", interpolate->trotation.x, interpolate->trotation.y, interpolate->trotation.z, interpolate->trotation.w);
-    mod_log("expe: %f %f %f %f\n", calc.x, calc.y, calc.z, calc.w);
-
-    gamedata->object->SetPosition(dposition);
-    gamedata->object->SetRotation(zplm_quat(calc.x, calc.y, calc.z, calc.w));
+    quat_t drotation;
+    zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, interpolate->delta);
+    gamedata->object->SetRotation(drotation);
 }
 
 void module_vehicle_interpolate() {

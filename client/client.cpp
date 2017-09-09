@@ -1,4 +1,4 @@
-﻿#define MOD_CLIENT
+#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -135,6 +135,9 @@ struct mod_t {
     mod_mouse_t     mouse;
     mod_graphics_t  graphics;
     librg_entity_t  player;
+
+    u64 last_update;
+    f32 last_delta;
 
     b32 input_blocked;
     b32 spawned;

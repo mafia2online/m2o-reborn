@@ -174,10 +174,15 @@ namespace tools {
         *(BYTE *)0x1CC397D = 1;
 
         // Disable game pause when minimized or in background
-        Mem::Utilites::InstallNopPatch(0xAC6D63);
-        Mem::Utilites::InstallNopPatch(0xAC6D49);
-        Mem::Utilites::InstallNopPatch(0xAC6E84);
-        Mem::Utilites::InstallNopPatch(0xAC6EB4);
+        //Mem::Utilites::InstallNopPatch(0xAC6D63);
+        //Mem::Utilites::InstallNopPatch(0xAC6D49);
+        //Mem::Utilites::InstallNopPatch(0xAC6E84);
+        //Mem::Utilites::InstallNopPatch(0xAC6EB4);
+
+        // other try to do ^
+        // Mem::Hooks::InstallJmpPatch(0xAC6D2E, 0xAC6F7D);
+        // Mem::Hooks::InstallJmpPatch(0xAC6E5C, 0xAC6F7D);
+
 
         // Disabled hooks (last edited by MyU)
         // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);

@@ -16,9 +16,11 @@ typedef struct {
 
 typedef struct {
     vec3_t lposition;
-    vec3_t lvelocity;
     quat_t lrotation;
+
     vec3_t tposition;
-    vec3_t tvelocity;
     quat_t trotation;
+    // vec3_t velocity;
+
+    f32 delta;
 } librg_component(interpolate);
