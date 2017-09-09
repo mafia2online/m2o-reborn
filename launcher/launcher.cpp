@@ -387,7 +387,11 @@ namespace Launcher
         memset(&piProcessInfo, 0, sizeof(piProcessInfo));
         siStartupInfo.cb = sizeof(siStartupInfo);
 
-        if (!CreateProcess(pathString.c_str(), NULL, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, GetAppPath(), &siStartupInfo, &piProcessInfo))
+		if (argc > 1) {
+			pathString += " " + std::string(argv[1]);
+		}
+
+        if (!CreateProcess(NULL, (LPSTR)pathString.c_str(), NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, GetAppPath(), &siStartupInfo, &piProcessInfo))
         {
             std::string error = "Failed to start mafia2.exe, can't launch.";
             Launcher::HandleError(error);
