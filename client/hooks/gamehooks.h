@@ -1,3 +1,10 @@
+#include "CEntity.hpp"
+#include "CCar.hpp"
+#include "CGame.hpp"
+#include "CEntityMessage.hpp"
+
+#include "messages.h"
+
 namespace tools {
 
     DWORD GameStartDrive__Return;
@@ -44,13 +51,11 @@ namespace tools {
         __asm jmp[GameInitHook_Return];
     }
 
-
-    //TODO Reverse properly to get the vehicle where the player enter in : waiting vehicle creation method
     void __declspec(naked) GameStartDriveHook__1()
     {
         __asm call[_callDrive];
         __asm pushad;
-        mod_log("Break in car1\n");
+        player_mod_message(E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR);
         __asm popad;
         __asm jmp[GameStartDrive__Return];
     }
@@ -59,16 +64,17 @@ namespace tools {
     {
         __asm call[_callDrive];
         __asm pushad;
-        mod_log("Break in car2\n");
+        player_mod_message(E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR);
         __asm popad;
         __asm jmp[GameStartDrive_2__Return];
     }
 
+    static M2::C_Car *car = nullptr;
     void __declspec(naked) GameStartDriveHook__3()
     {
         __asm call[_callDrive];
-        __asm pushad;
-        mod_log("Entered car\n");
+        __asm pushad
+        player_mod_message(E_PlayerMessage::MESSAGE_MOD_ENTER_CAR);
         __asm popad;
         __asm jmp[GameStartDrive_3__Return];
     }
@@ -77,7 +83,7 @@ namespace tools {
     {
         __asm call[_callEnd];
         __asm pushad;
-        mod_log("Leaved car\n");
+        player_mod_message(E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR);
         __asm popad;
         __asm jmp[GameEndDrive__Return];
     }
@@ -109,6 +115,28 @@ namespace tools {
         }
     }
 
+    /* Entity Messages */
+
+    typedef bool(__cdecl * CScriptEntity__RecvMessage_t) (void *lua, void *a2, const char *function, M2::C_EntityMessage *message);
+    CScriptEntity__RecvMessage_t onReceiveMessage;
+    int OnReceiveMessageHook(void *lua, void *a2, const char *function, M2::C_EntityMessage *pMessage)
+    {
+        if (pMessage) {
+            M2::C_Game *game = M2::C_Game::Get();
+            if (game) {
+                M2::C_Player2 *player = game->GetLocalPed();
+                if (player) {
+                    M2::C_Entity *entity = reinterpret_cast<M2::C_Entity*>(player);
+                    if (entity) {
+                        if (pMessage->m_dwReceiveGUID == entity->m_dwGUID) {
+                            player_game_message(pMessage);
+                        }
+                    }
+                }
+            }
+        }
+        return onReceiveMessage(lua, a2, function, pMessage);
+    }
     /**
      * Game hooking calls
      */
@@ -132,12 +160,24 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x14E5BC0, (DWORD)FrameReleaseFix);
         Mem::Hooks::InstallJmpPatch(0x12F0DB0, (DWORD)FrameReleaseFix2);
 
+        // Entity Messages hooks
+        onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);
+
         // noop the CreateMutex, allow to run multiple instances
         Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
 
         // Always use vec3
         *(BYTE *)0x09513EB = 0x75;
         *(BYTE *)0x0950D61 = 0x75;
+
+        // Disable game reloading after death
+        *(BYTE *)0x1CC397D = 1;
+
+        // Disable game pause when minimized or in background
+        Mem::Utilites::InstallNopPatch(0xAC6D63);
+        Mem::Utilites::InstallNopPatch(0xAC6D49);
+        Mem::Utilites::InstallNopPatch(0xAC6E84);
+        Mem::Utilites::InstallNopPatch(0xAC6EB4);
 
         // Disabled hooks (last edited by MyU)
         // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);

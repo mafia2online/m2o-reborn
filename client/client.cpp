@@ -194,6 +194,8 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "hooks/dx/CDirectInput8Proxy.h"
 #include "hooks/dx/CDirectInput8Hook.h"
 
+#include "hooks/messages.h"
+
 // tool stuff
 #include "tools/console.h"
 #include "tools/file_logger.h"
