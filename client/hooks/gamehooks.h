@@ -169,13 +169,6 @@ namespace tools {
     {
         if (!mod.window) {
             mod.window = hWnd;
-            mod.input_blocked = false;
-        }
-
-        if (nk_ctx) {
-            nk_input_begin(nk_ctx);
-            nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam);
-            nk_input_end(nk_ctx);
         }
 
         return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
@@ -185,10 +178,11 @@ namespace tools {
     {
         mod_wndproc_hook(hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
 
-        // blocking the input
-        if (mod.input_blocked && lpMsg->message == WM_INPUT) {
-            return false;
-        }
+        // blocking the input for the game
+        // dont do it :D
+        // if (mod.input_blocked && lpMsg->message == WM_INPUT) {
+        //     return false;
+        // }
 
         return mod_peekmsg_original(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
     }

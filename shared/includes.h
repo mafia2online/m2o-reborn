@@ -37,3 +37,5 @@ typedef zplm_quat_t quat_t;
 
 #define print_posm(vec, msg) mod_log("%s %f %f %f\n", msg, vec.x, vec.y, vec.z)
 #define print_pos(vec) print_posm(vec, "print_pos: ")
+
+#define mod_assert librg_assert

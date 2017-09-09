@@ -12,4 +12,4 @@ typedef struct {
     f32 brake;
     i16 model;
     i8 gear;
-} librg_component(vehicle);
+} librg_component(car);

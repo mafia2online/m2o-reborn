@@ -47,7 +47,6 @@ void game_connect()
 	else {
 		librg_network_start({ "localhost", 27010 });
 	}
-    
 }
 
 void game_disconnect()
@@ -59,6 +58,7 @@ void game_disconnect()
 void game_tick()
 {
     librg_tick();
+
 
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;
@@ -74,6 +74,10 @@ void game_tick()
             ztime = 1.0f;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
         mod_log("Time shift!\n");
+    }
+
+    if (GetAsyncKeyState(VK_F1) & 0x1) {
+        mod.input_blocked = !mod.input_blocked;
     }
 
     if (GetAsyncKeyState(VK_F8) & 0x1) {
