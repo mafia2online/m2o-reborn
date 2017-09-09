@@ -58,6 +58,7 @@ void game_disconnect()
 void game_tick()
 {
     librg_tick();
+    module_vehicle_interpolate();
 
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;

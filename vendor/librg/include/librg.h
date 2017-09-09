@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LIBRG - reguider library
  *
  * A library for building simple and elegant cross-platform mmo client-server solutions.
@@ -1074,7 +1074,6 @@ extern "C" {
      * COMPONENTS
      *
      */
-    // librg_dbg("initializing %s pool, approximate size: %f kb\n", #NAME, (zpl_size_of(ZPL_JOIN3(PREFIX, NAME, _t))*h->count) / 1000.0)       \
 
     #define librg_component_define_inner(PREFIX, NAME)                                                                                      \
         ZPL_JOIN3(librg__component_, NAME, _pool_t) ZPL_JOIN3(librg__component_, NAME, _pool);                                              \

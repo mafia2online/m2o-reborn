@@ -164,6 +164,7 @@ void mod_log(const char* format, ...) {
 
     zpl_mutex_lock(&mod.mutexes.log);
     zpl_printf(message);
+    mod.debug_stream << message;
     zpl_mutex_unlock(&mod.mutexes.log);
 }
 

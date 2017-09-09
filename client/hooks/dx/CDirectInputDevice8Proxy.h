@@ -272,19 +272,19 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::SetCooperativeLevel(HWND hwnd, DWORD 
         mod_assert(hwnd);
 
         // idk wtf is dis, but also kinda helps ?
-        // mod_log("dxinput: setting non-exclusive\n");
-        // if ((dwCustomFlags & DISCL_EXCLUSIVE) != 0) {
-        //     dwCustomFlags &= ~(DISCL_EXCLUSIVE);
-        // }
-        // dwCustomFlags |= DISCL_NONEXCLUSIVE;
+        mod_log("dxinput: setting non-exclusive\n");
+        if ((dwCustomFlags & DISCL_EXCLUSIVE) != 0) {
+            dwCustomFlags &= ~(DISCL_EXCLUSIVE);
+        }
+        dwCustomFlags |= DISCL_NONEXCLUSIVE;
 
         // enabled native-feel mouse
         // good for windwed mode, with cursor showing
-        // mod_log("dxinput: setting background mode\n");
-        // if ((dwCustomFlags & DISCL_FOREGROUND) != 0) {
-        //     dwCustomFlags &= ~(DISCL_FOREGROUND);
-        // }
-        // dwCustomFlags |= DISCL_BACKGROUND;
+        mod_log("dxinput: setting background mode\n");
+        if ((dwCustomFlags & DISCL_FOREGROUND) != 0) {
+            dwCustomFlags &= ~(DISCL_FOREGROUND);
+        }
+        dwCustomFlags |= DISCL_BACKGROUND;
 
         // TODO: move wndproc hook into here maybe
         // wndproc_install(hwnd);

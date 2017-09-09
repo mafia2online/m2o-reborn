@@ -13,3 +13,12 @@ typedef struct {
     i16 model;
     i8 gear;
 } librg_component(car);
+
+typedef struct {
+    vec3_t lposition;
+    vec3_t lvelocity;
+    quat_t lrotation;
+    vec3_t tposition;
+    vec3_t tvelocity;
+    quat_t trotation;
+} librg_component(interpolate);

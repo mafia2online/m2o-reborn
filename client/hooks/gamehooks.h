@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
 
     DWORD GameStartDrive__Return;
     DWORD GameStartDrive_2__Return;
