@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Graphics init
  * @return
  */
@@ -45,8 +45,8 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
 
     // todo: refactor
     // very important, centers initial mouse position on the zkreen
-    mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
-    mod.mouse.y = pPresentationParameters->BackBufferHeight / 2;
+    // mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
+    // mod.mouse.y = pPresentationParameters->BackBufferHeight / 2;
 
     nk_ctx = nk_d3d9_init(
         mod.graphics.device,
@@ -121,6 +121,28 @@ void graphics_device_render(void)
     if (!mod.window) {
         return;
     }
+
+    nk_input_begin(nk_ctx);
+    if (mod.input_blocked) {
+        nk_style_show_cursor(nk_ctx);
+        for (usize i = 0; i < 3; i++)
+            nk_input_button(nk_ctx, mod.mouse.buttons[i].id, mod.mouse.x, mod.mouse.y, mod.mouse.buttons[i].state);
+        nk_input_motion(nk_ctx, mod.mouse.x, mod.mouse.y);
+    }
+    else {
+        nk_style_hide_cursor(nk_ctx);
+    }
+
+    zpl_mutex_try_lock(&mod.mutexes.wnd_msg);
+    while (!mod.wnd_msg.empty()) {
+        auto msg = mod.wnd_msg.front();
+        nk_d3d9_handle_event(msg.hWnd, msg.uMsg, msg.wParam, msg.lParam);
+        mod.wnd_msg.pop();
+    }
+    zpl_mutex_unlock(&mod.mutexes.wnd_msg);
+    nk_input_end(nk_ctx);
+
+
 
     if (mod.state.render) {
         mod.state.render();

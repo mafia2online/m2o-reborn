@@ -1,4 +1,4 @@
-#define MOD_CLIENT
+﻿#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -23,6 +23,7 @@
 
 // container stuff
 #include <list>
+#include <queue>
 #include <vector>
 #include <unordered_map>
 
@@ -43,6 +44,7 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
+#define NK_BUTTON_TRIGGER_ON_RELEASE
 #define NK_D3D9_IMPLEMENTATION
 #include <nuklear.h>
 #include <nuklear_d3d9.h>
@@ -69,12 +71,41 @@ struct mod_path_t {
     std::string game_files;
 };
 
-struct mouse_state_t {
+typedef struct {
+    nk_buttons id;
+    int state;
+} mod_mousebtn_t;
+
+typedef struct {
+    int id;
+    int state;
+} mod_keybtn_t;
+
+typedef struct {
+    HWND hWnd;
+    UINT uMsg;
+    WPARAM wParam;
+    LPARAM lParam;
+} mod_wndmsg_t;
+
+typedef struct {
     int x;
     int y;
-    short flags;
-    struct raw { BYTE x, y; } raw;
-};
+
+    union {
+        struct {
+            mod_mousebtn_t left;
+            mod_mousebtn_t right;
+            mod_mousebtn_t middle;
+        } btn;
+
+        mod_mousebtn_t buttons[3];
+    };
+
+    // mod_keybtn_t keys[256];
+
+    struct _DIMOUSESTATE state;
+} mod_mouse_t;
 
 struct mod_graphics_t {
     IDirect3DDevice9 *device;
@@ -107,7 +138,8 @@ struct mod_t {
     mod_path_t  paths;
     mod_state_t state;
 
-    mouse_state_t   mouse;
+    std::queue<mod_wndmsg_t> wnd_msg;
+    mod_mouse_t     mouse;
     mod_graphics_t  graphics;
     librg_entity_t  player;
 
@@ -116,6 +148,7 @@ struct mod_t {
 
     struct {
         zpl_mutex_t log;
+        zpl_mutex_t wnd_msg;
     } mutexes;
 
     // other

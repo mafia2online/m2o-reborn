@@ -23,7 +23,30 @@ void game_connect()
     ((M2::C_Player2*)ped)->LockControls(false);
     ped->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    librg_network_start({ "inlife.no-ip.org", 27010 });
+	char *arg = GetCommandLine();
+	LPCSTR tok = strrchr(arg, '"');
+	if (tok == NULL) {
+		tok = strtok(arg, " ");
+		tok = strtok(NULL, " ");
+	}
+	else {
+		char buf[MAX_PATH] = { 0 };
+		tok = strtok(arg, "\"");
+		tok = strtok(NULL, "\"");
+
+		if (tok != NULL) {
+			strcpy(buf, tok);
+		}
+	}
+
+	if (tok != NULL) {
+		while (*tok == ' ') ++tok;
+		mod_log("Connection IP: '%s'", tok);
+		librg_network_start({ (char *)tok, 27010 });
+	}
+	else {
+		librg_network_start({ "localhost", 27010 });
+	}
 }
 
 void game_disconnect()
@@ -50,6 +73,10 @@ void game_tick()
             ztime = 1.0f;
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
         mod_log("Time shift!\n");
+    }
+
+    if (GetAsyncKeyState(VK_F1) & 0x1) {
+        mod.input_blocked = !mod.input_blocked;
     }
 
     if (GetAsyncKeyState(VK_F8) & 0x1) {

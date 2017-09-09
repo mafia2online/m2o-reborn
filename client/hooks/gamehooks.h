@@ -199,31 +199,47 @@ namespace tools {
     wnd_peekmsg_cb mod_peekmsg_original;
     wnd_wndproc_cb mod_wndproc_original;
 
-    LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
+    LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         if (!mod.window) {
             mod.window = hWnd;
-            mod.input_blocked = false;
         }
 
-        if (nk_ctx) {
-            nk_input_begin(nk_ctx);
-            nk_d3d9_handle_event(hWnd, uMsg, wParam, lParam);
-            nk_input_end(nk_ctx);
+
+        switch (uMsg) {
+            case WM_KEYDOWN:
+            case WM_KEYUP:
+            case WM_SYSKEYDOWN:
+            case WM_SYSKEYUP:
+            case WM_CHAR:
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONUP:
+            case WM_RBUTTONDOWN:
+            case WM_RBUTTONUP:
+            case WM_MBUTTONDOWN:
+            case WM_MBUTTONUP:
+            case WM_MOUSEWHEEL:
+            case WM_MOUSEMOVE:
+            case WM_LBUTTONDBLCLK:
+                zpl_mutex_lock(&mod.mutexes.wnd_msg);
+                mod.wnd_msg.push({ hWnd, uMsg, wParam, lParam });
+                zpl_mutex_unlock(&mod.mutexes.wnd_msg);
+                break;
+
+            case WM_INPUTLANGCHANGE:
+                // UpdateCurrentLanguage();
+                mod_log("language changed\n");
+                break;
+
+            case WM_QUIT:
+                mod_log("WM_QUIT\n");
+                mod_exit("exit");
+                break;
         }
 
         return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
     }
 
-    BOOL WINAPI mod_peekmsg_hook(mod_peekmsg_args)
-    {
-        mod_wndproc_hook(hWnd, lpMsg->message, lpMsg->wParam, lpMsg->lParam);
-
-        // blocking the input
-        if (mod.input_blocked && lpMsg->message == WM_INPUT) {
-            return false;
-        }
-
+    BOOL WINAPI mod_peekmsg_hook(mod_peekmsg_args) {
         return mod_peekmsg_original(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
     }
 

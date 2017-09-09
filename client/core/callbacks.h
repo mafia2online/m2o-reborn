@@ -57,5 +57,8 @@ void entity_update(librg_event_t *event)
  */
 void entity_remove(librg_event_t *event)
 {
-
+    switch (librg_entity_type(event->entity)) {
+        case TYPE_PLAYER:  return ped_onremove(event);
+        case TYPE_VEHICLE: return vehicle_onremove(event);
+    }
 }

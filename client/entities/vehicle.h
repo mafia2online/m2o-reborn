@@ -84,3 +84,9 @@ void vehicle_onupdate(librg_event_t *event)
     gamedata->object->SetPosition(transform->position);
     gamedata->object->SetRotation(transform->rotation);
 }
+
+void vehicle_onremove(librg_event_t *event) {
+    auto gamedata  = librg_fetch_gamedata(event->entity);
+    gamedata->object->Deactivate();
+    mod_log("remvoing vehicle");
+}
