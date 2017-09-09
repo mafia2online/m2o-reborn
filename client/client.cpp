@@ -77,11 +77,6 @@ typedef struct {
 } mod_mousebtn_t;
 
 typedef struct {
-    int id;
-    int state;
-} mod_keybtn_t;
-
-typedef struct {
     HWND hWnd;
     UINT uMsg;
     WPARAM wParam;
@@ -92,6 +87,8 @@ typedef struct {
     int x;
     int y;
 
+    struct _DIMOUSESTATE state;
+
     union {
         struct {
             mod_mousebtn_t left;
@@ -101,10 +98,6 @@ typedef struct {
 
         mod_mousebtn_t buttons[3];
     };
-
-    // mod_keybtn_t keys[256];
-
-    struct _DIMOUSESTATE state;
 } mod_mouse_t;
 
 struct mod_graphics_t {

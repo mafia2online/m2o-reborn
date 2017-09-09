@@ -1,4 +1,4 @@
-namespace tools {
+﻿namespace tools {
 
     DWORD GameStartDrive__Return;
     DWORD GameStartDrive_2__Return;
@@ -169,7 +169,6 @@ namespace tools {
         if (!mod.window) {
             mod.window = hWnd;
         }
-
 
         switch (uMsg) {
             case WM_KEYDOWN:
