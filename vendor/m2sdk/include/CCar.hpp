@@ -87,6 +87,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, unsigned int>(0x09CEF30, this);
 		}
 
+        void OpenDoors(int open)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x9BBC70, this, open);
+        }
+
 		void OpenHood()
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BCFB0, this);

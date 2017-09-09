@@ -11,6 +11,11 @@
 
 namespace M2
 {
+    enum E_HumanMessage
+    {
+        MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE = 851972
+    };
+
 	class ICEntityMessage
 	{
 	public:
