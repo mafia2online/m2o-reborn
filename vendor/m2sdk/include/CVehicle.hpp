@@ -25,7 +25,19 @@ namespace M2
         E_SEAT_PASSENGER_BACK_2
     };
 
-	class ICVehicle : public C_ActorVehicle
+    enum E_VehicleLights
+    {
+        E_FRONT_LIGHT = 1,
+        E_PLATE_LIGHT = 0
+    };
+
+    enum E_IndicatorLights
+    {
+        E_INDICATOR_RIGHT = 0,
+        E_INDICATOR_LEFT = 1
+    };
+
+	class ICVehicle
 	{
 
 	};
@@ -47,6 +59,38 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x126EF40, this, unk);
 		}
+
+        bool IsBeaconLightOn()
+        {
+            DWORD retn = (*(DWORD *)((DWORD)this + 0x6F0 ^ 0) & 0x40);
+            return retn;
+        }
+
+        bool IsIndicatorLightsOn(E_IndicatorLights indicator)
+        {
+            int result = 8 * (indicator == 0) + 8;
+            DWORD retn = (*(DWORD *)((DWORD)this + 0x6F0) & result);
+        }
+
+        bool IsReflectorLightOn(E_VehicleLights light)
+        {
+            DWORD retn;
+            if (light == E_FRONT_LIGHT)
+            {
+                retn = (*(DWORD *)((DWORD)this + 0x6F0) & 1u);
+            }
+            else if (light == E_PLATE_LIGHT)
+            {
+                retn = (*(DWORD *)((DWORD)this + 0x6F0) & 2u);
+            }
+            return retn;
+        }
+
+        bool IsTaxiLightOn()
+        {
+            DWORD retn = (*(DWORD *)((DWORD)this + 0x6F0) & 0x80);
+            return retn;
+        }
 
 		void SetBeaconLightOn(bool enable)
 		{
@@ -78,7 +122,7 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x1204540, this, brake, unk);
 		}
 
-		void SetIndicatorLightsOn(int toggle, int indicator)
+		void SetIndicatorLightsOn(int toggle, E_IndicatorLights indicator)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x120CBC0, this, toggle, indicator);
 		}
@@ -98,7 +142,7 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x1217560, this, power);
 		}
 
-		void SetReflectorLightsOn(bool toggle, int light)
+		void SetReflectorLightsOn(bool toggle, E_VehicleLights light)
 		{
 			Mem::InvokeFunction<Mem::call_this, bool>(0x11F7B80, this, toggle, light);
 		}
