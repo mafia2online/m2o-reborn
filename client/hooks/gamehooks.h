@@ -198,8 +198,8 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333);//When entering car
 
         // Disable game pause when minimized or in background
-        Mem::Hooks::InstallJmpPatch(0xAC6D2E, 0xAC6F7D);
-        Mem::Hooks::InstallJmpPatch(0xAC6E5C, 0xAC6F7D);
+        Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
+        Mem::Hooks::InstallJmpPatch(0xAC6E57, 0xAC6F79);
     }
 
     /**
