@@ -13,15 +13,51 @@ mod_settings_t mod_settings;
 #include "components.h"
 #include "messages.h"
 
-#include "entities/ped.h"
-#include "entities/vehicle.h"
-#include "core/callbacks.h"
+// server modules
+#include "modules/module_ped.h"
+#include "modules/module_car.h"
+
 #include "settings.h"
 
-void register_messages() {
-    librg_network_add(MOD_VEHICLE_CREATE, mod_vehicle_create);
-    librg_network_add(MOD_VEHICLE_ENTER, mod_vehicle_enter);
+/**
+ * Place to decide should the client be allowed to connect
+ */
+void on_connection_request(librg_event_t *event) {
+    if (mod_settings.password.size() == 0) {
+        return;
+    }
+
+    // read password
+    u32 size = librg_data_ru32(event->data);
+    std::string password = "";
+    for (usize i = 0; i < size; ++i) {
+        password += librg_data_ru8(event->data);
+    }
+
+    // if not matches - reject
+    if (password != mod_settings.password) {
+        librg_event_reject(event);
+    }
 }
+
+/**
+ * On client connected
+ */
+void on_connect_accepted(librg_event_t *event) {
+    auto transform = librg_fetch_transform(event->entity);
+    auto client    = librg_fetch_client(event->entity);
+
+    mod_log("spawning player %u at: %f %f %f\n",
+        event->entity,
+        transform->position.x,
+        transform->position.y,
+        transform->position.z
+    );
+
+    librg_attach_ped(event->entity, {0});
+    librg_streamer_client_set(event->entity, client->peer);
+}
+
 
 int main() {
     librg_config_t config = {0};
@@ -43,17 +79,17 @@ int main() {
 
     librg_event_add(LIBRG_CONNECTION_REQUEST, on_connection_request);
     librg_event_add(LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
-    librg_event_add(LIBRG_ENTITY_CREATE, entity_create);
-    librg_event_add(LIBRG_ENTITY_UPDATE, entity_update);
-    librg_event_add(LIBRG_ENTITY_REMOVE, entity_remove);
-    librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, clientstream_update);
 
-    register_messages();
+    module_car_init();
 
     librg_network_start(address);
 
     while (true) {
         librg_tick();
+
+        module_ped_tick();
+        module_car_tick();
+
         zpl_sleep_ms(1);
     }
 

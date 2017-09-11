@@ -1,4 +1,4 @@
-﻿bool mod_init()
+bool mod_init()
 {
     Mem::Initialize();
 
@@ -70,12 +70,11 @@ void mod_attach(HMODULE module)
     librg_init(config);
 
     // setup callbacks
-    librg_event_add(LIBRG_CONNECTION_ACCEPT, client_connect);
-    librg_event_add(LIBRG_CONNECTION_REFUSE, client_disconnect);
-    librg_event_add(LIBRG_ENTITY_CREATE, entity_create);
-    librg_event_add(LIBRG_ENTITY_UPDATE, entity_update);
-    librg_event_add(LIBRG_ENTITY_REMOVE, entity_remove);
-    librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, clientstream_update);
+    librg_event_add(LIBRG_CONNECTION_ACCEPT, game_connected);
+    librg_event_add(LIBRG_CONNECTION_REFUSE, game_disconnected);
+
+    module_ped_init();
+    module_car_init();
 
     if (graphics_init() == false) {
         return mod_exit("Unable to init Graphics Manager");

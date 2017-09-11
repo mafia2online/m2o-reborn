@@ -216,10 +216,11 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // actual client stuff
 #include "states/title.h"
 #include "states/debug.h"
-#include "entities/components.h"
-#include "entities/vehicle.h"
-#include "entities/ped.h"
-#include "core/callbacks.h"
+
+// "modules"
+#include "modules/module_ped.h"
+#include "modules/module_car.h"
+
 #include "core/graphics.h"
 #include "core/game.h"
 #include "core/mod.h"
