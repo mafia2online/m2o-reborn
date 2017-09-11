@@ -1,4 +1,4 @@
-﻿#define MOD_CLIENT
+#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -77,11 +77,6 @@ typedef struct {
 } mod_mousebtn_t;
 
 typedef struct {
-    int id;
-    int state;
-} mod_keybtn_t;
-
-typedef struct {
     HWND hWnd;
     UINT uMsg;
     WPARAM wParam;
@@ -92,6 +87,8 @@ typedef struct {
     int x;
     int y;
 
+    struct _DIMOUSESTATE state;
+
     union {
         struct {
             mod_mousebtn_t left;
@@ -101,10 +98,6 @@ typedef struct {
 
         mod_mousebtn_t buttons[3];
     };
-
-    // mod_keybtn_t keys[256];
-
-    struct _DIMOUSESTATE state;
 } mod_mouse_t;
 
 struct mod_graphics_t {
@@ -143,6 +136,9 @@ struct mod_t {
     mod_graphics_t  graphics;
     librg_entity_t  player;
 
+    u64 last_update;
+    f32 last_delta;
+
     b32 input_blocked;
     b32 spawned;
 
@@ -171,6 +167,7 @@ void mod_log(const char* format, ...) {
 
     zpl_mutex_lock(&mod.mutexes.log);
     zpl_printf(message);
+    mod.debug_stream << message;
     zpl_mutex_unlock(&mod.mutexes.log);
 }
 

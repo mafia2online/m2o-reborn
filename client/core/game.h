@@ -73,7 +73,11 @@ void game_disconnect()
 
 void game_tick()
 {
+    mod.last_delta  = (zpl_utc_time_now() - mod.last_update) / 1000.f;
+    mod.last_update = zpl_utc_time_now();
+
     librg_tick();
+    module_vehicle_interpolate();
 
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;

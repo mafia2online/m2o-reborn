@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Graphics init
  * @return
  */
@@ -122,27 +122,32 @@ void graphics_device_render(void)
         return;
     }
 
+    // start input capture
     nk_input_begin(nk_ctx);
     if (mod.input_blocked) {
         nk_style_show_cursor(nk_ctx);
+
+        // input mouse btns
         for (usize i = 0; i < 3; i++)
             nk_input_button(nk_ctx, mod.mouse.buttons[i].id, mod.mouse.x, mod.mouse.y, mod.mouse.buttons[i].state);
+
+        // input mouse move
         nk_input_motion(nk_ctx, mod.mouse.x, mod.mouse.y);
     }
     else {
         nk_style_hide_cursor(nk_ctx);
     }
 
+    // handle queue of msgs
     zpl_mutex_try_lock(&mod.mutexes.wnd_msg);
     while (!mod.wnd_msg.empty()) {
-        auto msg = mod.wnd_msg.front();
+        auto msg = mod.wnd_msg.front(); mod.wnd_msg.pop();
         nk_d3d9_handle_event(msg.hWnd, msg.uMsg, msg.wParam, msg.lParam);
-        mod.wnd_msg.pop();
     }
     zpl_mutex_unlock(&mod.mutexes.wnd_msg);
+
+    // finish input queue
     nk_input_end(nk_ctx);
-
-
 
     if (mod.state.render) {
         mod.state.render();

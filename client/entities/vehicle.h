@@ -1,4 +1,4 @@
-static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
+﻿static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
 
 void vehicle_oncreate(librg_event_t *event)
 {
@@ -58,6 +58,7 @@ void vehicle_oncreate(librg_event_t *event)
     reinterpret_cast<M2::C_Entity *>(car)->SetPosition(transform->position);
 
     librg_attach_gamedata(event->entity, { (M2::C_Entity *)car });
+    librg_attach_interpolate(event->entity, {0});
 
     mod_log("Created at %x!\n", car);
 }
@@ -74,19 +75,59 @@ void vehicle_onclient(librg_event_t *event)
 }
 
 
-void vehicle_onupdate(librg_event_t *event)
-{
-    auto transform = librg_fetch_transform(event->entity);
-    auto gamedata  = librg_fetch_gamedata(event->entity);
+void vehicle_onupdate(librg_event_t *event) {
+    auto transform   = librg_fetch_transform(event->entity);
+    auto interpolate = librg_fetch_interpolate(event->entity);
 
-    librg_assert(gamedata && gamedata->object);
+    // if this car is not interpolable
+    if (!interpolate) return;
 
-    gamedata->object->SetPosition(transform->position);
-    gamedata->object->SetRotation(transform->rotation);
+    interpolate->lposition = interpolate->tposition;
+    interpolate->lrotation = interpolate->trotation;
+
+    interpolate->tposition = transform->position;
+    interpolate->trotation = transform->rotation;
+
+    interpolate->delta = 0.0f;
 }
 
 void vehicle_onremove(librg_event_t *event) {
     auto gamedata  = librg_fetch_gamedata(event->entity);
     gamedata->object->Deactivate();
-    mod_log("remvoing vehicle");
+    mod_log("remvoing vehicle\n");
+}
+
+void module_vehicle_interpolate_each(librg_entity_t entity) {
+    auto transform   = librg_fetch_transform(entity);
+    auto interpolate = librg_fetch_interpolate(entity);
+    auto gamedata    = librg_fetch_gamedata(entity);
+
+    // last delta tick against constant tick delay
+    interpolate->delta += (mod.last_delta / 16.666f);
+    // mod_log("%f\n", interpolate->delta);
+
+    librg_assert(gamedata && gamedata->object);
+
+    vec3_t dposition;
+    zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, interpolate->delta);
+    gamedata->object->SetPosition(dposition);
+
+    auto last = interpolate->lrotation;
+    auto dest = interpolate->trotation;
+
+    if (last == dest) return;
+
+    quat_t drotation;
+    zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, interpolate->delta);
+    gamedata->object->SetRotation(drotation);
+}
+
+void module_vehicle_interpolate() {
+    librg_entity_filter_t filter = {0};
+    if (librg_index_interpolate() == 0) return;
+
+    filter.contains1 = librg_index_interpolate();
+    filter.excludes1 = librg_index_clientstream();
+
+    librg_entity_each(filter, module_vehicle_interpolate_each);
 }

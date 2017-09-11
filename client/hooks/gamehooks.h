@@ -200,6 +200,22 @@ namespace tools {
         // Disable game pause when minimized or in background
         Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
         Mem::Hooks::InstallJmpPatch(0xAC6E57, 0xAC6F79);
+        //Mem::Utilites::InstallNopPatch(0xAC6D63);
+        //Mem::Utilites::InstallNopPatch(0xAC6D49);
+        //Mem::Utilites::InstallNopPatch(0xAC6E84);
+        //Mem::Utilites::InstallNopPatch(0xAC6EB4);
+
+        // other try to do ^
+        // Mem::Hooks::InstallJmpPatch(0xAC6D2E, 0xAC6F7D);
+        // Mem::Hooks::InstallJmpPatch(0xAC6E5C, 0xAC6F7D);
+
+
+        // Disabled hooks (last edited by MyU)
+        // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);
+        // CallEvent = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199B40, (DWORD)C_TickedModuleManager__CallEvent);
+        // CallEvents = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199BA0, (DWORD)C_TickedModuleManager__CallEvents);
+        // CallEventByIndex = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199960, (DWORD)C_TickedModuleManager__CallEventByIndex);
+        // Mem::Hooks::InstallJmpPatch(0x5CFCD0, (DWORD)HOOK_C_SDSManager__ActivateStreamMapLine);
     }
 
     /**
@@ -224,7 +240,6 @@ namespace tools {
         if (!mod.window) {
             mod.window = hWnd;
         }
-
 
         switch (uMsg) {
             case WM_KEYDOWN:
