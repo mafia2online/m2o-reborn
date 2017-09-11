@@ -137,6 +137,23 @@ namespace tools {
         }
         return onReceiveMessage(lua, a2, function, pMessage);
     }
+
+    /* Player input process */
+    DWORD CPlayer2__UpdateInput__Return;
+    DWORD CPlayer2__UpdateInput__Call = 0x42ABE0;
+    M2::C_Entity *player = nullptr;
+    void __declspec(naked) CPlayer2__UpdateInput()
+    {
+        __asm call[CPlayer2__UpdateInput__Call];
+        __asm mov player, ebx;
+        __asm pushad;
+       
+        //TODO: Hook here
+
+        __asm popad;
+        __asm jmp[CPlayer2__UpdateInput__Return];
+    }
+
     /**
      * Game hooking calls
      */
@@ -163,6 +180,9 @@ namespace tools {
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);
 
+        // Player input hook
+        CPlayer2__UpdateInput__Return = Mem::Hooks::InstallNotDumbJMP(0x43BD42, (Address)CPlayer2__UpdateInput);
+
         // noop the CreateMutex, allow to run multiple instances
         Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
 
@@ -173,16 +193,13 @@ namespace tools {
         // Disable game reloading after death
         *(BYTE *)0x1CC397D = 1;
 
+        // Prevent game controlling engine state and radio
+        Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
+        Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
+
         // Disable game pause when minimized or in background
-        //Mem::Utilites::InstallNopPatch(0xAC6D63);
-        //Mem::Utilites::InstallNopPatch(0xAC6D49);
-        //Mem::Utilites::InstallNopPatch(0xAC6E84);
-        //Mem::Utilites::InstallNopPatch(0xAC6EB4);
-
-        // other try to do ^
-        // Mem::Hooks::InstallJmpPatch(0xAC6D2E, 0xAC6F7D);
-        // Mem::Hooks::InstallJmpPatch(0xAC6E5C, 0xAC6F7D);
-
+        Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
+        Mem::Hooks::InstallJmpPatch(0xAC6E57, 0xAC6F79);
 
         // Disabled hooks (last edited by MyU)
         // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);
@@ -190,6 +207,7 @@ namespace tools {
         // CallEvents = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199BA0, (DWORD)C_TickedModuleManager__CallEvents);
         // CallEventByIndex = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199960, (DWORD)C_TickedModuleManager__CallEventByIndex);
         // Mem::Hooks::InstallJmpPatch(0x5CFCD0, (DWORD)HOOK_C_SDSManager__ActivateStreamMapLine);
+
     }
 
     /**
@@ -268,97 +286,4 @@ namespace tools {
             reinterpret_cast<PBYTE>(mod_peekmsg_hook)
         );
     }
-
-
-    /**
-     * Archieve
-     */
-
-
-    /*
-    std::unordered_map<int, SString> event_name_map;
-
-    DWORD AddEvent;
-    int __fastcall C_TickedModuleManager__AddEvent(DWORD _this, DWORD ebx, int a2, char *a3)
-    {
-    //CCore::Instance().GetLogger().Writeln("AddEvent(%d, %s) - Current Thread ID: %x", a2, a3, GetCurrentThreadId());
-    event_name_map[a2] = SString(a3);
-    return Mem::InvokeFunction<Mem::call_this, int>(AddEvent, _this, a2, a3);
-    }
-
-    DWORD CallEvent;
-    int __fastcall C_TickedModuleManager__CallEvent(DWORD _this, DWORD ebx, int a2, int a3)
-    {
-
-    if (a2 != 36 && a2 != 37 && a2 != 5 && a2 != 22 && a2 != 23)
-    CCore::Instance().GetLogger().Writeln("CallEvent \"%s\" with params %d from %x.", event_name_map[a2].GetCStr(), a3, GetCurrentThreadId());
-
-    return Mem::InvokeFunction<Mem::call_this, int>(CallEvent, _this, a2, a3);
-    }
-
-    DWORD CallEvents;
-    int __fastcall C_TickedModuleManager__CallEvents(DWORD _this, DWORD ebx, int a1, int a3, int *a4, int a5)
-    {
-    CCore::Instance().GetLogger().Writeln("CallEvents: %d %d %d %d", a1, a3, a4, a5);
-    //CCore::Instance().GetLogger().Writeln("Call Events size: %d", vec.size());
-
-    std::vector<int>* vec = reinterpret_cast<std::vector<int>*>(a1);
-    CCore::Instance().GetLogger().Writeln("Vector size: %d %d", vec->size(), vec[0]);
-
-
-    //CCore::Instance().GetLogger().Writeln("CallEvents %s with params %d from %x.", event_name_map[a2].GetCStr(), a3, GetCurrentThreadId());
-    return Mem::InvokeFunction<Mem::call_this, int>(CallEvents, _this, a1, a3, a4, a5);
-    }
-
-    DWORD CallEventByIndex;
-    int __fastcall C_TickedModuleManager__CallEventByIndex(DWORD _this, DWORD ebx, rsize_t DstSize, int a3, int a4)
-    {
-    CCore::Instance().GetLogger().Writeln("CallEventByIndex: %d %d %d", DstSize, a3, a4);
-    //CCore::Instance().GetLogger().Writeln("CallEvents %s with params %d from %x.", event_name_map[a2].GetCStr(), a3, GetCurrentThreadId());
-    return Mem::InvokeFunction<Mem::call_this, int>(CallEventByIndex, _this, DstSize, a3, a4);
-    }
-
-
-
-    const char * szStreamMapLine = "";
-    DWORD C_SDSManager__ActivateStreamMapLine_JMP = 0x5CFCD7;
-    DWORD C_SDSManager__ActivateStreamMapLine_END = 0x5CFFC1;
-
-    void meh()
-    {
-    if (strcmp(szStreamMapLine, "free_summer_load") == 0) // free_area_state
-    {
-
-    }
-    else if (strcmp(szStreamMapLine, "free_summer_load") == 0)
-    {
-    CCore::Instance().GetLogger().Writeln("FaderFadeIn %x!", M2::C_GameGuiModule::Get());
-    }
-    }
-    DWORD _this_ebx;
-    DWORD _ecx;
-    void __declspec (naked) HOOK_C_SDSManager__ActivateStreamMapLine(void)
-    {
-    _asm push ebp;
-    _asm mov ebp, esp;
-    _asm mov eax, [ebp + 4];
-    _asm mov _this_ebx, eax;
-    _asm mov eax, [ebp + 12];
-    _asm mov szStreamMapLine, eax;
-    _asm mov _ecx, ecx;
-    _asm pop ebp;
-    _asm pushad;
-
-    meh();
-    CCore::Instance().GetLogger().Writeln("SDS::ActivateStreamMapLine Requesting: '%s' (%x)", szStreamMapLine, _ecx);
-
-    _asm popad;
-    _asm sub esp, 2Ch;
-    _asm push ebx;
-    _asm push ebp;
-    _asm push esi;
-    _asm push edi;
-    _asm jmp C_SDSManager__ActivateStreamMapLine_JMP;
-    }
-    */
 }

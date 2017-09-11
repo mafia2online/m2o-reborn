@@ -24,7 +24,7 @@ namespace M2
 
 		void SetActive(bool active)
 		{
-			Mem::InvokeFunction<Mem::call_this, int>(0x058C090, this, active);
+			Mem::InvokeFunction<Mem::call_this, int>(0x58C0B0, this, active);
 		}
 
 		void SetAudioSilent(bool silent)

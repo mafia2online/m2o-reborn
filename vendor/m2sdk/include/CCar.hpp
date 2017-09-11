@@ -11,17 +11,35 @@
 
 namespace M2
 {
+    class CCarVFTable
+    {
+    public:
+        pad(CCarVFTable, pad0, 0x88);
+        DWORD SetSPZText;               // 0088 - 008C
+        DWORD GetSPZText;               // 008C - 0090
+        DWORD SetDirtLevel;             // 0090 - 0094
+        pad(CCarVFTable, pad1, 0xC);    // 0094 - 00A0
+        DWORD GetWorldEntity;           // 00A0 - 00A4
+        pad(CCarVFTable, pad2, 0x40);   // 00A4 - 00E4
+        DWORD GetTotalSeats;            // 00E4 - 00E8
+        pad(CCarVFTable, pad3, 0x4);    // 00E8 - 00EC
+        DWORD GetSeatAtIndex;           // 00EC - 00F0
+        pad(CCarVFTable, pad4, 0x30);   // 00F0 - 0120
+        DWORD SetHornOn;                // 0120 - 0124
+    };
+
 	class ICCar
 	{
 	public:
-        pad(ICCar, pad0, 0x78);         // 0000 - 0078
-        int             m_nSlotSDS;     // 0078 - 007C
-		pad(ICCar, pad1, 0x2C);         // 007C - 00A8
-		C_Vehicle		m_pVehicle;     // 00A8 - 00CC
-        pad(ICCar, pad2, 0x1BC);        // 00CC - 0288
-        vec3_t          m_vecMoveSpeed; // 0288 - 0294
-        float           m_fSpeed;       // 0294 - 0298
-        float           m_fSpeedDir;    // 0298 - 029C
+        CCarVFTable     *m_pVFTable;        // 0000 - 0004
+        pad(ICCar, pad1, 0x74);             // 0004 - 0078
+        int             m_nSlotSDS;         // 0078 - 007C
+		pad(ICCar, pad2, 0x2C);             // 007C - 00A8
+		C_Vehicle		m_pVehicle;         // 00A8 - 00CC
+        pad(ICCar, pad3, 0x1BC);            // 00CC - 0288
+        vec3_t          m_vecMoveSpeed;     // 0288 - 0294
+        float           m_fSpeed;           // 0294 - 0298
+        float           m_fSpeedDir;        // 0298 - 029C
 	};
 
 	class C_Car : public ICCar
@@ -61,6 +79,17 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, double>(0x04476E0, this);
 		}
+        
+        vec3_t GetWheelPos(int index)
+        {
+            if (index <= 0) {
+                index = 1;
+            }
+
+            vec3_t pos;
+            Mem::InvokeFunction<Mem::call_this, int>(0x9BCB90, this, &pos, index - 1);
+            return pos;
+        }
 
         void Init(int initProps)
         {
@@ -106,6 +135,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BCEB0, this);
 		}
+
+        void RestoreCar()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x4E9890, this, 1, 0, 0);
+        }
 
 		void SetMotorDamage(float damage)
 		{
