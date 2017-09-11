@@ -1,6 +1,8 @@
 static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
 
 void module_car_callback_create(librg_event_t *event) {
+    if (librg_entity_type(event->entity) != TYPE_CAR) return;
+
     mod_log("creating vehicle\n");
 
     auto transform = librg_fetch_transform(event->entity);

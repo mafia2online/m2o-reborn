@@ -2,8 +2,7 @@
  * Graphics init
  * @return
  */
-bool graphics_init()
-{
+bool graphics_init() {
     mod_log("graphics_init\n");
     CDirect3D9Hook::Install();
     return true;
@@ -12,8 +11,7 @@ bool graphics_init()
 /**
  * Terminate gfx
  */
-void graphics_terminate()
-{
+void graphics_terminate() {
     CDirect3D9Hook::Uninstall();
 }
 
@@ -22,8 +20,7 @@ void graphics_terminate()
  * @param w
  * @param h
  */
-void graphics_dimensions(int *w, int *h)
-{
+inline void graphics_dimensions(int *w, int *h) {
     *w = static_cast<int>(mod.graphics.present_params.BackBufferWidth);
     *h = static_cast<int>(mod.graphics.present_params.BackBufferHeight);
 }
@@ -33,8 +30,7 @@ void graphics_dimensions(int *w, int *h)
  * @param pDevice
  * @param pPresentationParameters
  */
-void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
-{
+void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
     mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)\n", pDevice, pPresentationParameters);
 
     mod.graphics.font_manager = (void *)new CFontManager(pDevice);
@@ -75,8 +71,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
  * On device lost callback
  * @param pDevice
  */
-void graphics_device_lost(IDirect3DDevice9 * pDevice)
-{
+void graphics_device_lost(IDirect3DDevice9 * pDevice) {
     mod_log("CGraphicsManager::OnDeviceLost(%x)", pDevice);
 
     if (mod.graphics.font_manager) {
@@ -91,8 +86,7 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice)
  * @param pDevice
  * @param pPresentationParameters
  */
-void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
-{
+void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
     mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
     mod.graphics.device = pDevice;
@@ -108,16 +102,14 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
 /**
  * On device pre-render callback
  */
-void graphics_device_prerender(void)
-{
+inline void graphics_device_prerender(void) {
     // todo
 }
 
 /**
  * On device render callback
  */
-void graphics_device_render(void)
-{
+inline void graphics_device_render(void) {
     if (!mod.window) {
         return;
     }

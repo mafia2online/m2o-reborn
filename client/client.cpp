@@ -60,8 +60,8 @@
 #endif
 
 // global vars for nk
-struct nk_context*      nk_ctx;
-struct nk_font_atlas*   nk_atlas;
+struct nk_context*    nk_ctx;
+struct nk_font_atlas* nk_atlas;
 
 // tools
 struct mod_path_t {
@@ -131,17 +131,19 @@ struct mod_t {
     mod_path_t  paths;
     mod_state_t state;
 
-    std::queue<mod_wndmsg_t> wnd_msg;
     mod_mouse_t     mouse;
-    mod_graphics_t  graphics;
     librg_entity_t  player;
+    mod_graphics_t  graphics;
 
+    // game tick props
     u64 last_update;
     f32 last_delta;
 
+    // game related states
     b32 input_blocked;
     b32 spawned;
 
+    // collection of mutexes
     struct {
         zpl_mutex_t log;
         zpl_mutex_t wnd_msg;
@@ -149,6 +151,7 @@ struct mod_t {
 
     // other
     std::ofstream   debug_stream;
+    std::queue<mod_wndmsg_t> wnd_msg;
 };
 
 // public interface definitions
@@ -228,12 +231,12 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 /**
  * Our main process function
  */
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
-            DisableThreadLibraryCalls(hModule);
-            mod_attach(hModule);
+            DisableThreadLibraryCalls(module);
+            mod_attach(module);
             break;
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:
