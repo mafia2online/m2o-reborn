@@ -22,7 +22,7 @@ void game_connect()
     auto ped = (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed();
     ((M2::C_Player2*)ped)->LockControls(false);
     ped->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
-
+	
 	char *arg = GetCommandLine();
 	LPCSTR tok = strrchr(arg, '"');
 	if (tok == NULL) {
@@ -40,9 +40,25 @@ void game_connect()
 	}
 
 	if (tok != NULL) {
-		while (*tok == ' ') ++tok;
-		mod_log("Connection IP: '%s'", tok);
-		librg_network_start({ (char *)tok, 27010 });
+		while (zpl_char_is_space(*tok)) ++tok;
+		
+		char hostname[16] = { 0 }; char hr = 0;
+		char port_raw[5]  = { 0 }; char pr = 0;
+		int port = 27010;
+
+		while (*tok && (*tok != ':' && !zpl_char_is_space(*tok))) {
+			hostname[hr++] = *tok++;
+		}
+
+		if (*tok++ == ':') {
+			while (*tok && zpl_char_is_digit(*tok)) {
+				port_raw[pr++] = *tok++;
+			}
+
+			port = atoi(port_raw);
+		}
+		
+		librg_network_start({ hostname, port });
 	}
 	else {
 		librg_network_start({ "localhost", 27010 });
