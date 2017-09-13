@@ -5,6 +5,9 @@
 
 #include "m2sdk.h"
 
+#define M2_CAR_MODELS 54
+#define M2_PED_MODELS 175
+
 #define MODELMGR_MAX			1000
 #define SDS_LOAD_DIR_ADDR		0x190ABDC
 #define SDS_LOAD_DIR_CARS		"/sds/cars/"
@@ -12,7 +15,7 @@
 #define SDS_LOAD_DIR_PLAYER		"/sds/player/"
 #define SDS_LOAD_DIR_TRAFFIC    "/sds/traffic/"
 
-static char * VehicleModels[] =
+static char * VehicleModels[M2_CAR_MODELS] =
 {
     "ascot_baileys200_pha",			"berkley_kingfisher_pha",			"fuel_tank",
     "gai_353_military_truck",		"hank_b",							"hank_fueltank",					"hot_rod_1",
@@ -30,7 +33,7 @@ static char * VehicleModels[] =
     "trailer_sg",					"ulver_newyorker",					"ulver_newyorker_p",                "walker_rocket",            "walter_coupe"
 };
 
-static char * PlayerModels[][2] =
+static char * PlayerModels[M2_PED_MODELS][2] =
 {
     // Player
     { "/sds/player/", "vitarmy" },{ "/sds/player/", "vitksl" },{ "/sds/player/", "vitksl2" },
@@ -104,12 +107,13 @@ namespace M2
 {
     namespace Models
     {
-        void GetVehicleModelFromID(const int id, std::string *model)
+        inline void GetVehicleModelFromID(const int id, std::string *directory, std::string *model)
         {
+            directory->assign(SDS_LOAD_DIR_CARS);
             model->assign(VehicleModels[id]);
         }
 
-        void GetPlayerModelFromiD(const int id, std::string *directory, std::string *model)
+        inline void GetPlayerModelFromID(const int id, std::string *directory, std::string *model)
         {
             directory->assign(PlayerModels[id][0]);
             model->assign(PlayerModels[id][1]);
