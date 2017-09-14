@@ -1,7 +1,7 @@
 static M2::Wrappers::ModelManager *model_manager = nullptr;
 
 struct mod_model_node_t {
-    M2::Wrappers::ModelManager *manager;
+    M2::Wrappers::GameModelManager *manager;
     M2::C_Model *model;
     b32 cached;
     u32 count;
@@ -31,33 +31,38 @@ mod_model_node_t *model_fetch_node(M2::EntityTypes type, i32 model) {
     mod_model_node_t *node;
 
     switch (type) {
-        case M2::Entity_Human:  node = &mod_model_cache.ped; mod_assert(model < M2_PED_MODELS); break;
-        case M2::Entity_Car:    node = &mod_model_cache.car; mod_assert(model < M2_CAR_MODELS); break;
+        case M2::Entity_Human: mod_assert(model < M2_PED_MODELS); node = &mod_model_cache.ped[model]; break;
+        case M2::Entity_Car:   mod_assert(model < M2_CAR_MODELS); node = &mod_model_cache.car[model]; break;
     }
 
-    if (!node[model]->cached) {
-        node[model]->cached = true;
+    if (!node->cached) {
+        node->cached = true;
 
-        char *native_dir;
-        char *native_model;
-
-        switch (type) {
-            case M2::Entity_Human:  M2::Models::GetPlayerModelFromID(model, native_dir, native_model); break;
-            case M2::Entity_Car:    M2::Models::GetVehicleModelFromID(model, native_dir, native_model); break;
-        }
-
-        node[model]->manager = model_manager->Load(native_dir, native_model); mod_assert(node[model]->manager);
-        node[model]->model   = M2::C_Core::Get()->AllocateModel(2); mod_assert(model);
-        node[model]->model->CloneHierarchy(node[model]->manager->GetModelManager()->m_pModel);
+        std::string native_dir;
+        std::string native_model;
 
         switch (type) {
-            case M2::Entity_Human:  model->SetName("m2online_ped"); model->MarkForNotify(2); break;
-            case M2::Entity_Car:    model->SetName("m2online_car"); model->MarkForNotify(6); break;
+            case M2::Entity_Human: M2::Models::GetPlayerModelFromID(model, &native_dir, &native_model); break;
+            case M2::Entity_Car:   M2::Models::GetVehicleModelFromID(model, &native_dir, &native_model); break;
         }
+
+        node->manager = model_manager->Load(native_dir.c_str(), native_model.c_str()); mod_assert(node->manager);
+        node->model   = M2::C_Core::Get()->AllocateModel(2); mod_assert(node->model);
+        node->model->CloneHierarchy(node->manager->GetModelManager()->m_pModel);
+
+        switch (type) {
+            case M2::Entity_Human: node->model->SetName("m2online_ped"); node->model->MarkForNotify(2); break;
+            case M2::Entity_Car:   node->model->SetName("m2online_car"); node->model->MarkForNotify(6); break;
+        }
+
+        mod_log("model_fetch_node: adding to cache\n");
+    }
+    else {
+        mod_log("model_fetch_node: using from cache\n");
     }
 
-    node[model]->count++;
-    return node[model];
+    node->count++;
+    return node;
 }
 
 void model_free() {
@@ -74,17 +79,17 @@ void create_game_entity(librg_entity_t entity, M2::EntityTypes type, i32 model) 
 
     auto trans  = librg_fetch_transform(entity);
     auto mnode  = model_fetch_node(M2::Entity_Player, 0);
-    auto object = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Entity>(type); mod_assert(game_object);
+    auto object = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Entity>(type); mod_assert(object);
 
     // setting up the model
     /**/ if (type == M2::Entity_Human) {
-        object->SetModel(mnode->model)
+        object->SetModel(mnode->model);
         object->Setup();
     }
     else if (type == M2::Entity_Car) {
-        object->Init(NULL); // NOTE: should it also be in the human ?
-        object->SetModel(mnode->model)
-        object->m_nSlotSDS = mnode->manager->GetModelManager()->m_pSlot->m_iSlotNumber;
+        ((M2::C_Car*)object)->Init(NULL); // NOTE: should it also be in the human ?
+        object->SetModel(mnode->model);
+        ((M2::C_Car*)object)->m_nSlotSDS = mnode->manager->GetModelManager()->m_pSlot->m_iSlotNumber;
         object->Setup();
     }
 
@@ -100,7 +105,7 @@ void create_game_entity(librg_entity_t entity, M2::EntityTypes type, i32 model) 
     librg_attach_gamedata(entity, { object });
 }
 
-void destroy_game_entity(librg_enitty_t entity) {
+void destroy_game_entity(librg_entity_t entity) {
     auto gamedata = librg_fetch_gamedata(entity);
     mod_assert(gamedata && gamedata->object);
     librg_detach_gamedata(entity);
