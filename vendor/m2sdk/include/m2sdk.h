@@ -38,6 +38,8 @@
 #include "CRenderCamera.hpp"
 #include "CResources.hpp"
 #include "CScene.hpp"
+#include "CScriptMachine.hpp"
+#include "CScriptMachineManager.hpp"
 #include "CSDSManager.hpp"
 #include "CSDSModelManager.hpp"
 #include "CShotManager.hpp"
@@ -53,4 +55,5 @@
 #include "CWeatherManager.hpp"
 
 /* Wrappers */
+#include "../wrappers/lua.hpp"
 #include "../wrappers/models.hpp"
