@@ -7,6 +7,7 @@
 #include "CCar.hpp"
 #include "CCarManager.hpp"
 #include "CCore.hpp"
+#include "CDoor.hpp"
 #include "CEntity.hpp"
 #include "CEntityFactory.hpp"
 #include "CEntityMessage.hpp"
@@ -17,6 +18,7 @@
 #include "CGameCameraMafia.hpp"
 #include "CGameGuiModule.hpp"
 #include "CGameRenderingSystemModule.hpp"
+#include "CGfxEffects.hpp"
 #include "CGfxEnvironmentEffects.hpp"
 #include "CHints.hpp"
 #include "CHud.hpp"
@@ -48,6 +50,7 @@
 #include "CTimer.hpp"
 #include "CTrafficStreaming.hpp"
 #include "CVehicle.hpp"
+#include "CWeatherManager.hpp"
 
 /* Wrappers */
 #include "../wrappers/models.hpp"
