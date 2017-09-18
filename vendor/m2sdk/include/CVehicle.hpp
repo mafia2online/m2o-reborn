@@ -45,12 +45,12 @@ namespace M2
 	class C_Vehicle : public ICVehicle
 	{
 	public:
-		void AddVehicleFlags(int unk, int unk2)
+		void AddVehicleFlags(unsigned int unk, int unk2)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x12637E0, this, unk, unk2);
 		}
 
-		void ClearVehicleFlags(int unk, int unk2)
+		void ClearVehicleFlags(unsigned int unk, int unk2)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x1217180, this, unk, unk2);
 		}
@@ -102,6 +102,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x1217610, this, brake);
 		}
 
+        void SetDynamic(bool dynamic, int unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x12169F0, this, dynamic, unk);
+        }
+
 		void SetEngineOn(bool unk, bool unk2)
 		{
 			Mem::InvokeFunction<Mem::call_this, bool>(0x1263850, this, unk, unk2);
@@ -147,6 +152,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, bool>(0x11F7B80, this, toggle, light);
 		}
 
+        void SetSpeedFloat(float speed)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9A01A0, this, speed);
+        }
+
 		void SetSPZText(const char *text)
 		{
 			if (strlen(text) > 8)
@@ -164,5 +174,10 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x1263620, this, unk, unk2);
 		}
+
+        void StopAllSounds()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x1234530, this);
+        }
 	};
 };
