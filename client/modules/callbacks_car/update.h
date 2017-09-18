@@ -1,4 +1,4 @@
-void module_car_callback_clientstream(librg_event_t *event) {
+﻿void module_car_callback_clientstream(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_CAR) return;
 
     auto transform = librg_fetch_transform(event->entity);

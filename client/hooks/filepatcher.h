@@ -1,4 +1,4 @@
-namespace tools {
+﻿namespace tools {
 
     /**
      * Callback type

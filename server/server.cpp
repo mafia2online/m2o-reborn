@@ -1,4 +1,4 @@
-#define MOD_SERVER
+﻿#define MOD_SERVER
 
 #include "includes.h"
 
@@ -80,6 +80,7 @@ int main() {
     librg_event_add(LIBRG_CONNECTION_REQUEST, on_connection_request);
     librg_event_add(LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
 
+    module_ped_init();
     module_car_init();
 
     librg_network_start(address);

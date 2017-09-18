@@ -1,4 +1,6 @@
-void module_car_callback_interpolate(librg_entity_t entity) {
+﻿void module_car_callback_interpolate(librg_entity_t entity) {
+    if (librg_entity_type(entity) != TYPE_CAR) return;
+
     auto transform   = librg_fetch_transform(entity);
     auto interpolate = librg_fetch_interpolate(entity);
     auto gamedata    = librg_fetch_gamedata(entity);
@@ -20,5 +22,5 @@ void module_car_callback_interpolate(librg_entity_t entity) {
 
     quat_t drotation;
     zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, interpolate->delta);
-    gamedata->object->SetRotation(drotation);
+    //gamedata->object->SetRotation(drotation);
 }

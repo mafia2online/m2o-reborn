@@ -73,9 +73,6 @@ void mod_attach(HMODULE module)
     librg_event_add(LIBRG_CONNECTION_ACCEPT, game_connected);
     librg_event_add(LIBRG_CONNECTION_REFUSE, game_disconnected);
 
-    module_ped_init();
-    module_car_init();
-
     if (graphics_init() == false) {
         return mod_exit("Unable to init Graphics Manager");
     }
@@ -104,7 +101,9 @@ void mod_exit(std::string reason)
 {
     mod_log("exiting %s\n", reason.c_str());
 
+    model_free();
     librg_free();
+
     mod.debug_stream.close();
 
     zpl_mutex_destroy(&mod.mutexes.log);

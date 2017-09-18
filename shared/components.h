@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Entity types
  */
 enum {
@@ -41,6 +41,7 @@ typedef struct {
         // vec3_t velocity;
 
         f32 delta;
+        i32 step;
     } librg_component(interpolate);
 
     typedef struct {

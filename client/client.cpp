@@ -1,4 +1,4 @@
-#define MOD_CLIENT
+﻿#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -229,6 +229,8 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "core/graphics.h"
 #include "core/game.h"
 #include "core/mod.h"
+
+#include "hacks.h"
 
 /**
  * Our main process function

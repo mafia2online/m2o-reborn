@@ -1,9 +1,16 @@
-float ztime = 0; // debugging time stuff, nice to have for now
+﻿float ztime = 0; // debugging time stuff, nice to have for now
+
+void hackit();
+void hackitick();
 
 void game_init() {
     mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
+
+    model_init();
+    module_ped_init();
+    module_car_init();
 }
 
 void game_connected(librg_event_t *event) {
@@ -113,6 +120,14 @@ void game_tick() {
         librg_send(MOD_VEHICLE_CREATE, data, {});
     }
 
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        librg_fetch_gamedata(lastcar)->object->Deactivate();
+    }
+
+    if (GetAsyncKeyState(VK_F7) & 0x1) {
+        librg_fetch_gamedata(lastcar)->object->Activate();
+    }
+
     if (GetAsyncKeyState(VK_F9) & 0x1) {
         // send vehicle create request onto server
         librg_send(MOD_VEHICLE_ENTER, data, {});
@@ -122,4 +137,10 @@ void game_tick() {
         game_connect();
         mod.spawned = true;
     }
+
+    if (GetAsyncKeyState(VK_F4) & 0x1) {
+        hackit();
+    }
+
+    hackitick();
 }

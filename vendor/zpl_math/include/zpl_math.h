@@ -1,4 +1,4 @@
-/*
+﻿/*
 
 ZPL - Math module
 

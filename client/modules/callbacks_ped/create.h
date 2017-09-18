@@ -1,4 +1,4 @@
-void module_ped_callback_create(librg_event_t *event) {
+﻿void module_ped_callback_create(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_PED) return;
 
     auto transform = librg_fetch_transform(event->entity);
@@ -56,4 +56,5 @@ void module_ped_callback_create(librg_event_t *event) {
     mod_log("Created at %x!\n", human);
 
     librg_attach_gamedata(event->entity, { (M2::C_Entity*)human, pPedModelManager });
+    librg_attach_interpolate(event->entity, { 0 });
 }
