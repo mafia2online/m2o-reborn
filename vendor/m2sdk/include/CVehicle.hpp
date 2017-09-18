@@ -92,6 +92,17 @@ namespace M2
             return retn;
         }
 
+        //CRASHY
+        void Lock()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0xD7CDC0, this);
+        }
+
+        void OpenDoor(int unk, int door, bool open)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x12618F0, this, unk, door, open);
+        }
+
 		void SetBeaconLightOn(bool enable)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x120CC10, this, enable);
@@ -101,6 +112,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x1217610, this, brake);
 		}
+
+        void SetDoorFree(int door, bool free)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x1261ED0, this, door, free);
+        }
 
         void SetDynamic(bool dynamic, int unk)
         {
@@ -178,6 +194,12 @@ namespace M2
         void StopAllSounds()
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x1234530, this);
+        }
+
+        //CRASHY
+        void Unlock()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0xD6AEA0, this);
         }
 	};
 };

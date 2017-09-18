@@ -106,18 +106,6 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, bool>(0x09A2280, this, seat);
 		}
 
-        //CRASHY
-        /*
-        void Lock()
-        {
-            Mem::InvokeFunction<Mem::call_this, int>(0xD7CDC0, this);
-        }
-
-        void Unlock()
-        {
-            Mem::InvokeFunction<Mem::call_this, int>(0xD6AEA0, this);
-        }*/
-
 		void LockEntryPoints()
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09CCA50, this);

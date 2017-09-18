@@ -7,6 +7,7 @@ enum E_PlayerMessage
     MESSAGE_MOD_BREAKIN_CAR
 };
 
+/* Messages from the game that we catched */
 void player_game_message(M2::C_EntityMessage *message)
 {
     
@@ -26,6 +27,7 @@ void player_game_message(M2::C_EntityMessage *message)
     }
 }
 
+/* Messages from the mod own hooking */
 void player_mod_message(E_PlayerMessage message)
 {
     switch (message)
@@ -47,4 +49,11 @@ void player_mod_message(E_PlayerMessage message)
             mod_log("Start to leave car\n");
         }
     }
+}
+
+/* When the player want to enter into vehicle */
+/* Return true and the player will enter, false and the player will be stuck */
+bool player_request_vehicle_enter()
+{
+    return false;
 }
