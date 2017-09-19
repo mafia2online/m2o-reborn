@@ -178,9 +178,18 @@ namespace tools {
         }
     }
 
+    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+    static M2::C_Car *tryToEnterCar = nullptr;
     void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
     {
-        if (player_request_vehicle_enter() == true) {
+        __asm
+        {
+            mov ecx, esi;
+            call CHuman2CarWrapper__GetCar;
+            mov tryToEnterCar, eax;
+        }
+         
+        if (player_request_vehicle_enter(tryToEnterCar) == true) {
             __asm {
                 mov     al, 1
                 pop     esi
