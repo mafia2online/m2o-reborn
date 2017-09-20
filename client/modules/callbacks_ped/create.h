@@ -7,29 +7,19 @@
     const char *model = "cvezjon";
 
     M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
-    if (!pModelManager) {
-        return;
-    }
+    mod_assert(pModelManager);
 
     M2::Wrappers::GameModelManager *pPedModelManager = pModelManager->Load(directory, model);
-    if (!pPedModelManager) {
-        return;
-    }
+    mod_assert(pPedModelManager);
 
     M2::C_Human2 *human = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human);
-    if (!human) {
-        return;
-    }
+    mod_assert(human);
 
     M2::C_Model *pModel = M2::C_Core::Get()->AllocateModel(2);
-    if (!pModel) {
-        return;
-    }
+    mod_assert(pModel);
 
     pModel->CloneHierarchy(pPedModelManager->GetModelManager()->m_pModel);
-    if (!pModel) {
-        return;
-    }
+    mod_assert(pModel);
 
     pModel->SetName("m2online_ped");
     pModel->MarkForNotify(2);
@@ -57,4 +47,5 @@
 
     librg_attach_gamedata(event->entity, { (M2::C_Entity*)human, pPedModelManager });
     librg_attach_interpolate(event->entity, { 0 });
+    librg_attach_ped(event->entity, { 0 });
 }

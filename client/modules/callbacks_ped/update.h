@@ -1,84 +1,93 @@
-﻿void module_ped_callback_clientstream(librg_event_t *event) {
+﻿#define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
+
+void module_ped_callback_clientstream(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_PED) return;
 
     auto transform = librg_fetch_transform(event->entity);
-    auto gamedata  = librg_fetch_gamedata(event->entity);
+    auto gamedata = librg_fetch_gamedata(event->entity);
+    auto ped = librg_fetch_ped(event->entity);
 
-    transform->position = gamedata->object->GetPosition();
-    transform->rotation = gamedata->object->GetRotation();
+    // make sure we have all objects
+    mod_assert(ped && gamedata && gamedata->object);
 
-    zplm_vec3_t direction;// = ((M2::C_Human2 *)gamedata->object)->GetDirection();
-    Mem::InvokeFunction<Mem::call_this, void>(gamedata->object->m_pVFTable->GetDirection, (M2::C_Player2 *)gamedata->object, &direction);
-    direction.x = 0.0f;
+    // read new values of entity
+    auto new_position = gamedata->object->GetPosition();
+    auto diff_position = new_position - transform->position;
+    transform->position = new_position;
 
-    // mod_log("%f\n", direction.w);
-    librg_data_wptr(event->data, &direction, sizeof(direction));
+    // lower limits
+    // 0.05 - 0.06 - walking
+    // 0.13 - 0.14 - running
+    // 0.19 - 0.20 - sprinting
+    f32 ped_speed = zplm_vec3_mag(diff_position);
+
+    /**/ if (ped_speed > 0.19f) {
+        ped->move_state = (u8)M2::HUMAN_MOVE_MODE_SPRINT;
+    }
+    else if (ped_speed > 0.13f) {
+        ped->move_state = (u8)M2::HUMAN_MOVE_MODE_RUN;
+    }
+    else if (ped_speed > 0.01f) {
+        ped->move_state = (u8)M2::HUMAN_MOVE_MODE_WALK;
+    }
+    else {
+        ped->move_state = (u8)M2::HUMAN_MOVE_MODE_BREATH;
+    }
+
+    ped->is_accelerating = (ped_speed > ped->prev_speed);
+    ped->prev_speed = ped_speed;
+
+    // assign and send new values
+    vec3_t newdir; zplm_vec3_norm0(&newdir, diff_position);
+    if ((valid_dir(newdir.x) || valid_dir(newdir.y)) && ped->is_accelerating) {
+        ped->direction = (ped->direction + newdir) * 0.5f; // calc average
+    }
+
+    // write last valid direction
+    librg_data_wptr(event->data, ped, sizeof(ped_t));
 }
-
-#define zplm_sign(x) ((x) >= 0 ? (x) == 0 ? 0 : 1 : -1)
 
 void module_ped_callback_update(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_PED) return;
 
+    auto interpolate = librg_fetch_interpolate(event->entity);
     auto transform = librg_fetch_transform(event->entity);
     auto gamedata  = librg_fetch_gamedata(event->entity);
-    auto interpolate = librg_fetch_interpolate(event->entity);
+    auto ped       = librg_fetch_ped(event->entity);
 
-    librg_assert(gamedata && gamedata->object);
+    // make sure we have all objects
+    librg_assert(ped && gamedata && gamedata->object);
 
-    vec3_t direction;
-    librg_data_rptr(event->data, &direction, sizeof(direction));
+    // interpolation stuff
+    if (interpolate) {
+        interpolate->lposition = interpolate->tposition;
+        interpolate->lrotation = interpolate->trotation;
 
-    // if this car is not interpolable
-    if (!interpolate) return;
+        interpolate->tposition = transform->position;
+        interpolate->trotation = transform->rotation;
 
-    interpolate->lposition = interpolate->tposition;
-    interpolate->lrotation = interpolate->trotation;
+        interpolate->delta = 0.0f;
+    }
 
-    interpolate->tposition = transform->position;
-    interpolate->trotation = transform->rotation;
-
-    interpolate->delta = 0.0f;
+    librg_data_rptr(event->data, ped, sizeof(ped_t));
 
     // apply movement anim
     {
-        // get direction
-        vec3_t dir = interpolate->tposition - interpolate->lposition;
+        auto extr_shift = ped->direction * 5.0f; /* create extrapolated shift for ped */
+        auto targ_pos = transform->position + extr_shift;
 
-        //print_posm(dir, "going to");
-        // round it up
-        //dir.x = zplm_sign(dir.x);
-        //dir.y = zplm_sign(dir.y);
-        const float coef = 100.0f;
-        dir.x = zplm_clamp(dir.x * 1000.0f, -coef, coef);
-        dir.y = zplm_clamp(dir.y * 1000.0f, -coef, coef);
-        dir.z = 0.0f;
+        targ_pos.z = transform->position.z;
+        gamedata->object->SetDirection(vec3(ped->direction.x, ped->direction.y, 0.0f));
 
-        
-
-        // skip next steps
-        if (dir.x == 0.0f && dir.y == 0.0f) {
-            if (interpolate->step++ > 5) {
-                interpolate->step = 0;
-
-                mod_log("stopping player\n");
-                auto ped = ((M2::C_Human2*)gamedata->object);
-
-                M2::C_SyncObject *pSyncObject = nullptr;
-                ped->GetScript()->ScrMoveV(&pSyncObject, interpolate->tposition, M2::HUMAN_MOVE_MODE_END, interpolate->tposition, true);
-
-                return;
-            }
+        // doesnt occur
+        // TODO: remove
+        if (targ_pos.x == transform->position.x && targ_pos.y == transform->position.y) {
+            return;
         }
 
-        vec3_t ext; // extrapolated value
-        zplm_vec3_mul(&ext, dir, 15.0f);
-
-        vec3_t tar = ext + transform->position;
-
-        auto ped = ((M2::C_Human2*)gamedata->object);
         M2::C_SyncObject *pSyncObject = nullptr;
-        ped->GetScript()->ScrMoveV(&pSyncObject, tar, M2::HUMAN_MOVE_MODE_RUN, tar, true);
+        ((M2::C_Human2*)gamedata->object)->GetScript()->ScrMoveV(
+            &pSyncObject, targ_pos, (M2::eHumanMoveMode)ped->move_state, vec3(ped->direction.x, ped->direction.y, 0.0f), true
+        );
     }
-
 }

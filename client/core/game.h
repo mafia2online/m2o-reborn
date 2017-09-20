@@ -1,4 +1,4 @@
-﻿float ztime = 0; // debugging time stuff, nice to have for now
+float ztime = 0; // debugging time stuff, nice to have for now
 
 void hackit();
 void hackitick();
@@ -8,7 +8,7 @@ void game_init() {
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
 
-    model_init();
+    // model_init();
     module_ped_init();
     module_car_init();
 }
@@ -16,11 +16,13 @@ void game_init() {
 void game_connected(librg_event_t *event) {
     mod_log("connected to the server\n");
     mod.player = event->entity;
+    librg_attach_ped(event->entity, {0});
     librg_attach_gamedata(event->entity, { (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed() });
 }
 
 void game_disconnected(librg_event_t *event) {
     mod_log("disconnected form the server\n");
+    librg_detach_ped(event->entity);
     librg_detach_gamedata(event->entity);
 }
 

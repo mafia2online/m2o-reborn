@@ -15,7 +15,11 @@ enum {
  * (shared)
  */
 typedef struct {
+    i8 move_state;
     zplm_vec3_t direction;
+
+    f32 prev_speed;
+    b8 is_accelerating;
 } librg_component(ped);
 
 typedef struct {
