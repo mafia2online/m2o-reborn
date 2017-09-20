@@ -79,12 +79,6 @@ void module_ped_callback_update(librg_event_t *event) {
         targ_pos.z = transform->position.z;
         gamedata->object->SetDirection(vec3(ped->direction.x, ped->direction.y, 0.0f));
 
-        // doesnt occur
-        // TODO: remove
-        if (targ_pos.x == transform->position.x && targ_pos.y == transform->position.y) {
-            return;
-        }
-
         M2::C_SyncObject *pSyncObject = nullptr;
         ((M2::C_Human2*)gamedata->object)->GetScript()->ScrMoveV(
             &pSyncObject, targ_pos, (M2::eHumanMoveMode)ped->move_state, vec3(ped->direction.x, ped->direction.y, 0.0f), true

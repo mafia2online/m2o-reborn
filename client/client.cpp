@@ -1,4 +1,4 @@
-﻿#define MOD_CLIENT
+#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -231,6 +231,10 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "core/mod.h"
 
 #include "hacks.h"
+
+// NOTE(zaklaus): Tell the OS to prefer dedicated video card.
+DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
+int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
 
 /**
  * Our main process function
