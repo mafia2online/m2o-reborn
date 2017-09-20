@@ -1,4 +1,4 @@
-float ztime = 0; // debugging time stuff, nice to have for now
+﻿float ztime = 0; // debugging time stuff, nice to have for now
 
 void hackit();
 void hackitick();
@@ -141,8 +141,8 @@ void game_tick() {
     }
 
     if (GetAsyncKeyState(VK_F4) & 0x1) {
-        hackit();
+        //hackit();
     }
 
-    hackitick();
+    //hackitick();
 }
