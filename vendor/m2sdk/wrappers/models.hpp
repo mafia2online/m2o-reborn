@@ -178,8 +178,10 @@ namespace M2
 
             bool Load(const char *directory, const char *model)
             {
-                if (!m_pModelManager)
+                if (!m_pModelManager) {
+                    mod_log("[GameModelManager]: Null pointer\n");
                     return false;
+                }
 
                 bool result = false;
                 ICPlayerModelManager *pModelManager = m_pModelManager;
@@ -239,15 +241,19 @@ namespace M2
             GameModelManager    *Load(const char *directory, const char *model)
             {
                 if (m_pModelManagers.size() >= MODELMGR_MAX) {
+                    mod_log("[ModelManager]: Max models error\n");
                     return nullptr;
                 }
 
                 GameModelManager *pModelManager = new GameModelManager();
-                if (!pModelManager)
+                if (!pModelManager) {
+                    mod_log("[ModelManager]: GameModelManager null pointer\n");
                     return nullptr;
+                }
 
                 if (!pModelManager->Load(directory, model)) {
                     delete(pModelManager);
+                    mod_log("[ModelManager]: Can't load model\n");
                     return nullptr;
                 }
 

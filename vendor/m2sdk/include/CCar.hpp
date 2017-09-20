@@ -55,6 +55,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BCF30, this);
 		}
 
+        void DoorChangeState(int door)
+        {
+            Mem::InvokeFunction<Mem::call_this, void *>(0x4DBE10, this, door);
+        }
+
 		int GetActualPlayerSeatIndex()
 		{
 			return Mem::InvokeFunction<Mem::call_this, int>(0x09A22D0, this);
@@ -135,6 +140,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BCEB0, this);
 		}
+
+        void ResetRigidBody()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x46CCA0, this);
+        }
 
         void RestoreCar()
         {

@@ -154,6 +154,57 @@ namespace tools {
         __asm jmp[CPlayer2__UpdateInput__Return];
     }
 
+    /* Actions patching */
+
+    void __declspec(naked) CCarActionEnter__TestAction__Hook()
+    {
+        __asm {
+            pop     edi;
+            mov     al, 1;
+            pop     esi;
+            add     esp, 0Ch;
+            retn    4;
+        }
+    }
+
+    void __declspec(naked) CCarActionBreakIn__TestAction__Hook()
+    {
+        __asm {
+            pop     edi
+            pop     esi
+            mov     al, 0
+            pop     ebx
+            retn    4
+        }
+    }
+
+    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+    static M2::C_Car *tryToEnterCar = nullptr;
+    void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+    {
+        __asm
+        {
+            mov ecx, esi;
+            call CHuman2CarWrapper__GetCar;
+            mov tryToEnterCar, eax;
+        }
+         
+        if (player_request_vehicle_enter(tryToEnterCar) == true) {
+            __asm {
+                mov     al, 1
+                pop     esi
+                retn    8
+            }
+        }
+        else {
+            __asm {
+                mov     al, 0
+                pop     esi
+                retn    8
+            }
+        }
+    }
+
     /**
      * Game hooking calls
      */
@@ -176,6 +227,11 @@ namespace tools {
         // Crash fix on C_Frame::Release
         Mem::Hooks::InstallJmpPatch(0x14E5BC0, (DWORD)FrameReleaseFix);
         Mem::Hooks::InstallJmpPatch(0x12F0DB0, (DWORD)FrameReleaseFix2);
+
+        // Patchs for enter action testing
+        Mem::Hooks::InstallJmpPatch(0xA3E8E1, (DWORD)CCarActionEnter__TestAction__Hook);
+        Mem::Hooks::InstallJmpPatch(0xA3F0A6, (DWORD)CCarActionBreakIn__TestAction__Hook);
+        Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
 
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);
@@ -201,12 +257,12 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
         Mem::Hooks::InstallJmpPatch(0xAC6E57, 0xAC6F79);
 
-        // Disabled hooks (last edited by MyU)
-        // AddEvent = (DWORD)Mem::Hooks::InstallJmpPatch(0x11A58A0, (DWORD)C_TickedModuleManager__AddEvent);
-        // CallEvent = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199B40, (DWORD)C_TickedModuleManager__CallEvent);
-        // CallEvents = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199BA0, (DWORD)C_TickedModuleManager__CallEvents);
-        // CallEventByIndex = (DWORD)Mem::Hooks::InstallDetourPatch(0x1199960, (DWORD)C_TickedModuleManager__CallEventByIndex);
-        // Mem::Hooks::InstallJmpPatch(0x5CFCD0, (DWORD)HOOK_C_SDSManager__ActivateStreamMapLine);
+        // Disable shop loading
+        //Mem::Utilites::PatchAddress(0x4731A0, 0x0004C2);
+        //Mem::Utilites::PatchAddress(0xAC4B80, 0x0004C2);
+
+        // Disable garages
+        //Mem::Utilites::PatchAddress(0xCD6E90, 0xC300B0);
     }
 
     /**
