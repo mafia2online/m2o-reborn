@@ -53,6 +53,7 @@
 #include "CTrafficStreaming.hpp"
 #include "CVehicle.hpp"
 #include "CWeatherManager.hpp"
+#include "CWrappersList.hpp"
 
 /* Wrappers */
 #include "../wrappers/lua.hpp"

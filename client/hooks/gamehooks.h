@@ -1,4 +1,4 @@
-﻿#include "CEntity.hpp"
+#include "CEntity.hpp"
 #include "CCar.hpp"
 #include "CGame.hpp"
 #include "CEntityMessage.hpp"
@@ -249,13 +249,20 @@ namespace tools {
         // Disable game reloading after death
         *(BYTE *)0x1CC397D = 1;
 
-        // Prevent game controlling engine state and radio
+        // Disable game controlling engine state and radio
         Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
         Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
 
         // Disable game pause when minimized or in background
         Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
         Mem::Hooks::InstallJmpPatch(0xAC6E57, 0xAC6F79);
+
+        // Disable game creating vehicle (common/police) map icons
+        Mem::Hooks::InstallJmpPatch(0x9CC219, 0x9CC220);//C_Car::OnActivate
+        Mem::Hooks::InstallJmpPatch(0x9CC53C, 0x9CC543);//C_Car::OnDeactivate
+        Mem::Hooks::InstallJmpPatch(0x4DCABD, 0x4DCAC4);//C_Car::SetSeatOwner
+        Mem::Hooks::InstallJmpPatch(0x4DCC7D, 0x4DCC8A);//C_Car::SetSeatOwner
+
 
         // Disable shop loading
         //Mem::Utilites::PatchAddress(0x4731A0, 0x0004C2);

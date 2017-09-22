@@ -1,4 +1,4 @@
-﻿/** @file CEntity.hpp
+/** @file CEntity.hpp
 *  @brief Game's Entity class
 *
 *
@@ -37,7 +37,7 @@ namespace M2
         DWORD           m_dwGUID;               // 001C - 0020
         DWORD           m_dwFlags;              // 0020 - 0024
         pad(ICEntity, pad1, 0x3C);              // 0024 - 0060
-        M2::C_Model     *m_pModel;              // 0060 - 0064
+        C_Model         *m_pModel;              // 0060 - 0064
     };
     class C_Entity : public ICEntity
     {
