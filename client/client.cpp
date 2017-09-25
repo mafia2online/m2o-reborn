@@ -150,7 +150,7 @@ struct mod_t {
     } mutexes;
 
     // other
-    std::ofstream   debug_stream;
+    zpl_file_t debug_log;
     std::queue<mod_wndmsg_t> wnd_msg;
 };
 
@@ -170,7 +170,7 @@ void mod_log(const char* format, ...) {
 
     zpl_mutex_lock(&mod.mutexes.log);
     zpl_printf(message);
-    mod.debug_stream << message;
+    zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
     zpl_mutex_unlock(&mod.mutexes.log);
 }
 

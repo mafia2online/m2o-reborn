@@ -1,4 +1,4 @@
-/**
+﻿/**
  * LIBRG - reguider library
  *
  * A library for building simple and elegant cross-platform mmo client-server solutions.
@@ -395,6 +395,7 @@ extern "C" {
         b32 rejected;
         librg_void **data;
         librg_entity_t entity;
+        void *custom;
     } librg_event_t;
 
     /**
@@ -1424,12 +1425,9 @@ extern "C" {
         for (isize i = 0; i < zpl_array_count(queue); i++) {
             librg_entity_t target = queue[i];
 
-            librg_assert(
-                librg_fetch_client(target) &&
-                librg_fetch_client(target)->peer
-            );
-
+            if (!librg_has_client(target)) continue;
             librg_peer_t peer = librg_fetch_client(target)->peer;
+            librg_assert(peer);
 
             if (peer == ignored) {
                 continue;

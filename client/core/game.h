@@ -1,4 +1,4 @@
-﻿float ztime = 0; // debugging time stuff, nice to have for now
+﻿float ztime = 0.5; // debugging time stuff, nice to have for now
 
 void hackit();
 void hackitick();
@@ -11,13 +11,17 @@ void game_init() {
     // model_init();
     module_ped_init();
     module_car_init();
+
+    M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
 }
 
 void game_connected(librg_event_t *event) {
     mod_log("connected to the server\n");
     mod.player = event->entity;
     librg_attach_ped(event->entity, {0});
-    librg_attach_gamedata(event->entity, { (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed() });
+    auto gm = librg_attach_gamedata(event->entity, { (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed() });
+
+    mod_log("my ped guid: %lu\n", (u32)gm->object->m_dwGUID);
 }
 
 void game_disconnected(librg_event_t *event) {
@@ -118,21 +122,17 @@ void game_tick() {
     }
 
     if (GetAsyncKeyState(VK_F8) & 0x1) {
-        // send vehicle create request onto server
-        librg_send(MOD_VEHICLE_CREATE, data, {});
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {
-        librg_fetch_gamedata(lastcar)->object->Deactivate();
+        //librg_fetch_gamedata(lastcar)->object->Deactivate();
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
-        librg_fetch_gamedata(lastcar)->object->Activate();
+        //librg_fetch_gamedata(lastcar)->object->Activate();
     }
 
     if (GetAsyncKeyState(VK_F9) & 0x1) {
-        // send vehicle create request onto server
-        librg_send(MOD_VEHICLE_ENTER, data, {});
     }
 
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {

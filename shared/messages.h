@@ -1,4 +1,1 @@
-enum {
-    MOD_VEHICLE_CREATE = LIBRG_LAST_ENUM_NUMBER,
-    MOD_VEHICLE_ENTER,
-};
+﻿// TODO: remove file

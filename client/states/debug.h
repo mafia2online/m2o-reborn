@@ -1,4 +1,4 @@
-void debug_state_render()
+﻿void debug_state_render()
 {
     enum { EASY, HARD };
     static int op = EASY;
@@ -12,11 +12,11 @@ void debug_state_render()
         NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
         /* fixed widget pixel width */
         nk_layout_row_static(nk_ctx, 30, 80, 1);
-        if (nk_button_label(nk_ctx, "button")) {
-            mod_log("asdasdasd\n");
+        if (nk_button_label(nk_ctx, "spawn car")) {
+            // send vehicle create request onto server
+            librg_send(MOD_CAR_CREATE, data, {});
         }
-        if (nk_button_label(nk_ctx, "blockem")) {
-            mod.input_blocked = true;
+        if (nk_button_label(nk_ctx, "do nothing")) {
         }
 
         /* fixed widget window ratio width */

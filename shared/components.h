@@ -14,18 +14,27 @@ enum {
  * Entity components
  * (shared)
  */
+
+enum {
+    PED_ON_GROUND,
+    PED_IN_CAR,
+};
+
 typedef struct {
     zplm_vec3_t direction;
     f32 speed;
+    
+    u8 state;
     i8 move_state;
     b8 is_accelerating;
 } librg_component(ped);
 
 typedef struct {
+    u16 model;
+
     f32 wheel_turn;
     f32 brake;
-    i16 model;
-    i8 gear;
+    i8  gear;
 } librg_component(car);
 
 
@@ -41,7 +50,6 @@ typedef struct {
 
         vec3_t tposition;
         quat_t trotation;
-        // vec3_t velocity;
 
         f32 delta;
         i32 step;

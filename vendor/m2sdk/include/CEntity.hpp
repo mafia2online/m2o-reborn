@@ -95,7 +95,7 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetPosition, this, &pos);
         }
 
-        void SetRotation(vec3_t rot)
+        void SetRotation(quat_t rot)
         {
 
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetRotation, this, &rot);

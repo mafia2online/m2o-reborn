@@ -1,4 +1,4 @@
-﻿#define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
+#define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
 
 void module_ped_callback_clientstream(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_PED) return;
@@ -16,6 +16,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     auto diff_position = new_position - transform->position;
     transform->position = new_position;
 
+    // TODO: add ability to handle it for remote peds
     // convert player movement to human movement
     switch (movestate) {
         case M2::E_MOVEMENT_WALK:     ped->move_state = M2::HUMAN_MOVE_MODE_WALK; break;
@@ -53,18 +54,14 @@ void module_ped_callback_update(librg_event_t *event) {
     // interpolation stuff
     if (interpolate) {
         interpolate->lposition = interpolate->tposition;
-        interpolate->lrotation = interpolate->trotation;
-
         interpolate->tposition = transform->position;
-        interpolate->trotation = transform->rotation;
-
         interpolate->delta = 0.0f;
     }
 
     librg_data_rptr(event->data, ped, sizeof(ped_t));
 
     // apply movement anim
-    {
+    if (ped->state == PED_ON_GROUND) {
         auto extr_shift = ped->direction * 3.0f; /* create extrapolated shift for ped */
         auto targ_pos = transform->position + extr_shift;
 

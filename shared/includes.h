@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #define D_SCL_SECURE_NO_WARNINGS
 
 #ifdef _DEBUG
@@ -42,3 +42,9 @@ typedef zplm_quat_t quat_t;
 #define print_pos(vec) print_posm(vec, "print_pos: ")
 
 #define mod_assert librg_assert
+#define mod_assert_msg librg_assert_msg
+
+enum {
+    MOD_CAR_CREATE = LIBRG_LAST_ENUM_NUMBER,
+    MOD_CAR_ENTER,
+};

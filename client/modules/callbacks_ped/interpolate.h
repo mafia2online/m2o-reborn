@@ -11,6 +11,7 @@
     //mod_log("%f\n", interpolate->delta);
 
     librg_assert(ped && gamedata && gamedata->object);
+    if (ped->state != PED_ON_GROUND) return;
 
     vec3_t dposition;
     zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, interpolate->delta);

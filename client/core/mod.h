@@ -1,4 +1,4 @@
-bool mod_init()
+﻿bool mod_init()
 {
     Mem::Initialize();
 
@@ -57,7 +57,13 @@ void mod_attach(HMODULE module)
 
     // path n basics
     mod_path_register(module);
-    mod.debug_stream.open(mod.paths.debug);
+
+    if (zpl_file_open(&mod.debug_log, mod.paths.debug.c_str())) {
+        zpl_file_create(&mod.debug_log, mod.paths.debug.c_str());
+    }
+
+    zpl_file_seek(&mod.debug_log, 0);
+
     mod.module = module;
 
     // setup manual client mode
@@ -104,7 +110,7 @@ void mod_exit(std::string reason)
     model_free();
     librg_free();
 
-    mod.debug_stream.close();
+    zpl_file_close(&mod.debug_log);
 
     zpl_mutex_destroy(&mod.mutexes.log);
     zpl_mutex_destroy(&mod.mutexes.wnd_msg);

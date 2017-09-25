@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 enum E_PlayerMessage
 {
@@ -55,5 +55,8 @@ void player_mod_message(E_PlayerMessage message)
 /* Return true and the player will enter, false and the player will be stuck */
 bool player_request_vehicle_enter(M2::C_Car *car)
 {
+    librg_event_t event = { 0 }; event.custom = (void*)car;
+    librg_event_trigger(MOD_CAR_ENTER, &event);
+
     return true;
 }
