@@ -42,7 +42,7 @@ namespace tools {
             temp_filename.find_last_of("/\\") + 1
         );
 
-        mod_log("[GAME]%s\n", temp_filename.c_str());
+        // mod_log("[GAME]%s\n", temp_filename.c_str());
 
         for (auto sds_file : filepatcher_sds_files) {
             if (filename == sds_file) file_found = true;
