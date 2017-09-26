@@ -45,5 +45,10 @@ namespace M2
 		C_HumanInventory	*GetInventory() { return reinterpret_cast<ICHuman2 *>(this)->m_pInventory; }
 		C_HumanScript	*GetScript() { return reinterpret_cast<ICHuman2 *>(this)->m_pScript; }
 		C_HumanWeaponController	*GetWeaponController() { return reinterpret_cast<ICHuman2 *>(this)->m_pWeaponController; }
+
+        void SetColor(int color)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9389B0, this, color);
+        }
 	};
 };

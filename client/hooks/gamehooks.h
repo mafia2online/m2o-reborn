@@ -263,6 +263,10 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x4DCABD, 0x4DCAC4);//C_Car::SetSeatOwner
         Mem::Hooks::InstallJmpPatch(0x4DCC7D, 0x4DCC8A);//C_Car::SetSeatOwner
 
+        // Prevent game controlling wipers
+        Mem::Hooks::InstallJmpPatch(0x4877F1, 0x487892);//C_Car::UpdateIdleFX
+        Mem::Hooks::InstallJmpPatch(0xA151CB, 0xA151D4);//C_Car::InitTuning
+
 
         // Disable shop loading
         //Mem::Utilites::PatchAddress(0x4731A0, 0x0004C2);

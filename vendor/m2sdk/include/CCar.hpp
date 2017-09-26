@@ -40,6 +40,8 @@ namespace M2
         vec3_t          m_vecMoveSpeed;     // 0288 - 0294
         float           m_fSpeed;           // 0294 - 0298
         float           m_fSpeedDir;        // 0298 - 029C
+        pad(ICCar, pad4, 0xB8D);            // 029C - 0E29
+        bool            m_bWipers;          // 0E29 - 0E2D
 	};
 
 	class C_Car : public ICCar
@@ -151,6 +153,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x4E9890, this, 1, 0, 0);
         }
 
+        void SetColor(int primary, int secondary)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9BBF70, this, primary, secondary);
+        }
+
 		void SetMotorDamage(float damage)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BADB0, this, damage);
@@ -169,6 +176,11 @@ namespace M2
         void Setup()
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x0A151F0, this);
+        }
+
+        void SetWipersOn(bool toggle)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x447650, this, toggle);
         }
 
 		void UnlockEntryPoints()

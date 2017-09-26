@@ -60,6 +60,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x126EF40, this, unk);
 		}
 
+        void GetVehicleColor(vec3_t *const primary, vec3_t *const secondary)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x11F7880, this, primary, secondary);
+        }
+
         bool IsBeaconLightOn()
         {
             DWORD retn = (*(DWORD *)((DWORD)this + 0x6F0 ^ 0) & 0x40);
@@ -185,6 +190,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x120CC30, this, enable);
 		}
+
+        void SetVehicleColor(const vec3_t primary, const vec3_t secondary)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x11F7820, this, &primary, &secondary);
+        }
 
 		void SetVehicleFlags(int unk, int unk2)
 		{
