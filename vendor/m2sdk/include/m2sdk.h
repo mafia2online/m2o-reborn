@@ -58,3 +58,4 @@
 /* Wrappers */
 #include "../wrappers/lua.hpp"
 #include "../wrappers/models.hpp"
+#include "../wrappers/config.hpp"
