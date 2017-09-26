@@ -96,9 +96,9 @@ namespace M2
             return pos;
         }
 
-        void Init(int initProps)
+        bool Init(int initProps)
         {
-            Mem::InvokeFunction<Mem::call_this, bool>(0x9A1E40, this, initProps);
+            return Mem::InvokeFunction<Mem::call_this, bool>(0x9A1E40, this, initProps);
         }
 
 		bool IsSeatWindowOpen(int seat)

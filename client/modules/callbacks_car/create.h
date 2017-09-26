@@ -1,4 +1,4 @@
-﻿static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
+static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
 
 librg_entity_t lastcar;
 
@@ -31,30 +31,31 @@ void module_car_callback_create(librg_event_t *event) {
 
     pModel->CloneHierarchy(pPedModelManager->GetModelManager()->m_pModel);
     pModel->SetName("m2online_car");
-    pModel->MarkForNotify(6);
+    pModel->MarkForNotify(2);
 
     reinterpret_cast<M2::C_Entity *>(object)->SetModel(pModel);
 
-    object->Init(NULL);
-    object->m_nSlotSDS = pPedModelManager->GetModelManager()->m_pSlot->m_iSlotNumber;
-    object->Setup();
+    if (object->Init(NULL)) {
+        object->m_nSlotSDS = pPedModelManager->GetModelManager()->m_pSlot->m_iSlotNumber;
+        object->Setup();
 
-    DWORD flags = reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0xFFFFB7BF | 0x4800;
-    reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags = flags;
+        DWORD flags = reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0xFFFFFFBF | 0x4800;
+        reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags = flags;
 
-    if (reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0x20)
-        mod_log("Flags set sucessfully!\n");
+        if (reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0x20)
+            mod_log("Flags set sucessfully!\n");
 
-    reinterpret_cast<M2::C_Entity *>(object)->Activate();
+        reinterpret_cast<M2::C_Entity *>(object)->Activate();
 
-    if (reinterpret_cast<M2::C_Entity *>(object)->IsActive())
-        mod_log("Entity active !\n");
+        if (reinterpret_cast<M2::C_Entity *>(object)->IsActive())
+            mod_log("Entity active !\n");
 
-    reinterpret_cast<M2::C_Entity *>(object)->SetPosition(transform->position);
+        reinterpret_cast<M2::C_Entity *>(object)->SetPosition(transform->position);
 
-    auto gm = librg_attach_gamedata(event->entity, { (M2::C_Entity *)object });
-    librg_attach_interpolate(event->entity, {0});
-    librg_attach_car(event->entity, car);
+        auto gm = librg_attach_gamedata(event->entity, { (M2::C_Entity *)object });
+        librg_attach_interpolate(event->entity, { 0 });
+        librg_attach_car(event->entity, car);
 
-    mod_log("Created at %x with GUID: %lu!\n", object, gm->object->m_dwGUID);
+        mod_log("Created at %x with GUID: %lu!\n", object, gm->object->m_dwGUID);
+    }
 }
