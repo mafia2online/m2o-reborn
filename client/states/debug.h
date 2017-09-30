@@ -16,7 +16,8 @@
             // send vehicle create request onto server
             librg_send(MOD_CAR_CREATE, data, {});
         }
-        if (nk_button_label(nk_ctx, "do nothing")) {
+        if (nk_button_label(nk_ctx, "disable cursor")) {
+            mod.input_blocked = 0;
         }
 
         /* fixed widget window ratio width */

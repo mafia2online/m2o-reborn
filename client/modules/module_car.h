@@ -3,8 +3,8 @@
 #include "callbacks_car/remove.h"
 #include "callbacks_car/interpolate.h"
 
-void module_car_local_enter(librg_event_t *event) {
-    auto car = (M2::C_Entity *)event->custom;
+void module_car_local_enter(void *custom) {
+    auto car = (M2::C_Entity *)custom;
     auto ped = librg_fetch_ped(mod.player);
 
     mod_assert(car && ped);
@@ -30,13 +30,16 @@ void module_car_remote_enter(librg_message_t *msg) {
     mod_assert_msg(librg_entity_valid(entped) && gmped && gmped->object, "trying to put ped in invalid car");
     mod_assert_msg(librg_entity_valid(entcar) && gmcar && gmcar->object, "trying to put invalid ped in car");
 
+    mod_log("im not putting anyone anywhere fuck u\n");
+    return;
+
     mod_log("putting ped: %u in the car: %u\n", entped, entcar);
 
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2*)gmped->object)->GetScript()->UseAB(
         &pSyncObject,
         reinterpret_cast<M2::C_Vehicle *>(gmcar->object),
-        false, M2::E_VehicleSeat::E_SEAT_DRIVER, true
+        true, M2::E_VehicleSeat::E_SEAT_DRIVER, false
     );
 }
 
@@ -47,7 +50,7 @@ inline void module_car_init() {
     librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, module_car_callback_clientstream);
     
     // local events
-    librg_event_add(MOD_CAR_ENTER, module_car_local_enter);
+    //librg_event_add(MOD_CAR_ENTER, module_car_local_enter);
 
     // remote events
     librg_network_add(MOD_CAR_ENTER, module_car_remote_enter);

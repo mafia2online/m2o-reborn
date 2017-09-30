@@ -1,4 +1,4 @@
-#define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
+﻿#define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
 
 void module_ped_callback_clientstream(librg_event_t *event) {
     if (librg_entity_type(event->entity) != TYPE_PED) return;
@@ -11,19 +11,41 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     mod_assert(ped && gamedata && gamedata->object);
 
     // read new values of entity
-    auto movestate = ((M2::C_Player2*)gamedata->object)->m_pPlayerControls.m_ePlayerMovementState;
     auto new_position = gamedata->object->GetPosition();
     auto diff_position = new_position - transform->position;
     transform->position = new_position;
 
-    // TODO: add ability to handle it for remote peds
-    // convert player movement to human movement
-    switch (movestate) {
-        case M2::E_MOVEMENT_WALK:     ped->move_state = M2::HUMAN_MOVE_MODE_WALK; break;
-        case M2::E_MOVEMENT_JOG:      ped->move_state = M2::HUMAN_MOVE_MODE_RUN; break;
-        case M2::E_MOVEMENT_SPRINT:   ped->move_state = M2::HUMAN_MOVE_MODE_SPRINT; break;
-        case M2::E_MOVEMENT_IDLE:     ped->move_state = M2::HUMAN_MOVE_MODE_BREATH; break;
-        case M2::E_MOVEMENT_STOPPING: ped->move_state = M2::HUMAN_MOVE_MODE_END; break;
+    if (event->entity != mod.player) {
+        // lower limits
+        // 0.05 - 0.06 - walking
+        // 0.13 - 0.14 - running
+        // 0.19 - 0.20 - sprinting
+        f32 ped_speed = zplm_vec3_mag(diff_position);
+
+        /**/ if (ped_speed > 0.19f) {
+            ped->move_state = (u8)M2::HUMAN_MOVE_MODE_SPRINT;
+        }
+        else if (ped_speed > 0.13f) {
+            ped->move_state = (u8)M2::HUMAN_MOVE_MODE_RUN;
+        }
+        else if (ped_speed > 0.01f) {
+            ped->move_state = (u8)M2::HUMAN_MOVE_MODE_WALK;
+        }
+        else {
+            ped->move_state = (u8)M2::HUMAN_MOVE_MODE_BREATH;
+        }
+    }
+    else {
+        auto movestate = ((M2::C_Player2*)gamedata->object)->m_pPlayerControls.m_ePlayerMovementState;
+
+        // convert local player movement to human movement
+        switch (movestate) {
+            case M2::E_MOVEMENT_WALK:     ped->move_state = M2::HUMAN_MOVE_MODE_WALK; break;
+            case M2::E_MOVEMENT_JOG:      ped->move_state = M2::HUMAN_MOVE_MODE_RUN; break;
+            case M2::E_MOVEMENT_SPRINT:   ped->move_state = M2::HUMAN_MOVE_MODE_SPRINT; break;
+            case M2::E_MOVEMENT_IDLE:     ped->move_state = M2::HUMAN_MOVE_MODE_BREATH; break;
+            case M2::E_MOVEMENT_STOPPING: ped->move_state = M2::HUMAN_MOVE_MODE_END; break;
+        }
     }
 
     f32 ped_speed = zplm_vec3_mag(diff_position);

@@ -1,4 +1,4 @@
-/** @file CEntity.hpp
+﻿/** @file CEntity.hpp
 *  @brief Game's Entity class
 *
 *
@@ -97,7 +97,6 @@ namespace M2
 
         void SetRotation(quat_t rot)
         {
-
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetRotation, this, &rot);
         }
 

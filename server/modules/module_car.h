@@ -49,6 +49,13 @@ void module_car_enter(librg_message_t *msg) {
 
     mod_assert_msg(librg_entity_valid(entcar), "trying to enter invalid car");
 
+    auto cs = librg_fetch_clientstream(entcar);
+
+    if (cs && cs->peer) {
+        mod_log("the car has a driver already\n");
+        return;
+    }
+
     mod_log("ped: %lu becomes driver of: %lu\n", entped, entcar);
     librg_streamer_client_set(entcar, msg->peer);
 

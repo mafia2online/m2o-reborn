@@ -188,6 +188,8 @@ void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
+void module_car_local_enter(void *);
+
 // hooks
 #include "hooks/memory.h"
 #include "hooks/steamdrm.h"

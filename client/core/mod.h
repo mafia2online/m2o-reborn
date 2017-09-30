@@ -58,9 +58,8 @@ void mod_attach(HMODULE module)
     // path n basics
     mod_path_register(module);
 
-    if (zpl_file_open(&mod.debug_log, mod.paths.debug.c_str())) {
-        zpl_file_create(&mod.debug_log, mod.paths.debug.c_str());
-    }
+    zpl_file_remove(mod.paths.debug.c_str());
+    zpl_file_create(&mod.debug_log, mod.paths.debug.c_str());
 
     zpl_file_seek(&mod.debug_log, 0);
 
