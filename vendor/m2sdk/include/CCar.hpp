@@ -87,6 +87,11 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, long double>(0x09BAD20, this);
 		}
 
+        int GetPartByName(const char *name)
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x46C630, this, name);
+        }
+
 		double GetRepairPrice()
 		{
 			return Mem::InvokeFunction<Mem::call_this, double>(0x04476E0, this);

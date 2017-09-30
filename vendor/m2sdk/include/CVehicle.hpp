@@ -153,14 +153,14 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x120CBC0, this, toggle, indicator);
 		}
 
-		void SetOffPart(int part, bool unk)
+		void SetOffPart(int part)
 		{
-			Mem::InvokeFunction<Mem::call_this, bool>(0x119C5B0, this, part, unk);
+			Mem::InvokeFunction<Mem::call_this, bool>(0x1263DD0, this, part);
 		}
 
-		void SetOnPart(int part, bool unk)
+		void SetOnPart(int part)
 		{
-			Mem::InvokeFunction<Mem::call_this, bool>(0x119C6C0, this, part, unk);
+			Mem::InvokeFunction<Mem::call_this, bool>(0x1263EA0, this, part);
 		}
 
 		void SetPower(float power)

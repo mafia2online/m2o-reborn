@@ -29,6 +29,16 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x0431300, this, unk, unk2, unk3, unk4);
 		}
 
+        void DoModelSelectById(int hand, int model, int unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x91DCA0, this, hand, model, unk);
+        }
+
+        void DoMouthModelSelectById(int model)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x42DB60, this, model);
+        }
+
 		void DoShot(bool unk, vec3_t const *from, vec3_t const *to)
 		{
 			Mem::InvokeFunction<Mem::call_this, bool>(0x0438790, this, unk, from, to);
