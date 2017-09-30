@@ -1,4 +1,4 @@
-﻿/** @file CHumanScript.hpp
+/** @file CHumanScript.hpp
 *  @brief Game's Entity class
 *
 *
@@ -143,6 +143,24 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0x08F7B40, this, ent);
 		}
 
+        void ScrDoAction(C_SyncObject **syncObject, M2::C_Vehicle *veh, bool bEnter, M2::E_VehicleSeat seat, int iAnimate)
+        {
+            int iEnter = (bEnter) ? 1 : 0;
+            bool bAnimate = (int)!iAnimate;
+            int iSeat = (int)seat;
+
+            /* Are we exiting the vehicle ? */
+            if (!bEnter) {
+                iSeat = 0;
+            }
+            else {
+                iSeat -= 1;
+                iSeat = (iSeat < 0) ? 0 : iSeat;
+            }
+
+            Mem::InvokeFunction<Mem::call_this, int>(0x099E1E0, this, syncObject, veh, iEnter, iSeat, bAnimate, 0, 2);
+        }
+
 		void ScriptAnimEffectStop()
 		{
 			Mem::InvokeFunction<Mem::call_this, unsigned int>(0x0D6D0D0, this);
@@ -168,6 +186,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x09221A0, this, tag);
 		}
 
+        void SetCarAttackPermission(bool permission)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x91DAD0, this, permission);
+        }
+
 		void SetPhysState(ePhysState state)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x093B8A0, this, state);
@@ -192,24 +215,6 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0x093B830, this, ent);
 		}
-
-        void UseAB(C_SyncObject **syncObject, M2::C_Vehicle *veh, bool bEnter, M2::E_VehicleSeat seat, int iAnimate)
-        {
-            int iEnter = (bEnter) ? 1 : 0;
-            bool bAnimate = (int)!iAnimate;
-            int iSeat = (int)seat;
-
-            /* Are we exiting the vehicle ? */
-            if (!bEnter) {
-                iSeat = 0;
-            }
-            else {
-                iSeat -= 1;
-                iSeat = (iSeat < 0) ? 0 : iSeat;
-            }
-
-            Mem::InvokeFunction<Mem::call_this, int>(0x099E1E0, this, syncObject, veh, iEnter, iSeat, bAnimate, 0, 2);
-        }
 
         /*C_SyncObject *ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, hmm_vec3 const &pos, const bool smooth)
         {

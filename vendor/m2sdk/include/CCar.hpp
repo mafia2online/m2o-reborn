@@ -62,6 +62,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void *>(0x4DBE10, this, door);
         }
 
+        void DisableMotionBlur(bool disable)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9CCEF0, this, disable);
+        }
+
 		int GetActualPlayerSeatIndex()
 		{
 			return Mem::InvokeFunction<Mem::call_this, int>(0x09A22D0, this);
@@ -162,6 +167,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BADB0, this, damage);
 		}
+
+        void SetPainting(const char *painting)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x4472A0, this, painting);
+        }
 
 		void SetSiren(bool siren)
 		{
