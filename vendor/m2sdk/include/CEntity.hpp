@@ -106,6 +106,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void>(m_pVFTable->SetDirection, this, &dir);
         }
 
+        void SetName(const char *name)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x1192020, this, name);
+        }
+
         void Release()
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x119DDD0, this);

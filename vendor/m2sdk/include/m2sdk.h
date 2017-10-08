@@ -1,3 +1,6 @@
+/* Utils */
+#include "../utils/TArray.hpp"
+
 /* Classes */
 
 #include "CActor.hpp"
@@ -18,6 +21,7 @@
 #include "CGameCameraMafia.hpp"
 #include "CGameGuiModule.hpp"
 #include "CGameRenderingSystemModule.hpp"
+#include "CGameTrafficModule.hpp"
 #include "CGfxEffects.hpp"
 #include "CGfxEnvironmentEffects.hpp"
 #include "CHints.hpp"
@@ -38,6 +42,7 @@
 #include "CPoliceWanted.hpp"
 #include "CRenderCamera.hpp"
 #include "CResources.hpp"
+#include "CReticle.hpp"
 #include "CRtR3DIconManager.hpp"
 #include "CRtRGameModule.hpp"
 #include "CScene.hpp"
@@ -53,7 +58,9 @@
 #include "CSyncObject.hpp"
 #include "CTextDatabase.hpp"
 #include "CTimer.hpp"
+#include "CTrafficLightsMgr.hpp"
 #include "CTrafficStreaming.hpp"
+#include "CVehDoor.hpp"
 #include "CVehicle.hpp"
 #include "CWeatherManager.hpp"
 #include "CWrappersList.hpp"
