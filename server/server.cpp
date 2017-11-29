@@ -70,7 +70,6 @@ int main() {
     ctx.max_entities = 16000;
     ctx.max_connections = 100;
 
-
     librg_address_t address = {0};
     address.port = 27010;
 

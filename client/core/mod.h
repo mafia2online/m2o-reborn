@@ -109,6 +109,7 @@ void mod_exit(std::string reason)
 {
     mod_log("exiting %s\n", reason.c_str());
 
+    Discord_Shutdown();
     //model_free();
     librg_free(ctx);
     delete ctx;

@@ -23,6 +23,7 @@ struct interpolate_t {
 
     f32 delta;
     i32 step;
+    b32 enabled;
 };
 
 struct ped_t {

@@ -58,7 +58,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     }
 
     // write last valid direction
-    librg_data_wptr(event->data, ped, sizeof(ped_t));
+    librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream));
 }
 
 void module_ped_callback_update(librg_event_t *event) {
@@ -69,6 +69,7 @@ void module_ped_callback_update(librg_event_t *event) {
 
     // make sure we have all objects
     mod_assert(ped && ped->object);
+    mod_log("getting update from server \n");
 
     interpolate_t *interpolate = &ped->interpolate;
 
@@ -77,7 +78,7 @@ void module_ped_callback_update(librg_event_t *event) {
     interpolate->tposition = entity->position;
     interpolate->delta = 0.0f;
     
-    librg_data_rptr(event->data, ped, sizeof(ped_t));
+    librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
 
     // apply movement anim
     if (ped->stream.state == PED_ON_GROUND) {

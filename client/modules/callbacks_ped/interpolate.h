@@ -3,6 +3,7 @@ void module_ped_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
     if (entity->type != TYPE_PED) return;
 
     auto ped = (ped_t *)(entity->user_data);
+    if (!ped->interpolate.enabled) return;
 
     // make sure we have all objects
     mod_assert(ped && ped->object);

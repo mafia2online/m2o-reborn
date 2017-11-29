@@ -59,6 +59,7 @@ include_directories(
     vendor/detours/include
     vendor/m2sdk/include
     vendor/nuklear/include
+    vendor/discord_rpc/include
     server/
     shared/
     launcher/
@@ -66,6 +67,7 @@ include_directories(
 )
 
 link_directories(
+    ${PROJECT_SOURCE_DIR}/vendor/discord_rpc/lib
     ${PROJECT_SOURCE_DIR}/vendor/steam_api/lib
     ${PROJECT_SOURCE_DIR}/vendor/detours/lib
     ${D3DX9_LIBRARY}
@@ -93,10 +95,11 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h*"
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/discord_rpc/include/*.h"
 )
 
 set(SERVER_LIBRARIES)
-set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours)
+set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours discord-rpcd)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 

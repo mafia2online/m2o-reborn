@@ -47,6 +47,7 @@ void module_ped_callback_create(librg_event_t *event) {
 
     ped->object = (M2::C_Entity*)human;
     ped->pGameModelManager = pPedModelManager;
+    ped->interpolate.enabled = true;
 
     event->entity->user_data = ped;
 }

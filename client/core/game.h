@@ -12,6 +12,8 @@ void game_init() {
     module_ped_init();
     module_car_init();
 
+    discordInit();
+
     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
 }
 
@@ -102,6 +104,8 @@ void game_tick() {
     module_ped_tick();
     module_car_tick();
 
+    updateDiscordPresence();
+
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
         ztime -= 0.1f;
         if (ztime < 0)
@@ -145,5 +149,6 @@ void game_tick() {
         //hackit();
     }
 
+    Discord_RunCallbacks();
     //hackitick();
 }

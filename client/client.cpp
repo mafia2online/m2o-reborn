@@ -229,6 +229,7 @@ void module_car_local_enter(void *);
 // "modules"
 #include "modules/module_ped.h"
 #include "modules/module_car.h"
+#include "modules/discord.h"
 
 #include "core/graphics.h"
 #include "core/game.h"
