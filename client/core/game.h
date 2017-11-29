@@ -1,4 +1,4 @@
-﻿float ztime = 0.5; // debugging time stuff, nice to have for now
+float ztime = 0.5; // debugging time stuff, nice to have for now
 
 void hackit();
 void hackitick();
@@ -18,16 +18,17 @@ void game_init() {
 void game_connected(librg_event_t *event) {
     mod_log("connected to the server\n");
     mod.player = event->entity;
-    librg_attach_ped(event->entity, {0});
-    auto gm = librg_attach_gamedata(event->entity, { (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed() });
 
-    mod_log("my ped guid: %lu\n", (u32)gm->object->m_dwGUID);
+    auto ped = new ped_t();
+    ped->object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
+
+    event->entity->user_data = ped;
+    mod_log("my ped guid: %lu\n", (u32)ped->object->m_dwGUID);
 }
 
 void game_disconnected(librg_event_t *event) {
     mod_log("disconnected form the server\n");
-    librg_detach_ped(event->entity);
-    librg_detach_gamedata(event->entity);
+    delete event->entity->user_data;
 }
 
 void game_connect() {
@@ -80,23 +81,23 @@ void game_connect() {
             port = atoi(port_raw);
         }
 
-        librg_network_start({ hostname, port });
+        librg_network_start(ctx, { port, hostname });
     }
     else {
-        librg_network_start({ "localhost", 27010 });
+        librg_network_start(ctx, { 27010, "localhost" });
     }
 }
 
 void game_disconnect() {
     mod_log("disconnecting...\n");
-    librg_network_stop();
+    librg_network_stop(ctx);
 }
 
 void game_tick() {
     mod.last_delta  = (zpl_utc_time_now() - mod.last_update) / 1000.f;
     mod.last_update = zpl_utc_time_now();
 
-    librg_tick();
+    librg_tick(ctx);
 
     module_ped_tick();
     module_car_tick();

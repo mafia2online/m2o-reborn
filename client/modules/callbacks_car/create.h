@@ -3,15 +3,15 @@ static M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
 librg_entity_t lastcar;
 
 void module_car_callback_create(librg_event_t *event) {
-    if (librg_entity_type(event->entity) != TYPE_CAR) return;
+    if (event->entity->type != TYPE_CAR) return;
 
     mod_log("creating vehicle\n");
 
-    car_t car = {0};
+    auto entity = event->entity;
+    auto car = new car_t();
     //librg_data_rptr(event->data, &car, sizeof(car_t));
 
-    auto transform = librg_fetch_transform(event->entity);
-    print_posm(transform->position, "creating vehicle at:");
+    print_posm(entity->position, "creating vehicle at:");
 
     std::string dir;
     std::string model;
@@ -50,12 +50,11 @@ void module_car_callback_create(librg_event_t *event) {
         if (reinterpret_cast<M2::C_Entity *>(object)->IsActive())
             mod_log("Entity active !\n");
 
-        reinterpret_cast<M2::C_Entity *>(object)->SetPosition(transform->position);
+        reinterpret_cast<M2::C_Entity *>(object)->SetPosition(entity->position);
 
-        auto gm = librg_attach_gamedata(event->entity, { (M2::C_Entity *)object });
-        librg_attach_interpolate(event->entity, { 0 });
-        librg_attach_car(event->entity, car);
+        car->object = (M2::C_Entity *)object;
+        entity->user_data = car;
 
-        mod_log("Created at %x with GUID: %lu!\n", object, gm->object->m_dwGUID);
+        mod_log("Created at %x with GUID: %lu!\n", object, car->object->m_dwGUID);
     }
 }

@@ -1,18 +1,42 @@
 {
-  "name": "zpl_math.c",
-  "version": "1.0.1",
+  "_from": "zpl_math.c",
+  "_id": "zpl_math.c@1.0.1",
+  "_inBundle": false,
+  "_integrity": "sha512-nZCG41KzHzI1sK9N53rP7qb8NTj15PC06KLfW7z+2VcxHvwrVjJ09HWDEvR4WzuMTd1B2brKimZ4eEmXvIccJw==",
+  "_location": "/zpl_math.c",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "zpl_math.c",
+    "name": "zpl_math.c",
+    "escapedName": "zpl_math.c",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/zpl_math.c/-/zpl_math.c-1.0.1.tgz",
+  "_shasum": "5d061fa15117e49b58ed1a4146399348add8a72e",
+  "_spec": "zpl_math.c",
+  "_where": "/Users/inlife/Projects/reguider/librg",
+  "author": {
+    "name": "Dominik Madarasz",
+    "email": "zaklaus@outlook.com"
+  },
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-math/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "Vector math library that is gamedev friendly.",
-  "main": "include/zpl_math.h",
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zpl-c/zpl-math.git"
-  },
+  "homepage": "https://github.com/zpl-c/zpl-math#readme",
   "keywords": [
     "c",
     "c++",
@@ -22,10 +46,15 @@
     "library",
     "math"
   ],
-  "author": "Dominik Madarasz <zaklaus@outlook.com>",
   "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/zpl-c/zpl-math/issues"
+  "main": "include/zpl_math.h",
+  "name": "zpl_math.c",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-math.git"
   },
-  "homepage": "https://github.com/zpl-c/zpl-math#readme"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.1"
 }

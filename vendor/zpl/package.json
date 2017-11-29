@@ -1,18 +1,45 @@
 {
-  "name": "zpl.c",
-  "version": "3.0.5",
+  "_from": "zpl.c@3.3.0",
+  "_id": "zpl.c@3.3.0",
+  "_inBundle": false,
+  "_integrity": "sha512-i/jWQTOYkxLEy/yGPO+oT/y/uMLFTLOpbXTkUFU3OD4UhAlXahY7nr8FMoIVS86WfKIcK6oMfLeyvYaCAXH3Jg==",
+  "_location": "/zpl.c",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "zpl.c@3.3.0",
+    "name": "zpl.c",
+    "escapedName": "zpl.c",
+    "rawSpec": "3.3.0",
+    "saveSpec": null,
+    "fetchSpec": "3.3.0"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/",
+    "/zpl_cull.c",
+    "/zpl_event.c"
+  ],
+  "_resolved": "https://registry.npmjs.org/zpl.c/-/zpl.c-3.3.0.tgz",
+  "_shasum": "124591e3621df571a4e89d45506a552dedb7844d",
+  "_spec": "zpl.c@3.3.0",
+  "_where": "/Users/inlife/Projects/reguider/librg",
+  "author": {
+    "name": "Dominik Madarasz",
+    "email": "zaklaus@outlook.com",
+    "url": "http://madaraszd.net/"
+  },
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "Single-file public domain header-only C and C++ helper library.",
-  "main": "include/zpl.h",
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zpl-c/zpl.git"
-  },
+  "homepage": "https://github.com/zpl-c/zpl#readme",
   "keywords": [
     "zpl",
     "header-only",
@@ -20,10 +47,15 @@
     "c++",
     "small"
   ],
-  "author": "Dominik Madarasz <zaklaus@outlook.com> (http://madaraszd.net/)",
   "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/zpl-c/zpl/issues"
+  "main": "include/zpl.h",
+  "name": "zpl.c",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl.git"
   },
-  "homepage": "https://github.com/zpl-c/zpl#readme"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "3.3.0"
 }

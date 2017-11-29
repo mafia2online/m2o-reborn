@@ -1,20 +1,21 @@
-﻿#define MOD_ENTITY_KEEP_ALIVE 1
+#define MOD_ENTITY_KEEP_ALIVE 1
 #define MOD_ENTITY_POSITION_THRESHOLD 0.035
 
-void module_car_callback_interpolate(librg_entity_t entity) {
-    if (librg_entity_type(entity) != TYPE_CAR) return;
+void module_car_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
+    auto entity = librg_entity_fetch(ctx, id);
+    mod_assert(entity);
 
-    auto transform   = librg_fetch_transform(entity);
-    auto interpolate = librg_fetch_interpolate(entity);
-    auto gamedata    = librg_fetch_gamedata(entity);
+    if (librg_entity_type(ctx, entity->id) != TYPE_CAR) return;
+
+    auto ped = (ped_t *)entity->user_data;
+    librg_assert(ped && ped->object);
 
     // last delta tick against constant tick delay
-    interpolate->delta += (mod.last_delta / 16.666f);
+    ped->interpolate.delta += (mod.last_delta / 16.666f);
     // mod_log("%f\n", interpolate->delta);
-    librg_assert(gamedata && gamedata->object);
 
-    auto curr_pos = gamedata->object->GetPosition();
-    auto diff_pos = curr_pos - transform->position;
+    auto curr_pos = ped->object->GetPosition();
+    auto diff_pos = curr_pos - entity->position;
 
     print_posm(diff_pos, "curr diff");
 
@@ -25,22 +26,22 @@ void module_car_callback_interpolate(librg_entity_t entity) {
     }
 
     // position
-    if (interpolate->lposition != interpolate->tposition) {
+    if (ped->interpolate.lposition != ped->interpolate.tposition) {
         vec3_t dposition;
-        interpolate->step = 0;
-        zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, interpolate->delta);
-        gamedata->object->SetPosition(dposition);
+        ped->interpolate.step = 0;
+        zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
+        ped->object->SetPosition(dposition);
     }
 
-    // rotation
-    if (interpolate->lrotation != interpolate->trotation) {
-        auto last = interpolate->lrotation;
-        auto dest = interpolate->trotation;
+    // rotation TODO:
+    if (ped->interpolate.lrotation != ped->interpolate.trotation) {
+        auto last = ped->interpolate.lrotation;
+        auto dest = ped->interpolate.trotation;
 
         quat_t drotation;
-        zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, interpolate->delta);
-        gamedata->object->SetRotation(drotation);
+        zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, ped->interpolate.delta);
+        ped->object->SetRotation(drotation);
     }
 
-    interpolate->step++;
+    ped->interpolate.step++;
 }

@@ -1,18 +1,46 @@
 {
-  "name": "zpl_cull.c",
-  "version": "2.1.2",
+  "_from": "zpl_cull.c@3.1.2",
+  "_id": "zpl_cull.c@3.1.2",
+  "_inBundle": false,
+  "_integrity": "sha512-dKoQgsD+DhiPtAbKl9qZE9yQhK1ZwN4WSMfTarOl3/a8stalzHKk/hxCoBLAKnwlHftd4U4Wp2Cm6XYvUuB2pA==",
+  "_location": "/zpl_cull.c",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "zpl_cull.c@3.1.2",
+    "name": "zpl_cull.c",
+    "escapedName": "zpl_cull.c",
+    "rawSpec": "3.1.2",
+    "saveSpec": null,
+    "fetchSpec": "3.1.2"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/zpl_cull.c/-/zpl_cull.c-3.1.2.tgz",
+  "_shasum": "a9bc7ee0e88afd23b5376cafb8f7feb3147251ae",
+  "_spec": "zpl_cull.c@3.1.2",
+  "_where": "/Users/inlife/Projects/reguider/librg",
+  "author": {
+    "name": "Dominik Madarasz",
+    "email": "zaklaus@outlook.com"
+  },
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-cull/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "zpl.c": "^3.0.0",
+    "zpl_math.c": "^1.0.1"
+  },
+  "deprecated": false,
   "description": "Tree culling library.",
-  "main": "include/zpl_cull.h",
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zpl-c/zpl-cull.git"
-  },
+  "homepage": "https://github.com/zpl-c/zpl-cull#readme",
   "keywords": [
     "c",
     "c++",
@@ -22,14 +50,15 @@
     "library",
     "culling"
   ],
-  "author": "Dominik Madarasz <zaklaus@outlook.com>",
   "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/zpl-c/zpl-cull/issues"
+  "main": "include/zpl_cull.h",
+  "name": "zpl_cull.c",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-cull.git"
   },
-  "homepage": "https://github.com/zpl-c/zpl-cull#readme",
-  "dependencies": {
-    "zpl.c": "^3.0.0",
-    "zpl_math.c": "^1.0.1"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "3.1.2"
 }

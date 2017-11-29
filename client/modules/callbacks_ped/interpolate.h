@@ -1,21 +1,21 @@
-﻿void module_ped_callback_interpolate(librg_entity_t entity) {
-    if (librg_entity_type(entity) != TYPE_PED) return;
+void module_ped_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
+    auto entity = librg_entity_fetch(ctx, id); mod_assert(entity);
+    if (entity->type != TYPE_PED) return;
 
-    auto transform   = librg_fetch_transform(entity);
-    auto interpolate = librg_fetch_interpolate(entity);
-    auto gamedata    = librg_fetch_gamedata(entity);
-    auto ped         = librg_fetch_ped(entity);
+    auto ped = (ped_t *)(entity->user_data);
+
+    // make sure we have all objects
+    mod_assert(ped && ped->object);
 
     // last delta tick against constant tick delay
-    interpolate->delta += (mod.last_delta / 33.666f);
+    ped->interpolate.delta += (mod.last_delta / 33.666f);
     //mod_log("%f\n", interpolate->delta);
 
-    librg_assert(ped && gamedata && gamedata->object);
-    if (ped->state != PED_ON_GROUND) return;
+    if (ped->stream.state != PED_ON_GROUND) return;
 
     vec3_t dposition;
-    zplm_vec3_lerp(&dposition, interpolate->lposition, interpolate->tposition, interpolate->delta);
+    zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
 
     //if (dposition == interpolate->tposition) return;
-    gamedata->object->SetPosition(dposition);
+    ped->object->SetPosition(dposition);
 }

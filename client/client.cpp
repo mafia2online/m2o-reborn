@@ -1,4 +1,4 @@
-﻿#define MOD_CLIENT
+#define MOD_CLIENT
 
 // common shared stuff
 #include "includes.h"
@@ -62,6 +62,8 @@
 // global vars for nk
 struct nk_context*    nk_ctx;
 struct nk_font_atlas* nk_atlas;
+
+librg_ctx_t *ctx;
 
 // tools
 struct mod_path_t {
@@ -132,7 +134,7 @@ struct mod_t {
     mod_state_t state;
 
     mod_mouse_t     mouse;
-    librg_entity_t  player;
+    librg_entity_t  *player;
     mod_graphics_t  graphics;
 
     // game tick props
@@ -218,7 +220,7 @@ void module_car_local_enter(void *);
 #include "components.h"
 #include "messages.h"
 
-#include "core/model.h"
+//#include "core/model.h"
 
 // actual client stuff
 #include "states/title.h"

@@ -33,9 +33,6 @@ set(CMAKE_BUILD_TYPE "Debug")
 ###
 # Compile vendor dependencies
 ###
-add_definitions(-D_WINSOCK_DEPRECATED_NO_WARNINGS)
-add_subdirectory(vendor/enet)
-remove_definitions(-D_WINSOCK_DEPRECATED_NO_WARNINGS)
 
 if (WIN32)
     if (NOT DirectX_D3DX9_INCLUDE_FOUND)
@@ -98,8 +95,8 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
 )
 
-set(SERVER_LIBRARIES enet)
-set(CLIENT_LIBRARIES enet d3d9 d3dx9 dxgi dinput8 dxguid detours)
+set(SERVER_LIBRARIES)
+set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 

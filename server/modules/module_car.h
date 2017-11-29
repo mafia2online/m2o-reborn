@@ -1,90 +1,63 @@
-﻿librg_entity_t lastcar;
+// TODO: remove (TESTING)
+librg_entity_id lastcar;
 
 void module_car_create(librg_message_t *msg) {
-    auto player  = librg_get_client_entity(msg->peer);
-    auto vehicle = librg_entity_create(TYPE_CAR);
+    auto playerid  = librg_entity_find(msg->ctx, msg->peer);
+    auto vehicleid = librg_entity_create(msg->ctx, TYPE_CAR);
 
-    auto pt = librg_fetch_transform(player);
-    auto vt = librg_fetch_transform(vehicle);
+    auto player  = librg_entity_fetch(msg->ctx, playerid);
+    auto vehicle = librg_entity_fetch(msg->ctx, vehicleid);
 
-    vt->position = vec3(
-        pt->position.x + 3.0f,
-        pt->position.y,
-        pt->position.z
+    vehicle->position = vec3(
+        player->position.x + 3.0f,
+        player->position.y,
+        player->position.z
     );
 
-    auto car = librg_attach_car(vehicle, { 0 });
+    auto car = new car_t();
 
-    car->model = librg_data_ru16(msg->data);
-    car->brake = 0.0f;
+    car->stream.model = librg_data_ru16(msg->data);
+    car->stream.brake = 0.0f;
 
-    lastcar = vehicle;
+    vehicle->user_data = car;
+
+    lastcar = vehicle->id;
 
     // log
-    print_posm(vt->position, "created a vehicle at: ");
+    print_posm(vehicle->position, "created a vehicle at: ");
 }
-
-void module_car_callback_create(librg_event_t *event) {
-    if (librg_entity_type(event->entity) != TYPE_CAR) return;
-    auto car = librg_fetch_car(event->entity); mod_assert(car);
-    //librg_data_wptr(event->data, car, sizeof(car_t));
-}
-
-void module_car_callback_update(librg_event_t *event) {
-    if (librg_entity_type(event->entity) != TYPE_CAR) return;
-    //auto car = librg_fetch_car(event->entity); mod_assert(car);
-    //librg_data_wptr(event->data, car, sizeof(car_t));
-}
-
-void module_car_callback_clientstream(librg_event_t *event) {
-    if (librg_entity_type(event->entity) != TYPE_CAR) return;
-    //auto car = librg_fetch_car(event->entity); mod_assert(car);
-    //librg_data_wptr(event->data, car, sizeof(car_t));
-}
-
 
 void module_car_enter(librg_message_t *msg) {
-    auto entped = librg_get_client_entity(msg->peer);
-    auto entcar = librg_data_ru32(msg->data);
+    auto playerid  = librg_entity_find(msg->ctx, msg->peer);
+    auto vehicleid = librg_data_ru32(msg->data);
 
-    mod_assert_msg(librg_entity_valid(entcar), "trying to enter invalid car");
+    mod_assert_msg(librg_entity_valid(msg->ctx, vehicleid), "trying to enter invalid car");
+    auto ped = librg_entity_fetch(msg->ctx, vehicleid);
+    auto car = librg_entity_fetch(msg->ctx, vehicleid);
 
-    auto cs = librg_fetch_clientstream(entcar);
+    mod_assert(ped && car);
 
-    if (cs && cs->peer) {
+    if (car->flags & LIBRG_ENTITY_CONTROLLED) {
         mod_log("the car has a driver already\n");
         return;
     }
 
-    mod_log("ped: %lu becomes driver of: %lu\n", entped, entcar);
-    librg_streamer_client_set(entcar, msg->peer);
+    mod_log("ped: %lu becomes driver of: %lu\n", playerid, vehicleid);
+    librg_entity_control_set(msg->ctx, vehicleid, msg->peer);
 
-    auto ped = librg_fetch_ped(entped); mod_assert(ped);
-    ped->state = PED_IN_CAR;
+    // sorry
+    ((ped_t *)ped->user_data)->stream.state = PED_IN_CAR;
 
-    librg_send_instream_except(MOD_CAR_ENTER, entped, msg->peer, data, {
-        mod_log("sending enter message to EVERYYYYBODY\n");
-        librg_data_wu32(&data, entped);
-        librg_data_wu32(&data, entcar);
-    });
+    librg_data_t data;
+    librg_data_init(&data);
+    mod_log("sending enter message to EVERYYYYBODY\n");
+    librg_data_wu32(&data, playerid);
+    librg_data_wu32(&data, vehicleid);
+    librg_message_send_instream(msg->ctx, MOD_CAR_ENTER, playerid, data.rawptr, librg_data_get_wpos(&data));
+    librg_data_free(&data);
 }
 
 void module_car_exit(librg_message_t *msg) {
-    librg_streamer_client_remove(lastcar);
-}
-
-
-
-inline void module_car_init() {
-    librg_event_add(LIBRG_ENTITY_CREATE, module_car_callback_create);
-    librg_event_add(LIBRG_ENTITY_UPDATE, module_car_callback_update);
-    //librg_event_add(LIBRG_ENTITY_REMOVE, module_car_callback_remove);
-    librg_event_add(LIBRG_CLIENT_STREAMER_UPDATE, module_car_callback_clientstream);
-
-    librg_network_add(MOD_CAR_CREATE, module_car_create);
-    librg_network_add(MOD_CAR_ENTER, module_car_enter);
-}
-
-inline void module_car_tick() {
+    librg_entity_control_remove(msg->ctx, lastcar);
 
 }

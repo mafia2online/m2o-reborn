@@ -1,4 +1,4 @@
-﻿bool mod_init()
+bool mod_init()
 {
     Mem::Initialize();
 
@@ -65,18 +65,21 @@ void mod_attach(HMODULE module)
 
     mod.module = module;
 
-    // setup manual client mode
-    librg_config_t config;
-    config.tick_delay = 32;
-    config.mode = LIBRG_MODE_CLIENT;
-    config.world_size = zplm_vec2(5000.0f, 5000.0f);
-    config.max_entities = 1000;
+    // allocate ctx
+    ctx = new librg_ctx_t;
+    zpl_zero_item(ctx);
 
-    librg_init(config);
+    // setup manual client mode
+    ctx->tick_delay = 32;
+    ctx->mode = LIBRG_MODE_CLIENT;
+    ctx->world_size = zplm_vec3(5000.0f, 5000.0f, 5000.0f);
+    ctx->max_entities = 1000;
+
+    librg_init(ctx);
 
     // setup callbacks
-    librg_event_add(LIBRG_CONNECTION_ACCEPT, game_connected);
-    librg_event_add(LIBRG_CONNECTION_REFUSE, game_disconnected);
+    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, game_connected);
+    librg_event_add(ctx, LIBRG_CONNECTION_REFUSE, game_disconnected);
 
     if (graphics_init() == false) {
         return mod_exit("Unable to init Graphics Manager");
@@ -106,8 +109,9 @@ void mod_exit(std::string reason)
 {
     mod_log("exiting %s\n", reason.c_str());
 
-    model_free();
-    librg_free();
+    //model_free();
+    librg_free(ctx);
+    delete ctx;
 
     zpl_file_close(&mod.debug_log);
 

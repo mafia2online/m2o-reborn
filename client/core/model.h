@@ -82,7 +82,6 @@ void model_free() {
 void create_game_entity(librg_entity_t entity, M2::EntityTypes type, i32 model) {
     mod_assert(model_manager);
 
-    auto trans  = librg_fetch_transform(entity);
     auto object = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Entity>(type); mod_assert(object);
 
     // setting up the model

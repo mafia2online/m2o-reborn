@@ -1,7 +1,5 @@
-﻿void module_ped_callback_create(librg_event_t *event) {
-    if (librg_entity_type(event->entity) != TYPE_PED) return;
-
-    auto transform = librg_fetch_transform(event->entity);
+void module_ped_callback_create(librg_event_t *event) {
+    if (event->entity->type != TYPE_PED) return;
 
     const char *directory = "/sds/traffic/";
     const char *model = "cvezjon";
@@ -41,11 +39,14 @@
     if (reinterpret_cast<M2::C_Entity *>(human)->IsActive())
         mod_log("Entity active !\n");
 
-    reinterpret_cast<M2::C_Entity *>(human)->SetPosition(transform->position);
+    reinterpret_cast<M2::C_Entity *>(human)->SetPosition(event->entity->position);
 
     mod_log("Created at %x!\n", human);
 
-    librg_attach_gamedata(event->entity, { (M2::C_Entity*)human, pPedModelManager });
-    librg_attach_interpolate(event->entity, { 0 });
-    librg_attach_ped(event->entity, { 0 });
+    auto ped = new ped_t();
+
+    ped->object = (M2::C_Entity*)human;
+    ped->pGameModelManager = pPedModelManager;
+
+    event->entity->user_data = ped;
 }

@@ -1,4 +1,4 @@
-﻿#define MOD_SERVER
+#define MOD_SERVER
 
 #include "includes.h"
 
@@ -7,6 +7,7 @@ typedef struct {
     std::string password;
 } mod_settings_t;
 
+librg_ctx_t ctx;
 mod_settings_t mod_settings;
 
 // shared stuff
@@ -14,7 +15,7 @@ mod_settings_t mod_settings;
 #include "messages.h"
 
 // server modules
-#include "modules/module_ped.h"
+#include "callbacks.h"
 #include "modules/module_car.h"
 
 #include "settings.h"
@@ -44,58 +45,59 @@ void on_connection_request(librg_event_t *event) {
  * On client connected
  */
 void on_connect_accepted(librg_event_t *event) {
-    auto transform = librg_fetch_transform(event->entity);
-    auto client    = librg_fetch_client(event->entity);
+    auto entity = event->entity;
 
     mod_log("spawning player %u at: %f %f %f\n",
-        event->entity,
-        transform->position.x,
-        transform->position.y,
-        transform->position.z
+        entity->id,
+        entity->position.x,
+        entity->position.y,
+        entity->position.z
     );
 
-    librg_attach_ped(event->entity, {0});
-    librg_streamer_client_set(event->entity, client->peer);
+    //auto object = new ped_t;
+    //zpl_zero_item(object); // fill object with 0s
+    entity->user_data = new ped_t();
+
+    // TODO: allocate stuff
+    librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 }
 
 
 int main() {
-    librg_config_t config = {0};
-    config.tick_delay = 32;
-    config.mode = LIBRG_MODE_SERVER;
-    config.world_size = zplm_vec2(5000.0f, 5000.0f);
-    config.max_entities = 16000;
-    config.max_connections = 100;
+    ctx.tick_delay = 32;
+    ctx.mode = LIBRG_MODE_SERVER;
+    ctx.world_size = zplm_vec3(5000.0f, 5000.0f, 5000.f);
+    ctx.max_entities = 16000;
+    ctx.max_connections = 100;
 
-    librg_address_t address;
+
+    librg_address_t address = {0};
     address.port = 27010;
 
-    settings_read(&config, &address, &mod_settings);
+    settings_read(&ctx, &address, &mod_settings);
 
-    librg_log("starting on port: %u with conn: %u\n", address.port, config.max_connections);
+    librg_log("starting on port: %u with conn: %u\n", address.port, ctx.max_connections);
     librg_log("my hostname: %s, my password: %s\n", mod_settings.hostname.c_str(), mod_settings.password.c_str());
 
-    librg_init(config);
+    librg_init(&ctx);
 
-    librg_event_add(LIBRG_CONNECTION_REQUEST, on_connection_request);
-    librg_event_add(LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
+    librg_event_add(&ctx, LIBRG_CONNECTION_REQUEST, on_connection_request);
+    librg_event_add(&ctx, LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
 
-    module_ped_init();
-    module_car_init();
+    librg_event_add(&ctx, LIBRG_ENTITY_CREATE, entity_on_create);
+    librg_event_add(&ctx, LIBRG_ENTITY_UPDATE, entity_on_update);
+    librg_event_add(&ctx, LIBRG_ENTITY_REMOVE, entity_on_remove);
+    librg_event_add(&ctx, LIBRG_CLIENT_STREAMER_UPDATE, entity_on_csupdate);
 
-    librg_network_start(address);
+    librg_network_start(&ctx, address);
 
     while (true) {
-        librg_tick();
-
-        module_ped_tick();
-        module_car_tick();
-
-        zpl_sleep_ms(1);
+        librg_tick(&ctx);
+        zpl_sleep_ms(5);
     }
 
-    librg_network_stop();
-    librg_free();
+    librg_network_stop(&ctx);
+    librg_free(&ctx);
 
     return 0;
 }

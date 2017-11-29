@@ -1,4 +1,4 @@
-﻿void debug_state_render()
+void debug_state_render()
 {
     enum { EASY, HARD };
     static int op = EASY;
@@ -14,7 +14,7 @@
         nk_layout_row_static(nk_ctx, 30, 80, 1);
         if (nk_button_label(nk_ctx, "spawn car")) {
             // send vehicle create request onto server
-            librg_send(MOD_CAR_CREATE, data, {});
+            librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
         }
         if (nk_button_label(nk_ctx, "disable cursor")) {
             mod.input_blocked = 0;

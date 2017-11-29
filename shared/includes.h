@@ -1,5 +1,6 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #define D_SCL_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #ifdef _DEBUG
 #define LIBRG_DEBUG
@@ -7,18 +8,11 @@
 
 #define MOD_NAME "Mafia 2 Online - Reloaded"
 
-#define LIBRG_PLATFORM_ID 5
-#define LIBRG_PLATFORM_PROTOCOL 2
-#define LIBRG_PLATFORM_BUILD 0
-
 #define LIBRG_IMPLEMENTATION
 #define ZPLJ_IMPLEMENTATION
 
 #include <librg.h>
 #include <zpl_json.h>
-
-#define __dummypool_t librg__component__dummy_pool_t
-#define __dummymeta_t librg__dummy_meta_ent_t
 
 // third party headers
 #include <string>
@@ -44,7 +38,9 @@ typedef zplm_quat_t quat_t;
 #define mod_assert librg_assert
 #define mod_assert_msg librg_assert_msg
 
+#define librg_message_send librg_message_send_all
+
 enum {
-    MOD_CAR_CREATE = LIBRG_LAST_ENUM_NUMBER,
+    MOD_CAR_CREATE = LIBRG_EVENT_LAST,
     MOD_CAR_ENTER,
 };

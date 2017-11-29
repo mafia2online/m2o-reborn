@@ -24,6 +24,14 @@
 
 
   Version History:
+  3.2.0 - Added Android support
+  3.1.5 - Renamed userptr to user_data in timer
+  3.1.4 - Fix for zpl_buffer_t not allocating correctly
+  3.1.2 - Small fix in zpl_memcompare
+  3.1.1 - Added char* conversion for data field in zpl_array_header_t
+  3.1.0 - Added data field to zpl_array_header_t
+  3.0.7 - Added timer userptr as argument to callback
+  3.0.6 - Small changes
   3.0.5 - Fixed compilation for emscripten
   3.0.4 - Small fixes for tiny cpp warnings
   3.0.3 - Small fixes for various cpp warnings and errors
@@ -80,7 +88,7 @@ extern "C" {
 #endif
 #endif
 
-#if defined(_WIN64) || defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
+#if defined(_WIN64) || defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__) || defined(__aarch64__)
 #ifndef ZPL_ARCH_64_BIT
 #define ZPL_ARCH_64_BIT 1
 #endif
@@ -112,7 +120,14 @@ extern "C" {
 #define ZPL_SYSTEM_UNIX 1
 #endif
 
-#if defined(__linux__)
+#if defined(ANDROID) || defined(__ANDROID__)
+#ifndef ZPL_SYSTEM_ANDROID
+#define ZPL_SYSTEM_ANDROID 1
+#endif
+#ifndef ZPL_SYSTEM_LINUX
+#define ZPL_SYSTEM_LINUX 1
+#endif
+#elif defined(__linux__)
 #ifndef ZPL_SYSTEM_LINUX
 #define ZPL_SYSTEM_LINUX 1
 #endif
@@ -141,7 +156,15 @@ extern "C" {
 #error Unknown compiler
 #endif
 
-#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__) || defined(ZPL_SYSTEM_EMSCRIPTEN)
+#if defined(__arm__) || defined(__aarch64__)
+#ifndef ZPL_CPU_ARM
+#define ZPL_CPU_ARM 1
+#endif
+#ifndef ZPL_CACHE_LINE_SIZE
+#define ZPL_CACHE_LINE_SIZE 64
+#endif
+
+#elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__) || defined(ZPL_SYSTEM_EMSCRIPTEN)
 #ifndef ZPL_CPU_X86
 #define ZPL_CPU_X86 1
 #endif
@@ -155,14 +178,6 @@ extern "C" {
 #endif
 #ifndef ZPL_CACHE_LINE_SIZE
 #define ZPL_CACHE_LINE_SIZE 128
-#endif
-
-#elif defined(__arm__)
-#ifndef ZPL_CPU_ARM
-#define ZPL_CPU_ARM 1
-#endif
-#ifndef ZPL_CACHE_LINE_SIZE
-#define ZPL_CACHE_LINE_SIZE 64
 #endif
 
 #elif defined(__MIPSEL__) || defined(__mips_isa_rev)
@@ -200,7 +215,9 @@ extern "C" {
 #endif
 
 #if defined(ZPL_SYSTEM_UNIX)
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #define _LARGEFILE64_SOURCE
 #endif
 
@@ -251,14 +268,19 @@ extern "C" {
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <spawn.h>
 
+#if !defined(ZPL_SYSTEM_ANDROID)
+#include <spawn.h>
+#endif
+
+#if !defined(ZPL_SYSTEM_ANDROID)
 #if !defined(ZPL_SYSTEM_EMSCRIPTEN)
 #include <emmintrin.h>
 #elif defined(ZPL_CPU_X86) && !defined(ZPL_SYSTEM_EMSCRIPTEN)
 #include <xmmintrin.h>
 #else
 #include <sched.h>
+#endif
 #endif
 
 #endif
@@ -1433,7 +1455,7 @@ extern "C" {
 
 #define zpl_buffer_init(x, allocator, cap) do {                         \
         void **nx = cast(void **)&(x);                                  \
-        zpl_buffer_header_t *zpl__bh = cast(zpl_buffer_header_t *)zpl_alloc((allocator), (cap)*zpl_size_of(*(x))); \
+        zpl_buffer_header_t *zpl__bh = cast(zpl_buffer_header_t *)zpl_alloc((allocator), sizeof(zpl_buffer_header_t)+(cap)*zpl_size_of(*(x))); \
         zpl__bh->count = 0;                                             \
         zpl__bh->capacity = cap;                                        \
         *nx = cast(void *)(zpl__bh+1);                                  \
@@ -1521,9 +1543,10 @@ extern "C" {
 #endif
 
     typedef struct zpl_array_header_t {
-        zpl_allocator_t allocator;
+        char           *data;
         isize           count;
         isize           capacity;
+        zpl_allocator_t allocator;
     } zpl_array_header_t;
 
 #define zpl_array_t(Type) Type *
@@ -1545,6 +1568,7 @@ extern "C" {
         zpl_array_header_t *zpl__ah = cast(zpl_array_header_t *)zpl_alloc(allocator_, zpl_size_of(zpl_array_header_t)+zpl_size_of(*(x))*(cap)); \
         zpl__ah->allocator = allocator_;                                \
         zpl__ah->count = 0;                                             \
+        zpl__ah->data = (char *)x;                                              \
         zpl__ah->capacity = cap;                                        \
         *zpl__array_ = cast(void *)(zpl__ah+1);                         \
     } while (0)
@@ -2069,8 +2093,7 @@ extern "C" {
     } zpl_file_t;
 
     typedef struct zpl_async_file_t {
-        zpl_file_t file;
-        b32 done;
+        zpl_file_t handle;
         isize size;
         void *data;
     } zpl_async_file_t;
@@ -2198,7 +2221,7 @@ extern "C" {
     //
     //
 
-#define ZPL_TIMER_CB(name) void name()
+#define ZPL_TIMER_CB(name) void name(void *user_data)
     typedef ZPL_TIMER_CB(zpl_timer_cb);
 
     typedef struct zpl_timer_t {
@@ -2208,6 +2231,7 @@ extern "C" {
         i32           initial_calls;
         u64           next_call_ts;
         u64           duration;
+        void         *user_data;
     } zpl_timer_t;
 
     typedef zpl_array_t(zpl_timer_t) zpl_timer_pool;
@@ -3653,7 +3677,7 @@ extern "C" {
         while (size--) {
             isize d;
             if ((d = (*s1p8++ - *s2p8++)) != 0)
-                return d;
+                return cast(i32)d;
         }
         return 0;
     }
@@ -6657,6 +6681,7 @@ extern "C" {
             zpl_memmove(nh, h, zpl_size_of(zpl_array_header_t) + element_size*h->count);
             nh->allocator = h->allocator;
             nh->count     = h->count;
+            nh->data = (char *)nh+1;
             nh->capacity  = capacity;
             zpl_free(h->allocator, h);
             return nh+1;
@@ -7415,18 +7440,51 @@ extern "C" {
     }
 
     typedef struct {
-        zpl_async_file_t f;
+        zpl_async_file_t *f;
         zpl_async_file_cb *proc;
-        zpl_thread_t td;
+        void *data;
+        isize data_size;
     } zpl__async_file_ctl_t;
 
-    void zpl__async_file_read_proc(zpl_async_file_t *file, zpl_async_file_cb *proc) {
-        // TODO(ZaKlaus):
-        zpl_unused(proc);
-        zpl_unused(file);
+    ZPL_DEF ZPL_THREAD_PROC(zpl__async_file_read_proc) {
+        zpl__async_file_ctl_t *afops = cast(zpl__async_file_ctl_t *)thread->user_data;
 
+        zpl_async_file_t *f = afops->f;
+
+        i64 file_size = zpl_file_size(&f->handle);
+        void *file_contents = zpl_malloc(file_size);
+        zpl_file_read(&f->handle, file_contents, file_size);
+
+        f->size = file_size;
+        f->data = file_contents;
+
+        afops->proc(f);
+
+        zpl_free(zpl_heap_allocator(), afops->f);
+        zpl_free(zpl_heap_allocator(), afops);
+
+        return 0;
     }
 
+    ZPL_DEF ZPL_THREAD_PROC(zpl__async_file_write_proc) {
+        zpl__async_file_ctl_t *afops = cast(zpl__async_file_ctl_t *)thread->user_data;
+
+        zpl_async_file_t *f = afops->f;
+
+        i64 file_size = afops->data_size;
+        void *file_contents = afops->data;
+        zpl_file_write(&f->handle, file_contents, file_size);
+
+        f->size = file_size;
+        f->data = file_contents;
+
+        afops->proc(f);
+
+        zpl_free(zpl_heap_allocator(), afops->f);
+        zpl_free(zpl_heap_allocator(), afops);
+
+        return 0;
+    }
 
     ZPL_DEF void zpl_async_file_read(zpl_file_t *file, zpl_async_file_cb *proc) {
         ZPL_ASSERT(file && proc);
@@ -7435,23 +7493,43 @@ extern "C" {
         zpl_async_file_t a_ = {0};
         *a = a_;
 
-        //a->file = file;
+        a->handle = *file;
 
         zpl_thread_t td = {0};
         zpl_thread_init(&td);
 
-        // TODO(ZaKlaus):
-        //zpl_thread_start(&td,
+        zpl__async_file_ctl_t *afops = (zpl__async_file_ctl_t *)zpl_malloc(sizeof(zpl__async_file_ctl_t));
+        zpl__async_file_ctl_t afops_ = {0};
+        *afops = afops_;
 
-        zpl_mfree(a);
+        afops->f = a;
+        afops->proc = proc;
+
+        zpl_thread_start(&td, zpl__async_file_read_proc, cast(void *)afops);
     }
 
     ZPL_DEF void zpl_async_file_write(zpl_file_t *file, void const* buffer, isize size, zpl_async_file_cb *proc) {
-        zpl_unused(file);
-        zpl_unused(buffer);
-        zpl_unused(size);
-        zpl_unused(proc);
-        ZPL_PANIC("NotImplemented");
+        ZPL_ASSERT(file && proc && buffer);
+
+        zpl_async_file_t *a = (zpl_async_file_t *)zpl_malloc(sizeof(zpl_async_file_t));
+        zpl_async_file_t a_ = {0};
+        *a = a_;
+
+        a->handle = *file;
+
+        zpl_thread_t td = {0};
+        zpl_thread_init(&td);
+
+        zpl__async_file_ctl_t *afops = (zpl__async_file_ctl_t *)zpl_malloc(sizeof(zpl__async_file_ctl_t));
+        zpl__async_file_ctl_t afops_ = {0};
+        *afops = afops_;
+
+        afops->f = a;
+        afops->proc = proc;
+        afops->data = cast(void *)buffer;
+        afops->data_size = size;
+
+        zpl_thread_start(&td, zpl__async_file_write_proc, cast(void *)afops);
     }
 
     // TODO: Is this a bad idea?
@@ -8496,7 +8574,7 @@ extern "C" {
                             t->next_call_ts = now + t->duration;
                         }
 
-                        t->callback();
+                        t->callback(t->user_data);
                     }
                 }
             }
