@@ -12,6 +12,7 @@
 #include "CSpeedometer.hpp"
 #include "CHints.hpp"
 #include "CResources.hpp"
+#include "CReticle.hpp"
 
 namespace M2
 {
@@ -25,7 +26,9 @@ namespace M2
 		C_Hints *m_pHints;				//0054 - 0058
 		pad(ICHud, pad2, 0x14);			//0058 - 006C
 		C_Timer *m_pTimer;				//006C - 0070
-		pad(ICHud, pad3, 0x30);			//0070 - 00A0
+		pad(ICHud, pad3, 0x4);			//0070 - 0074
+        C_Reticle *m_pReticle;          //0074 - 0078
+        pad(ICHud, pad4, 0x28);         //0078 - 00A0
 		C_HudScriptW *m_pScript;		//00A0 - ????
 	};
 

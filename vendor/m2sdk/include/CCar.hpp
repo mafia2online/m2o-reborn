@@ -7,7 +7,11 @@
 
 #pragma once
 #include "CommonHeaders.h"
+
+#include "CVehDoor.hpp"
 #include "CVehicle.hpp"
+
+#include "../utils/TArray.hpp"
 
 namespace M2
 {
@@ -31,17 +35,19 @@ namespace M2
 	class ICCar
 	{
 	public:
-        CCarVFTable     *m_pVFTable;        // 0000 - 0004
-        pad(ICCar, pad1, 0x74);             // 0004 - 0078
-        int             m_nSlotSDS;         // 0078 - 007C
-		pad(ICCar, pad2, 0x2C);             // 007C - 00A8
-		C_Vehicle		m_pVehicle;         // 00A8 - 00CC
-        pad(ICCar, pad3, 0x1BC);            // 00CC - 0288
-        vec3_t          m_vecMoveSpeed;     // 0288 - 0294
-        float           m_fSpeed;           // 0294 - 0298
-        float           m_fSpeedDir;        // 0298 - 029C
-        pad(ICCar, pad4, 0xB8D);            // 029C - 0E29
-        bool            m_bWipers;          // 0E29 - 0E2D
+        CCarVFTable                 *m_pVFTable;        // 0000 - 0004
+        pad(ICCar, pad0, 0x68);                         // 0004 - 006C
+        Utils::T_Array<C_VehDoor*>  m_pDoors;           // 006C - 0074
+        pad(ICCar, pad1, 0x4);                          // 0074 - 0078
+        int                         m_nSlotSDS;         // 0078 - 007C
+		pad(ICCar, pad2, 0x2C);                         // 007C - 00A8
+		C_Vehicle		            m_pVehicle;         // 00A8 - 00CC
+        pad(ICCar, pad3, 0x1BC);                        // 00CC - 0288
+        vec3_t                      m_vecMoveSpeed;     // 0288 - 0294
+        float                       m_fSpeed;           // 0294 - 0298
+        float                       m_fSpeedDir;        // 0298 - 029C
+        pad(ICCar, pad4, 0xB8D);                        // 029C - 0E29
+        bool                        m_bWipers;          // 0E29 - 0E2D
 	};
 
 	class C_Car : public ICCar
@@ -60,6 +66,11 @@ namespace M2
         void DoorChangeState(int door)
         {
             Mem::InvokeFunction<Mem::call_this, void *>(0x4DBE10, this, door);
+        }
+
+        void DisableMotionBlur(bool disable)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9CCEF0, this, disable);
         }
 
 		int GetActualPlayerSeatIndex()
@@ -81,6 +92,11 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, long double>(0x09BAD20, this);
 		}
+
+        int GetPartByName(const char *name)
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x46C630, this, name);
+        }
 
 		double GetRepairPrice()
 		{
@@ -162,6 +178,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BADB0, this, damage);
 		}
+
+        void SetPainting(const char *painting)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x4472A0, this, painting);
+        }
 
 		void SetSiren(bool siren)
 		{

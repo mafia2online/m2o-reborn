@@ -39,7 +39,7 @@ namespace M2
             return Mem::InvokeFunction<Mem::call_this, int>(0x4EE9B0, this, human);
         }
 
-        int RegisterIconEntity(C_Entity *ent, int lib, int icon)
+        int RegisterIconEntity(C_EntityPos *ent, int lib, int icon)
         {
             return Mem::InvokeFunction<Mem::call_this, int>(0x4E7350, this, ent, lib, icon, 0, 0, 0);
         }

@@ -24,6 +24,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x1164D40, this, &pos);
 		}
 
+        void SetRandomPosition()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x1164D90, this);
+        }
+
 		void SetRot(vec3_t *rot)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x046A6B0, this, &rot);
