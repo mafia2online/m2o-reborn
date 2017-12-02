@@ -16,7 +16,7 @@ void module_car_create(librg_message_t *msg) {
 
     auto car = new car_t();
 
-    car->stream.model = librg_data_ru16(msg->data);
+    //car->stream.model = librg_data_ru16(msg->data);
     car->stream.brake = 0.0f;
 
     vehicle->user_data = car;

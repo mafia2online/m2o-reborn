@@ -45,7 +45,7 @@ void module_car_remote_enter(librg_message_t *msg) {
     mod_log("putting ped: %u in the car: %u\n", entped, entcar);
 
     M2::C_SyncObject *pSyncObject = nullptr;
-    ((M2::C_Human2*)ped->object)->GetScript()->UseAB(
+    ((M2::C_Human2*)ped->object)->GetScript()->ScrDoAction(
         &pSyncObject,
         reinterpret_cast<M2::C_Vehicle *>(car->object),
         true, M2::E_VehicleSeat::E_SEAT_DRIVER, false

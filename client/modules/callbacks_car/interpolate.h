@@ -7,17 +7,15 @@ void module_car_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
 
     if (librg_entity_type(ctx, entity->id) != TYPE_CAR) return;
 
-    auto ped = (ped_t *)entity->user_data;
-    librg_assert(ped && ped->object);
+    auto car = (car_t *)entity->user_data;
+    librg_assert(car && car->object);
 
     // last delta tick against constant tick delay
-    ped->interpolate.delta += (mod.last_delta / 16.666f);
+    car->interpolate.delta += (mod.last_delta / 16.666f);
     // mod_log("%f\n", interpolate->delta);
 
-    auto curr_pos = ped->object->GetPosition();
+    auto curr_pos = car->object->GetPosition();
     auto diff_pos = curr_pos - entity->position;
-
-    print_posm(diff_pos, "curr diff");
 
     // TODO: make proper validation
     if (zpl_abs(diff_pos.x) < MOD_ENTITY_POSITION_THRESHOLD
@@ -26,22 +24,22 @@ void module_car_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
     }
 
     // position
-    if (ped->interpolate.lposition != ped->interpolate.tposition) {
+    if (car->interpolate.lposition != car->interpolate.tposition) {
         vec3_t dposition;
-        ped->interpolate.step = 0;
-        zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
-        ped->object->SetPosition(dposition);
+        car->interpolate.step = 0;
+        zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
+        car->object->SetPosition(dposition);
     }
 
     // rotation TODO:
-    if (ped->interpolate.lrotation != ped->interpolate.trotation) {
-        auto last = ped->interpolate.lrotation;
-        auto dest = ped->interpolate.trotation;
+    if (car->interpolate.lrotation != car->interpolate.trotation) {
+        auto last = car->interpolate.lrotation;
+        auto dest = car->interpolate.trotation;
 
         quat_t drotation;
-        zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, ped->interpolate.delta);
-        ped->object->SetRotation(drotation);
+        zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
+        car->object->SetRotation(drotation);
     }
 
-    ped->interpolate.step++;
+    car->interpolate.step++;
 }

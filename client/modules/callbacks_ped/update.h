@@ -14,7 +14,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     auto diff_position = new_position - entity->position;
     entity->position = new_position;
 
-    if (event->entity != mod.player) {
+    if (event->entity->id != mod.player->id) {
         // lower limits
         // 0.05 - 0.06 - walking
         // 0.13 - 0.14 - running
@@ -69,7 +69,6 @@ void module_ped_callback_update(librg_event_t *event) {
 
     // make sure we have all objects
     mod_assert(ped && ped->object);
-    mod_log("getting update from server \n");
 
     interpolate_t *interpolate = &ped->interpolate;
 

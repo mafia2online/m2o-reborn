@@ -20,6 +20,10 @@ void debug_state_render()
             mod.input_blocked = 0;
         }
 
+        if (nk_button_label(nk_ctx, "hello")) {
+            mod_log("hello");
+        }
+
         /* fixed widget window ratio width */
         nk_layout_row_dynamic(nk_ctx, 30, 2);
         if (nk_option_label(nk_ctx, "easy", op == EASY)) op = EASY;

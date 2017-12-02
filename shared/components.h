@@ -56,11 +56,12 @@ struct ped_t {
 struct car_t {
 #pragma pack(push, 1)
     struct {
-        u16 model;
+        quat_t rotation;
 
         f32 wheel_turn;
         f32 brake;
         i8  gear;
+        u16 model;
     } stream;
 #pragma pack(pop)
 

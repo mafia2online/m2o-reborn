@@ -88,6 +88,9 @@ int main() {
     librg_event_add(&ctx, LIBRG_ENTITY_REMOVE, entity_on_remove);
     librg_event_add(&ctx, LIBRG_CLIENT_STREAMER_UPDATE, entity_on_csupdate);
 
+    librg_network_add(&ctx, MOD_CAR_CREATE, module_car_create);
+    librg_network_add(&ctx, MOD_CAR_ENTER, module_car_enter);
+
     librg_network_start(&ctx, address);
 
     while (true) {
