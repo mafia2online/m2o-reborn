@@ -1,30 +1,52 @@
 {
-  "_from": "zpl.c@3.3.0",
-  "_id": "zpl.c@3.3.0",
-  "_inBundle": false,
-  "_integrity": "sha512-i/jWQTOYkxLEy/yGPO+oT/y/uMLFTLOpbXTkUFU3OD4UhAlXahY7nr8FMoIVS86WfKIcK6oMfLeyvYaCAXH3Jg==",
+  "_args": [
+    [
+      {
+        "raw": "zpl.c@^3.3.2",
+        "scope": null,
+        "escapedName": "zpl.c",
+        "name": "zpl.c",
+        "rawSpec": "^3.3.2",
+        "spec": ">=3.3.2 <4.0.0",
+        "type": "range"
+      },
+      "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c"
+    ]
+  ],
+  "_from": "zpl.c@>=3.3.2 <4.0.0",
+  "_id": "zpl.c@3.3.2",
+  "_inCache": true,
   "_location": "/zpl.c",
+  "_nodeVersion": "8.9.1",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/zpl.c-3.3.2.tgz_1512146084442_0.7297232649289072"
+  },
+  "_npmUser": {
+    "name": "inlife",
+    "email": "vladgritsenko@gmail.com"
+  },
+  "_npmVersion": "5.5.1",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "zpl.c@3.3.0",
-    "name": "zpl.c",
+    "raw": "zpl.c@^3.3.2",
+    "scope": null,
     "escapedName": "zpl.c",
-    "rawSpec": "3.3.0",
-    "saveSpec": null,
-    "fetchSpec": "3.3.0"
+    "name": "zpl.c",
+    "rawSpec": "^3.3.2",
+    "spec": ">=3.3.2 <4.0.0",
+    "type": "range"
   },
   "_requiredBy": [
-    "#USER",
-    "/",
+    "/librg.c",
     "/zpl_cull.c",
     "/zpl_event.c"
   ],
-  "_resolved": "https://registry.npmjs.org/zpl.c/-/zpl.c-3.3.0.tgz",
-  "_shasum": "124591e3621df571a4e89d45506a552dedb7844d",
-  "_spec": "zpl.c@3.3.0",
-  "_where": "/Users/inlife/Projects/reguider/librg",
+  "_resolved": "https://registry.npmjs.org/zpl.c/-/zpl.c-3.3.2.tgz",
+  "_shasum": "98542de9bb15f6f2f5c20d55e1095ac0fe2b2a87",
+  "_shrinkwrap": null,
+  "_spec": "zpl.c@^3.3.2",
+  "_where": "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c",
   "author": {
     "name": "Dominik Madarasz",
     "email": "zaklaus@outlook.com",
@@ -33,12 +55,18 @@
   "bugs": {
     "url": "https://github.com/zpl-c/zpl/issues"
   },
-  "bundleDependencies": false,
-  "deprecated": false,
+  "dependencies": {},
   "description": "Single-file public domain header-only C and C++ helper library.",
+  "devDependencies": {},
   "directories": {
     "test": "test"
   },
+  "dist": {
+    "integrity": "sha512-3gGIgICRpB2migPqJc1N/+6/bQ8ya/cdbndNvx+yyiKLlBUm5XoBzYuMmSYyaJhtunzKSJr46J5l7Cqr2etr+g==",
+    "shasum": "98542de9bb15f6f2f5c20d55e1095ac0fe2b2a87",
+    "tarball": "https://registry.npmjs.org/zpl.c/-/zpl.c-3.3.2.tgz"
+  },
+  "gitHead": "11ec2d45e2c4fdf8aa0dfcd8f8e4cf85cc462d20",
   "homepage": "https://github.com/zpl-c/zpl#readme",
   "keywords": [
     "zpl",
@@ -49,7 +77,19 @@
   ],
   "license": "Unlicense",
   "main": "include/zpl.h",
+  "maintainers": [
+    {
+      "name": "inlife",
+      "email": "vladgritsenko@gmail.com"
+    },
+    {
+      "name": "zaklaus",
+      "email": "zaklaus@outlook.com"
+    }
+  ],
   "name": "zpl.c",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zpl-c/zpl.git"
@@ -57,5 +97,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "3.3.0"
+  "version": "3.3.2"
 }

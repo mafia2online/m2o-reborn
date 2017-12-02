@@ -6,7 +6,7 @@ static int64_t StartTime;
 
 static void updateDiscordPresence()
 {
-    char buffer[256];
+    //char buffer[256];
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
     discordPresence.state = "Developing";

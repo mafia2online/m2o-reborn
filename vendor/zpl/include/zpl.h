@@ -14,17 +14,19 @@
   #define ZPL_IMPLEMENTATION exactly in ONE source file right BEFORE including the library, like:
 
   #define ZPL_IMPLEMENTATION
-  #include"zpl.h"
+  #include "zpl.h"
 
   Credits:
-  Vladislav Gritsenko (GitHub: inlife)
+  Vladyslav Hrytsenko (GitHub: inlife)
   Dominik Madarasz (GitHub: zaklaus)
   Ginger Bill (GitHub: gingerBill)
   Sean Barrett (GitHub: nothings)
 
 
   Version History:
-  3.2.0 - Added Android support
+  3.3.2 - Fixes for android arm
+  3.3.1 - Fixed some type cast warnings
+  3.3.0 - Added Android support
   3.1.5 - Renamed userptr to user_data in timer
   3.1.4 - Fix for zpl_buffer_t not allocating correctly
   3.1.2 - Small fix in zpl_memcompare
@@ -192,7 +194,11 @@ extern "C" {
 #error Unknown CPU Type
 #endif
 
-
+#if !defined(ZPL_SYSTEM_EMSCRIPTEN) && !defined(ZPL_CPU_ARM) // disabled for __EMSCRIPTEN__
+#ifndef ZPL_THREADING
+#define ZPL_THREADING 1
+#endif
+#endif
 
 #ifndef ZPL_STATIC_ASSERT
 #define ZPL_STATIC_ASSERT3(cond, msg) typedef char static_assertion_##msg[(!!(cond))*2-1]
@@ -758,7 +764,7 @@ extern "C" {
 #endif
 
 
-
+#ifdef ZPL_THREADING
 
     // Atomics
 
@@ -966,7 +972,7 @@ extern "C" {
     ZPL_DEF b32   zpl_affinity_set    (zpl_affinity_t *a, isize core, isize thread);
     ZPL_DEF isize zpl_affinity_thread_count_for_core(zpl_affinity_t *a, isize core);
 
-
+#endif
 
 
     ////////////////////////////////////////////////////////////////
@@ -2092,6 +2098,8 @@ extern "C" {
         // zpl_dir_info_t *   dir_info; // TODO: Get directory info
     } zpl_file_t;
 
+#ifdef ZPL_THREADING
+
     typedef struct zpl_async_file_t {
         zpl_file_t handle;
         isize size;
@@ -2100,6 +2108,8 @@ extern "C" {
 
 #define ZPL_ASYNC_FILE_CB(name) void name(zpl_async_file_t *file)
     typedef ZPL_ASYNC_FILE_CB(zpl_async_file_cb);
+
+#endif // ZPL_THREADING
 
     typedef enum zpl_file_standard_type_e {
         zpl_file_standard_input_ev,
@@ -2131,8 +2141,10 @@ extern "C" {
     ZPL_DEF zpl_file_error_e zpl_file_truncate      (zpl_file_t *file, i64 size);
     ZPL_DEF b32         zpl_file_has_changed   (zpl_file_t *file); // NOTE: Changed since lasted checked
 
+#ifdef ZPL_THREADING
     ZPL_DEF void zpl_async_file_read(zpl_file_t *file, zpl_async_file_cb *proc);
     ZPL_DEF void zpl_async_file_write(zpl_file_t *file, void const* buffer, isize size, zpl_async_file_cb *proc);
+#endif
 
     zpl_file_error_e zpl_file_temp(zpl_file_t *file);
 
@@ -3191,7 +3203,7 @@ extern "C" {
 #define WS_MINIMIZEBOX      0x00020000
 #define WS_POPUP            0x80000000
 #define WS_OVERLAPPED     0
-#define WS_OVERLAPPEDWINDOW	0xcf0000
+#define WS_OVERLAPPEDWINDOW 0xcf0000
 #define CW_USEDEFAULT       0x80000000
 #define WS_BORDER           0x800000
 #define WS_CAPTION          0xc00000
@@ -3802,7 +3814,7 @@ extern "C" {
 
 
 
-#if !defined(ZPL_SYSTEM_EMSCRIPTEN) // disabled for __EMSCRIPTEN__
+#if ZPL_THREADING
 
     ////////////////////////////////////////////////////////////////
     //
@@ -4533,10 +4545,6 @@ extern "C" {
 #endif
     }
 
-
-#endif // !defined(ZPL_SYSTEM_EMSCRIPTEN)
-
-
     void zpl_sync_init(zpl_sync_t *s) {
         zpl_zero_item(s);
         zpl_mutex_init(&s->mutex);
@@ -4607,78 +4615,6 @@ extern "C" {
 
 
 
-
-
-
-
-    zpl_inline zpl_allocator_t zpl_heap_allocator(void) {
-        zpl_allocator_t a;
-        a.proc = zpl_heap_allocator_proc;
-        a.data = NULL;
-        return a;
-    }
-
-    ZPL_ALLOCATOR_PROC(zpl_heap_allocator_proc) {
-        void *ptr = NULL;
-        zpl_unused(allocator_data);
-        zpl_unused(old_size);
-        // TODO: Throughly test!
-        switch (type) {
-#if defined(ZPL_COMPILER_MSVC) || (defined(ZPL_COMPILER_GCC) && defined(ZPL_SYSTEM_WINDOWS))
-        case zpl_allocation_alloc_ev:
-            ptr = _aligned_malloc(size, alignment);
-            if (flags & zpl_allocator_flag_clear_to_zero_ev)
-                zpl_zero_size(ptr, size);
-            break;
-        case zpl_allocation_free_ev:
-            _aligned_free(old_memory);
-            break;
-        case zpl_allocation_resize_ev:
-            ptr = _aligned_realloc(old_memory, size, alignment);
-            break;
-
-#elif defined(ZPL_SYSTEM_LINUX)
-            case zpl_allocation_alloc_ev: {
-                ptr = aligned_alloc(alignment, size);
-
-                if (flags & zpl_allocator_flag_clear_to_zero_ev) {
-                    zpl_zero_size(ptr, size);
-                }
-            } break;
-
-            case zpl_allocation_free_ev: {
-                free(old_memory);
-            } break;
-
-            case zpl_allocation_resize_ev: {
-                zpl_allocator_t a = zpl_heap_allocator();
-                ptr = zpl_default_resize_align(a, old_memory, old_size, size, alignment);
-            } break;
-#else
-        case zpl_allocation_alloc_ev: {
-            posix_memalign(&ptr, alignment, size);
-
-            if (flags & zpl_allocator_flag_clear_to_zero_ev) {
-                zpl_zero_size(ptr, size);
-            }
-        } break;
-
-        case zpl_allocation_free_ev: {
-            free(old_memory);
-        } break;
-
-        case zpl_allocation_resize_ev: {
-            zpl_allocator_t a = zpl_heap_allocator();
-            ptr = zpl_default_resize_align(a, old_memory, old_size, size, alignment);
-        } break;
-#endif
-
-        case zpl_allocation_free_all_ev:
-            break;
-        }
-
-        return ptr;
-    }
 
 
 #if defined(ZPL_SYSTEM_WINDOWS)
@@ -4898,8 +4834,7 @@ extern "C" {
 #endif
 
 
-
-
+#endif // ZPL_THREADING
 
 
     ////////////////////////////////////////////////////////////////
@@ -5029,6 +4964,79 @@ extern "C" {
     // Custom Allocation
     //
     //
+
+    //
+    // Heap Allocator
+    //
+
+    zpl_inline zpl_allocator_t zpl_heap_allocator(void) {
+        zpl_allocator_t a;
+        a.proc = zpl_heap_allocator_proc;
+        a.data = NULL;
+        return a;
+    }
+
+    ZPL_ALLOCATOR_PROC(zpl_heap_allocator_proc) {
+        void *ptr = NULL;
+        zpl_unused(allocator_data);
+        zpl_unused(old_size);
+        // TODO: Throughly test!
+        switch (type) {
+    #if defined(ZPL_COMPILER_MSVC) || (defined(ZPL_COMPILER_GCC) && defined(ZPL_SYSTEM_WINDOWS))
+            case zpl_allocation_alloc_ev:
+                ptr = _aligned_malloc(size, alignment);
+                if (flags & zpl_allocator_flag_clear_to_zero_ev)
+                    zpl_zero_size(ptr, size);
+                break;
+            case zpl_allocation_free_ev:
+                _aligned_free(old_memory);
+                break;
+            case zpl_allocation_resize_ev:
+                ptr = _aligned_realloc(old_memory, size, alignment);
+                break;
+
+    #elif defined(ZPL_SYSTEM_LINUX) && !defined(ZPL_CPU_ARM)
+            case zpl_allocation_alloc_ev: {
+                    ptr = aligned_alloc(alignment, size);
+
+                    if (flags & zpl_allocator_flag_clear_to_zero_ev) {
+                        zpl_zero_size(ptr, size);
+                    }
+                } break;
+
+                case zpl_allocation_free_ev: {
+                    free(old_memory);
+                } break;
+
+                case zpl_allocation_resize_ev: {
+                    zpl_allocator_t a = zpl_heap_allocator();
+                    ptr = zpl_default_resize_align(a, old_memory, old_size, size, alignment);
+                } break;
+    #else
+            case zpl_allocation_alloc_ev: {
+                posix_memalign(&ptr, alignment, size);
+
+                if (flags & zpl_allocator_flag_clear_to_zero_ev) {
+                    zpl_zero_size(ptr, size);
+                }
+            } break;
+
+            case zpl_allocation_free_ev: {
+                free(old_memory);
+            } break;
+
+            case zpl_allocation_resize_ev: {
+                zpl_allocator_t a = zpl_heap_allocator();
+                ptr = zpl_default_resize_align(a, old_memory, old_size, size, alignment);
+            } break;
+    #endif
+
+            case zpl_allocation_free_all_ev:
+                break;
+        }
+
+        return ptr;
+    }
 
 
     //
@@ -7439,6 +7447,8 @@ extern "C" {
         return result;
     }
 
+#ifdef ZPL_THREADING
+
     typedef struct {
         zpl_async_file_t *f;
         zpl_async_file_cb *proc;
@@ -7452,10 +7462,10 @@ extern "C" {
         zpl_async_file_t *f = afops->f;
 
         i64 file_size = zpl_file_size(&f->handle);
-        void *file_contents = zpl_malloc(file_size);
-        zpl_file_read(&f->handle, file_contents, file_size);
+        void *file_contents = zpl_malloc((isize)file_size);
+        zpl_file_read(&f->handle, file_contents, (isize)file_size);
 
-        f->size = file_size;
+        f->size = (isize)file_size;
         f->data = file_contents;
 
         afops->proc(f);
@@ -7473,9 +7483,9 @@ extern "C" {
 
         i64 file_size = afops->data_size;
         void *file_contents = afops->data;
-        zpl_file_write(&f->handle, file_contents, file_size);
+        zpl_file_write(&f->handle, file_contents, (isize)file_size);
 
-        f->size = file_size;
+        f->size = (isize)file_size;
         f->data = file_contents;
 
         afops->proc(f);
@@ -7531,6 +7541,8 @@ extern "C" {
 
         zpl_thread_start(&td, zpl__async_file_write_proc, cast(void *)afops);
     }
+
+#endif // ZPL_THREADING
 
     // TODO: Is this a bad idea?
     zpl_global b32    zpl__std_file_set = false;
@@ -8426,6 +8438,34 @@ extern "C" {
 
         return result;
     }
+#elif defined(ZPL_CPU_ARM)
+    zpl_inline u64 zpl_rdtsc(void) {
+#if defined(__aarch64__)
+        int64_t r = 0;
+        asm volatile("mrs %0, cntvct_el0" : "=r"(r) );
+#elif defined(__ARM_ARCH_7A__)
+        uint32_t r = 0;
+        asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(r) );
+#elif (__ARM_ARCH >= 6)
+        uint32_t pmccntr;
+        uint32_t pmuseren;
+        uint32_t pmcntenset;
+
+        // Read the user mode perf monitor counter access permissions.
+        asm volatile("mrc p15, 0, %0, c9, c14, 0" : "=r"(pmuseren));
+        if (pmuseren & 1) {  // Allows reading perfmon counters for user mode code.
+            asm volatile("mrc p15, 0, %0, c9, c12, 1" : "=r"(pmcntenset));
+            if (pmcntenset & 0x80000000ul) {  // Is it counting?
+                asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(pmccntr));
+                // The counter is set up to count every 64th cycle
+                return ((int64_t)pmccntr) * 64;  // Should optimize to << 6
+            }
+        }
+#else
+#error "No suitable method for zpl_rdtsc for this cpu type"
+#endif
+        return r;
+    }
 #endif
 
 #if defined(ZPL_SYSTEM_WINDOWS)
@@ -8587,7 +8627,11 @@ extern "C" {
     //
     //
 
+#if ZPL_THREADING
     zpl_global zpl_atomic32_t zpl__random_shared_counter = {0};
+#else
+    zpl_global i32 zpl__random_shared_counter = 0;
+#endif
 
     zpl_internal u32 zpl__get_noise_from_time(void) {
         u32 accum = 0;
@@ -8633,9 +8677,15 @@ extern "C" {
         r->value = 0;
 
         r->offsets[0] = zpl__get_noise_from_time();
+#ifdef ZPL_THREADING
         r->offsets[1] = zpl_atomic32_fetch_add(&zpl__random_shared_counter, 1);
         r->offsets[2] = zpl_thread_current_id();
         r->offsets[3] = zpl_thread_current_id() * 3 + 1;
+#else
+        r->offsets[1] = zpl__random_shared_counter++;
+        r->offsets[2] = 0;
+        r->offsets[3] = 1;
+#endif
         time = zpl_utc_time_now();
         r->offsets[4] = cast(u32)(time >> 32);
         r->offsets[5] = cast(u32)time;

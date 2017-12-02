@@ -1,35 +1,56 @@
 {
-  "_from": "enet.c@1.4.5",
+  "_args": [
+    [
+      {
+        "raw": "enet.c@^1.4.5",
+        "scope": null,
+        "escapedName": "enet.c",
+        "name": "enet.c",
+        "rawSpec": "^1.4.5",
+        "spec": ">=1.4.5 <2.0.0",
+        "type": "range"
+      },
+      "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c"
+    ]
+  ],
+  "_from": "enet.c@>=1.4.5 <2.0.0",
   "_id": "enet.c@1.4.5",
-  "_inBundle": false,
-  "_integrity": "sha512-3vT2kHdxcsW8K4aKy90il81WxGQ6tw2smD96k8fdAuwljSS1CwuArYRqjVbqbQjrtcUQIJyY68JIz8KQQmIrPg==",
+  "_inCache": true,
   "_location": "/enet.c",
+  "_nodeVersion": "8.9.1",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/enet.c-1.4.5.tgz_1511777059392_0.779384303605184"
+  },
+  "_npmUser": {
+    "name": "inlife",
+    "email": "vladgritsenko@gmail.com"
+  },
+  "_npmVersion": "5.5.1",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "enet.c@1.4.5",
-    "name": "enet.c",
+    "raw": "enet.c@^1.4.5",
+    "scope": null,
     "escapedName": "enet.c",
-    "rawSpec": "1.4.5",
-    "saveSpec": null,
-    "fetchSpec": "1.4.5"
+    "name": "enet.c",
+    "rawSpec": "^1.4.5",
+    "spec": ">=1.4.5 <2.0.0",
+    "type": "range"
   },
   "_requiredBy": [
-    "#USER",
-    "/"
+    "/librg.c"
   ],
   "_resolved": "https://registry.npmjs.org/enet.c/-/enet.c-1.4.5.tgz",
   "_shasum": "a86bd0fcac4b2db70f4c1e15f0ec522edcfdacc3",
-  "_spec": "enet.c@1.4.5",
-  "_where": "/Users/inlife/Projects/reguider/librg",
+  "_shrinkwrap": null,
+  "_spec": "enet.c@^1.4.5",
+  "_where": "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c",
   "author": {
     "name": "Lee Salzman"
   },
   "bugs": {
     "url": "https://github.com/zpl-c/enet-c/issues"
   },
-  "bundleDependencies": false,
   "contributors": [
     {
       "name": "Vladyslav Hrytsenko"
@@ -38,11 +59,18 @@
       "name": "Dominik Madarász"
     }
   ],
-  "deprecated": false,
+  "dependencies": {},
   "description": "ENet - Simple, lightweight and reliable UDP networking library written on pure C.",
+  "devDependencies": {},
   "directories": {
     "doc": "misc/docs"
   },
+  "dist": {
+    "integrity": "sha512-3vT2kHdxcsW8K4aKy90il81WxGQ6tw2smD96k8fdAuwljSS1CwuArYRqjVbqbQjrtcUQIJyY68JIz8KQQmIrPg==",
+    "shasum": "a86bd0fcac4b2db70f4c1e15f0ec522edcfdacc3",
+    "tarball": "https://registry.npmjs.org/enet.c/-/enet.c-1.4.5.tgz"
+  },
+  "gitHead": "cf3067d7319ca29c404e464fc2acfe66e0fed46a",
   "homepage": "https://github.com/zpl-c/enet-c#readme",
   "keywords": [
     "udp",
@@ -53,7 +81,19 @@
   ],
   "license": "MIT",
   "main": "include/enet.h",
+  "maintainers": [
+    {
+      "name": "inlife",
+      "email": "vladgritsenko@gmail.com"
+    },
+    {
+      "name": "zaklaus",
+      "email": "zaklaus@outlook.com"
+    }
+  ],
   "name": "enet.c",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zpl-c/enet-c.git"

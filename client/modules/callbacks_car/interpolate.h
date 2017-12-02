@@ -12,7 +12,7 @@ void module_car_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
 
     // last delta tick against constant tick delay
     car->interpolate.delta += (mod.last_delta / 16.666f);
-    // mod_log("%f\n", interpolate->delta);
+    mod_log("%f\n", car->interpolate.delta);
 
     auto curr_pos = car->object->GetPosition();
     auto diff_pos = curr_pos - entity->position;
@@ -33,6 +33,8 @@ void module_car_callback_interpolate(librg_ctx_t *ctx, librg_entity_id id) {
 
     // rotation TODO:
     if (car->interpolate.lrotation != car->interpolate.trotation) {
+        mod_log("interpolating rotation");
+
         auto last = car->interpolate.lrotation;
         auto dest = car->interpolate.trotation;
 

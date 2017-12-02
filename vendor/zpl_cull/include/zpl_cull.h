@@ -179,13 +179,12 @@ extern "C" {
         for (i32 i = 0; i < zpl_array_count(c->nodes); ++i) {
             zplc_node_t *node = &c->nodes[i];
             if (node->tag == tag) {
-                // if (node->unused) return false;
-                // if (c->free_nodes == NULL) {
-                //     zpl_array_init_reserve(c->free_nodes, c->allocator, c->max_nodes);
-                // }
-                // zpl_array_append(c->free_nodes, i);
-                // node->unused = true;
-                zpl_array_remove_at(c->nodes, i);
+                if (node->unused) return false;
+                if (c->free_nodes == NULL) {
+                    zpl_array_init_reserve(c->free_nodes, c->allocator, c->max_nodes);
+                }
+                zpl_array_append(c->free_nodes, i);
+                node->unused = true;
                 return true;
             }
         }
@@ -224,12 +223,12 @@ extern "C" {
             zpl_array_init(c->nodes, c->allocator);
         }
 
-        // if (c->free_nodes && zpl_array_count(c->free_nodes) > 0) {
-        //     node.unused = false;
-        //     c->nodes[c->free_nodes[zpl_array_count(c->free_nodes)-1]] = node;
-        //     zpl_array_pop(c->free_nodes);
-        //     return c;
-        // }
+        if (c->free_nodes && zpl_array_count(c->free_nodes) > 0) {
+            node.unused = false;
+            c->nodes[c->free_nodes[zpl_array_count(c->free_nodes)-1]] = node;
+            zpl_array_pop(c->free_nodes);
+            return c;
+        }
 
         if ((usize)zpl_array_count(c->nodes) < c->max_nodes) {
             insert:
@@ -238,7 +237,6 @@ extern "C" {
         }
 
         if (c->use_min_bounds && zplc__bounds_small_enough(c->boundary, c->min_bounds)) {
-            c->max_nodes++;
             goto insert;
         }
 

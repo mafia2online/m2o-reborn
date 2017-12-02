@@ -14,6 +14,12 @@ enum {
     PED_IN_CAR,
 };
 
+enum {
+    MOD_ENTITY_PED          = (1 << 20),
+    MOD_ENTITY_CAR          = (1 << 21),
+    MOD_ENTITY_INTERPOLATED = (1 << 28),
+};
+
 struct interpolate_t {
     vec3_t lposition;
     quat_t lrotation;

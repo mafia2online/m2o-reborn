@@ -177,7 +177,8 @@ Address Mem::Hooks::InstallNotDumbJMP(Address target_addr, Address hookfnc_addr,
     std::vector<Byte> patch_data(len, 0x90);
     patch_data[0] = X86Instructions::JMP;
     *reinterpret_cast<Address *>(patch_data.data() + 1) = hookfnc_addr - (target_addr + 5);
-    std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
+    //std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
+    zpl_memcopy(reinterpret_cast<std::vector<Byte>::value_type*>(target_addr), patch_data.data(), patch_data.size());
     return target_addr + len;
 }
 
