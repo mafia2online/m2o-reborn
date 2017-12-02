@@ -58,6 +58,8 @@ include_directories(
     vendor/steam_api/include
     vendor/detours/include
     vendor/m2sdk/include
+    vendor/m2sdk/utils
+    vendor/m2sdk/wrappers
     vendor/nuklear/include
     vendor/discord_rpc/include
     server/
@@ -94,6 +96,8 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/include/*.h*"
+    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/utils/*.h*"
+    "${PROJECT_SOURCE_DIR}/vendor/m2sdk/wrappers/*.h*"
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/discord_rpc/include/*.h"
 )
