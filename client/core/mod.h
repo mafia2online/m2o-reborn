@@ -33,6 +33,7 @@ void mod_game_tick() {
 
     librg_tick(ctx);
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), mod_entity_interpolate);
+
     updateDiscordPresence();
 
     /* show/hide mouse */
@@ -42,6 +43,7 @@ void mod_game_tick() {
     /* connect to the server */
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
         //game_connect();
+        librg_network_start(ctx, { 27010, "localhost" });
         mod.spawned = true;
     }
 
