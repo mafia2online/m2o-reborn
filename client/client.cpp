@@ -146,8 +146,8 @@ struct mod_t {
     mod_state_t state;
 
     mod_mouse_t     mouse;
-    librg_entity_t  *player;
     mod_graphics_t  graphics;
+    librg_entity_t  *player;
 
     // game tick props
     u64 last_update;
@@ -186,8 +186,6 @@ void graphics_device_prerender();
 void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-
-void module_car_local_enter(void *);
 
 // =======================================================================//
 // !

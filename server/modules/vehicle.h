@@ -24,19 +24,17 @@ void module_car_enter(librg_message_t *msg) {
         return;
     }
 
-    mod_log("ped: %lu becomes driver of: %lu\n", player->id, vehicle->id);
+    mod_log("[info] ped: %lu becomes driver of: %lu\n", player->id, vehicle->id);
     librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
 
-    // sorry
-    ((ped_t *)player->user_data)->stream.state = PED_IN_CAR;
-
-    mod_log("sending enter message to EVERYYYYBODY\n");
-    mod_message_send_instream(msg->ctx, MOD_CAR_ENTER, player->id, [&](librg_data_t *data) {
+    mod_message_send_instream_except(msg->ctx, MOD_CAR_ENTER, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);
         librg_data_wu32(data, vehicle->id);
     });
 }
 
 void module_car_exit(librg_message_t *msg) {
+    auto player = librg_entity_find(msg->ctx, msg->peer);
+    mod_log("player: %d is trying to leave his current car\n", player->id);
     // librg_entity_control_remove(msg->ctx, lastcar);
 }

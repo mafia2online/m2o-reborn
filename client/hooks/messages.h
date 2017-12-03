@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 enum E_PlayerMessage
 {
@@ -10,7 +10,7 @@ enum E_PlayerMessage
 /* Messages from the game that we catched */
 void player_game_message(M2::C_EntityMessage *message)
 {
-    
+
     switch (message->m_dwMessage)
     {
         case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE:
@@ -47,6 +47,9 @@ void player_mod_message(E_PlayerMessage message)
         case E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR:
         {
             mod_log("Start to leave car\n");
+
+            librg_event_t event = { 0 }; event.entity = mod.player;
+            librg_event_trigger(ctx, MOD_CAR_EXIT, &event);
         }
     }
 }
@@ -55,10 +58,14 @@ void player_mod_message(E_PlayerMessage message)
 /* Return true and the player will enter, false and the player will be stuck */
 bool player_request_vehicle_enter(M2::C_Car *car)
 {
-    // librg_event_t event = { 0 }; event.custom = (void*)car;
-    // librg_event_trigger(MOD_CAR_ENTER, &event);
+    librg_event_t event = { 0 };
 
-    module_car_local_enter((void *)car);
+    event.entity    = mod.player;
+    event.user_data = (void *)car;
+
+    librg_event_trigger(ctx, MOD_CAR_ENTER, &event);
+
+    // module_car_local_enter((void *)car);
 
     return true;
 }

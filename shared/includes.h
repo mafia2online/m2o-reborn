@@ -39,9 +39,10 @@ typedef zplm_quat_t quat_t;
 #define mod_assert librg_assert
 #define mod_assert_msg librg_assert_msg
 
-#define librg_message_send librg_message_send_all
-
+// TODO: move to components.h
+/* events/messages */
 enum {
     MOD_CAR_CREATE = LIBRG_EVENT_LAST,
     MOD_CAR_ENTER,
+    MOD_CAR_EXIT,
 };

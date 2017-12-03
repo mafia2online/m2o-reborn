@@ -46,3 +46,5 @@ inline void mod_message_add(librg_ctx_t *ctx, LIBRG_MESSAGE_ID id, message_callb
     ctx->messages[id] = callback.target;
 }
 */
+
+#define librg_message_send librg_message_send_all

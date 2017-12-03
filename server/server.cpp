@@ -111,6 +111,7 @@ int main() {
 
     librg_network_add(ctx, MOD_CAR_CREATE, module_car_create);
     librg_network_add(ctx, MOD_CAR_ENTER, module_car_enter);
+    librg_network_add(ctx, MOD_CAR_EXIT, module_car_exit);
 
     librg_network_start(ctx, address);
 

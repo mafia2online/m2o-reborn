@@ -4,10 +4,6 @@
 // !
 // =======================================================================//
 
-void module_car_init() {
-    //librg_network_add(ctx, MOD_CAR_ENTER, module_car_remote_enter);
-}
-
 /**
  * The entity enters the stream zone
  */
@@ -64,7 +60,7 @@ void module_car_callback_create(librg_event_t *event) {
         mod_log("Created at %x with GUID: %lu!\n", object, car->object->m_dwGUID);
     }
 
-    event->flags |= MOD_ENTITY_INTERPOLATED;
+    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
     event->entity->user_data = car;
 }
 
@@ -88,16 +84,26 @@ void module_car_callback_remove(librg_event_t *event) {
  * The entity in our stream zone gets updated
  */
 void module_car_callback_update(librg_event_t *event) {
-    auto car = (car_t *)event->entity->user_data;
-    auto interpolate = &car->interpolate;
+    auto entity = event->entity; mod_assert(entity);
+    auto car = (car_t *)(event->entity->user_data);
 
+    // make sure we have all objects
+    mod_assert(car && car->object);
+
+    interpolate_t *interpolate = &car->interpolate;
+
+    // interpolation stuff
     interpolate->lposition = interpolate->tposition;
     interpolate->lrotation = interpolate->trotation;
-
-    interpolate->tposition = event->entity->position;
+    interpolate->tposition = entity->position;
     interpolate->trotation = car->stream.rotation;
-
     interpolate->delta = 0.0f;
+
+    librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
+
+    if (car->stream.speed > 0.0f) {
+        ((M2::C_Car *)car->object)->SetSpeedFloat(car->stream.speed);
+    }
 }
 
 /**
@@ -110,7 +116,8 @@ void module_car_callback_clientstream(librg_event_t *event) {
 
     // TODO: add rotations
     event->entity->position = car->object->GetPosition();
-    car->stream.rotation = car->object->GetRotation();
+    car->stream.rotation    = car->object->GetRotation();
+    car->stream.speed       = ((M2::C_Car *)car->object)->m_fSpeed;
 
     librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
 }
@@ -123,49 +130,51 @@ void module_car_callback_clientstream(librg_event_t *event) {
 
 #define MOD_ENTITY_KEEP_ALIVE 1
 #define MOD_ENTITY_POSITION_THRESHOLD 0.035
+#define MOD_ENTITY_ROTATION_THRESHOLD 0.005
 
 void module_car_callback_interpolate(librg_entity_t *entity) {
-    mod_assert(entity);
-
-    if (librg_entity_type(ctx, entity->id) != TYPE_CAR) return;
-
     auto car = (car_t *)entity->user_data;
     librg_assert(car && car->object);
 
-    // last delta tick against constant tick delay
-    car->interpolate.delta += (mod.last_delta / 16.666f);
-    mod_log("%f\n", car->interpolate.delta);
-
-    auto curr_pos = car->object->GetPosition();
-    auto diff_pos = curr_pos - entity->position;
-
-    // TODO: make proper validation
-    if (zpl_abs(diff_pos.x) < MOD_ENTITY_POSITION_THRESHOLD
-     && zpl_abs(diff_pos.y) < MOD_ENTITY_POSITION_THRESHOLD) {
+    // skip entity if we are the driver
+    if (mod.player->flags & MOD_ENTITY_DRIVER && ((ped_t *)mod.player->user_data)->vehicle == entity) {
         return;
     }
 
-    // position
+    // last delta tick against constant tick delay
+    car->interpolate.delta += (mod.last_delta / 40.666f);
+    car->interpolate.delta = zplm_clamp01(car->interpolate.delta);
+
+    /* position interpolation */
     if (car->interpolate.lposition != car->interpolate.tposition) {
-        vec3_t dposition;
-        car->interpolate.step = 0;
-        zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
-        car->object->SetPosition(dposition);
+        auto curr_pos = car->object->GetPosition();
+        auto diff_pos = curr_pos - entity->position;
+
+        if (zpl_abs(diff_pos.x) > MOD_ENTITY_POSITION_THRESHOLD
+         || zpl_abs(diff_pos.y) > MOD_ENTITY_POSITION_THRESHOLD) {
+            vec3_t dposition;
+            zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
+            car->object->SetPosition(dposition);
+        }
     }
 
-    // rotation TODO:
+    /* rotation interpolation */
     if (car->interpolate.lrotation != car->interpolate.trotation) {
-        mod_log("interpolating rotation");
+        auto curr_rot = car->object->GetRotation();
+        auto diff_rot = curr_rot - car->stream.rotation;
 
-        auto last = car->interpolate.lrotation;
-        auto dest = car->interpolate.trotation;
+        if (zpl_abs(diff_rot.x) > MOD_ENTITY_POSITION_THRESHOLD
+         || zpl_abs(diff_rot.y) > MOD_ENTITY_POSITION_THRESHOLD
+         || zpl_abs(diff_rot.z) > MOD_ENTITY_POSITION_THRESHOLD
+         || zpl_abs(diff_rot.w) > MOD_ENTITY_POSITION_THRESHOLD) {
+            auto last = car->interpolate.lrotation;
+            auto dest = car->interpolate.trotation;
 
-        quat_t drotation;
-        zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
-        car->object->SetRotation(drotation);
+            quat_t drotation;
+            zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
+            car->object->SetRotation(drotation);
+        }
     }
-
-    car->interpolate.step++;
 }
 
 // =======================================================================//
@@ -175,31 +184,50 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 // =======================================================================//
 
 /**
- * Event when local player enters a car
+ * Event when local player enters a local car
  */
-void module_car_local_enter(void *custom) {
-    auto expected = (M2::C_Entity *)custom;
-    auto ped = (ped_t*)mod.player->user_data;
+void module_car_local_enter(librg_event_t *event) {
+    auto vehicle = (M2::C_Entity *)event->user_data;
+    auto ped     = (ped_t*)mod.player->user_data;
 
-    mod_assert(expected && ped);
-    ped->stream.state = PED_IN_CAR;
+    mod_assert(vehicle && ped);
 
     // send vehicle create request onto server
     mod_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, [&](librg_entity_t *entity) {
         if (entity->type != TYPE_CAR) return;
         auto car = (car_t *)entity->user_data;
 
-        if (car->object == expected) {
+        if (car->object == vehicle) {
+            // set the driver data
+            mod.player->flags |= MOD_ENTITY_DRIVER;
+            ped->stream.state = PED_IN_CAR;
+            ped->vehicle      = entity;
+
             mod_message_send(ctx, MOD_CAR_ENTER, [&](librg_data_t *data) { librg_data_wu32(data, entity->id); });
         }
     });
 }
 
 /**
+ * Event when local player leaves local car
+ * @param event [description]
+ */
+void module_car_local_exit(librg_event_t *event) {
+    auto ped = (ped_t*)mod.player->user_data;
+
+    // reset the driver data
+    mod.player->flags &= ~MOD_ENTITY_DRIVER;
+    ped->stream.state = PED_ON_GROUND;
+    ped->vehicle      = nullptr;
+
+    mod_message_send(ctx, MOD_CAR_EXIT, nullptr);
+}
+
+/**
  * Event when a remote ped starts entering the car
  */
 void module_car_remote_enter(librg_message_t *msg) {
-    mod_log("received message for EVERYYYBODY\n");
+    mod_log("received message for car enter\n");
 
     auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
     auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
@@ -212,7 +240,8 @@ void module_car_remote_enter(librg_message_t *msg) {
 
     mod_log("im not putting anyone anywhere fuck u\n");
     return;
-
+    // TODO: vehicle put in for player entity hides both the car and the player
+#if 0
     mod_log("putting ped: %u in the car: %u\n", player->id, vehicle->id);
 
     M2::C_SyncObject *pSyncObject = nullptr;
@@ -221,4 +250,12 @@ void module_car_remote_enter(librg_message_t *msg) {
         reinterpret_cast<M2::C_Vehicle *>(car->object),
         true, M2::E_VehicleSeat::E_SEAT_DRIVER, false
     );
+#endif
+}
+
+void module_car_init() {
+    librg_event_add(ctx, MOD_CAR_ENTER, module_car_local_enter);
+    librg_event_add(ctx, MOD_CAR_EXIT, module_car_local_exit);
+
+    librg_network_add(ctx, MOD_CAR_ENTER, module_car_remote_enter);
 }

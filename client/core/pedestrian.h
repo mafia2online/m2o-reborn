@@ -4,10 +4,6 @@
 // !
 // =======================================================================//
 
-void module_ped_init() {
-
-}
-
 /**
  * The entity enters the stream zone
  */
@@ -110,6 +106,12 @@ void module_ped_callback_update(librg_event_t *event) {
             &pSyncObject, targ_pos, (M2::eHumanMoveMode)ped->stream.move_state,
             vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f), true
         );
+    } else {
+        // if we are not on the ground
+        // our prev position will be always our current
+        // so that after we appear on the ground again
+        // we won't be interpolated from somewhere far away
+        interpolate->lposition = entity->position;
     }
 }
 
@@ -124,6 +126,8 @@ void module_ped_callback_clientstream(librg_event_t *event) {
 
     // make sure we have all objects
     mod_assert(ped && ped->object);
+
+    // TODO: add checks for being on the ground
 
     // read new values of entity
     auto new_position = ped->object->GetPosition();
@@ -192,9 +196,11 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
 
     // last delta tick against constant tick delay
     ped->interpolate.delta += (mod.last_delta / 33.666f);
-    //mod_log("%f\n", interpolate->delta);
+    ped->interpolate.delta = zplm_clamp01(ped->interpolate.delta);
 
-    if (ped->stream.state != PED_ON_GROUND) return;
+    if (ped->stream.state != PED_ON_GROUND) {
+        return;
+    }
 
     vec3_t dposition;
     zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
@@ -209,13 +215,6 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
 // !
 // =======================================================================//
 
-// inline void module_ped_init() {
-//     librg_event_add(ctx, LIBRG_ENTITY_CREATE, module_ped_callback_create);
-//     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, module_ped_callback_update);
-//     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, module_ped_callback_remove);
-//     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, module_ped_callback_clientstream);
-// }
+void module_ped_init() {
 
-// inline void module_ped_tick() {
-//     librg_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, module_ped_callback_interpolate);
-// }
+}
