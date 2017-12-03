@@ -7,3 +7,5 @@ include/quick.c
 # other
 .DS_Store
 .swp
+
+node_modules

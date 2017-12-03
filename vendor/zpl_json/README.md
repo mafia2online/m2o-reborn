@@ -24,9 +24,9 @@ Thanks to the "at place" approach of parsing JSON tokens, the parser offers high
     "}\n"
 
 zplj_object_t *data_get(zplj_object_t *root, char *name) {
-    for (usize i = 0; i < zpl_array_count(root->nodes); ++i) {
+    for (isize i = 0; i < zpl_array_count(root->nodes); ++i) {
         zplj_object_t *node = (root->nodes + i);
-        if (node) {
+        if (node && !zpl_strcmp(node->name, name)) {
             return node;
         }
     }

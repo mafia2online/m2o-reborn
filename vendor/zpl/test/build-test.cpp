@@ -1,7 +1,6 @@
 #define ZPL_IMPLEMENTATION
 #include <zpl.h>
 
-int main(void) {
-
+int main() {
     return 0;
 }

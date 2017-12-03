@@ -22,6 +22,7 @@ Credits:
     Ginger Bill (GitHub: gingerBill)
 
 Version History:
+    1.1.0 - Added Cubic Hermite interpolation
     1.0.1 - Initial Version
 
 */
@@ -444,6 +445,9 @@ extern "C" {
     ZPLM_DEF void zplm_vec2_lerp(zplm_vec2_t *d, zplm_vec2_t a, zplm_vec2_t b, float t);
     ZPLM_DEF void zplm_vec3_lerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t b, float t);
     ZPLM_DEF void zplm_vec4_lerp(zplm_vec4_t *d, zplm_vec4_t a, zplm_vec4_t b, float t);
+
+    ZPLM_DEF void zplm_vec2_cslerp(zplm_vec2_t *d, zplm_vec2_t a, zplm_vec2_t v0, zplm_vec2_t b, zplm_vec2_t v1, float t);
+    ZPLM_DEF void zplm_vec3_cslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t);
 
     ZPLM_DEF void zplm_quat_lerp (zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t);
     ZPLM_DEF void zplm_quat_nlerp(zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t);
@@ -1923,6 +1927,35 @@ void zplm_vec3_lerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t b, float t) { ZPL
 void zplm_vec4_lerp(zplm_vec4_t *d, zplm_vec4_t a, zplm_vec4_t b, float t) { ZPLM_VEC_LERPN(4, d, a, b, t); }
 
 #undef ZPLM_VEC_LERPN
+
+void zplm_vec2_cslerp(zplm_vec2_t *d, zplm_vec2_t a, zplm_vec2_t v0, zplm_vec2_t b, zplm_vec2_t v1, float t) {
+    float t2  = t*t;
+    float ti  = (t-1);
+    float ti2 = ti*ti;
+
+    float h00 = (1 + 2*t)*ti2;
+    float h10 = t*ti2;
+    float h01 = t2*(3 - 2*t);
+    float h11 = t2*ti;
+
+    d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
+    d->y = h00*a.y + h10*v0.y + h01*b.y + h11*v1.y;
+}
+
+void zplm_vec3_cslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t) {
+    float t2  = t*t;
+    float ti  = (t-1);
+    float ti2 = ti*ti;
+
+    float h00 = (1 + 2*t)*ti2;
+    float h10 = t*ti2;
+    float h01 = t2*(3 - 2*t);
+    float h11 = t2*ti;
+
+    d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
+    d->y = h00*a.y + h10*v0.y + h01*b.y + h11*v1.y;
+    d->z = h00*a.z + h10*v0.z + h01*b.z + h11*v1.z;
+}
 
 void zplm_quat_lerp(zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t)  { zplm_vec4_lerp(&d->xyzw, a.xyzw, b.xyzw, t); }
 void zplm_quat_nlerp(zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t) { zplm_quat_lerp(d, a, b, t); zplm_quat_norm(d, *d); }

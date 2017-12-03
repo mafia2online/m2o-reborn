@@ -5,7 +5,41 @@
 #include <SDL.h>
 
 #define DEMO_CLIENT
-#include "demo-defines.h"
+
+enum {
+    DEMO_SPAWN_BLOCK = LIBRG_EVENT_LAST,
+};
+
+enum {
+    DEMO_TYPE_PLAYER,
+    DEMO_TYPE_NPC,
+};
+
+// enum {
+//     component_hero = librg_component_last,
+// };
+
+typedef struct {
+
+    struct {
+        zplm_vec3_t accel;
+        f32 walk_time;
+        f32 cooldown;
+        i32 max_hp;
+        i32 cur_hp;
+        librg_limiter_t limiter;
+    } stream;
+
+#ifdef DEMO_CLIENT
+    // interpolation
+    f32 delta;
+    zplm_vec3_t curr_pos, last_pos, target_pos;
+#endif
+} hero_t;
+
+// generate methods for components
+// librg_component(hero, component_hero, hero_t);
+
 
 #define SIZE_X 800
 #define SIZE_Y 600
@@ -117,7 +151,9 @@ SDL_Rect default_position() {
     return position;
 }
 
-void render_entity(librg_ctx_t *ctx, librg_entity_id entity) {
+void render_entity(librg_ctx_t *ctx, librg_entity_t *blob) {
+    librg_entity_id entity = blob->id;
+
     // set render color
     if (entity == player) {
         SDL_SetRenderDrawColor( sdl_renderer, 150, 250, 150, 255 );
@@ -133,7 +169,6 @@ void render_entity(librg_ctx_t *ctx, librg_entity_id entity) {
     }
 
     SDL_Rect position = default_position();
-    librg_entity_t *blob = librg_entity_fetch(ctx, entity);
 
     hero_t *hero = (hero_t *)blob->user_data;
 

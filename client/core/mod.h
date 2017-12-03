@@ -41,7 +41,7 @@ void mod_game_tick() {
     }
     /* connect to the server */
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
-        game_connect();
+        //game_connect();
         mod.spawned = true;
     }
 

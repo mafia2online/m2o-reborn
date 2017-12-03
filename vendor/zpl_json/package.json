@@ -1,18 +1,45 @@
 {
-  "name": "zpl_json.c",
-  "version": "2.0.7",
+  "_from": "zpl_json.c",
+  "_id": "zpl_json.c@2.0.8",
+  "_inBundle": false,
+  "_integrity": "sha512-7o6N/Y0nLHXphyuHwzCU96MVviiVB5k+/I3ZsZhbmUnJu5pYV1PKKZFurnCu8zT1tazZukbcw8PkkwUqFkJrGA==",
+  "_location": "/zpl_json.c",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "zpl_json.c",
+    "name": "zpl_json.c",
+    "escapedName": "zpl_json.c",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/zpl_json.c/-/zpl_json.c-2.0.8.tgz",
+  "_shasum": "72a5316c7be448ed0accfd96968c1f2fee60a258",
+  "_spec": "zpl_json.c",
+  "_where": "/Users/inlife/Projects/m2o/m2o-reborn",
+  "author": {
+    "name": "Dominik Madarasz",
+    "email": "zaklaus@outlook.com"
+  },
+  "bugs": {
+    "url": "https://github.com/zpl-c/zpl-json/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "zpl.c": "^3.0.0"
+  },
+  "deprecated": false,
   "description": "Small, fast and standard-friendly JSON parser.",
-  "main": "include/zpl_json.h",
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zpl-c/zpl-json.git"
-  },
+  "homepage": "https://github.com/zpl-c/zpl-json#readme",
   "keywords": [
     "c",
     "c++",
@@ -22,13 +49,15 @@
     "library",
     "json"
   ],
-  "author": "Dominik Madarasz <zaklaus@outlook.com>",
   "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/zpl-c/zpl-json/issues"
+  "main": "include/zpl_json.h",
+  "name": "zpl_json.c",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zpl-c/zpl-json.git"
   },
-  "homepage": "https://github.com/zpl-c/zpl-json#readme",
-  "dependencies": {
-    "zpl.c": "^3.0.0"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "2.0.8"
 }

@@ -1,51 +1,28 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "zpl_math.c@^1.0.1",
-        "scope": null,
-        "escapedName": "zpl_math.c",
-        "name": "zpl_math.c",
-        "rawSpec": "^1.0.1",
-        "spec": ">=1.0.1 <2.0.0",
-        "type": "range"
-      },
-      "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c"
-    ]
-  ],
-  "_from": "zpl_math.c@>=1.0.1 <2.0.0",
-  "_id": "zpl_math.c@1.0.1",
-  "_inCache": true,
+  "_from": "zpl_math.c@^1.1.0",
+  "_id": "zpl_math.c@1.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-bcVKHZLxYzmIOQyyLnvo9z8ouOBnG8nYMuKmVUY9H3gKha/3hl3fj+xOBYCFQkyQJMYYyTJOIiFb2ngcVHWcMA==",
   "_location": "/zpl_math.c",
-  "_nodeVersion": "8.3.0",
-  "_npmOperationalInternal": {
-    "host": "s3://npm-registry-packages",
-    "tmp": "tmp/zpl_math.c-1.0.1.tgz_1502807100020_0.4690340291708708"
-  },
-  "_npmUser": {
-    "name": "zaklaus",
-    "email": "zaklaus@outlook.com"
-  },
-  "_npmVersion": "5.3.0",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "zpl_math.c@^1.0.1",
-    "scope": null,
-    "escapedName": "zpl_math.c",
+    "type": "range",
+    "registry": true,
+    "raw": "zpl_math.c@^1.1.0",
     "name": "zpl_math.c",
-    "rawSpec": "^1.0.1",
-    "spec": ">=1.0.1 <2.0.0",
-    "type": "range"
+    "escapedName": "zpl_math.c",
+    "rawSpec": "^1.1.0",
+    "saveSpec": null,
+    "fetchSpec": "^1.1.0"
   },
   "_requiredBy": [
     "/librg.c",
     "/zpl_cull.c"
   ],
-  "_resolved": "https://registry.npmjs.org/zpl_math.c/-/zpl_math.c-1.0.1.tgz",
-  "_shasum": "5d061fa15117e49b58ed1a4146399348add8a72e",
-  "_shrinkwrap": null,
-  "_spec": "zpl_math.c@^1.0.1",
-  "_where": "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c",
+  "_resolved": "https://registry.npmjs.org/zpl_math.c/-/zpl_math.c-1.1.0.tgz",
+  "_shasum": "afb873885ddc25d209e8ca3e27146d9f25529aa5",
+  "_spec": "zpl_math.c@^1.1.0",
+  "_where": "/Users/inlife/Projects/m2o/m2o-reborn/vendor/node_modules/librg.c",
   "author": {
     "name": "Dominik Madarasz",
     "email": "zaklaus@outlook.com"
@@ -53,18 +30,12 @@
   "bugs": {
     "url": "https://github.com/zpl-c/zpl-math/issues"
   },
-  "dependencies": {},
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "Vector math library that is gamedev friendly.",
-  "devDependencies": {},
   "directories": {
     "test": "test"
   },
-  "dist": {
-    "integrity": "sha512-nZCG41KzHzI1sK9N53rP7qb8NTj15PC06KLfW7z+2VcxHvwrVjJ09HWDEvR4WzuMTd1B2brKimZ4eEmXvIccJw==",
-    "shasum": "5d061fa15117e49b58ed1a4146399348add8a72e",
-    "tarball": "https://registry.npmjs.org/zpl_math.c/-/zpl_math.c-1.0.1.tgz"
-  },
-  "gitHead": "b6f076e256e312882a9563cfb1d7e4a345302ca4",
   "homepage": "https://github.com/zpl-c/zpl-math#readme",
   "keywords": [
     "c",
@@ -77,15 +48,7 @@
   ],
   "license": "Unlicense",
   "main": "include/zpl_math.h",
-  "maintainers": [
-    {
-      "name": "zaklaus",
-      "email": "zaklaus@outlook.com"
-    }
-  ],
   "name": "zpl_math.c",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zpl-c/zpl-math.git"
@@ -93,5 +56,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.1"
+  "version": "1.1.0"
 }

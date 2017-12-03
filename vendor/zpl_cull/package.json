@@ -1,50 +1,27 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "zpl_cull.c@^3.1.2",
-        "scope": null,
-        "escapedName": "zpl_cull.c",
-        "name": "zpl_cull.c",
-        "rawSpec": "^3.1.2",
-        "spec": ">=3.1.2 <4.0.0",
-        "type": "range"
-      },
-      "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c"
-    ]
-  ],
-  "_from": "zpl_cull.c@>=3.1.2 <4.0.0",
+  "_from": "zpl_cull.c@^3.1.2",
   "_id": "zpl_cull.c@3.1.2",
-  "_inCache": true,
+  "_inBundle": false,
+  "_integrity": "sha512-dKoQgsD+DhiPtAbKl9qZE9yQhK1ZwN4WSMfTarOl3/a8stalzHKk/hxCoBLAKnwlHftd4U4Wp2Cm6XYvUuB2pA==",
   "_location": "/zpl_cull.c",
-  "_nodeVersion": "8.6.0",
-  "_npmOperationalInternal": {
-    "host": "s3://npm-registry-packages",
-    "tmp": "tmp/zpl_cull.c-3.1.2.tgz_1509035605082_0.9626139444299042"
-  },
-  "_npmUser": {
-    "name": "inlife",
-    "email": "vladgritsenko@gmail.com"
-  },
-  "_npmVersion": "5.5.1",
   "_phantomChildren": {},
   "_requested": {
+    "type": "range",
+    "registry": true,
     "raw": "zpl_cull.c@^3.1.2",
-    "scope": null,
-    "escapedName": "zpl_cull.c",
     "name": "zpl_cull.c",
+    "escapedName": "zpl_cull.c",
     "rawSpec": "^3.1.2",
-    "spec": ">=3.1.2 <4.0.0",
-    "type": "range"
+    "saveSpec": null,
+    "fetchSpec": "^3.1.2"
   },
   "_requiredBy": [
     "/librg.c"
   ],
   "_resolved": "https://registry.npmjs.org/zpl_cull.c/-/zpl_cull.c-3.1.2.tgz",
   "_shasum": "a9bc7ee0e88afd23b5376cafb8f7feb3147251ae",
-  "_shrinkwrap": null,
   "_spec": "zpl_cull.c@^3.1.2",
-  "_where": "D:\\Projects\\m2o-reborn\\vendor\\node_modules\\librg.c",
+  "_where": "/Users/inlife/Projects/m2o/m2o-reborn/vendor/node_modules/librg.c",
   "author": {
     "name": "Dominik Madarasz",
     "email": "zaklaus@outlook.com"
@@ -52,21 +29,16 @@
   "bugs": {
     "url": "https://github.com/zpl-c/zpl-cull/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "zpl.c": "^3.0.0",
     "zpl_math.c": "^1.0.1"
   },
+  "deprecated": false,
   "description": "Tree culling library.",
-  "devDependencies": {},
   "directories": {
     "test": "test"
   },
-  "dist": {
-    "integrity": "sha512-dKoQgsD+DhiPtAbKl9qZE9yQhK1ZwN4WSMfTarOl3/a8stalzHKk/hxCoBLAKnwlHftd4U4Wp2Cm6XYvUuB2pA==",
-    "shasum": "a9bc7ee0e88afd23b5376cafb8f7feb3147251ae",
-    "tarball": "https://registry.npmjs.org/zpl_cull.c/-/zpl_cull.c-3.1.2.tgz"
-  },
-  "gitHead": "475a46216572cd88b68a15267414fb6141664b19",
   "homepage": "https://github.com/zpl-c/zpl-cull#readme",
   "keywords": [
     "c",
@@ -79,19 +51,7 @@
   ],
   "license": "Unlicense",
   "main": "include/zpl_cull.h",
-  "maintainers": [
-    {
-      "name": "inlife",
-      "email": "vladgritsenko@gmail.com"
-    },
-    {
-      "name": "zaklaus",
-      "email": "zaklaus@outlook.com"
-    }
-  ],
   "name": "zpl_cull.c",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zpl-c/zpl-cull.git"

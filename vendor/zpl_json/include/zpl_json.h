@@ -20,6 +20,7 @@ Credits:
     Dominik Madarasz (GitHub: zaklaus)
 
 Version History:
+    2.0.8 - Small cleanup in README and test file
     2.0.7 - Small fixes for tiny cpp warnings
     2.0.5 - Fix for bad access on deallocation
     2.0.4 - Small fix for cpp issues

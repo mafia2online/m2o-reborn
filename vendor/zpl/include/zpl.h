@@ -24,6 +24,10 @@
 
 
   Version History:
+  3.4.1 - zpl_memcopy now uses memcpy for ARM arch-family
+  3.4.0 - Removed obsolete code
+  3.3.4 - Added Travis CI config
+  3.3.3 - Small macro formatting changes + ZPL_SYSTEM_IOS
   3.3.2 - Fixes for android arm
   3.3.1 - Fixed some type cast warnings
   3.3.0 - Added Android support
@@ -65,40 +69,39 @@
 #define ZPL_INCLUDE_ZPL_H
 
 #if defined(__cplusplus)
-extern "C" {
+  extern "C" {
 #endif
 
 #if defined(__cplusplus)
-#define ZPL_EXTERN extern "C"
+  #define ZPL_EXTERN extern "C"
 #else
-#define ZPL_EXTERN extern
+  #define ZPL_EXTERN extern
 #endif
 
 #if defined(_WIN32)
-#define ZPL_DLL_EXPORT ZPL_EXTERN __declspec(dllexport)
-#define ZPL_DLL_IMPORT ZPL_EXTERN __declspec(dllimport)
+  #define ZPL_DLL_EXPORT ZPL_EXTERN __declspec(dllexport)
+  #define ZPL_DLL_IMPORT ZPL_EXTERN __declspec(dllimport)
 #else
-#define ZPL_DLL_EXPORT ZPL_EXTERN __attribute__((visibility("default")))
-#define ZPL_DLL_IMPORT ZPL_EXTERN
+  #define ZPL_DLL_EXPORT ZPL_EXTERN __attribute__((visibility("default")))
+  #define ZPL_DLL_IMPORT ZPL_EXTERN
 #endif
 
 #ifndef ZPL_DEF
-#ifdef ZPL_STATIC
-#define ZPL_DEF static
-#else
-#define ZPL_DEF extern
-#endif
+  #ifdef ZPL_STATIC
+    #define ZPL_DEF static
+  #else
+    #define ZPL_DEF extern
+  #endif
 #endif
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__) || defined(__aarch64__)
-#ifndef ZPL_ARCH_64_BIT
-#define ZPL_ARCH_64_BIT 1
-#endif
+  #ifndef ZPL_ARCH_64_BIT
+  #define ZPL_ARCH_64_BIT 1
+  #endif
 #else
-
-#ifndef ZPL_ARCH_32_BIT
-#define ZPL_ARCH_32_BIT 1
-#endif
+  #ifndef ZPL_ARCH_32_BIT
+  #define ZPL_ARCH_32_BIT 1
+  #endif
 #endif
 
 
@@ -110,101 +113,106 @@ extern "C" {
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-#ifndef ZPL_SYSTEM_WINDOWS
-#define ZPL_SYSTEM_WINDOWS 1
-#endif
+  #ifndef ZPL_SYSTEM_WINDOWS
+  #define ZPL_SYSTEM_WINDOWS 1
+  #endif
 #elif defined(__APPLE__) && defined(__MACH__)
-#ifndef ZPL_SYSTEM_OSX
-#define ZPL_SYSTEM_OSX 1
-#endif
+  #ifndef ZPL_SYSTEM_OSX
+  #define ZPL_SYSTEM_OSX 1
+  #endif
+  #ifndef ZPL_SYSTEM_MACOS
+  #define ZPL_SYSTEM_MACOS 1
+  #endif
+  #include <TargetConditionals.h>
+  #if TARGET_IPHONE_SIMULATOR == 1 || TARGET_OS_IPHONE == 1
+    #ifndef ZPL_SYSTEM_IOS
+    #define ZPL_SYSTEM_IOS 1
+    #endif
+  #endif
 #elif defined(__unix__)
-#ifndef ZPL_SYSTEM_UNIX
-#define ZPL_SYSTEM_UNIX 1
-#endif
+  #ifndef ZPL_SYSTEM_UNIX
+  #define ZPL_SYSTEM_UNIX 1
+  #endif
 
-#if defined(ANDROID) || defined(__ANDROID__)
-#ifndef ZPL_SYSTEM_ANDROID
-#define ZPL_SYSTEM_ANDROID 1
-#endif
-#ifndef ZPL_SYSTEM_LINUX
-#define ZPL_SYSTEM_LINUX 1
-#endif
-#elif defined(__linux__)
-#ifndef ZPL_SYSTEM_LINUX
-#define ZPL_SYSTEM_LINUX 1
-#endif
-#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-#ifndef ZPL_SYSTEM_FREEBSD
-#define ZPL_SYSTEM_FREEBSD 1
-#endif
-#elif defined(__EMSCRIPTEN__)
-#ifndef ZPL_SYSTEM_EMSCRIPTEN
-#define ZPL_SYSTEM_EMSCRIPTEN 1
-#endif
+  #if defined(ANDROID) || defined(__ANDROID__)
+    #ifndef ZPL_SYSTEM_ANDROID
+    #define ZPL_SYSTEM_ANDROID 1
+    #endif
+    #ifndef ZPL_SYSTEM_LINUX
+    #define ZPL_SYSTEM_LINUX 1
+    #endif
+  #elif defined(__linux__)
+    #ifndef ZPL_SYSTEM_LINUX
+    #define ZPL_SYSTEM_LINUX 1
+    #endif
+  #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+    #ifndef ZPL_SYSTEM_FREEBSD
+    #define ZPL_SYSTEM_FREEBSD 1
+    #endif
+  #elif defined(__EMSCRIPTEN__)
+    #ifndef ZPL_SYSTEM_EMSCRIPTEN
+    #define ZPL_SYSTEM_EMSCRIPTEN 1
+    #endif
+  #else
+    #error This UNIX operating system is not supported
+  #endif
 #else
-#error This UNIX operating system is not supported
-#endif
-#else
-#error This operating system is not supported
+  #error This operating system is not supported
 #endif
 
 #if defined(_MSC_VER)
-#define ZPL_COMPILER_MSVC 1
+  #define ZPL_COMPILER_MSVC 1
 #elif defined(__GNUC__)
-#define ZPL_COMPILER_GCC 1
+  #define ZPL_COMPILER_GCC 1
 #elif defined(__clang__)
-#define ZPL_COMPILER_CLANG 1
+  #define ZPL_COMPILER_CLANG 1
 #else
-#error Unknown compiler
+  #error Unknown compiler
 #endif
 
 #if defined(__arm__) || defined(__aarch64__)
-#ifndef ZPL_CPU_ARM
-#define ZPL_CPU_ARM 1
-#endif
-#ifndef ZPL_CACHE_LINE_SIZE
-#define ZPL_CACHE_LINE_SIZE 64
-#endif
-
+  #ifndef ZPL_CPU_ARM
+  #define ZPL_CPU_ARM 1
+  #endif
+  #ifndef ZPL_CACHE_LINE_SIZE
+  #define ZPL_CACHE_LINE_SIZE 64
+  #endif
 #elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__) || defined(ZPL_SYSTEM_EMSCRIPTEN)
-#ifndef ZPL_CPU_X86
-#define ZPL_CPU_X86 1
-#endif
-#ifndef ZPL_CACHE_LINE_SIZE
-#define ZPL_CACHE_LINE_SIZE 64
-#endif
-
+  #ifndef ZPL_CPU_X86
+  #define ZPL_CPU_X86 1
+  #endif
+  #ifndef ZPL_CACHE_LINE_SIZE
+  #define ZPL_CACHE_LINE_SIZE 64
+  #endif
 #elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
-#ifndef ZPL_CPU_PPC
-#define ZPL_CPU_PPC 1
-#endif
-#ifndef ZPL_CACHE_LINE_SIZE
-#define ZPL_CACHE_LINE_SIZE 128
-#endif
-
+  #ifndef ZPL_CPU_PPC
+  #define ZPL_CPU_PPC 1
+  #endif
+  #ifndef ZPL_CACHE_LINE_SIZE
+  #define ZPL_CACHE_LINE_SIZE 128
+  #endif
 #elif defined(__MIPSEL__) || defined(__mips_isa_rev)
-#ifndef ZPL_CPU_MIPS
-#define ZPL_CPU_MIPS 1
-#endif
-#ifndef ZPL_CACHE_LINE_SIZE
-#define ZPL_CACHE_LINE_SIZE 64
-#endif
-
+  #ifndef ZPL_CPU_MIPS
+  #define ZPL_CPU_MIPS 1
+  #endif
+  #ifndef ZPL_CACHE_LINE_SIZE
+  #define ZPL_CACHE_LINE_SIZE 64
+  #endif
 #else
-#error Unknown CPU Type
+  #error Unknown CPU Type
 #endif
 
 #if !defined(ZPL_SYSTEM_EMSCRIPTEN) && !defined(ZPL_CPU_ARM) // disabled for __EMSCRIPTEN__
-#ifndef ZPL_THREADING
-#define ZPL_THREADING 1
-#endif
+  #ifndef ZPL_THREADING
+  #define ZPL_THREADING 1
+  #endif
 #endif
 
 #ifndef ZPL_STATIC_ASSERT
-#define ZPL_STATIC_ASSERT3(cond, msg) typedef char static_assertion_##msg[(!!(cond))*2-1]
-#define ZPL_STATIC_ASSERT2(cond, line) ZPL_STATIC_ASSERT3(cond, static_assertion_at_line_##line)
-#define ZPL_STATIC_ASSERT1(cond, line) ZPL_STATIC_ASSERT2(cond, line)
-#define ZPL_STATIC_ASSERT(cond)        ZPL_STATIC_ASSERT1(cond, __LINE__)
+  #define ZPL_STATIC_ASSERT3(cond, msg) typedef char static_assertion_##msg[(!!(cond))*2-1]
+  #define ZPL_STATIC_ASSERT2(cond, line) ZPL_STATIC_ASSERT3(cond, static_assertion_at_line_##line)
+  #define ZPL_STATIC_ASSERT1(cond, line) ZPL_STATIC_ASSERT2(cond, line)
+  #define ZPL_STATIC_ASSERT(cond)        ZPL_STATIC_ASSERT1(cond, __LINE__)
 #endif
 
 
@@ -215,101 +223,101 @@ extern "C" {
     //
 
 #if defined(_WIN32) && !defined(__MINGW32__)
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+  #ifndef _CRT_SECURE_NO_WARNINGS
+  #define _CRT_SECURE_NO_WARNINGS
+  #endif
 #endif
 
 #if defined(ZPL_SYSTEM_UNIX)
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#define _LARGEFILE64_SOURCE
+  #ifndef _GNU_SOURCE
+  #define _GNU_SOURCE
+  #endif
+  #define _LARGEFILE64_SOURCE
 #endif
 
 #if defined(ZPL_SYSTEM_WINDOWS)
-#include <stdio.h>
+  #include <stdio.h>
 
-#if !defined(ZPL_NO_WINDOWS_H)
-#define NOMINMAX            1
-#define WIN32_LEAN_AND_MEAN 1
-#define WIN32_MEAN_AND_LEAN 1
-#define VC_EXTRALEAN        1
-#include <windows.h>
-#undef NOMINMAX
-#undef WIN32_LEAN_AND_MEAN
-#undef WIN32_MEAN_AND_LEAN
-#undef VC_EXTRALEAN
-#endif
+  #if !defined(ZPL_NO_WINDOWS_H)
+    #define NOMINMAX            1
+    #define WIN32_LEAN_AND_MEAN 1
+    #define WIN32_MEAN_AND_LEAN 1
+    #define VC_EXTRALEAN        1
+    #include <windows.h>
+    #undef NOMINMAX
+    #undef WIN32_LEAN_AND_MEAN
+    #undef WIN32_MEAN_AND_LEAN
+    #undef VC_EXTRALEAN
+  #endif
 
-#include <malloc.h> // NOTE: _aligned_*()
-#include <intrin.h>
+  #include <malloc.h> // NOTE: _aligned_*()
+  #include <intrin.h>
 
     // TODO(ZaKlaus): Find a better way to get this flag in MinGW.
-#if defined(ZPL_COMPILER_GCC) && !defined(WC_ERR_INVALID_CHARS)
-#define WC_ERR_INVALID_CHARS 0x0080
-#endif
+  #if defined(ZPL_COMPILER_GCC) && !defined(WC_ERR_INVALID_CHARS)
+    #define WC_ERR_INVALID_CHARS 0x0080
+  #endif
 
 #else
 
-#if !defined(ZPL_SYSTEM_EMSCRIPTEN)
-#include <pthread.h>
-#endif
+  #if !defined(ZPL_SYSTEM_EMSCRIPTEN)
+    #include <pthread.h>
+  #endif
 
-#include <dlfcn.h>
-#include <errno.h>
-#include <fcntl.h>
-#ifndef _IOSC11_SOURCE
-#define _IOSC11_SOURCE
-#endif
-#include <stdlib.h> // NOTE: malloc on linux
-#include <sys/mman.h>
+  #include <dlfcn.h>
+  #include <errno.h>
+  #include <fcntl.h>
+  #ifndef _IOSC11_SOURCE
+  #define _IOSC11_SOURCE
+  #endif
+  #include <stdlib.h> // NOTE: malloc on linux
+  #include <sys/mman.h>
 
-#if !defined(ZPL_SYSTEM_OSX)
-#include <sys/sendfile.h>
-#endif
+  #if !defined(ZPL_SYSTEM_OSX)
+    #include <sys/sendfile.h>
+  #endif
 
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
+  #include <sys/stat.h>
+  #include <sys/time.h>
+  #include <sys/types.h>
+  #include <time.h>
+  #include <unistd.h>
 
-#if !defined(ZPL_SYSTEM_ANDROID)
-#include <spawn.h>
-#endif
+  #if !defined(ZPL_SYSTEM_ANDROID)
+    #include <spawn.h>
+  #endif
 
-#if !defined(ZPL_SYSTEM_ANDROID)
-#if !defined(ZPL_SYSTEM_EMSCRIPTEN)
-#include <emmintrin.h>
-#elif defined(ZPL_CPU_X86) && !defined(ZPL_SYSTEM_EMSCRIPTEN)
-#include <xmmintrin.h>
-#else
-#include <sched.h>
-#endif
-#endif
+  #if !defined(ZPL_SYSTEM_ANDROID) && !defined(ZPL_SYSTEM_IOS)
+    #if !defined(ZPL_SYSTEM_EMSCRIPTEN)
+      #include <emmintrin.h>
+    #elif defined(ZPL_CPU_X86) && !defined(ZPL_SYSTEM_EMSCRIPTEN)
+      #include <xmmintrin.h>
+    #else
+      #include <sched.h>
+    #endif
+  #endif
 
 #endif
 
 #if defined(ZPL_SYSTEM_OSX)
-#include <stdio.h>
-#include <mach/mach.h>
-#include <mach/mach_init.h>
-#include <mach/mach_time.h>
-#include <mach/thread_act.h>
-#include <mach/thread_policy.h>
-#include <sys/sysctl.h>
-#include <copyfile.h>
-#include <mach/clock.h>
+  #include <stdio.h>
+  #include <mach/mach.h>
+  #include <mach/mach_init.h>
+  #include <mach/mach_time.h>
+  #include <mach/thread_act.h>
+  #include <mach/thread_policy.h>
+  #include <sys/sysctl.h>
+  #include <copyfile.h>
+  #include <mach/clock.h>
 #endif
 
 #if defined(ZPL_SYSTEM_UNIX)
-#include <semaphore.h>
+  #include <semaphore.h>
 #endif
 
 #if !defined(ZPL_SYSTEM_WINDOWS)
-#include <stdarg.h>
-#include <stddef.h>
+  #include <stdarg.h>
+  #include <stddef.h>
 #endif
 
     ////////////////////////////////////////////////////////////////
@@ -370,11 +378,11 @@ extern "C" {
 #elif defined(_WIN32)
     // NOTE; To mark types changing their size, e.g. intptr
 #ifndef _W64
-#if !defined(__midl) && (defined(_X86_) || defined(_M_IX86)) && _MSC_VER >= 1300
-#define _W64 __w64
-#else
-#define _W64
-#endif
+  #if !defined(__midl) && (defined(_X86_) || defined(_M_IX86)) && _MSC_VER >= 1300
+    #define _W64 __w64
+  #else
+    #define _W64
+  #endif
 #endif
 
     typedef _W64   signed int  intptr;
@@ -405,54 +413,54 @@ extern "C" {
     typedef i32 b32;
 
 #if !defined(__cplusplus)
-#if (defined(_MSC_VER) && _MSC_VER < 1800) || (!defined(_MSC_VER) && !defined(__STDC_VERSION__))
-#ifndef true
-#define true  (0 == 0)
-#endif
-#ifndef false
-#define false (0 != 0)
-#endif
-    typedef b8 bool;
-#else
-#include <stdbool.h>
-#endif
+  #if (defined(_MSC_VER) && _MSC_VER < 1800) || (!defined(_MSC_VER) && !defined(__STDC_VERSION__))
+    #ifndef true
+    #define true  (0 == 0)
+    #endif
+    #ifndef false
+    #define false (0 != 0)
+    #endif
+      typedef b8 bool;
+  #else
+    #include <stdbool.h>
+  #endif
 #endif
 
 #ifndef U8_MIN
-#define U8_MIN 0u
-#define U8_MAX 0xffu
-#define I8_MIN (-0x7f - 1)
-#define I8_MAX 0x7f
+  #define U8_MIN 0u
+  #define U8_MAX 0xffu
+  #define I8_MIN (-0x7f - 1)
+  #define I8_MAX 0x7f
 
-#define U16_MIN 0u
-#define U16_MAX 0xffffu
-#define I16_MIN (-0x7fff - 1)
-#define I16_MAX 0x7fff
+  #define U16_MIN 0u
+  #define U16_MAX 0xffffu
+  #define I16_MIN (-0x7fff - 1)
+  #define I16_MAX 0x7fff
 
-#define U32_MIN 0u
-#define U32_MAX 0xffffffffu
-#define I32_MIN (-0x7fffffff - 1)
-#define I32_MAX 0x7fffffff
+  #define U32_MIN 0u
+  #define U32_MAX 0xffffffffu
+  #define I32_MIN (-0x7fffffff - 1)
+  #define I32_MAX 0x7fffffff
 
-#define U64_MIN 0ull
-#define U64_MAX 0xffffffffffffffffull
-#define I64_MIN (-0x7fffffffffffffffll - 1)
-#define I64_MAX 0x7fffffffffffffffll
+  #define U64_MIN 0ull
+  #define U64_MAX 0xffffffffffffffffull
+  #define I64_MIN (-0x7fffffffffffffffll - 1)
+  #define I64_MAX 0x7fffffffffffffffll
 
-#if defined(ZPL_ARCH_32_BIT)
-#define USIZE_MIX U32_MIN
-#define USIZE_MAX U32_MAX
+  #if defined(ZPL_ARCH_32_BIT)
+  #define USIZE_MIX U32_MIN
+  #define USIZE_MAX U32_MAX
 
-#define ISIZE_MIX S32_MIN
-#define ISIZE_MAX S32_MAX
-#elif defined(ZPL_ARCH_64_BIT)
-#define USIZE_MIX U64_MIN
-#define USIZE_MAX U64_MAX
+  #define ISIZE_MIX S32_MIN
+  #define ISIZE_MAX S32_MAX
+  #elif defined(ZPL_ARCH_64_BIT)
+  #define USIZE_MIX U64_MIN
+  #define USIZE_MAX U64_MAX
 
-#define ISIZE_MIX I64_MIN
-#define ISIZE_MAX I64_MAX
+  #define ISIZE_MIX I64_MIN
+  #define ISIZE_MAX I64_MAX
 #else
-#error Unknown architecture size. This library only supports 32 bit and 64 bit architectures.
+  #error Unknown architecture size. This library only supports 32 bit and 64 bit architectures.
 #endif
 
 #define F32_MIN 1.17549435e-38f
@@ -1652,180 +1660,6 @@ extern "C" {
         if (ZPL_ARRAY_HEADER(x)->capacity < (new_capacity)) \
             zpl_array_set_capacity(x, new_capacity);        \
     } while (0)
-
-
-    ////////////////////////////////////////////////////////////////
-    //
-    // Bit stream
-    //
-    // After a long day, i just wanted to go to sleep but then, something happened
-    // something i totally didn't expect to happen. It was a miracle.
-    // Some people said it looked like a bird, some people - that it looked like a plane,
-    // however one of them said - it's a BITSTREAM!
-    // And then it appeared. From mighty inner minds of the higher species, it was a gift from gods,
-    // to people...
-    //
-    // Bitstream is a fixed-size buffer using FIFO scheme.
-    // It's purpose is to serialize data into sequential chunk
-    // which can be portable.
-    //
-
-
-    typedef void *zpl_bs_t;
-
-    typedef struct zpl_bs_header_t {
-        zpl_allocator_t allocator;
-
-        usize capacity;
-        usize read_pos;
-        usize write_pos;
-    } zpl_bs_header_t;
-
-#ifndef ZPL_BS_GROW_FORMULA
-#define ZPL_BS_GROW_FORMULA(x) (2*(x) + 16)
-#endif
-
-#define ZPL_BS_HEADER(x) (cast(zpl_bs_header_t *)(x) - 1)
-
-#define zpl_bs_init(x, allocator_, size) do {                                                                             \
-        void **zpl__bs_ = cast(void **)&(x);                                                                           \
-        zpl_bs_header_t *zpl__bsh = cast(zpl_bs_header_t *)zpl_alloc(allocator_, zpl_size_of(zpl_bs_header_t) + size); \
-        zpl__bsh->allocator = allocator_;                                                                              \
-        zpl__bsh->capacity  = size;                                                                                    \
-        zpl__bsh->read_pos  = 0;                                                                                       \
-        zpl__bsh->write_pos = 0;                                                                                       \
-        *zpl__bs_ = cast(void *)(zpl__bsh+1);                                                                          \
-    } while (0)
-
-#define zpl_bs_free(x) do {                                                                                            \
-        zpl_bs_header_t *zpl__bsh = ZPL_BS_HEADER(x);                                                                  \
-        zpl_free(zpl__bsh->allocator, zpl__bsh);                                                                       \
-        x = NULL;                                                                                                      \
-    } while (0)
-
-#define zpl_bs_capacity(x)  ZPL_BS_HEADER(x)->capacity
-#define zpl_bs_read_pos(x)  ZPL_BS_HEADER(x)->read_pos
-#define zpl_bs_write_pos(x) ZPL_BS_HEADER(x)->write_pos
-#define zpl_bs_size(x)      zpl_bs_write_pos(x)
-
-#define zpl_bs_set_capacity(x, new_capacity) do {                                                                                        \
-        void **zpl__bs_ = cast(void **)&(x);                                                                                             \
-        zpl_bs_header_t *zpl__bs_h = ZPL_BS_HEADER(x);                                                                                   \
-        zpl_bs_header_t *zpl__bsh = cast(zpl_bs_header_t *)zpl_alloc(zpl__bs_h->allocator, zpl_size_of(zpl_bs_header_t) + new_capacity); \
-        *zpl__bsh = *zpl__bs_h;                                                                                                          \
-        zpl__bsh->capacity = new_capacity;                                                                                               \
-        void *zpl__bs = cast(void *)(zpl__bsh+1);                                                                                        \
-        zpl_memmove(zpl__bs, x, zpl_bs_capacity(x));                                                                                     \
-        zpl_free(zpl__bs_h->allocator, zpl__bs_h);                                                                                       \
-        *zpl__bs_ = cast(void *)(zpl__bsh+1);                                                                                            \
-    } while (0)
-
-#define zpl_bs_grow(x, min_capacity) do {                                                                                                \
-        usize new_capacity = ZPL_BS_GROW_FORMULA(zpl_bs_capacity(x));                                                                    \
-        if (new_capacity < (min_capacity))                                                                                               \
-            new_capacity = (min_capacity);                                                                                               \
-        zpl_bs_set_capacity(x, new_capacity);                                                                                            \
-    } while (0)
-
-#define zpl_bs_fits(x, size) do {                                                                                                        \
-        if (size > zpl_bs_capacity(x)) {                                                                                                 \
-            zpl_bs_grow(x, zpl_bs_capacity(x) + size);                                                                                   \
-        }                                                                                                                                \
-    } while (0)
-
-#define zpl_bs_write_size_at(x, value, size, offset) do {                                                   \
-    if (offset == 0) zpl_bs_fits(x, zpl_bs_write_pos(x) + size); \
-        else             zpl_bs_fits(x, offset + size);                                                     \
-        zpl_bs_header_t *zpl__bsh = ZPL_BS_HEADER(x);                                                       \
-        zpl_memcopy(x + ((offset == 0) ? zpl__bsh->write_pos : offset), value, size);                       \
-        if (offset == 0) zpl__bsh->write_pos += size;                                                       \
-    } while (0)
-
-#define zpl_bs_read_size_at(x, value, size, offset) do {                                                               \
-            zpl_bs_header_t *zpl__bsh = ZPL_BS_HEADER(x);                                                              \
-            ZPL_ASSERT_MSG(((offset == 0) ? zpl__bsh->read_pos : offset) + size <= zpl_bs_capacity(x),                 \
-                           "zpl_bs_read: trying to read from outside of the bounds");                                  \
-            zpl_memcopy(value, x + ((offset == 0) ? zpl__bsh->read_pos : offset), size);                               \
-            if (offset == 0) zpl__bsh->read_pos += size;                                                               \
-        } while (0)
-
-#define zpl_bs_write_value_at(x, value, type, offset) do {                                                             \
-        if (offset == 0) zpl_bs_fits(x, zpl_bs_write_pos(x) + zpl_size_of(type));                                      \
-        else             zpl_bs_fits(x, offset + zpl_size_of(type));                                                   \
-        zpl_bs_header_t *zpl__bsh = ZPL_BS_HEADER(x);                                                                  \
-        *(type *)(zpl_pointer_add(x, (offset == 0) ? zpl__bsh->write_pos : offset)) = value;                           \
-        if (offset == 0) zpl__bsh->write_pos += zpl_size_of(type);                                                     \
-    } while (0)
-
-#define zpl_bs_read_value_at(x, type, offset)                                                                          \
-    (zpl_size_of(type) + ((offset == 0) ? zpl_bs_read_pos(x) : offset) <= (zpl_bs_capacity(x)))                        \
-    ? *(type *)(zpl_pointer_add(x, (offset == 0) ? zpl_bs_read_pos(x) : offset))                                       \
-    : zpl_assert_crash("zpl_bs_read: trying to read from outside of the bounds");                                      \
-    if (offset == 0) ZPL_BS_HEADER(x)->read_pos += zpl_size_of(type);
-
-#define zpl_bs_write_size(x, value, size)   zpl_bs_write_size_at(x, value, size, 0)
-#define zpl_bs_read_size(x, value, size)    zpl_bs_read_size_at(x, value, size, 0)
-#define zpl_bs_write_value(x, value, type)  zpl_bs_write_value_at(x, value, type, 0)
-#define zpl_bs_read_value(x, type)          zpl_bs_read_value_at(x, type, 0)
-
-#define zpl_bs_write_i8(x, value)  zpl_bs_write_value(x, cast(i8) value,  i8)
-#define zpl_bs_write_u8(x, value)  zpl_bs_write_value(x, cast(u8) value,  u8)
-#define zpl_bs_write_i16(x, value) zpl_bs_write_value(x, cast(i16)value, i16)
-#define zpl_bs_write_u16(x, value) zpl_bs_write_value(x, cast(u16)value, u16)
-#define zpl_bs_write_i32(x, value) zpl_bs_write_value(x, cast(i32)value, i32)
-#define zpl_bs_write_u32(x, value) zpl_bs_write_value(x, cast(u32)value, u32)
-#define zpl_bs_write_i64(x, value) zpl_bs_write_value(x, cast(i64)value, i64)
-#define zpl_bs_write_u64(x, value) zpl_bs_write_value(x, cast(u64)value, u64)
-#define zpl_bs_write_f32(x, value) zpl_bs_write_value(x, cast(f32)value, f32)
-#define zpl_bs_write_f64(x, value) zpl_bs_write_value(x, cast(f64)value, f64)
-#define zpl_bs_write_b8(x, value)  zpl_bs_write_value(x, cast(b8) value,  b8)
-#define zpl_bs_write_b16(x, value) zpl_bs_write_value(x, cast(b16)value, b16)
-#define zpl_bs_write_b32(x, value) zpl_bs_write_value(x, cast(b32)value, b32)
-
-#define zpl_bs_write_i8_at(x, value, offset) zpl_bs_write_value_at(x, cast(i8) value,  i8, offset)
-#define zpl_bs_write_u8_at(x, value, offset) zpl_bs_write_value_at(x, cast(u8) value,  u8, offset)
-#define zpl_bs_write_i16_at(x, value, offset) zpl_bs_write_value_at(x, cast(i16)value, i16, offset)
-#define zpl_bs_write_u16_at(x, value, offset) zpl_bs_write_value_at(x, cast(u16)value, u16, offset)
-#define zpl_bs_write_i32_at(x, value, offset) zpl_bs_write_value_at(x, cast(i32)value, i32, offset)
-#define zpl_bs_write_u32_at(x, value, offset) zpl_bs_write_value_at(x, cast(u32)value, u32, offset)
-#define zpl_bs_write_i64_at(x, value, offset) zpl_bs_write_value_at(x, cast(i64)value, i64, offset)
-#define zpl_bs_write_u64_at(x, value, offset) zpl_bs_write_value_at(x, cast(u64)value, u64, offset)
-#define zpl_bs_write_f32_at(x, value, offset) zpl_bs_write_value_at(x, cast(f32)value, f32, offset)
-#define zpl_bs_write_f64_at(x, value, offset) zpl_bs_write_value_at(x, cast(f64)value, f64, offset)
-#define zpl_bs_write_b8_at(x, value, offset) zpl_bs_write_value_at(x, cast(b8) value,  b8, offset)
-#define zpl_bs_write_b16_at(x, value, offset) zpl_bs_write_value_at(x, cast(b16)value, b16, offset)
-#define zpl_bs_write_b32_at(x, value, offset) zpl_bs_write_value_at(x, cast(b32)value, b32, offset)
-
-#define zpl_bs_read_i8(x)  zpl_bs_read_value(x,  i8)
-#define zpl_bs_read_u8(x)  zpl_bs_read_value(x,  u8)
-#define zpl_bs_read_i16(x) zpl_bs_read_value(x, i16)
-#define zpl_bs_read_u16(x) zpl_bs_read_value(x, u16)
-#define zpl_bs_read_i32(x) zpl_bs_read_value(x, i32)
-#define zpl_bs_read_u32(x) zpl_bs_read_value(x, u32)
-#define zpl_bs_read_i64(x) zpl_bs_read_value(x, i64)
-#define zpl_bs_read_u64(x) zpl_bs_read_value(x, u64)
-#define zpl_bs_read_f32(x) zpl_bs_read_value(x, f32)
-#define zpl_bs_read_f64(x) zpl_bs_read_value(x, f64)
-#define zpl_bs_read_b8(x)  zpl_bs_read_value(x,  b8)
-#define zpl_bs_read_b16(x) zpl_bs_read_value(x, b16)
-#define zpl_bs_read_b32(x) zpl_bs_read_value(x, b32)
-
-#define zpl_bs_read_i8_at(x, offset)  zpl_bs_read_value_at(x,  i8, offset)
-#define zpl_bs_read_u8_at(x, offset)  zpl_bs_read_value_at(x,  u8, offset)
-#define zpl_bs_read_i16_at(x, offset) zpl_bs_read_value_at(x, i16, offset)
-#define zpl_bs_read_u16_at(x, offset) zpl_bs_read_value_at(x, u16, offset)
-#define zpl_bs_read_i32_at(x, offset) zpl_bs_read_value_at(x, i32, offset)
-#define zpl_bs_read_u32_at(x, offset) zpl_bs_read_value_at(x, u32, offset)
-#define zpl_bs_read_i64_at(x, offset) zpl_bs_read_value_at(x, i64, offset)
-#define zpl_bs_read_u64_at(x, offset) zpl_bs_read_value_at(x, u64, offset)
-#define zpl_bs_read_f32_at(x, offset) zpl_bs_read_value_at(x, f32, offset)
-#define zpl_bs_read_f64_at(x, offset) zpl_bs_read_value_at(x, f64, offset)
-#define zpl_bs_read_b8_at(x, offset)  zpl_bs_read_value_at(x,  b8, offset)
-#define zpl_bs_read_b16_at(x, offset) zpl_bs_read_value_at(x, b16, offset)
-#define zpl_bs_read_b32_at(x, offset) zpl_bs_read_value_at(x, b32, offset)
-
-
-
 
 
     ////////////////////////////////////////////////////////////////
@@ -3435,6 +3269,8 @@ extern "C" {
         u8 *__dest8 = cast(u8 *)dest;
         u8 *__source8 = cast(u8 *)source;
         __asm__ __volatile__("rep movsb" : "+D"(__dest8), "+S"(__source8), "+c"(n) : : "memory");
+#elif defined(ZPL_CPU_ARM)
+        return memcpy(dest, source, n);
 #else
         u8 *d = cast(u8 *)dest;
         u8 const *s = cast(u8 const *)source;
