@@ -376,8 +376,6 @@ void mod_main(HMODULE module)
 
     CDirectInput8Hook::Install();
     mod.state = MOD_TITLE_STATE;
-
-    discordInit();
 }
 
 /**

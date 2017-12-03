@@ -4,6 +4,10 @@
 // !
 // =======================================================================//
 
+void module_car_init() {
+    //librg_network_add(ctx, MOD_CAR_ENTER, module_car_remote_enter);
+}
+
 /**
  * The entity enters the stream zone
  */
@@ -218,20 +222,3 @@ void module_car_remote_enter(librg_message_t *msg) {
         true, M2::E_VehicleSeat::E_SEAT_DRIVER, false
     );
 }
-
-// inline void module_car_init() {
-//     librg_event_add(ctx, LIBRG_ENTITY_CREATE, module_car_callback_create);
-//     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, module_car_callback_update);
-//     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, module_car_callback_remove);
-//     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, module_car_callback_clientstream);
-
-//     // local events
-//     //librg_event_add(MOD_CAR_ENTER, module_car_local_enter);
-
-//     // remote events
-//     librg_network_add(ctx, MOD_CAR_ENTER, module_car_remote_enter);
-// }
-
-// inline void module_car_tick() {
-//     librg_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, module_car_callback_interpolate);
-// }

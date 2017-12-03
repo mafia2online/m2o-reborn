@@ -4,6 +4,9 @@
 // !
 // =======================================================================//
 
+/* some interfaces */
+void module_ped_callback_create();
+void module_car_callback_create();
 void mod_connected(librg_event_t *);
 void mod_disconnected(librg_event_t *);
 void mod_entity_create(librg_event_t *);
@@ -12,6 +15,10 @@ void mod_entity_remove(librg_event_t *);
 void mod_entity_client(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 
+/**
+ * Game initialization event
+ * World loaded, and we are ready to be telerpoted
+ */
 void mod_game_init() {
     mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
     tools::gamehooks_install_late();
@@ -25,8 +32,18 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, mod_entity_update);
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, mod_entity_remove);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client);
+
+    // call inits for modules
+    module_ped_init();
+    module_car_init();
+
+    discordInit();
 }
 
+/**
+ * Game tick event
+ * takes about ~16 ms per tick
+ */
 void mod_game_tick() {
     mod.last_delta  = (zpl_utc_time_now() - mod.last_update) / 1000.f;
     mod.last_update = zpl_utc_time_now();
@@ -88,20 +105,21 @@ void mod_game_tick() {
 // =======================================================================//
 
 void mod_connected(librg_event_t *event) {
-    mod_log("connected to the server\n");
+    mod_log("[info] connected to the server\n");
+    auto object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
+
+    ((M2::C_Player2*)object)->LockControls(false);
+    object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+
+    mod.state  = MOD_DEBUG_STATE;
     mod.player = event->entity;
+    mod.player->user_data = new ped_t(object);
 
-    auto ped = new ped_t();
-    ped->object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
-
-    event->entity->user_data = ped;
-    mod_log("my ped guid: %lu\n", (u32)ped->object->m_dwGUID);
-
-    mod.state = MOD_DEBUG_STATE;
+    mod_log("[info] local ped GUID: %lu\n", (u32)object->m_dwGUID);
 }
 
 void mod_disconnected(librg_event_t *event) {
-    mod_log("disconnected form the server\n");
+    mod_log("[info] disconnected form the server\n");
     delete event->entity->user_data;
 }
 

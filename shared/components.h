@@ -65,17 +65,21 @@ struct ped_t {
     } stream;
     #pragma pack(pop)
 
-    #ifdef MOD_CLIENT
+#ifdef MOD_CLIENT
     interpolate_t interpolate;
 
     /* game entity */
     M2::C_Entity *object;
     M2::Wrappers::GameModelManager *pGameModelManager;
-    #endif
 
-    ped_t() {
+
+    ped_t(M2::C_Entity *ent) {
         zpl_zero_item(this);
-    }
+        object = ent;
+    };
+#endif
+
+    ped_t() { zpl_zero_item(this); }
 };
 
 /**
@@ -99,13 +103,13 @@ struct car_t {
     } stream;
     #pragma pack(pop)
 
-    #ifdef MOD_CLIENT
+#ifdef MOD_CLIENT
     interpolate_t interpolate;
 
     /* game entity */
     M2::C_Entity *object;
     M2::Wrappers::GameModelManager *pGameModelManager;
-    #endif
+#endif
 
     car_t() {
         zpl_zero_item(this);

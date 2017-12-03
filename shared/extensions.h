@@ -40,3 +40,9 @@ inline void mod_message_send_instream_except(librg_ctx_t *ctx, LIBRG_MESSAGE_ID 
 inline void mod_entity_iterate(librg_ctx_t *ctx, u64 flags, entity_callback_t callback) {
     librg_entity_iteratex(ctx, flags, entity, { callback(librg_entity_fetch(ctx, entity)); } );
 }
+/*
+inline void mod_message_add(librg_ctx_t *ctx, LIBRG_MESSAGE_ID id, message_callback_t callback) {
+    //librg_messsage_add(ctx, id, (librg_message_cb)callback.target);
+    ctx->messages[id] = callback.target;
+}
+*/
