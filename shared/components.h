@@ -1,6 +1,9 @@
-/**
- * Entity types
- */
+// =======================================================================//
+// !
+// ! Generic flags and constants
+// !
+// =======================================================================//
+
 enum {
     TYPE_PED,
     TYPE_CAR,
@@ -15,11 +18,18 @@ enum {
 };
 
 enum {
-    MOD_ENTITY_PED          = (1 << 20),
-    MOD_ENTITY_CAR          = (1 << 21),
-    MOD_ENTITY_INTERPOLATED = (1 << 28),
+    MOD_ENTITY_INTERPOLATED = (1 << 20),
 };
 
+// =======================================================================//
+// !
+// ! Generic data structs
+// !
+// =======================================================================//
+
+/**
+ * Struct for storing the interpolation stuff
+ */
 struct interpolate_t {
     vec3_t lposition;
     quat_t lrotation;
@@ -29,11 +39,19 @@ struct interpolate_t {
 
     f32 delta;
     i32 step;
-    b32 enabled;
 };
 
+/**
+ * Struct for storing the
+ * pedestrian type of entity data
+ */
 struct ped_t {
-#pragma pack(push, 1)
+
+    /**
+     * Internal packed struct
+     * for continious data sync
+     */
+    #pragma pack(push, 1)
     struct {
         // 128
         zplm_vec3_t direction;
@@ -45,22 +63,32 @@ struct ped_t {
         b8 is_accelerating;
         //u8 unused;
     } stream;
-#pragma pack(pop)
+    #pragma pack(pop)
 
-#ifdef MOD_CLIENT
+    #ifdef MOD_CLIENT
     interpolate_t interpolate;
 
+    /* game entity */
     M2::C_Entity *object;
     M2::Wrappers::GameModelManager *pGameModelManager;
-#endif
- 
+    #endif
+
     ped_t() {
         zpl_zero_item(this);
     }
 };
 
+/**
+ * Struct for storing the
+ * vehicle type of entity data
+ */
 struct car_t {
-#pragma pack(push, 1)
+
+    /**
+     * Internal packed struct
+     * for continious data sync
+     */
+    #pragma pack(push, 1)
     struct {
         quat_t rotation;
 
@@ -69,14 +97,15 @@ struct car_t {
         i8  gear;
         u16 model;
     } stream;
-#pragma pack(pop)
+    #pragma pack(pop)
 
-#ifdef MOD_CLIENT
+    #ifdef MOD_CLIENT
     interpolate_t interpolate;
 
+    /* game entity */
     M2::C_Entity *object;
     M2::Wrappers::GameModelManager *pGameModelManager;
-#endif
+    #endif
 
     car_t() {
         zpl_zero_item(this);

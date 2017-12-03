@@ -1,3 +1,7 @@
+// NOTE (inlife): tried to make some wrapper for model stuff, didnt work
+// TODO remove
+
+#if 0
 static M2::Wrappers::ModelManager *model_manager = nullptr;
 
 struct mod_model_node_t {
@@ -128,3 +132,4 @@ void destroy_game_entity(librg_entity_t entity) {
 
     delete gamedata->object;
 }
+#endif

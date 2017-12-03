@@ -1,3 +1,9 @@
+// =======================================================================//
+// !
+// ! Generic gfx methods
+// !
+// =======================================================================//
+
 /**
  * Graphics init
  * @return
@@ -24,6 +30,12 @@ inline void graphics_dimensions(int *w, int *h) {
     *w = static_cast<int>(mod.graphics.present_params.BackBufferWidth);
     *h = static_cast<int>(mod.graphics.present_params.BackBufferHeight);
 }
+
+// =======================================================================//
+// !
+// ! Generic gfx events
+// !
+// =======================================================================//
 
 /**
  * Device create callback
@@ -98,6 +110,12 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
 
     nk_d3d9_shutdown();
 }
+
+// =======================================================================//
+// !
+// ! Render gfx events
+// !
+// =======================================================================//
 
 /**
  * On device pre-render callback

@@ -1,4 +1,9 @@
-﻿M2::C_Human2 *human = nullptr;
+/**
+ * TEMP file for testing some stuff etc
+ * TODO: remove someday
+ */
+
+M2::C_Human2 *human = nullptr;
 
 vec3_t mrot;
 vec3_t next_pos;

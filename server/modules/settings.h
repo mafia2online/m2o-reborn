@@ -1,3 +1,8 @@
+struct mod_settings_t {
+    std::string hostname;
+    std::string password;
+};
+
 #define settings_default                \
     "{\n"                               \
     "   hostname: \"my m2o server\",\n" \

@@ -1,13 +1,19 @@
 #define MOD_CLIENT
 
+// =======================================================================//
+// !
+// ! Generic, library, and system includes
+// !
+// =======================================================================//
+
 // common shared stuff
-#include "includes.h"
+#include <includes.h>
 
 // system libs
 #include <stdio.h>
 #include <stdint.h>
 
-// bla bla
+ /* TODO: remove some of the deps */
 #include <memory>
 #include <limits>
 #include <algorithm>
@@ -48,6 +54,12 @@
 #define NK_D3D9_IMPLEMENTATION
 #include <nuklear.h>
 #include <nuklear_d3d9.h>
+
+// =======================================================================//
+// !
+// ! Generic types and intefaces
+// !
+// =======================================================================//
 
 /**
  * Internal dependencies
@@ -159,26 +171,11 @@ struct mod_t {
 // public interface definitions
 static mod_t mod = {0};
 
-bool mod_init();
+void mod_game_init();
+void mod_game_tick();
+void mod_log(const char* format, ...);
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
-
-void mod_log(const char* format, ...) {
-    va_list ap;
-    char message[1024] = { 0 };
-    va_start(ap, format);
-    vsprintf(message, format, ap);
-    va_end(ap);
-
-    zpl_mutex_lock(&mod.mutexes.log);
-    zpl_printf(message);
-    zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
-    zpl_mutex_unlock(&mod.mutexes.log);
-}
-
-// game events
-void game_init();
-void game_tick();
 
 // graphics stuff, including dx callbacks
 bool graphics_init();
@@ -191,6 +188,12 @@ void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 void module_car_local_enter(void *);
+
+// =======================================================================//
+// !
+// ! Mod level includes and modules
+// !
+// =======================================================================//
 
 // hooks
 #include "hooks/memory.h"
@@ -216,9 +219,9 @@ void module_car_local_enter(void *);
 // after memory hooks :C
 #include <m2sdk.h>
 
-// shared stuff
-#include "components.h"
-#include "messages.h"
+// shared
+#include <components.h>
+#include <extensions.h>
 
 //#include "core/model.h"
 
@@ -226,20 +229,156 @@ void module_car_local_enter(void *);
 #include "states/title.h"
 #include "states/debug.h"
 
-// "modules"
-#include "modules/module_ped.h"
-#include "modules/module_car.h"
-#include "modules/discord.h"
-
+// core stuff
 #include "core/graphics.h"
-#include "core/game.h"
+#include "core/pedestrian.h"
+#include "core/vehicle.h"
+#include "core/discord.h"
+//#include "core/hacks.h"
 #include "core/mod.h"
-
-//#include "hacks.h"
 
 // NOTE(zaklaus): Tell the OS to prefer dedicated video card.
 DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
 int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
+
+// =======================================================================//
+// !
+// ! Mod helper methods
+// !
+// =======================================================================//
+
+/**
+ * Register all current mod paths
+ * @param module
+ */
+void mod_path_register(HMODULE module)
+{
+    char temp_path_raw[MAX_PATH] = { '\0' };
+    GetModuleFileName(module, temp_path_raw, MAX_PATH);
+
+    auto temp_path = std::string(temp_path_raw);
+    auto temp_pos  = temp_path.rfind("\\");
+
+    temp_path.erase(temp_pos, std::string::npos);
+
+    mod.paths.index = temp_path;
+    mod.paths.files = temp_path + "\\files";
+    mod.paths.debug = temp_path + "\\debug.log";
+    mod.paths.game_files = temp_path + "\\game_files";
+}
+
+/**
+ * Trigger exiting from the mod
+ * @param reason
+ */
+void mod_exit(std::string reason)
+{
+    mod_log("exiting %s\n", reason.c_str());
+
+    Discord_Shutdown();
+    //model_free();
+    librg_free(ctx);
+    delete ctx;
+
+    zpl_file_close(&mod.debug_log);
+
+    zpl_mutex_destroy(&mod.mutexes.log);
+    zpl_mutex_destroy(&mod.mutexes.wnd_msg);
+
+    MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
+
+    exit(0);
+}
+
+void mod_log(const char* format, ...) {
+    va_list ap;
+    char message[1024] = { 0 };
+    va_start(ap, format);
+    vsprintf(message, format, ap);
+    va_end(ap);
+
+    zpl_mutex_lock(&mod.mutexes.log);
+    zpl_printf(message);
+    zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
+    zpl_mutex_unlock(&mod.mutexes.log);
+}
+
+// =======================================================================//
+// !
+// ! Generic mod entrance methods
+// !
+// =======================================================================//
+
+/**
+ * Trigger attachment to process
+ * @param module
+ */
+void mod_main(HMODULE module)
+{
+    zpl_mutex_init(&mod.mutexes.log);
+    zpl_mutex_init(&mod.mutexes.wnd_msg);
+
+    // console, yay
+    tools::console_attach();
+    tools::console_color_fg(3);
+    {
+        mod_log("the\nm2o-reborn\n");
+        mod_log("starting...\n");
+    }
+    tools::console_color_fg(7);
+
+    // path n basics
+    mod_path_register(module);
+
+    zpl_file_remove(mod.paths.debug.c_str());
+    zpl_file_create(&mod.debug_log, mod.paths.debug.c_str());
+    zpl_file_seek(&mod.debug_log, 0);
+
+    mod.module = module;
+
+    // allocate ctx
+    ctx = new librg_ctx_t;
+    zpl_zero_item(ctx);
+
+    // setup manual client mode
+    ctx->tick_delay     = 32;
+    ctx->mode           = LIBRG_MODE_CLIENT;
+    ctx->world_size     = zplm_vec3(5000.0f, 5000.0f, 5000.0f);
+    ctx->max_entities   = 1000;
+
+    librg_init(ctx);
+
+    if (graphics_init() == false) {
+        return mod_exit("Unable to init Graphics Manager");
+    }
+
+    Mem::Initialize();
+
+    mod_log("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
+
+    tools::filepatcher_install();
+    tools::steam_drm_install();
+    tools::gamehooks_install();
+
+    // Disable loading screen
+    Mem::Utilites::PatchAddress(0x08CA820, 0xC300B0); // mov al, 0; retn
+
+    // Disable DLC loadings (NONO, WE NEED DLCs !)
+    //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
+
+    if (ExceptionHandler::Install() == false) {
+        return mod_exit("Unable to install exception handler");
+    }
+
+    // if (m_clientSettings.LoadFile(CClientSettings::DEFAULT_SETTINGS_FILENAME) == false) {
+    //     mod_exit("Unable to parse config file");
+    // }
+
+    CDirectInput8Hook::Install();
+    mod.state = MOD_TITLE_STATE;
+
+    discordInit();
+}
 
 /**
  * Our main process function
@@ -249,7 +388,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             DisableThreadLibraryCalls(module);
-            mod_attach(module);
+            mod_main(module);
             break;
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:

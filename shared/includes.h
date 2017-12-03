@@ -16,6 +16,7 @@
 
 // third party headers
 #include <string>
+#include <functional>
 
 // proxy some stuff
 typedef zplm_vec2_t vec2_t;

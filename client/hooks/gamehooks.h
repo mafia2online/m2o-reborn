@@ -24,7 +24,7 @@ namespace tools {
     {
         __asm call[_call];
         __asm pushad;
-        game_tick();
+        mod_game_tick();
         __asm popad;
         __asm jmp[GameLoopHook_1_Return];
     }
@@ -35,7 +35,7 @@ namespace tools {
         __asm fstp    dword ptr[esp + 0x10];
         __asm fld     dword ptr[esp + 0x10];
         __asm pushad;
-        game_tick();
+        mod_game_tick();
         __asm popad;
         __asm jmp[GameLoopHook_2_Return];
     }
@@ -46,7 +46,7 @@ namespace tools {
     {
         __asm call[_C_PreloadSDS__FinishPendingSlots];
         __asm pushad;
-        game_init();
+        mod_game_init();
         __asm popad;
         __asm jmp[GameInitHook_Return];
     }
@@ -147,7 +147,7 @@ namespace tools {
         __asm call[CPlayer2__UpdateInput__Call];
         __asm mov player, ebx;
         __asm pushad;
-       
+
         //TODO: Hook here
 
         __asm popad;
@@ -188,7 +188,7 @@ namespace tools {
             call CHuman2CarWrapper__GetCar;
             mov tryToEnterCar, eax;
         }
-         
+
         if (player_request_vehicle_enter(tryToEnterCar) == true) {
             __asm {
                 mov     al, 1
