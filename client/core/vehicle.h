@@ -179,14 +179,14 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
 // =======================================================================//
 // !
-// ! Custom events
+// ! Local car events
 // !
 // =======================================================================//
 
 /**
- * Event when local player enters a local car
+ * Event when local player starts entering a local car
  */
-void module_car_local_enter(librg_event_t *event) {
+void module_car_local_enter_start(librg_event_t *event) {
     auto vehicle = (M2::C_Entity *)event->user_data;
     auto ped     = (ped_t*)mod.player->user_data;
 
@@ -199,36 +199,88 @@ void module_car_local_enter(librg_event_t *event) {
 
         if (car->object == vehicle) {
             // set the driver data
-            mod.player->flags |= MOD_ENTITY_DRIVER;
-            ped->stream.state = PED_IN_CAR;
+            ped->stream.state = PED_ENTERING_CAR;
             ped->vehicle      = entity;
 
-            mod_message_send(ctx, MOD_CAR_ENTER, [&](librg_data_t *data) { librg_data_wu32(data, entity->id); });
+            mod_message_send(ctx, MOD_CAR_ENTER_START, [&](librg_data_t *data) { librg_data_wu32(data, entity->id); });
         }
     });
 }
 
 /**
- * Event when local player leaves local car
- * @param event [description]
+ * Local ped finished entering the car
+ * @param event
  */
-void module_car_local_exit(librg_event_t *event) {
+void module_car_local_enter_finish(librg_event_t *event) {
+    auto ped = (ped_t*)mod.player->user_data;
+
+    mod.player->flags |= MOD_ENTITY_DRIVER;
+    ped->stream.state = PED_IN_CAR;
+
+    mod_message_send(ctx, MOD_CAR_ENTER_FINISH, nullptr);
+}
+
+/**
+ * Event when local player starts leaving local car
+ * @param event
+ */
+void module_car_local_exit_start(librg_event_t *event) {
     auto ped = (ped_t*)mod.player->user_data;
 
     // reset the driver data
     mod.player->flags &= ~MOD_ENTITY_DRIVER;
-    ped->stream.state = PED_ON_GROUND;
-    ped->vehicle      = nullptr;
+    ped->stream.state = PED_EXITING_CAR;
 
-    mod_message_send(ctx, MOD_CAR_EXIT, nullptr);
+    mod_message_send(ctx, MOD_CAR_EXIT_START, nullptr);
 }
+
+/**
+ * Event when local player finished exiting local car
+ * @param event
+ */
+void module_car_local_exit_finish(librg_event_t *event) {
+    auto ped = (ped_t*)mod.player->user_data;
+
+    ped->vehicle = nullptr;
+    ped->stream.state = PED_ON_GROUND;
+
+    mod_message_send(ctx, MOD_CAR_EXIT_FINISH, nullptr);
+}
+
+// =======================================================================//
+// !
+// ! Remote car events
+// !
+// =======================================================================//
 
 /**
  * Event when a remote ped starts entering the car
  */
-void module_car_remote_enter(librg_message_t *msg) {
-    mod_log("received message for car enter\n");
+void module_car_remote_enter_start(librg_message_t *msg) {
+    auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
+    auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
+    mod_assert(player && vehicle);
 
+    auto ped = (ped_t *)player->user_data;
+    auto car = (car_t *)vehicle->user_data;
+    mod_assert_msg(ped->object, "trying to put ped in invalid car");
+    mod_assert_msg(car->object, "trying to put invalid ped in car");
+    mod_log("[info] putting ped: %u in the car: %u\n", player->id, vehicle->id);
+
+    // TODO: add seat sync
+    M2::C_SyncObject *pSyncObject = nullptr;
+    ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
+        &pSyncObject,
+        reinterpret_cast<M2::C_Vehicle *>(car->object),
+        true, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
+    );
+}
+
+/**
+ * Remote ped finished entering the car
+ * @param msg
+ */
+void module_car_remote_enter_finish(librg_message_t *msg) {
     auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
     auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
     mod_assert(player && vehicle);
@@ -238,24 +290,63 @@ void module_car_remote_enter(librg_message_t *msg) {
     mod_assert_msg(ped->object, "trying to put ped in invalid car");
     mod_assert_msg(car->object, "trying to put invalid ped in car");
 
-    mod_log("im not putting anyone anywhere fuck u\n");
-    return;
-    // TODO: vehicle put in for player entity hides both the car and the player
-#if 0
-    mod_log("putting ped: %u in the car: %u\n", player->id, vehicle->id);
+    // TODO: add PutPlayerInVehicle focred
+}
+
+/**
+ * Remote ped started exiting the car
+ * @param msg
+ */
+void module_car_remote_exit_start(librg_message_t *msg) {
+    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
+    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
+
+    mod_assert(ped && ped->object && ped->vehicle);
 
     M2::C_SyncObject *pSyncObject = nullptr;
-    ((M2::C_Human2*)ped->object)->GetScript()->ScrDoAction(
+    ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
         &pSyncObject,
-        reinterpret_cast<M2::C_Vehicle *>(car->object),
-        true, M2::E_VehicleSeat::E_SEAT_DRIVER, false
+        reinterpret_cast<M2::C_Vehicle *>(ped->vehicle),
+        false, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
     );
-#endif
+}
+
+/**
+ * Remote ped finished exiting the car
+ * @param msg
+ */
+void module_car_remote_exit_finish(librg_message_t *msg) {
+    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
+    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
+
+    // TODO: add forced exit for player
+}
+
+// =======================================================================//
+// !
+// ! Initializers, misc
+// !
+// =======================================================================//
+
+void module_car_interaction_finish(librg_event_t *event) {
+    auto ped = (ped_t *)mod.player->user_data;
+
+    /**/ if (ped->stream.state == PED_ENTERING_CAR) {
+        module_car_local_enter_finish(event);
+    }
+    else if (ped->stream.state == PED_EXITING_CAR) {
+        module_car_local_exit_finish(event);
+    }
 }
 
 void module_car_init() {
-    librg_event_add(ctx, MOD_CAR_ENTER, module_car_local_enter);
-    librg_event_add(ctx, MOD_CAR_EXIT, module_car_local_exit);
+    librg_event_add(ctx, MOD_CAR_INTERACTION_FINISH,  module_car_interaction_finish);
 
-    librg_network_add(ctx, MOD_CAR_ENTER, module_car_remote_enter);
+    librg_event_add(ctx, MOD_CAR_ENTER_START,   module_car_local_enter_start);
+    librg_event_add(ctx, MOD_CAR_EXIT_START,    module_car_local_exit_start);
+
+    librg_network_add(ctx, MOD_CAR_ENTER_START,     module_car_remote_enter_start);
+    librg_network_add(ctx, MOD_CAR_ENTER_FINISH,    module_car_remote_enter_finish);
+    librg_network_add(ctx, MOD_CAR_EXIT_START,      module_car_remote_exit_start);
+    librg_network_add(ctx, MOD_CAR_EXIT_FINISH,     module_car_remote_exit_finish);
 }

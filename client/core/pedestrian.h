@@ -55,7 +55,7 @@ void module_ped_callback_create(librg_event_t *event) {
     ped->object = (M2::C_Entity*)human;
     ped->pGameModelManager = pPedModelManager;
 
-    event->flags |= MOD_ENTITY_INTERPOLATED;
+    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
     event->entity->user_data = ped;
 }
 
@@ -100,6 +100,7 @@ void module_ped_callback_update(librg_event_t *event) {
 
         targ_pos.z = entity->position.z;
         ped->object->SetDirection(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
+        return;
 
         M2::C_SyncObject *pSyncObject = nullptr;
         ((M2::C_Human2*)ped->object)->GetScript()->ScrMoveV(
@@ -195,8 +196,8 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
     mod_assert(ped && ped->object);
 
     // last delta tick against constant tick delay
-    ped->interpolate.delta += (mod.last_delta / 33.666f);
-    ped->interpolate.delta = zplm_clamp01(ped->interpolate.delta);
+    ped->interpolate.delta += (mod.last_delta / 40.666f);
+    // ped->interpolate.delta = zplm_clamp01(ped->interpolate.delta);
 
     if (ped->stream.state != PED_ON_GROUND) {
         return;

@@ -1,5 +1,5 @@
 struct {
-    char hostname_input[16];
+    char hostname_input[256];
     char port_input[6];
 
     int  hostname_len;
@@ -21,7 +21,7 @@ void title_state_render() {
         nk_layout_row_dynamic(nk_ctx, 30, 2);
 
         nk_label(nk_ctx, "Host:", NK_TEXT_LEFT);
-        nk_edit_string_zero_terminated(nk_ctx, NK_EDIT_BOX, title_state_data.hostname_input, 16, nk_filter_default);
+        nk_edit_string_zero_terminated(nk_ctx, NK_EDIT_BOX, title_state_data.hostname_input, 256, nk_filter_default);
 
         nk_label(nk_ctx, "Port:", NK_TEXT_LEFT);
         nk_edit_string_zero_terminated(nk_ctx, NK_EDIT_FIELD, title_state_data.port_input, 6, nk_filter_default);

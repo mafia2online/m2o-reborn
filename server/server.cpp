@@ -18,6 +18,7 @@ librg_ctx_t *ctx;
 
 #include "core/router.h"
 
+/* simple bandwidth measurer */
 void mod_measure(void *user_data) {
     librg_ctx_t *ctx = (librg_ctx_t *)user_data;
 
@@ -32,7 +33,7 @@ void mod_measure(void *user_data) {
     lastdl = ctx->network.host->totalReceivedData;
     lastup = ctx->network.host->totalSentData;
 
-    mod_log("librg_update: took %f ms. Current used bandwidth D/U: (%f / %f) mbps. \r", ctx->last_update, dl, up);
+    mod_log("librg_update: took %.3f ms. Current used bandwidth D/U: (%.3f / %.3f) mbps. \r", ctx->last_update, dl, up);
 }
 
 int main() {

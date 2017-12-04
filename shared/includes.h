@@ -43,6 +43,9 @@ typedef zplm_quat_t quat_t;
 /* events/messages */
 enum {
     MOD_CAR_CREATE = LIBRG_EVENT_LAST,
-    MOD_CAR_ENTER,
-    MOD_CAR_EXIT,
+    MOD_CAR_ENTER_START,
+    MOD_CAR_ENTER_FINISH,
+    MOD_CAR_EXIT_START,
+    MOD_CAR_EXIT_FINISH,
+    MOD_CAR_INTERACTION_FINISH,
 };

@@ -15,13 +15,16 @@ void player_game_message(M2::C_EntityMessage *message)
     {
         case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE:
         {
-            mod_log("Enter/Exit Vehicle done\n");
+            mod_log("[game-event] Enter/Exit Vehicle done\n");
+
+            librg_event_t event = { 0 }; event.entity = mod.player;
+            librg_event_trigger(ctx, MOD_CAR_INTERACTION_FINISH, &event);
         }
         break;
 
         default:
         {
-            mod_log("unknow event %d\n", (int)message->m_dwMessage);
+            mod_log("[game-event] unknow event %d\n", (int)message->m_dwMessage);
         }
         break;
     }
@@ -34,22 +37,22 @@ void player_mod_message(E_PlayerMessage message)
     {
         case E_PlayerMessage::MESSAGE_MOD_ENTER_CAR:
         {
-            mod_log("Start to enter vehicle\n");
+            mod_log("[game-event] ped start to enter vehicle\n");
         }
         break;
 
         case E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR:
         {
-            mod_log("Start to breakin vehicle\n");
+            mod_log("[game-event] Start to breakin vehicle\n");
         }
         break;
 
         case E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR:
         {
-            mod_log("Start to leave car\n");
+            mod_log("[game-event] Start to leave car\n");
 
             librg_event_t event = { 0 }; event.entity = mod.player;
-            librg_event_trigger(ctx, MOD_CAR_EXIT, &event);
+            librg_event_trigger(ctx, MOD_CAR_EXIT_START, &event);
         }
     }
 }
@@ -58,12 +61,14 @@ void player_mod_message(E_PlayerMessage message)
 /* Return true and the player will enter, false and the player will be stuck */
 bool player_request_vehicle_enter(M2::C_Car *car)
 {
+    mod_log("[game-event] ped request vehicle enter\n");
+
     librg_event_t event = { 0 };
 
     event.entity    = mod.player;
     event.user_data = (void *)car;
 
-    librg_event_trigger(ctx, MOD_CAR_ENTER, &event);
+    librg_event_trigger(ctx, MOD_CAR_ENTER_START, &event);
 
     // module_car_local_enter((void *)car);
 

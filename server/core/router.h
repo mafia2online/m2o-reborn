@@ -64,16 +64,17 @@ void entity_on_remove(librg_event_t *event) {
 }
 
 void mod_register_routes(librg_ctx_t *ctx) {
-    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, on_connection_request);
-    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
+    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST,  on_connection_request);
+    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT,   on_connect_accepted);
 
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, entity_on_create);
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, entity_on_update);
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, entity_on_remove);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, entity_on_csupdate);
 
-    librg_network_add(ctx, MOD_CAR_CREATE, module_car_create);
-    librg_network_add(ctx, MOD_CAR_ENTER, module_car_enter);
-    librg_network_add(ctx, MOD_CAR_EXIT, module_car_exit);
-
+    librg_network_add(ctx, MOD_CAR_CREATE,          module_car_create);
+    librg_network_add(ctx, MOD_CAR_ENTER_START,     module_car_enter_start);
+    librg_network_add(ctx, MOD_CAR_ENTER_FINISH,    module_car_enter_finish);
+    librg_network_add(ctx, MOD_CAR_EXIT_START,      module_car_exit_start);
+    librg_network_add(ctx, MOD_CAR_EXIT_FINISH,     module_car_exit_finish);
 }

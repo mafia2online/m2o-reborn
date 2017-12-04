@@ -15,6 +15,8 @@ enum {
 /* ped states */
 enum {
     PED_ON_GROUND,
+    PED_ENTERING_CAR,
+    PED_EXITING_CAR,
     PED_IN_CAR,
 };
 
