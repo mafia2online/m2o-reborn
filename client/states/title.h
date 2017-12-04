@@ -1,51 +1,39 @@
-﻿void title_state_init()
-{
-    if (!mod.graphics.font_manager) {
-        return;
-    }
+struct {
+    char hostname_input[16];
+    char port_input[6];
 
-    auto fm = (CFontManager *)mod.graphics.font_manager;
+    int  hostname_len;
+    int  port_len;
+} title_state_data;
 
-    fm->AddFont("TitleUIFont", "Aurora BdCn BT", 26, false);
-    fm->AddFont("TitleUIFontBig", "Aurora BdCn BT", 32, false);
+void title_state_init() {
+    zpl_strcpy(title_state_data.hostname_input, "localhost");
+    zpl_strcpy(title_state_data.port_input, "27010");
 }
 
-void title_state_render()
-{
-    if (!mod.graphics.font_manager) {
-        return;
+void title_state_render() {
+    // int w, h;
+    // graphics_dimensions(&w, &h);
+    // f32 centerx, centery;
+
+    if (nk_begin(nk_ctx, "Mafia 2 Online: Reborn", nk_rect(50, 50, 210, 150), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        /* 2 columes */
+        nk_layout_row_dynamic(nk_ctx, 30, 2);
+
+        nk_label(nk_ctx, "Host:", NK_TEXT_LEFT);
+        nk_edit_string_zero_terminated(nk_ctx, NK_EDIT_BOX, title_state_data.hostname_input, 16, nk_filter_default);
+
+        nk_label(nk_ctx, "Port:", NK_TEXT_LEFT);
+        nk_edit_string_zero_terminated(nk_ctx, NK_EDIT_FIELD, title_state_data.port_input, 6, nk_filter_default);
+
+        /* 1 column */
+        nk_layout_row_dynamic(nk_ctx, 30, 1);
+        if (nk_button_label(nk_ctx, "Connect")) {
+            mod_log("connecting to: %s:%d\n", title_state_data.hostname_input, atoi(title_state_data.port_input));
+            librg_network_start(ctx, { atoi(title_state_data.port_input), title_state_data.hostname_input });
+        }
     }
-
-    auto fm = (CFontManager *)mod.graphics.font_manager;
-
-    int iScreenW{}, iScreenH{};
-    graphics_dimensions(&iScreenW, &iScreenH);
-
-    auto font = fm->GetFont("TitleUIFont");
-    int iFontHeight = (int)fm->GetFontHeight(*font) + 5; // lawl +5
-
-    if (font != nullptr) {
-        int iYOffset = iScreenH - 50;
-
-        fm->DrawTextA("Q", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *font, true);
-        fm->DrawTextA("uit", 25 + (int)fm->GetTextWidthA(*font, "Q"), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *font, true);
-        iYOffset -= iFontHeight;
-
-        fm->DrawTextA("S", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *font, true);
-        fm->DrawTextA("ettings", 25 + (int)fm->GetTextWidthA(*font, "S"), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *font, true);
-        iYOffset -= iFontHeight;
-
-        fm->DrawTextA("F", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *font, true);
-        fm->DrawTextA("ind Servers", 25 + (int)fm->GetTextWidthA(*font, "F"), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *font, true);
-        iYOffset -= iFontHeight;
-
-        fm->DrawTextA("Q", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *font, true);
-        fm->DrawTextA("uick connect", 25 + (int)fm->GetTextWidthA(*font, "Q"), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *font, true);
-        iYOffset -= iFontHeight;
-
-        fm->DrawTextA("MAFIA II ", 25, iYOffset, D3DCOLOR_XRGB(179, 48, 48), *fm->GetFont("TitleUIFontBig"), true);
-        fm->DrawTextA("Online", 25 + (int)fm->GetTextWidthA(*fm->GetFont("TitleUIFontBig"), "MAFIA II "), iYOffset, D3DCOLOR_XRGB(255, 255, 255), *fm->GetFont("TitleUIFontBig"), true);
-    }
+    nk_end(nk_ctx);
 }
 
 #define MOD_TITLE_STATE { title_state_init, nullptr, title_state_render }

@@ -154,7 +154,7 @@ struct mod_t {
     f32 last_delta;
 
     // game related states
-    b32 input_blocked;
+    b32 input_blocked = true;
     b32 spawned;
 
     // collection of mutexes

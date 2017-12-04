@@ -143,7 +143,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
     // last delta tick against constant tick delay
     car->interpolate.delta += (mod.last_delta / 40.666f);
-    car->interpolate.delta = zplm_clamp01(car->interpolate.delta);
+    car->interpolate.delta = zplm_clamp(car->interpolate.delta, 0.f, 1.0f);
 
     /* position interpolation */
     if (car->interpolate.lposition != car->interpolate.tposition) {
@@ -163,17 +163,17 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
         auto curr_rot = car->object->GetRotation();
         auto diff_rot = curr_rot - car->stream.rotation;
 
-        if (zpl_abs(diff_rot.x) > MOD_ENTITY_POSITION_THRESHOLD
-         || zpl_abs(diff_rot.y) > MOD_ENTITY_POSITION_THRESHOLD
-         || zpl_abs(diff_rot.z) > MOD_ENTITY_POSITION_THRESHOLD
-         || zpl_abs(diff_rot.w) > MOD_ENTITY_POSITION_THRESHOLD) {
+        // if (zpl_abs(diff_rot.x) > MOD_ENTITY_POSITION_THRESHOLD
+        //  || zpl_abs(diff_rot.y) > MOD_ENTITY_POSITION_THRESHOLD
+        //  || zpl_abs(diff_rot.z) > MOD_ENTITY_POSITION_THRESHOLD
+        //  || zpl_abs(diff_rot.w) > MOD_ENTITY_POSITION_THRESHOLD) {
             auto last = car->interpolate.lrotation;
             auto dest = car->interpolate.trotation;
 
             quat_t drotation;
             zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
             car->object->SetRotation(drotation);
-        }
+        // }
     }
 }
 

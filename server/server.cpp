@@ -6,8 +6,8 @@
 #include <extensions.h>
 
 // server modules
-#include "modules/settings.h"
-#include "modules/vehicle.h"
+#include "core/settings.h"
+#include "core/vehicle.h"
 
 struct mod_t {
     mod_settings_t settings;
@@ -16,69 +16,23 @@ struct mod_t {
 static mod_t mod;
 librg_ctx_t *ctx;
 
-/**
- * Place to decide should the client be allowed to connect
- */
-void on_connection_request(librg_event_t *event) {
-    if (mod.settings.password.size() == 0) {
-        return;
-    }
+#include "core/router.h"
 
-    // read password
-    u32 size = librg_data_ru32(event->data);
-    std::string password = "";
-    for (usize i = 0; i < size; ++i) {
-        password += librg_data_ru8(event->data);
-    }
+void mod_measure(void *user_data) {
+    librg_ctx_t *ctx = (librg_ctx_t *)user_data;
 
-    // if not matches - reject
-    if (password != mod.settings.password) {
-        librg_event_reject(event);
-    }
-}
+    if (!ctx || !ctx->network.host) return;
 
-/**
- * On client connected
- */
-void on_connect_accepted(librg_event_t *event) {
-    auto entity = event->entity;
+    static u32 lastdl = 0;
+    static u32 lastup = 0;
 
-    // entity->position = vec3(-421.75f, 479.31f, 0.05f);
+    f32 dl = (ctx->network.host->totalReceivedData - lastdl) * 8.0f / (1000.0f * 1000); // mbps
+    f32 up = (ctx->network.host->totalSentData - lastup)     * 8.0f / (1000.0f * 1000); // mbps
 
-    mod_log("spawning player %u at: %f %f %f\n",
-        entity->id,
-        entity->position.x,
-        entity->position.y,
-        entity->position.z
-    );
+    lastdl = ctx->network.host->totalReceivedData;
+    lastup = ctx->network.host->totalSentData;
 
-    //auto object = new ped_t;
-    //zpl_zero_item(object); // fill object with 0s
-    entity->user_data = new ped_t();
-
-    // TODO: allocate stuff
-    librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
-}
-
-void entity_on_create(librg_event_t *event) {
-    // emtpy
-}
-
-void entity_on_update(librg_event_t *event) {
-    switch (event->entity->type) {
-        case TYPE_PED: { auto ped = (ped_t *)event->entity->user_data; librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-        case TYPE_CAR: { auto car = (car_t *)event->entity->user_data; librg_data_wptr(event->data, &car->stream, sizeof(car->stream)); } break;
-    }
-}
-void entity_on_csupdate(librg_event_t *event) {
-    switch (event->entity->type) {
-        case TYPE_PED: { auto ped = (ped_t *)event->entity->user_data; librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-        case TYPE_CAR: { auto car = (car_t *)event->entity->user_data; librg_data_rptr(event->data, &car->stream, sizeof(car->stream)); } break;
-    }
-}
-
-void entity_on_remove(librg_event_t *event) {
-    // emtpty
+    mod_log("librg_update: took %f ms. Current used bandwidth D/U: (%f / %f) mbps. \r", ctx->last_update, dl, up);
 }
 
 int main() {
@@ -89,29 +43,23 @@ int main() {
     /* fill up default settings */
     ctx->mode            = LIBRG_MODE_SERVER;
     ctx->tick_delay      = 32;
-    ctx->world_size      = zplm_vec3(5000.0f, 5000.0f, 5000.f);
+    ctx->world_size      = zplm_vec3(5000.0f, 5000.0f, 0.0f);
     ctx->max_entities    = 16000;
     ctx->max_connections = 100;
 
     librg_address_t address = { 27010, NULL };
     settings_read(ctx, &address, &mod.settings);
 
-    librg_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
-    librg_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
+    mod_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
+    mod_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
 
     librg_init(ctx);
+    mod_register_routes(ctx);
 
-    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, on_connection_request);
-    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
-
-    librg_event_add(ctx, LIBRG_ENTITY_CREATE, entity_on_create);
-    librg_event_add(ctx, LIBRG_ENTITY_UPDATE, entity_on_update);
-    librg_event_add(ctx, LIBRG_ENTITY_REMOVE, entity_on_remove);
-    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, entity_on_csupdate);
-
-    librg_network_add(ctx, MOD_CAR_CREATE, module_car_create);
-    librg_network_add(ctx, MOD_CAR_ENTER, module_car_enter);
-    librg_network_add(ctx, MOD_CAR_EXIT, module_car_exit);
+    zpl_timer_t *tick_timer = zpl_timer_add(ctx->timers);
+    tick_timer->user_data = (void *)ctx; /* provide ctx as a argument to timer */
+    zpl_timer_set(tick_timer, 1000 * 1000, -1, mod_measure);
+    zpl_timer_start(tick_timer, 1000);
 
     librg_network_start(ctx, address);
 

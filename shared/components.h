@@ -7,9 +7,9 @@
 /* entity types */
 enum {
     TYPE_PED,
+    TYPE_PLAYER = TYPE_PED,
     TYPE_CAR,
     TYPE_OTHER,
-    TYPE_PLAYER = TYPE_PED,
 };
 
 /* ped states */
