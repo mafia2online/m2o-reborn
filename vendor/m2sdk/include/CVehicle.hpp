@@ -40,8 +40,11 @@ namespace M2
 	class ICVehicle
 	{
     public:
-        pad(ICVehicle, pad0, 0x3F4);        // 0000 - 03F4
-        float           m_fSteer;           // 03F4 - 03F8
+        pad(ICVehicle, pad0, 0x3E8);
+        float           m_fSteer;           // 03E8 - 03EC
+        pad(ICVehicle, pad1, 0x4);          // 03EC - 03F0
+        float           m_fMaxSteer;        // 03F0 - 03F4
+        float           m_fAddedSteer;      // 03F4 - 03F8
 	};
 
 	class C_Vehicle : public ICVehicle
