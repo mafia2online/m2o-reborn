@@ -40,6 +40,7 @@
 #include "CPlayerModelManager.hpp"
 #include "CPlayerRadio.hpp"
 #include "CPoliceWanted.hpp"
+#include "CRangeMeter.hpp"
 #include "CRenderCamera.hpp"
 #include "CResources.hpp"
 #include "CReticle.hpp"

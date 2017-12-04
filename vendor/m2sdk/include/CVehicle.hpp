@@ -108,6 +108,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x12618F0, this, unk, door, open);
         }
 
+        void SetAddSteer(float steer)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x1204460, this, steer);
+        }
+
 		void SetBeaconLightOn(bool enable)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x120CC10, this, enable);
@@ -185,6 +190,11 @@ namespace M2
 
 			Mem::InvokeFunction<Mem::call_this, int>(0x11F75D0, this, text, 0);
 		}
+
+        void SetSteer(float steer)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x1204360, this, steer);
+        }
 
 		void SetTaxiLightsOn(bool enable)
 		{

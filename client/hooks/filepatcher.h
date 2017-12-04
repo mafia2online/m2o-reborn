@@ -11,7 +11,7 @@ namespace tools {
      */
     std::string filepatcher_sds_files[] = {
         "sdsconfig.bin",
-        "StreamMapa.bin",
+        //"StreamMapa.bin",
         "tables.sds",
         "gui.sds",
         "gui-main.sds"
