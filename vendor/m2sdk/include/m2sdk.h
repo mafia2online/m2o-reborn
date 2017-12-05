@@ -1,4 +1,5 @@
 /* Utils */
+#include "../utils/Matrix.hpp"
 #include "../utils/TArray.hpp"
 
 /* Classes */
@@ -6,7 +7,7 @@
 #include "CActor.hpp"
 #include "CActorVehicle.hpp"
 #include "ccamera.hpp"
-#include "CCameraModule.hpp"
+#include "CGameCamera.hpp"
 #include "CCar.hpp"
 #include "CCarManager.hpp"
 #include "CCore.hpp"
@@ -68,6 +69,7 @@
 #include "CWrappersList.hpp"
 
 /* Wrappers */
+#include "../wrappers/camera.hpp"
 #include "../wrappers/lua.hpp"
 #include "../wrappers/models.hpp"
 #include "../wrappers/config.hpp"

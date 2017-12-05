@@ -1,4 +1,4 @@
-/** @file CCameraModule.cpp
+/** @file CGameCamera.cpp
 *  @brief Game's CameraModule wrapper
 *
 *
@@ -12,7 +12,7 @@
 
 namespace M2
 {
-	class ICCameraModuleModule
+	class ICGameCamera
 	{
 	public:
 		void *m_pVFTable;
@@ -20,9 +20,14 @@ namespace M2
 		C_Camera *pCamera2;
 	};
 
-	class C_CameraModule : public GameClassWrapper<C_CameraModule, ICCameraModuleModule, 0x1ABCAAC>
+	class C_GameCamera : public GameClassWrapper<C_GameCamera, ICGameCamera, 0x1ABCAAC>
 	{
 	public:
+        void CreateCamera(int cameraID, int cameraInitType, C_Camera *createdCamera)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x01083C00, this, cameraID, cameraInitType, createdCamera);
+        }
+
 		C_Camera * GetCamera(int index)
 		{
 			return (Mem::InvokeFunction<Mem::call_this, C_Camera *>(0x10822C0, this, index));

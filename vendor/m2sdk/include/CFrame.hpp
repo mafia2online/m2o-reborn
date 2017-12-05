@@ -7,6 +7,7 @@
 
 #pragma once
 #include "CommonHeaders.h"
+#include "Matrix.hpp"
 
 namespace M2
 {
@@ -21,6 +22,11 @@ namespace M2
         int Clone()
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x14DADC0, this);
+        }
+
+        void GetWorldMatrix(Utils::Matrix43 *mat)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x01410BC0, this, mat);
         }
 
 		void MarkForNotify(int unk)
