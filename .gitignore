@@ -26,6 +26,7 @@ binary/*
 !binary/resources/
 !binary/steam_appid.txt
 !binary/steam_api.dll
+!binary/m2o-2clients.exe
 
 # os stuff
 .DS_Store

@@ -118,6 +118,7 @@ void module_car_callback_clientstream(librg_event_t *event) {
     event->entity->position = car->object->GetPosition();
     car->stream.rotation    = car->object->GetRotation();
     car->stream.speed       = ((M2::C_Car *)car->object)->m_fSpeed;
+    car->stream.steer       = ((M2::C_Car *)car->object)->m_pVehicle.m_fSteer;
 
     librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
 }
@@ -144,6 +145,9 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     // last delta tick against constant tick delay
     car->interpolate.delta += (mod.last_delta / 40.666f);
     car->interpolate.delta = zplm_clamp(car->interpolate.delta, 0.f, 1.0f);
+
+    /* steering */
+    ((M2::C_Car *)car->object)->m_pVehicle.SetSteer(car->stream.steer/* * (180.0f / ZPLM_PI)*/);
 
     /* position interpolation */
     if (car->interpolate.lposition != car->interpolate.tposition) {
@@ -270,8 +274,7 @@ void module_car_remote_enter_start(librg_message_t *msg) {
     // TODO: add seat sync
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
-        &pSyncObject,
-        reinterpret_cast<M2::C_Vehicle *>(car->object),
+        &pSyncObject, (M2::C_Vehicle *)car->object,
         true, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
     );
 }
@@ -281,16 +284,11 @@ void module_car_remote_enter_start(librg_message_t *msg) {
  * @param msg
  */
 void module_car_remote_enter_finish(librg_message_t *msg) {
-    auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
-    auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
-    mod_assert(player && vehicle);
+    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
+    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
+    auto car = (car_t *)ped->vehicle; mod_assert(car && car->object);
 
-    auto ped = (ped_t *)player->user_data;
-    auto car = (car_t *)vehicle->user_data;
-    mod_assert_msg(ped->object, "trying to put ped in invalid car");
-    mod_assert_msg(car->object, "trying to put invalid ped in car");
-
-    // TODO: add PutPlayerInVehicle focred
+    // TODO: add PutPlayerInVehicle focred if not in the car yet
 }
 
 /**
@@ -300,13 +298,14 @@ void module_car_remote_enter_finish(librg_message_t *msg) {
 void module_car_remote_exit_start(librg_message_t *msg) {
     auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
     auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
+    auto car = (car_t *)ped->vehicle; mod_assert(car && car->object);
 
     mod_assert(ped && ped->object && ped->vehicle);
+    mod_log("[info] removing ped: %u from the car: %u\n", player->id, ped->vehicle->id);
 
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
-        &pSyncObject,
-        reinterpret_cast<M2::C_Vehicle *>(ped->vehicle),
+        &pSyncObject, (M2::C_Vehicle *)car->object,
         false, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
     );
 }
