@@ -8,6 +8,7 @@ namespace M2
     class ICGfxEffects
     {
     public:
+
     };
 
     class C_GfxEffects : public GameClassWrapper<C_GfxEffects, ICGfxEffects, 0x1AC18F4>

@@ -28,6 +28,16 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, void>(0x14BA3D0, this, unk);
 		}
 
+        void NotifyEnableChange()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x1410F90, this);
+        }
+
+        void ProcessAllNotifications()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x14AF6C0, this);
+        }
+
 		void SetName(const char *name)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x14BA350, this, name);

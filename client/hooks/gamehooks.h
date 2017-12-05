@@ -179,7 +179,9 @@ namespace tools {
     }
 
     DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+    DWORD CHuman2CarWrapper__GetDoor = 0x940C80;
     static M2::C_Car *tryToEnterCar = nullptr;
+    static int tryToEnterDoor = -2;
     void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
     {
         __asm
@@ -189,7 +191,16 @@ namespace tools {
             mov tryToEnterCar, eax;
         }
 
-        if (player_request_vehicle_enter(tryToEnterCar) == true) {
+        __asm
+        {
+            mov     ecx, [esp + 8]
+            push    ecx
+            mov ecx, esi;
+            call CHuman2CarWrapper__GetDoor;
+            mov tryToEnterDoor, eax;
+        }
+
+        if (player_request_vehicle_enter(tryToEnterCar, tryToEnterDoor) == true) {
             __asm {
                 mov     al, 1
                 pop     esi
