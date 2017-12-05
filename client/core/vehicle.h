@@ -271,6 +271,8 @@ void module_car_remote_enter_start(librg_message_t *msg) {
     mod_assert_msg(car->object, "trying to put invalid ped in car");
     mod_log("[info] putting ped: %u in the car: %u\n", player->id, vehicle->id);
 
+    ped->vehicle = vehicle;
+
     // TODO: add seat sync
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
@@ -285,8 +287,8 @@ void module_car_remote_enter_start(librg_message_t *msg) {
  */
 void module_car_remote_enter_finish(librg_message_t *msg) {
     auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
-    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
-    auto car = (car_t *)ped->vehicle; mod_assert(car && car->object);
+    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object && ped->vehicle);
+    auto car = (car_t *)ped->vehicle->user_data; mod_assert(car && car->object);
 
     // TODO: add PutPlayerInVehicle focred if not in the car yet
 }
@@ -297,16 +299,16 @@ void module_car_remote_enter_finish(librg_message_t *msg) {
  */
 void module_car_remote_exit_start(librg_message_t *msg) {
     auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
-    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
-    auto car = (car_t *)ped->vehicle; mod_assert(car && car->object);
+    auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object && ped->vehicle);
+    auto car = (car_t *)ped->vehicle->user_data; mod_assert(car && car->object);
 
-    mod_assert(ped && ped->object && ped->vehicle);
     mod_log("[info] removing ped: %u from the car: %u\n", player->id, ped->vehicle->id);
 
+    // TODO: add seat sync
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->object,
-        false, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
+        true, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
     );
 }
 
@@ -317,6 +319,8 @@ void module_car_remote_exit_start(librg_message_t *msg) {
 void module_car_remote_exit_finish(librg_message_t *msg) {
     auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
     auto ped = (ped_t *)player->user_data; mod_assert(ped && ped->object);
+
+    ped->vehicle = nullptr;
 
     // TODO: add forced exit for player
 }

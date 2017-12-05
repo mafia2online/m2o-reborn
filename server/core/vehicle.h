@@ -31,10 +31,10 @@ void module_car_enter_start(librg_message_t *msg) {
     auto vehicle = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
     mod_assert_msg(vehicle && player, "trying to enter invalid vehicle");
 
-    if (vehicle->flags & LIBRG_ENTITY_CONTROLLED) {
-         mod_log("the vehicle has a driver already\n");
-         return;
-    }
+    // if (vehicle->flags & LIBRG_ENTITY_CONTROLLED) {
+    //      mod_log("the vehicle has a driver already\n");
+    //      return;
+    // }
 
     auto ped = (ped_t *)player->user_data;
     ped->vehicle = vehicle;

@@ -20,8 +20,8 @@ void debug_state_render()
             mod.input_blocked = 0;
         }
 
-        if (nk_button_label(nk_ctx, "hello")) {
-            mod_log("hello");
+        if (nk_button_label(nk_ctx, "teleport spawn")) {
+            ((ped_t *)mod.player->user_data)->object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
         }
 
         /* fixed widget window ratio width */

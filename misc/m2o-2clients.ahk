@@ -13,7 +13,7 @@ SetWorkingDir, %BinaryFolder%  ; Ensures a consistent starting directory.
 Run launcher.exe
 
 ; console
-WinWait m2o-reborn
+WinWait m2o-reborn-cli
 WinActivate
 WinSetTitle, m2o-cli-1
 WinMove, m2o-cli-1,, 0, (A_ScreenHeight / 1.5), (A_ScreenWidth / 2), (A_ScreenHeight / 3)
@@ -30,7 +30,7 @@ WinMove, m2o-app-1,, 0, 0, (A_ScreenWidth / 2), (A_ScreenHeight / 1.5)
 Run launcher.exe
 
 ; console
-WinWait m2o-reborn
+WinWait m2o-reborn-cli
 WinActivate
 WinSetTitle, m2o-cli-2
 WinMove, m2o-cli-2,, (A_ScreenWidth / 2), (A_ScreenHeight / 1.5), (A_ScreenWidth / 2), (A_ScreenHeight / 3)

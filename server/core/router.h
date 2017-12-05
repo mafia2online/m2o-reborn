@@ -72,7 +72,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, entity_on_remove);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, entity_on_csupdate);
 
-    librg_network_add(ctx, MOD_CAR_CREATE,          module_car_create);
+    librg_network_add(ctx, MOD_CAR_CREATE,          module_car_create); /* testing */
     librg_network_add(ctx, MOD_CAR_ENTER_START,     module_car_enter_start);
     librg_network_add(ctx, MOD_CAR_ENTER_FINISH,    module_car_enter_finish);
     librg_network_add(ctx, MOD_CAR_EXIT_START,      module_car_exit_start);

@@ -10,7 +10,6 @@ enum E_PlayerMessage
 /* Messages from the game that we catched */
 void player_game_message(M2::C_EntityMessage *message)
 {
-
     switch (message->m_dwMessage)
     {
         case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE:

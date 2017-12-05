@@ -1,4 +1,4 @@
-﻿namespace tools {
+namespace tools {
     // maximum mumber of lines the output console should have
     static const WORD MAX_CONSOLE_LINES = 500;
 
@@ -14,7 +14,7 @@
 
         // Title
         HWND hConsole = GetConsoleWindow();
-        std::string title = TEXT("m2o-reborn");
+        std::string title = TEXT("m2o-reborn-cli");
         SetConsoleTitle(title.c_str());
 
         // Position
