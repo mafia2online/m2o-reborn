@@ -63,6 +63,7 @@
 #include "CTrafficStreaming.hpp"
 #include "CVehDoor.hpp"
 #include "CVehicle.hpp"
+#include "CVehicleEffectManager.hpp"
 #include "CWeatherManager.hpp"
 #include "CWrappersList.hpp"
 

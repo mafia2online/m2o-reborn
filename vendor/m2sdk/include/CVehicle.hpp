@@ -9,6 +9,7 @@
 #include "CommonHeaders.h"
 
 #include "CActorVehicle.hpp"
+#include "CVehicleEffectManager.hpp"
 
 namespace M2
 {
@@ -41,10 +42,12 @@ namespace M2
 	{
     public:
         pad(ICVehicle, pad0, 0x3E8);
-        float           m_fSteer;           // 03E8 - 03EC
-        pad(ICVehicle, pad1, 0x4);          // 03EC - 03F0
-        float           m_fMaxSteer;        // 03F0 - 03F4
-        float           m_fAddedSteer;      // 03F4 - 03F8
+        float                   m_fSteer;           // 03E8 - 03EC
+        pad(ICVehicle, pad1, 0x4);                  // 03EC - 03F0
+        float                   m_fMaxSteer;        // 03F0 - 03F4
+        float                   m_fAddedSteer;      // 03F4 - 03F8
+        pad(ICVehicle, pad2, 0x454);                // 03F8 - 084C
+        C_VehicleEffectManager  *m_pEffectManager;  // 084C - 0850
 	};
 
 	class C_Vehicle : public ICVehicle
