@@ -43,6 +43,7 @@ struct interpolate_t {
     quat_t trotation;
 
     f32 delta;
+    i32 step;
 };
 
 /**
@@ -77,6 +78,7 @@ struct ped_t {
     /* game entity */
     M2::C_Entity *object;
     M2::Wrappers::GameModelManager *pGameModelManager;
+    M2::C_SyncObject *sync;
 
     ped_t(M2::C_Entity *ent) {
         zpl_zero_item(this);

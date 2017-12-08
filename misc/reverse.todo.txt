@@ -1,0 +1,25 @@
+C_Vehicle::SetVehicleDir
+C_Vehicle::SetVehicleRot
+
+Are they same as C_Car::SetVehicleRot/Dir ?
+
+ue::game::vehicle::C_Vehicle::SetDriveSpeed(float,float,float,float)                                        __text 0060FAD0 0000007D 0000001C 00000014 R . . . B T .
+ue::game::vehicle::C_Vehicle::SetSpeed(ue::sys::math::C_Vector const&,bool)                                 __text 0060FB50 000002D9 0000003C 00000009 R . . . B T .
+ue::game::vehicle::C_Vehicle::SetImpulse(ue::sys::math::C_Vector const&,ue::sys::math::C_Vector const&,int) __text 0060FE30 00000080 0000001C 00000010 R . . . B . .
+ue::game::vehicle::C_Vehicle::OpenDoor(int,bool,bool) __text 00612190 00000A4C 0000011C 0000000D R . . . B T .
+
+ue::game::vehicle::C_Vehicle::LocalDamage(int,ue::sys::math::C_Vector const&,ue::sys::math::C_Vector const&,float,float) __text 006849E0 00000333 0000004C 00000018 R . . . B T .
+ue::game::vehicle::C_Vehicle::PartialDamage(ue::sys::math::C_Vector const&,float)                                        __text 00684110 0000074B 000000AC 0000000C R . . . B T .
+ue::game::vehicle::C_Vehicle::DamageDeformPart(int,float)                                                                __text 00684890 0000014C 0000002C 0000000C R . . . B T .
+
+ue::game::vehicle::C_Motor::GetMotorTorque(float,float,float,bool)                  __text 006053C0 00000376 0000000C 00000011 R . . . B T .
+ue::game::vehicle::C_Motor::UpdateMotor(float,float,float)                          __text 00605740 00000523 00000028 00000010 R . . . B T .
+ue::game::vehicle::C_Motor::C_Motor(void)                                           __text 00605C70 00000417 0000011C 00000004 R . . . B T .
+ue::game::vehicle::C_Motor::SetGearboxSettings(ue::game::vehicle::S_GearBox const&) __text 00606090 000001C3 0000002C 00000008 R . . . B . .
+ue::game::vehicle::C_Motor::SetFuel(float)                                          __text 00606260 00000047 00000004 00000008 R . . . B T .
+ue::game::vehicle::C_Motor::~C_Motor()                                              __text 006062B0 00000005 00000004 00000004 R . . . B T .
+ue::game::vehicle::C_Motor::~C_Motor()                                              __text 006062C0 00000009 00000004 00000004 R . . . B T .
+ue::game::vehicle::C_Motor::UpdateGearbox(float,float,float,float)                  __text 006062D0 000005C1 00000028 00000014 R . . . B T .
+ue::game::vehicle::C_Motor::UpdateEffects(float,bool,float)                         __text 006068A0 000002CC 0000000C 00000010 R . . . B T .
+ue::game::vehicle::C_Motor::GetFuelSettings(ue::game::vehicle::S_Fuel &)            __text 00606B70 0000001C 00000004 00000008 R . . . B . .
+ue::game::vehicle::C_Motor::SetMotorBySpeed(float,float)                            __text 00606B90 00000356 00000018 0000000C R . . . B T .

@@ -17,6 +17,7 @@ namespace M2
 
 	class C_SyncObject : public ICSyncObject
 	{
+	public:
 		void Done()
 		{
 			Mem::InvokeFunction<Mem::call_this, unsigned int>(0x11E7680, this);

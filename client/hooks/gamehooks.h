@@ -154,6 +154,36 @@ namespace tools {
         __asm jmp[CPlayer2__UpdateInput__Return];
     }
 
+
+    void CPlayer__EnterCar_Hook(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
+        mod_log("we are entering the car seat: %u\n", seat);
+    }
+
+    DWORD CPlayer__EnterCar__Call = 0x42CAC0;
+    DWORD CPlayer__EnterCar_JumpBack = 0x437945;
+    void __declspec(naked) CPlayer2__EnterCar()
+    {
+        __asm
+        {
+            mov eax, dword ptr ss : [esp + 0x10]
+            mov ecx, dword ptr ds : [ edi + 0x44]
+
+            pushad
+                push eax
+                push ecx
+                push esi
+                call CPlayer__EnterCar_Hook
+                add esp, 0xC
+            popad
+
+            push eax
+            push ecx
+            mov ecx, esi
+            call CPlayer__EnterCar__Call
+            jmp CPlayer__EnterCar_JumpBack
+        }
+    }
+
     /* Actions patching */
 
     void __declspec(naked) CCarActionEnter__TestAction__Hook()
@@ -278,6 +308,8 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x4877F1, 0x487892);//C_Car::UpdateIdleFX
         Mem::Hooks::InstallJmpPatch(0xA151CB, 0xA151D4);//C_Car::InitTuning
 
+        //CPlayer2::EnterCar
+        Mem::Hooks::InstallJmpPatch(0x437935, (Address)CPlayer2__EnterCar);
 
         // Disable shop loading
         //Mem::Utilites::PatchAddress(0x4731A0, 0x0004C2);

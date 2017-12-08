@@ -42,8 +42,11 @@ namespace M2
         int                         m_nSlotSDS;         // 0078 - 007C
 		pad(ICCar, pad2, 0x2C);                         // 007C - 00A8
 		C_Vehicle		            m_pVehicle;         // 00A8 - 00CC
-        pad(ICCar, pad3, 0x1BC);                        // 00CC - 0288
-        vec3_t                      m_vecMoveSpeed;     // 0288 - 0294
+        pad(ICCar, pad3, 0x1BC - 4 - 20);                        // 00CC - 0288
+        vec3_t                      m_test;     // 0288 - 0294
+        float pt1[2];
+        vec3_t                      m_vecLastCrashPosition;     // 0288 - 0294
+        float pad5;
         float                       m_fSpeed;           // 0294 - 0298
         float                       m_fSpeedDir;        // 0298 - 029C
         pad(ICCar, pad4, 0xB8D);                        // 029C - 0E29

@@ -135,6 +135,9 @@ typedef union mod_state_t {
 } mod_state_t;
 #undef STATE_CB
 
+static f32 test_pos_t = 0.0f;
+static f32 test_rot_t = 0.0f;
+
 // base mod data structure
 struct mod_t {
     // win stuff

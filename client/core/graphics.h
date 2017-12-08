@@ -77,6 +77,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
     if (mod.state.init) {
         mod.state.init();
     }
+    mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 }
 
 /**
@@ -101,14 +102,15 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice) {
 void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
     mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
+    mod_assert(nk_ctx && nk_atlas->temporary.alloc);
+    nk_d3d9_shutdown();
+
     mod.graphics.device = pDevice;
     mod.graphics.present_params = *pPresentationParameters;
 
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceReset();
     }
-
-    nk_d3d9_shutdown();
 }
 
 // =======================================================================//
@@ -122,6 +124,7 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
  */
 inline void graphics_device_prerender(void) {
     // todo
+    mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 }
 
 /**
@@ -131,6 +134,7 @@ inline void graphics_device_render(void) {
     if (!mod.window) {
         return;
     }
+    mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 
     // start input capture
     nk_input_begin(nk_ctx);

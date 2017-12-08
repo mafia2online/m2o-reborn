@@ -95,18 +95,25 @@ void module_ped_callback_update(librg_event_t *event) {
 
     // apply movement anim
     if (ped->stream.state == PED_ON_GROUND) {
-        auto extr_shift = ped->stream.direction * 3.0f; /* create extrapolated shift for ped */
+        auto extr_shift = ped->stream.direction * 13.0f; /* create extrapolated shift for ped */
         auto targ_pos = entity->position + extr_shift;
 
         targ_pos.z = entity->position.z;
         ped->object->SetDirection(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
-        return;
+        // return;
 
-        M2::C_SyncObject *pSyncObject = nullptr;
-        ((M2::C_Human2*)ped->object)->GetScript()->ScrMoveV(
-            &pSyncObject, targ_pos, (M2::eHumanMoveMode)ped->stream.move_state,
-            vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f), true
-        );
+        //if (interpolate->step++ > 10) {
+            interpolate->step = 0;
+
+            return;
+            if (ped->sync) {
+                ped->sync->Done();
+            }
+            ((M2::C_Human2*)ped->object)->GetScript()->ScrMoveV(
+                &ped->sync, targ_pos, (M2::eHumanMoveMode)ped->stream.move_state,
+                vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f), true
+            );
+        //}
     } else {
         // if we are not on the ground
         // our prev position will be always our current

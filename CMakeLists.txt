@@ -1,4 +1,4 @@
-﻿###
+###
 # CMake entry point
 ###
 cmake_minimum_required (VERSION 2.8)
@@ -172,6 +172,7 @@ if(MSVC)
     GroupSources(vendor/detours)
     GroupSources(vendor/m2sdk)
     GroupSources(vendor/nuklear)
+    GroupSources(vendor/discord_rpc)
     GroupSources(launcher)
 endif()
 

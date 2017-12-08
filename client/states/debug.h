@@ -8,7 +8,7 @@ void debug_state_render()
     static char field_buffer[64];
     static int active;
 
-    if (nk_begin(nk_ctx, "Show Привет", nk_rect(50, 50, 220, 220),
+    if (nk_begin(nk_ctx, "Show Привет", nk_rect(50, 50, 400, 420),
         NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
         /* fixed widget pixel width */
         nk_layout_row_static(nk_ctx, 30, 80, 1);
@@ -19,6 +19,19 @@ void debug_state_render()
         if (nk_button_label(nk_ctx, "disable cursor")) {
             mod.input_blocked = 0;
         }
+
+
+        char b1[16];
+        char b2[16];
+        sprintf(b1, "%f", test_pos_t);
+        sprintf(b2, "%f", test_rot_t);
+
+        nk_layout_row_dynamic(nk_ctx, 30, 2);
+        nk_button_label(nk_ctx, b1);
+        nk_slider_float(nk_ctx, 0, &test_pos_t, 0.3f, 0.0001f);
+
+        nk_button_label(nk_ctx, b2);
+        nk_slider_float(nk_ctx, 0, &test_rot_t, 0.3f, 0.0001f);
 
         if (nk_button_label(nk_ctx, "teleport spawn")) {
             ((ped_t *)mod.player->user_data)->object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
