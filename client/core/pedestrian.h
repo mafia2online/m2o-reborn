@@ -99,7 +99,7 @@ void module_ped_callback_update(librg_event_t *event) {
         auto targ_pos = entity->position + extr_shift;
 
         targ_pos.z = entity->position.z;
-        ped->object->SetDirection(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
+        reinterpret_cast<M2::C_Human2*>(ped->object)->SetDir(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
         // return;
 
         //if (interpolate->step++ > 10) {
@@ -214,7 +214,7 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
     zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
 
     //if (dposition == interpolate->tposition) return;
-    ped->object->SetPosition(dposition);
+    reinterpret_cast<M2::C_Human2*>(ped->object)->SetPos(dposition);
 }
 
 // =======================================================================//
