@@ -63,7 +63,6 @@ void module_car_callback_create(librg_event_t *event) {
     event->entity->flags |= MOD_ENTITY_INTERPOLATED;
     event->entity->user_data = car;
 
-    object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
     object->m_pVehicle.SetEngineOn(true, false);
 }
 
@@ -186,7 +185,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
         vec3_t dposition;
         zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
-        car->object->SetPosition(dposition);
+        reinterpret_cast<M2::C_Car*>(car->object)->SetPos(dposition);
     }
 
     /* rotation interpolation */
@@ -200,7 +199,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
             quat_t drotation;
             zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
-            car->object->SetRotation(drotation);
+            reinterpret_cast<M2::C_Car*>(car->object)->SetRot(drotation);
         }
     }
 }
