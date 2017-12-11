@@ -156,7 +156,7 @@ namespace tools {
 
 
     void CPlayer__EnterCar_Hook(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
-        mod_log("we are entering the car seat: %u\n", seat);
+        player_enter_vehicle(car, seat);
     }
 
     DWORD CPlayer__EnterCar__Call = 0x42CAC0;
@@ -184,6 +184,35 @@ namespace tools {
         }
     }
 
+    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+    DWORD CHuman2CarWrapper__GetDoor = 0x940C80;
+    static M2::C_Car *tryToEnterCar = nullptr;
+    void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+    {
+        __asm
+        {
+            mov ecx, esi;
+            call CHuman2CarWrapper__GetCar;
+            mov tryToEnterCar, eax;
+        }
+
+
+        if (player_request_vehicle_enter(tryToEnterCar) == true) {
+            __asm {
+                mov     al, 1
+                pop     esi
+                retn    8
+            }
+        }
+        else {
+            __asm {
+                mov     al, 0
+                pop     esi
+                retn    8
+            }
+        }
+    }
+
     /* Actions patching */
 
     void __declspec(naked) CCarActionEnter__TestAction__Hook()
@@ -208,44 +237,6 @@ namespace tools {
         }
     }
 
-    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
-    DWORD CHuman2CarWrapper__GetDoor = 0x940C80;
-    static M2::C_Car *tryToEnterCar = nullptr;
-    static int tryToEnterDoor = -2;
-    void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
-    {
-        __asm
-        {
-            mov ecx, esi;
-            call CHuman2CarWrapper__GetCar;
-            mov tryToEnterCar, eax;
-        }
-
-        __asm
-        {
-            mov     ecx, [esp + 8]
-            push    ecx
-            mov ecx, esi;
-            call CHuman2CarWrapper__GetDoor;
-            mov tryToEnterDoor, eax;
-        }
-
-        if (player_request_vehicle_enter(tryToEnterCar, tryToEnterDoor) == true) {
-            __asm {
-                mov     al, 1
-                pop     esi
-                retn    8
-            }
-        }
-        else {
-            __asm {
-                mov     al, 0
-                pop     esi
-                retn    8
-            }
-        }
-    }
-
     /**
      * Game hooking calls
      */
@@ -264,6 +255,7 @@ namespace tools {
         GameStartDrive_2__Return = Mem::Hooks::InstallNotDumbJMP(0x43B394, (Address)GameStartDriveHook__2);
         GameStartDrive_3__Return = Mem::Hooks::InstallNotDumbJMP(0x437940, (Address)GameStartDriveHook__3);
         GameEndDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x43BAAD, (Address)GameEndDriveHook);
+        Mem::Hooks::InstallJmpPatch(0x437935, (Address)CPlayer2__EnterCar);
 
         // Crash fix on C_Frame::Release
         Mem::Hooks::InstallJmpPatch(0x14E5BC0, (DWORD)FrameReleaseFix);
@@ -307,9 +299,6 @@ namespace tools {
         // Prevent game controlling wipers
         Mem::Hooks::InstallJmpPatch(0x4877F1, 0x487892);//C_Car::UpdateIdleFX
         Mem::Hooks::InstallJmpPatch(0xA151CB, 0xA151D4);//C_Car::InitTuning
-
-        //CPlayer2::EnterCar
-        Mem::Hooks::InstallJmpPatch(0x437935, (Address)CPlayer2__EnterCar);
 
         // Disable shop loading
         //Mem::Utilites::PatchAddress(0x4731A0, 0x0004C2);

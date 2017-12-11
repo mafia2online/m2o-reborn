@@ -58,7 +58,7 @@ void player_mod_message(E_PlayerMessage message)
 
 /* When the player want to enter into vehicle */
 /* Return true and the player will enter, false and the player will be stuck */
-bool player_request_vehicle_enter(M2::C_Car *car, int door)
+bool player_request_vehicle_enter(M2::C_Car *car)
 {
     mod_log("[game-event] ped request vehicle enter\n");
 
@@ -72,4 +72,9 @@ bool player_request_vehicle_enter(M2::C_Car *car, int door)
     // module_car_local_enter((void *)car);
 
     return true;
+}
+
+void player_enter_vehicle(M2::C_Actor *car, u8 seat)
+{
+
 }
