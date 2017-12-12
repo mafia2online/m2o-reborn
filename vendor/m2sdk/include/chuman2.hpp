@@ -50,5 +50,20 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x9389B0, this, color);
         }
+
+        void SetDir(vec3_t dir)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x94E9C0, this, &dir);
+        }
+
+        void SetPos(vec3_t pos)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x94E960, this, &pos);
+        }
+
+        void SetRot(quat_t rot)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x94EA80, this, &rot);
+        }
 	};
 };

@@ -19,7 +19,7 @@ namespace M2
 	class C_Actor : public ICActor
 	{
 	public:
-		void SetPos(vec3_t *pos)
+		void SetPos(vec3_t pos)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x1164D40, this, &pos);
 		}
@@ -29,9 +29,9 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x1164D90, this);
         }
 
-		void SetRot(vec3_t *rot)
+		void SetRot(quat_t rot)
 		{
-			Mem::InvokeFunction<Mem::call_this, void>(0x046A6B0, this, &rot);
+			Mem::InvokeFunction<Mem::call_this, void>(0x1080E90, this, &rot);
 		}
 	};
 };

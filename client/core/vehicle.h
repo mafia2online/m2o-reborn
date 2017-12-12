@@ -16,65 +16,29 @@ void module_car_callback_create(librg_event_t *event) {
 
     print_posm(entity->position, "creating vehicle at:");
 
-    std::string dir;
-    std::string model;
-    M2::Models::GetVehicleModelFromID(0, &dir, &model);
-
-    M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
-    mod_assert(pModelManager);
-
-    M2::Wrappers::GameModelManager *pPedModelManager = pModelManager->Load(dir.c_str(), model.c_str());
-    mod_assert(pPedModelManager);
-
-    M2::C_Car *object = M2::C_EntityFactory::Get()->CreateEntity<M2::C_Car>(M2::EntityTypes::Entity_Car);
-    mod_assert(object);
-
-    M2::C_Model *pModel = M2::C_Core::Get()->AllocateModel(2);
-    mod_assert(pModel);
-
-    pModel->CloneHierarchy(pPedModelManager->GetModelManager()->m_pModel);
-    pModel->SetName("m2online_car");
-    pModel->MarkForNotify(2);
-
-    reinterpret_cast<M2::C_Entity *>(object)->SetModel(pModel);
-
-    if (object->Init(NULL)) {
-        object->m_nSlotSDS = pPedModelManager->GetModelManager()->m_pSlot->m_iSlotNumber;
-        object->Setup();
-
-        DWORD flags = reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0xFFFFFFBF | 0x4800;
-        reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags = flags;
-
-        if (reinterpret_cast<M2::C_Entity *>(object)->m_dwFlags & 0x20)
-            mod_log("Flags set sucessfully!\n");
-
-        reinterpret_cast<M2::C_Entity *>(object)->Activate();
-
-        if (reinterpret_cast<M2::C_Entity *>(object)->IsActive())
-            mod_log("Entity active !\n");
-
-        reinterpret_cast<M2::C_Entity *>(object)->SetPosition(entity->position);
-
-        car->object = (M2::C_Entity *)object;
-
-        mod_log("Created at %x with GUID: %lu!\n", object, car->object->m_dwGUID);
+    static M2::C_Entity *carEntity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
+    if (carEntity == nullptr) {
+        return;
     }
+    carEntity->SetPosition(entity->position);
+    if(carEntity->IsActive()){
+        car->object = carEntity;
 
-    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-    event->entity->user_data = car;
+        event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+        event->entity->user_data = car;
 
-    //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
-    object->m_pVehicle.SetEngineOn(true, true);
+        //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
+        reinterpret_cast<M2::C_Car*>(carEntity)->m_pVehicle.SetEngineOn(true, false);
+    }
 }
 
 /**
  * The entity exists the stream zone
  */
 void module_car_callback_remove(librg_event_t *event) {
-    // TODO: add vehicle removing
-    //auto gamedata  = librg_fetch_gamedata(event->entity);
-    //gamedata->object->Deactivate();
-    mod_log("remvoing vehicle\n");
+    auto car = (car_t *)event->entity->user_data;
+    M2::Wrappers::DestroyEntity(car->object);
+    delete event->entity->user_data;
 }
 
 // =======================================================================//
@@ -187,7 +151,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
         vec3_t dposition;
         zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
-        car->object->SetPosition(dposition);
+        reinterpret_cast<M2::C_Car*>(car->object)->SetPos(dposition);
     }
 
     /* rotation interpolation */
@@ -201,7 +165,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
 
             quat_t drotation;
             zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
-            car->object->SetRotation(drotation);
+            reinterpret_cast<M2::C_Car*>(car->object)->SetRot(drotation);
         }
     }
 }

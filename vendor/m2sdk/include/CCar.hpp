@@ -177,6 +177,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x9BBF70, this, primary, secondary);
         }
 
+        void SetDir(vec3_t dir)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x46CAF0, this, &dir);
+        }
+
 		void SetMotorDamage(float damage)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BADB0, this, damage);
@@ -185,6 +190,16 @@ namespace M2
         void SetPainting(const char *painting)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x4472A0, this, painting);
+        }
+
+        void SetPos(vec3_t pos)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x46CA90, this, &pos);
+        }
+
+        void SetRot(quat_t rot)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x46CB50, this, &rot);
         }
 
 		void SetSiren(bool siren)
