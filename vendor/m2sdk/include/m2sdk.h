@@ -67,6 +67,7 @@
 #include "CVehicleEffectManager.hpp"
 #include "CWeatherManager.hpp"
 #include "CWrappersList.hpp"
+#include "CHuman2CarWrapper.hpp"
 
 /* Wrappers */
 //#include "../wrappers/camera.hpp"

@@ -71,6 +71,7 @@ struct ped_t {
     #pragma pack(pop)
 
     librg_entity_t *vehicle;
+    u8 seat;
 
 #ifdef MOD_CLIENT
     interpolate_t interpolate;

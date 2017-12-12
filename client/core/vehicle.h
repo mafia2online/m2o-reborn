@@ -63,8 +63,8 @@ void module_car_callback_create(librg_event_t *event) {
     event->entity->flags |= MOD_ENTITY_INTERPOLATED;
     event->entity->user_data = car;
 
-    object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
-    object->m_pVehicle.SetEngineOn(true, false);
+    //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
+    object->m_pVehicle.SetEngineOn(true, true);
 }
 
 /**
@@ -108,6 +108,7 @@ void module_car_callback_update(librg_event_t *event) {
         //((M2::C_Car *)car->object)->m_pVehicle.SetSpeedFloat(car->stream.speed);
         //((M2::C_Car *)car->object)->SetSpeedFloat(100.0f);
     }
+    //((M2::C_Car *)car->object)->SetSpeedFloat(10.0f);
 }
 
 f32 mod_fract_round(f32 x, i32 exp) {
@@ -219,6 +220,7 @@ void module_car_local_enter_start(librg_event_t *event) {
     auto ped     = (ped_t*)mod.player->user_data;
 
     mod_assert(vehicle && ped);
+    u8 seat = *(u8*)event->data;
 
     // send vehicle create request onto server
     mod_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, [&](librg_entity_t *entity) {
@@ -228,9 +230,13 @@ void module_car_local_enter_start(librg_event_t *event) {
         if (car->object == vehicle) {
             // set the driver data
             ped->stream.state = PED_ENTERING_CAR;
+            ped->seat         = seat;
             ped->vehicle      = entity;
 
-            mod_message_send(ctx, MOD_CAR_ENTER_START, [&](librg_data_t *data) { librg_data_wu32(data, entity->id); });
+            mod_message_send(ctx, MOD_CAR_ENTER_START, [&](librg_data_t *data) {
+                librg_data_wu32(data, entity->id);
+                librg_data_wu8(data, seat);
+            });
         }
     });
 }
@@ -269,6 +275,7 @@ void module_car_local_exit_start(librg_event_t *event) {
 void module_car_local_exit_finish(librg_event_t *event) {
     auto ped = (ped_t*)mod.player->user_data;
 
+    ped->seat = 0;
     ped->vehicle = nullptr;
     ped->stream.state = PED_ON_GROUND;
 
@@ -289,6 +296,7 @@ void module_car_remote_enter_start(librg_message_t *msg) {
     auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
     mod_assert(player && vehicle);
 
+    auto seat = librg_data_ru8(msg->data);
     auto ped = (ped_t *)player->user_data;
     auto car = (car_t *)vehicle->user_data;
     mod_assert_msg(ped->object, "trying to put ped in invalid car");
@@ -296,12 +304,13 @@ void module_car_remote_enter_start(librg_message_t *msg) {
     mod_log("[info] putting ped: %u in the car: %u\n", player->id, vehicle->id);
 
     ped->vehicle = vehicle;
+    ped->seat = seat;
 
     // TODO: add seat sync
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->object,
-        true, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
+        true, (M2::E_VehicleSeat)seat, 1
     );
 }
 
@@ -332,7 +341,7 @@ void module_car_remote_exit_start(librg_message_t *msg) {
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->object)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->object,
-        true, M2::E_VehicleSeat::E_SEAT_DRIVER, 1
+        true, (M2::E_VehicleSeat)ped->seat, 1
     );
 }
 
