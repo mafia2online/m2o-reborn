@@ -62,19 +62,18 @@ bool player_request_vehicle_enter(M2::C_Car *car)
 {
     mod_log("[game-event] ped request vehicle enter\n");
 
-    librg_event_t event = { 0 };
-
-    event.entity    = mod.player;
-    event.user_data = (void *)car;
-
-    librg_event_trigger(ctx, MOD_CAR_ENTER_START, &event);
-
-    // module_car_local_enter((void *)car);
-
     return true;
 }
 
-void player_enter_vehicle(M2::C_Actor *car, u8 seat)
-{
+void game_player_enter_car(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
+    mod_log("[game-event] ped entering the car on seat: %d\n", seat);
 
+    librg_event_t event = { 0 };
+    u8 iseat = seat + 1;
+
+    event.entity = mod.player;
+    event.user_data = (void *)car;
+    event.data = (librg_data_t*)&iseat;
+
+    librg_event_trigger(ctx, MOD_CAR_ENTER_START, &event);
 }

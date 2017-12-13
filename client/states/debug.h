@@ -1,3 +1,5 @@
+void mod_disconnected(librg_event_t *);
+
 void debug_state_render()
 {
     enum { EASY, HARD };
@@ -12,12 +14,20 @@ void debug_state_render()
         NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
         /* fixed widget pixel width */
         nk_layout_row_static(nk_ctx, 30, 80, 1);
+        if (nk_button_label(nk_ctx, "disconnect")) {
+            librg_network_stop(ctx);
+            mod_disconnected(nullptr);
+        }
+
         if (nk_button_label(nk_ctx, "spawn car")) {
             // send vehicle create request onto server
             librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
         }
         if (nk_button_label(nk_ctx, "disable cursor")) {
             mod.input_blocked = 0;
+        }
+        if (nk_button_label(nk_ctx, "teleport spawn")) {
+            ((ped_t *)mod.player->user_data)->object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
         }
 
 
@@ -33,9 +43,10 @@ void debug_state_render()
         nk_button_label(nk_ctx, b2);
         nk_slider_float(nk_ctx, 0, &test_rot_t, 0.3f, 0.0001f);
 
-        if (nk_button_label(nk_ctx, "teleport spawn")) {
-            ((ped_t *)mod.player->user_data)->object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
-        }
+        char pos[256];
+        auto cpos = ((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed())->GetPosition();
+        sprintf(pos, "%.2f %.2f %.2f", cpos.x, cpos.y, cpos.z);
+        nk_label(nk_ctx, pos, NK_TEXT_LEFT);
 
         /* fixed widget window ratio width */
         nk_layout_row_dynamic(nk_ctx, 30, 2);

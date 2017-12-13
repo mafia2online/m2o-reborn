@@ -1128,11 +1128,11 @@ extern "C" {
         if (entity->flags & LIBRG_ENTITY_CLIENT) {
             entity->client_peer     = NULL;
             librg_table_destroy(&entity->last_snapshot);
+        }
 
-            // remove entity from the streamer
-             if (entity->stream_branch) {
-                 zplc_remove(entity->stream_branch, entity->id);
-             }
+        // remove entity from the streamer
+        if (entity->stream_branch) {
+            zplc_remove(entity->stream_branch, entity->id);
         }
 
         if (entity->flags & LIBRG_ENTITY_QUERIED) {

@@ -42,8 +42,12 @@ void on_connect_accepted(librg_event_t *event) {
     librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 }
 
+void on_connect_disconnect(librg_event_t *event) {
+    delete event->entity->user_data;
+}
+
 void entity_on_create(librg_event_t *event) {
-    // emtpy
+    mod_log("sending a create packet for entity: %d\n", event->entity->id);
 }
 
 void entity_on_update(librg_event_t *event) {
@@ -60,12 +64,13 @@ void entity_on_csupdate(librg_event_t *event) {
 }
 
 void entity_on_remove(librg_event_t *event) {
-    // emtpty
+    mod_log("sending a remove packet for entity: %d\n", event->entity->id);
 }
 
 void mod_register_routes(librg_ctx_t *ctx) {
-    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST,  on_connection_request);
-    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT,   on_connect_accepted);
+    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, on_connection_request);
+    librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, on_connect_accepted);
+    librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, on_connect_disconnect);
 
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, entity_on_create);
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, entity_on_update);

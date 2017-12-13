@@ -31,20 +31,21 @@ void module_car_enter_start(librg_message_t *msg) {
     auto vehicle = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
     mod_assert_msg(vehicle && player, "trying to enter invalid vehicle");
 
-    if (vehicle->flags & LIBRG_ENTITY_CONTROLLED) {
-          mod_log("the vehicle has a driver already\n");
-          return;
+    auto seat = librg_data_ru8(msg->data);
+    auto ped = (ped_t *)player->user_data;
+
+    ped->vehicle = vehicle;
+    ped->seat = seat;
+
+    if (seat == 1 || !(vehicle->flags & LIBRG_ENTITY_CONTROLLED)) {
+        librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
     }
 
-    auto ped = (ped_t *)player->user_data;
-    ped->vehicle = vehicle;
-
-    mod_log("[info] ped: %lu becomes driver of: %lu\n", player->id, vehicle->id);
-    librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
-
+    mod_log("[info] ped: %lu becomes member of: %lu on seat: %u\n", player->id, vehicle->id, seat);
     mod_message_send_instream_except(msg->ctx, MOD_CAR_ENTER_START, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);
         librg_data_wu32(data, vehicle->id);
+        librg_data_wu8(data, seat);
     });
 }
 
@@ -75,6 +76,7 @@ void module_car_exit_finish(librg_message_t *msg) {
     auto player  = librg_entity_find(msg->ctx, msg->peer);
     auto ped = (ped_t *)player->user_data;
     ped->vehicle = nullptr;
+    ped->seat = 0;
 
     mod_message_send_instream_except(msg->ctx, MOD_CAR_EXIT_FINISH, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);

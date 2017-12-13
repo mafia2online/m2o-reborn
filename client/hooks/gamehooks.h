@@ -154,11 +154,6 @@ namespace tools {
         __asm jmp[CPlayer2__UpdateInput__Return];
     }
 
-
-    void CPlayer__EnterCar_Hook(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
-        player_enter_vehicle(car, seat);
-    }
-
     DWORD CPlayer__EnterCar__Call = 0x42CAC0;
     DWORD CPlayer__EnterCar_JumpBack = 0x437945;
     void __declspec(naked) CPlayer2__EnterCar()
@@ -166,13 +161,13 @@ namespace tools {
         __asm
         {
             mov eax, dword ptr ss : [esp + 0x10]
-            mov ecx, dword ptr ds : [ edi + 0x44]
+            mov ecx, dword ptr ds : [edi + 0x44]
 
             pushad
                 push eax
                 push ecx
                 push esi
-                call CPlayer__EnterCar_Hook
+                call game_player_enter_car
                 add esp, 0xC
             popad
 

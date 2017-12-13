@@ -28,6 +28,7 @@ void mod_game_init() {
     // setup callbacks
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, mod_connected);
     librg_event_add(ctx, LIBRG_CONNECTION_REFUSE, mod_disconnected);
+    librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, mod_disconnected);
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, mod_entity_create);
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, mod_entity_update);
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, mod_entity_remove);
@@ -120,7 +121,15 @@ void mod_connected(librg_event_t *event) {
 
 void mod_disconnected(librg_event_t *event) {
     mod_log("[info] disconnected form the server\n");
-    delete event->entity->user_data;
+
+    auto object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
+
+    ((M2::C_Player2*)object)->LockControls(true);
+    // object->SetPosition(zplm_vec3_zero());
+
+    delete mod.player->user_data;
+    mod.state = MOD_TITLE_STATE;
+    mod.player = nullptr;
 }
 
 // =======================================================================//
