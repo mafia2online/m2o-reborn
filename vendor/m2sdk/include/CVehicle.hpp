@@ -41,12 +41,14 @@ namespace M2
 	class ICVehicle
 	{
     public:
-        pad(ICVehicle, pad0, 0x3E8);
+        pad(ICVehicle, pad0, 0x1E0);
+        vec3_t                  m_vSpeed;           // 01E0 - 01E4
+        pad(ICVehicle, pad1, 0x204);                // 01E4 - 03E8
         float                   m_fSteer;           // 03E8 - 03EC
-        pad(ICVehicle, pad1, 0x4);                  // 03EC - 03F0
+        pad(ICVehicle, pad2, 0x4);                  // 03EC - 03F0
         float                   m_fMaxSteer;        // 03F0 - 03F4
         float                   m_fAddedSteer;      // 03F4 - 03F8
-        pad(ICVehicle, pad2, 0x454);                // 03F8 - 084C
+        pad(ICVehicle, pad3, 0x454);                // 03F8 - 084C
         C_VehicleEffectManager  *m_pEffectManager;  // 084C - 0850
 	};
 

@@ -253,6 +253,8 @@ namespace M2
 
         C_SyncObject *ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &pos, const bool smooth);
         C_SyncObject *ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &pos, const bool smooth);
+        C_SyncObject *ScrLookAtAngles(C_SyncObject **syncObject, M2::C_Entity *ent, float x, float y, float z);
+        C_SyncObject *ScrLookAtDir(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &pos, float unk);
         C_SyncObject *ScrMoveV(C_SyncObject **syncObject, const vec3_t &begin, const eHumanMoveMode moveMode, const vec3_t &target, const bool smoothStop);
         C_SyncObject *ScrShootAt(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &dir, const bool smooth);
         C_SyncObject *ScrPanicRunAway(C_SyncObject **syncObject, const vec3_t &dir);
@@ -413,6 +415,16 @@ namespace M2
     C_SyncObject _declspec(naked) *C_HumanScript::ScrLookAt(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &pos, const bool smooth)
     {
         _asm jmp dwAddress2;
+    }
+    DWORD dwAddress6 = 0x951920;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrLookAtAngles(C_SyncObject **syncObject, M2::C_Entity *ent, float x, float y, float z)
+    {
+        _asm jmp dwAddress6;
+    }
+    DWORD dwAddress7 = 0x993330;
+    C_SyncObject _declspec(naked) *C_HumanScript::ScrLookAtDir(C_SyncObject **syncObject, M2::C_Entity *ent, vec3_t const &pos, float unk)
+    {
+        _asm jmp dwAddress7;
     }
     DWORD dwAddress3 = 0x9910B0;
     C_SyncObject _declspec(naked) *C_HumanScript::ScrMoveV(C_SyncObject **syncObject, const vec3_t &begin, const eHumanMoveMode moveMode, const vec3_t &target, const bool smoothStop)
