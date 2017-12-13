@@ -42,7 +42,10 @@ namespace M2
 	class ICCamera
 	{
 	public:
-		pad(ICCamera, pad0, 0x12C);								// 0000 - 012C
+        pad(ICCamera, pad0, 0x38);                              // 0000 - 0038
+        vec3_t              m_vecCamPos;					    // 0038 - 0044
+        vec3_t              m_vecCamUp;					        // 0044 - 0050
+		pad(ICCamera, pad1, 0xDC);								// 0050 - 012C
 		C_GameCameraMafia	*m_pGameCamera;						// 012C - 0130
 
 	};

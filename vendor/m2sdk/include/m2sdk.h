@@ -69,7 +69,7 @@
 #include "CWrappersList.hpp"
 
 /* Wrappers */
-//#include "../wrappers/camera.hpp"
+#include "../wrappers/camera.hpp"
 #include "../wrappers/entity.hpp"
 #include "../wrappers/lua.hpp"
 #include "../wrappers/models.hpp"
