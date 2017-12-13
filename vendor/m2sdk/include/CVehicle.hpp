@@ -43,7 +43,7 @@ namespace M2
     public:
         pad(ICVehicle, pad0, 0x1E0);
         vec3_t                  m_vSpeed;           // 01E0 - 01E4
-        pad(ICVehicle, pad1, 0x204);                // 01E4 - 03E8
+        pad(ICVehicle, pad1, 0x1FC);                // 01E4 - 03E8
         float                   m_fSteer;           // 03E8 - 03EC
         pad(ICVehicle, pad2, 0x4);                  // 03EC - 03F0
         float                   m_fMaxSteer;        // 03F0 - 03F4
