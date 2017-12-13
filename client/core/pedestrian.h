@@ -61,6 +61,11 @@ void module_ped_callback_update(librg_event_t *event) {
 
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
 
+
+    ((M2::C_Human2*)ped->object)->GetScript()->ScrLookAt(
+        &ped->sync, nullptr, ped->stream.look_at, true
+    );
+
     // apply movement anim
     if (ped->stream.state == PED_ON_GROUND) {
         auto extr_shift = ped->stream.direction * 13.0f; /* create extrapolated shift for ped */
@@ -147,6 +152,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     ped->stream.is_accelerating = (ped_speed > ped->stream.speed);
     ped->stream.speed = ped_speed;
 
+    M2::Wrappers::GetLookAt(&ped->stream.look_at);
 
     //reinterpret_cast<M2::C_Human2*>(ped->object)->GetDir();
 

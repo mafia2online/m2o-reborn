@@ -44,7 +44,8 @@ void debug_state_render()
         nk_slider_float(nk_ctx, 0, &test_rot_t, 0.3f, 0.0001f);
 
         char pos[256];
-        auto cpos = ((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed())->GetPosition();
+        vec3_t cpos;
+        M2::Wrappers::GetLookAt(&cpos);
         sprintf(pos, "%.2f %.2f %.2f", cpos.x, cpos.y, cpos.z);
         nk_label(nk_ctx, pos, NK_TEXT_LEFT);
 

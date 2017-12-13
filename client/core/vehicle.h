@@ -69,32 +69,8 @@ void module_car_callback_update(librg_event_t *event) {
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
     if (car->stream.speed > 0.0f) {
-        //((M2::C_Car *)car->object)->m_pVehicle.SetSpeedFloat(car->stream.speed);
-        //((M2::C_Car *)car->object)->SetSpeedFloat(100.0f);
+        ((M2::C_Car *)car->object)->SetSpeedFloat(10.0f);
     }
-    //((M2::C_Car *)car->object)->SetSpeedFloat(10.0f);
-}
-
-f32 mod_fract_round(f32 x, i32 exp) {
-    f32 fract = zplm_pow(10.0f, exp);
-    return zplm_round(x * fract) / fract;
-}
-
-vec3_t mod_fract_round_v3(vec3_t vec, i32 exp) {
-    return vec3(
-        mod_fract_round(vec.x, exp),
-        mod_fract_round(vec.y, exp),
-        mod_fract_round(vec.z, exp)
-    );
-}
-
-quat_t mod_fract_round_quat(quat_t vec, i32 exp) {
-    return zplm_quat(
-        mod_fract_round(vec.x, exp),
-        mod_fract_round(vec.y, exp),
-        mod_fract_round(vec.z, exp),
-        mod_fract_round(vec.w, exp)
-    );
 }
 
 /**
@@ -105,15 +81,8 @@ void module_car_callback_clientstream(librg_event_t *event) {
 
     librg_assert(car && car->object);
 
-    //mod_log("%x\n", car->object);
-    //vec3_t vec = ((M2::C_Car *)car->object)->m_test;
-    //print_posm(vec, "applying speed: \n");
-    // TODO: add rotations
     event->entity->position = car->object->GetPosition();
-    //event->entity->position = mod_fract_round_v3(car->object->GetPosition(), 2);
     car->stream.rotation = car->object->GetRotation();
-    //car->stream.rotation    = mod_fract_round_quat(car->object->GetRotation(), 5);
-    //car->stream.speed       = ((M2::C_Car *)car->object)->m_fSpeedDir;
     car->stream.steer       = ((M2::C_Car *)car->object)->m_pVehicle.m_fSteer;
 
     librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
@@ -142,7 +111,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     car->interpolate.delta = zplm_clamp(car->interpolate.delta, 0.f, 1.0f);
 
     /* steering */
-    ((M2::C_Car *)car->object)->m_pVehicle.SetSteer(car->stream.steer/* * (180.0f / ZPLM_PI)*/);
+    ((M2::C_Car *)car->object)->m_pVehicle.SetSteer(car->stream.steer);
 
     /* position interpolation */
     if (car->interpolate.lposition != car->interpolate.tposition && car->interpolate.step++ > 16) {

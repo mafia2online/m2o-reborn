@@ -6,6 +6,9 @@ namespace M2
     {
         static const float DIRECTION_MULTIPLIER = 8192.0f;
 
+        /**
+         * Returns an aproximate position of the place local player is looking at
+         */
         void GetLookAt(vec3_t *lookAt)
         {
             auto camera = M2::C_GameCamera::Get()->GetCamera(1);

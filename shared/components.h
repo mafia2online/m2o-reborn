@@ -60,6 +60,7 @@ struct ped_t {
     struct {
         // 128
         zplm_vec3_t direction;
+        vec3_t look_at;
         f32 speed;
 
         // 32

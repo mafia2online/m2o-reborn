@@ -37,25 +37,7 @@ inline void graphics_dimensions(int *w, int *h) {
 // !
 // =======================================================================//
 
-/**
- * Device create callback
- * @param pDevice
- * @param pPresentationParameters
- */
-void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
-    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)\n", pDevice, pPresentationParameters);
-
-    mod.graphics.font_manager = (void *)new CFontManager(pDevice);
-    mod.graphics.device = pDevice;
-
-    memcpy(&mod.graphics.present_params, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
-
-
-    // todo: refactor
-    // very important, centers initial mouse position on the zkreen
-    // mod.mouse.x = pPresentationParameters->BackBufferWidth / 2;
-    // mod.mouse.y = pPresentationParameters->BackBufferHeight / 2;
-
+void mod_nk_create() {
     nk_ctx = nk_d3d9_init(
         mod.graphics.device,
         mod.graphics.present_params.BackBufferWidth,
@@ -73,10 +55,27 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
     nk_d3d9_font_stash_end();
     nk_style_load_all_cursors(nk_ctx, nk_atlas->cursors);
     nk_style_set_font(nk_ctx, &robot->handle);
+}
+
+/**
+ * Device create callback
+ * @param pDevice
+ * @param pPresentationParameters
+ */
+void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
+    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)\n", pDevice, pPresentationParameters);
+
+    mod.graphics.font_manager = (void *)new CFontManager(pDevice);
+    mod.graphics.device = pDevice;
+
+    memcpy(&mod.graphics.present_params, pPresentationParameters, sizeof(D3DPRESENT_PARAMETERS));
+
+    mod_nk_create();
 
     if (mod.state.init) {
         mod.state.init();
     }
+
     mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 }
 
@@ -102,15 +101,14 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice) {
 void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
     mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
-    mod_assert(nk_ctx && nk_atlas->temporary.alloc);
-    nk_d3d9_shutdown();
-
     mod.graphics.device = pDevice;
     mod.graphics.present_params = *pPresentationParameters;
 
     if (mod.graphics.font_manager) {
         ((CFontManager *)mod.graphics.font_manager)->OnDeviceReset();
     }
+
+    mod_nk_create();
 }
 
 // =======================================================================//

@@ -54,6 +54,19 @@ void mod_game_tick() {
 
     updateDiscordPresence();
 
+    if (GetAsyncKeyState(VK_F3) & 0x1) {
+        vec3_t dest;
+        M2::Wrappers::GetLookAt(&dest);
+
+        print_posm(dest, "trying to look at");
+
+        M2::C_SyncObject *sync = nullptr;
+        ((M2::C_Human2*)M2::C_Game::Get()->GetLocalPed())->GetScript()->ScrLookAt(
+            &sync, (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed(), dest, true
+        );
+    }
+
+
     /* show/hide mouse */
     if (GetAsyncKeyState(VK_F1) & 0x1) {
         mod.input_blocked = !mod.input_blocked;
