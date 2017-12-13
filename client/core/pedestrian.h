@@ -27,8 +27,12 @@ void module_ped_callback_create(librg_event_t *event) {
  * The entity exists the stream zone
  */
 void module_ped_callback_remove(librg_event_t *event) {
-    auto ped = (ped_t *)event->entity->user_data;
+    if (event->entity->id == mod.player->id) return;
+    mod_log("destroying entity %d\n", event->entity->id);
+
+    auto ped = (ped_t *)event->entity->user_data; mod_assert(ped && ped->object);
     M2::Wrappers::DestroyEntity(ped->object);
+
     delete event->entity->user_data;
 }
 
