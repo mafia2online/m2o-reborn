@@ -104,8 +104,8 @@ struct car_t {
     #pragma pack(push, 1)
     struct {
         quat_t rotation;
+        vec3_t speed;
         f32 steer;
-        f32 speed;
 
         f32 brake;
         i8  gear;

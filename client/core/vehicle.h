@@ -68,9 +68,7 @@ void module_car_callback_update(librg_event_t *event) {
 
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    if (car->stream.speed > 0.0f) {
-        ((M2::C_Car *)car->object)->SetSpeedFloat(10.0f);
-    }
+    ((M2::C_Car *)car->object)->m_pVehicle.SetSpeedVec(car->stream.speed);
 }
 
 /**
@@ -84,6 +82,7 @@ void module_car_callback_clientstream(librg_event_t *event) {
     event->entity->position = car->object->GetPosition();
     car->stream.rotation = car->object->GetRotation();
     car->stream.steer       = ((M2::C_Car *)car->object)->m_pVehicle.m_fSteer;
+    car->stream.speed       = ((M2::C_Car *)car->object)->m_pVehicle.m_vSpeed;
 
     librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
 }
