@@ -147,6 +147,9 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     ped->stream.is_accelerating = (ped_speed > ped->stream.speed);
     ped->stream.speed = ped_speed;
 
+
+    //reinterpret_cast<M2::C_Human2*>(ped->object)->GetDir();
+
     // assign and send new values
     vec3_t newdir; zplm_vec3_norm0(&newdir, diff_position);
     if ((valid_dir(newdir.x) || valid_dir(newdir.y)) && ped->stream.is_accelerating) {
