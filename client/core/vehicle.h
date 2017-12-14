@@ -68,7 +68,7 @@ void module_car_callback_update(librg_event_t *event) {
 
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    ((M2::C_Car *)car->object)->m_pVehicle.SetSpeedVec(car->stream.speed);
+    ((M2::C_Car *)car->object)->m_pVehicle.SetSpeed(car->stream.speed);
 }
 
 /**

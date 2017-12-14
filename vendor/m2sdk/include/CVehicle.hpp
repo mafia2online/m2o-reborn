@@ -188,6 +188,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, bool>(0x11F7B80, this, toggle, light);
 		}
 
+        void SetSpeed(vec3_t vec)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x1217750, this, &vec, 1);
+        }
+
         void SetSpeedFloat(float speed)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x9A01A0, this, speed);
@@ -224,11 +229,6 @@ namespace M2
         void StopAllSounds()
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x1234530, this);
-        }
-
-        void SetSpeedVec(vec3_t vec)
-        {
-            Mem::InvokeFunction<Mem::call_this, int>(0x1217750, this, &vec, 1);
         }
 
         //CRASHY

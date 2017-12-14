@@ -39,5 +39,10 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x120A860, this);
         }
+
+        void VehicleIsDestroyed()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x120A7A0, this);
+        }
     };
 };
