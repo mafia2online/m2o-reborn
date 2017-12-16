@@ -21,9 +21,19 @@ void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
  */
 void mod_game_init() {
     mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
+
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(0.5); /* 0.0 .. 1.0 - time of the day */
+
+    // TODO: fix crash inside ActivateStreamMapLine
+    // if (M2::C_SDSLoadingTable::Get()) {
+    //     M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
+    //     M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
+
+    //     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
+    //     mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_late_afternoon");
+    // }
 
     // setup callbacks
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, mod_connected);
@@ -120,25 +130,25 @@ void mod_game_tick() {
 
 void mod_connected(librg_event_t *event) {
     mod_log("[info] connected to the server\n");
-    auto object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
+    auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
 
-    ((M2::C_Player2*)object)->LockControls(false);
-    object->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+    ped->CPlayer->LockControls(false);
+    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
     mod.state  = MOD_DEBUG_STATE;
     mod.player = event->entity;
-    mod.player->user_data = new ped_t(object);
+    mod.player->user_data = ped;
 
-    mod_log("[info] local ped GUID: %lu\n", (u32)object->m_dwGUID);
+    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
 }
 
 void mod_disconnected(librg_event_t *event) {
     mod_log("[info] disconnected form the server\n");
 
-    auto object = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
+    auto CEntity = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
 
-    ((M2::C_Player2*)object)->LockControls(true);
-    // object->SetPosition(zplm_vec3_zero());
+    ((M2::C_Player2*)CEntity)->LockControls(true);
+    // object->SetPosition(zplm_vec3_zero()); // creates black textures :O
 
     delete mod.player->user_data;
     mod.state = MOD_TITLE_STATE;
@@ -185,67 +195,3 @@ void mod_entity_interpolate(librg_ctx_t *ctx, librg_entity_t *entity) {
         case TYPE_CAR: { module_car_callback_interpolate(entity); } break;
     }
 }
-
-// ARCHIVE
-
-// void game_connect() {
-//     mod.state = MOD_DEBUG_STATE;
-//     mod_log("spawning and connecting...\n");
-
-//     if (M2::C_SDSLoadingTable::Get()) {
-//         M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
-//         M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
-
-//         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
-//     }
-
-//     auto ped = (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed();
-//     ((M2::C_Player2*)ped)->LockControls(false);
-//     ped->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
-
-//     char *arg = GetCommandLine();
-//     LPCSTR tok = strrchr(arg, '"');
-//     if (tok == NULL) {
-//         tok = strtok(arg, " ");
-//         tok = strtok(NULL, " ");
-//     }
-//     else {
-//         char buf[MAX_PATH] = { 0 };
-//         tok = strtok(arg, "\"");
-//         tok = strtok(NULL, "\"");
-
-//         if (tok != NULL) {
-//             strcpy(buf, tok);
-//         }
-//     }
-
-//     if (tok != NULL) {
-//         while (zpl_char_is_space(*tok)) ++tok;
-
-//         char hostname[16] = { 0 }; char hr = 0;
-//         char port_raw[5]  = { 0 }; char pr = 0;
-//         int port = 27010;
-
-//         while (*tok && (*tok != ':' && !zpl_char_is_space(*tok))) {
-//             hostname[hr++] = *tok++;
-//         }
-
-//         if (*tok++ == ':') {
-//             while (*tok && zpl_char_is_digit(*tok)) {
-//                 port_raw[pr++] = *tok++;
-//             }
-
-//             port = atoi(port_raw);
-//         }
-
-//         librg_network_start(ctx, { port, hostname });
-//     }
-//     else {
-//         librg_network_start(ctx, { 27010, "localhost" });
-//     }
-// }
-
-// void game_disconnect() {
-//     mod_log("disconnecting...\n");
-//     librg_network_stop(ctx);
-// }

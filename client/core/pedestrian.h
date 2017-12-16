@@ -15,7 +15,7 @@ void module_ped_callback_create(librg_event_t *event) {
 
         auto ped = new ped_t();
 
-        ped->object = human;
+        ped->CEntity = human;
         //ped->pGameModelManager = pPedModelManager;
 
         event->entity->flags |= MOD_ENTITY_INTERPOLATED;
@@ -30,10 +30,10 @@ void module_ped_callback_remove(librg_event_t *event) {
     if (event->entity->id == mod.player->id) return;
     mod_log("destroying entity %d\n", event->entity->id);
 
-    auto ped = (ped_t *)event->entity->user_data; mod_assert(ped && ped->object);
-    M2::Wrappers::DestroyEntity(ped->object);
+    auto ped = get_ped(event->entity); mod_assert(ped && ped->CEntity);
+    M2::Wrappers::DestroyEntity(ped->CEntity);
 
-    delete event->entity->user_data;
+    delete ped;
 }
 
 // =======================================================================//
@@ -47,10 +47,10 @@ void module_ped_callback_remove(librg_event_t *event) {
  */
 void module_ped_callback_update(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
-    auto ped = (ped_t *)(event->entity->user_data);
+    auto ped = get_ped(event->entity);
 
     // make sure we have all objects
-    mod_assert(ped && ped->object);
+    mod_assert(ped && ped->CEntity);
 
     interpolate_t *interpolate = &ped->interpolate;
 
@@ -61,8 +61,7 @@ void module_ped_callback_update(librg_event_t *event) {
 
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
 
-
-    ((M2::C_Human2*)ped->object)->GetScript()->ScrLookAt(
+    ped->CHuman->GetScript()->ScrLookAt(
         &ped->sync, nullptr, ped->stream.look_at, true
     );
 
@@ -72,7 +71,7 @@ void module_ped_callback_update(librg_event_t *event) {
         auto targ_pos = entity->position + extr_shift;
 
         targ_pos.z = entity->position.z;
-        reinterpret_cast<M2::C_Human2*>(ped->object)->SetDir(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
+        ped->CHuman->SetDir(vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f));
         // return;
 
         //if (interpolate->step++ > 10) {
@@ -82,7 +81,7 @@ void module_ped_callback_update(librg_event_t *event) {
             if (ped->sync) {
                 ped->sync->Done();
             }
-            ((M2::C_Human2*)ped->object)->GetScript()->ScrMoveV(
+            ped->CHuman->GetScript()->ScrMoveV(
                 &ped->sync, targ_pos, (M2::eHumanMoveMode)ped->stream.move_state,
                 vec3(ped->stream.direction.x, ped->stream.direction.y, 0.0f), true
             );
@@ -103,15 +102,15 @@ void module_ped_callback_update(librg_event_t *event) {
  */
 void module_ped_callback_clientstream(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
-    auto ped = (ped_t *)(event->entity->user_data);
+    auto ped = get_ped(event->entity);
 
     // make sure we have all objects
-    mod_assert(ped && ped->object);
+    mod_assert(ped && ped->CEntity);
 
     // TODO: add checks for being on the ground
 
     // read new values of entity
-    auto new_position = ped->object->GetPosition();
+    auto new_position = ped->CEntity->GetPosition();
     auto diff_position = new_position - entity->position;
     entity->position = new_position;
 
@@ -136,7 +135,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
         }
     }
     else {
-        auto movestate = ((M2::C_Player2*)ped->object)->m_pPlayerControls.m_ePlayerMovementState;
+        auto movestate = ped->CPlayer->m_pPlayerControls.m_ePlayerMovementState;
 
         // convert local player movement to human movement
         switch (movestate) {
@@ -151,10 +150,6 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     f32 ped_speed = zplm_vec3_mag(diff_position);
     ped->stream.is_accelerating = (ped_speed > ped->stream.speed);
     ped->stream.speed = ped_speed;
-
-    M2::Wrappers::GetLookAt(&ped->stream.look_at);
-
-    //reinterpret_cast<M2::C_Human2*>(ped->object)->GetDir();
 
     // assign and send new values
     vec3_t newdir; zplm_vec3_norm0(&newdir, diff_position);
@@ -173,11 +168,7 @@ void module_ped_callback_clientstream(librg_event_t *event) {
 // =======================================================================//
 
 void module_ped_callback_interpolate(librg_entity_t *entity) {
-    mod_assert(entity);
-    auto ped = (ped_t *)(entity->user_data);
-
-    // make sure we have all objects
-    mod_assert(ped && ped->object);
+    auto ped = get_ped(entity); mod_assert(ped && ped->CEntity);
 
     // last delta tick against constant tick delay
     ped->interpolate.delta += (mod.last_delta / 40.666f);
@@ -191,7 +182,7 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
     zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
 
     //if (dposition == interpolate->tposition) return;
-    reinterpret_cast<M2::C_Human2*>(ped->object)->SetPos(dposition);
+    ped->CHuman->SetPos(dposition);
 }
 
 // =======================================================================//

@@ -78,13 +78,17 @@ struct ped_t {
     interpolate_t interpolate;
 
     /* game entity */
-    M2::C_Entity *object;
-    M2::Wrappers::GameModelManager *pGameModelManager;
+    union {
+        M2::C_Player2 *CPlayer; /* watch out, not all peds are players */
+        M2::C_Human2 *CHuman;
+        M2::C_Entity *CEntity;
+    };
+
     M2::C_SyncObject *sync;
 
     ped_t(M2::C_Entity *ent) {
         zpl_zero_item(this);
-        object = ent;
+        CEntity = ent;
     };
 #endif
 
@@ -97,6 +101,9 @@ struct ped_t {
  */
 struct car_t {
 
+    u16 model;
+    i8  gear;
+
     /**
      * Internal packed struct
      * for continious data sync
@@ -106,10 +113,7 @@ struct car_t {
         quat_t rotation;
         vec3_t speed;
         f32 steer;
-
         f32 brake;
-        i8  gear;
-        u16 model;
     } stream;
     #pragma pack(pop)
 
@@ -117,8 +121,18 @@ struct car_t {
     interpolate_t interpolate;
 
     /* game entity */
-    M2::C_Entity *object;
-    M2::Wrappers::GameModelManager *pGameModelManager;
+    union {
+        M2::C_Car *CCar;
+        M2::C_Entity *CEntity;
+    };
+
+    M2::C_SyncObject *sync;
+
+    car_t(M2::C_Entity *ent) {
+        zpl_zero_item(this);
+        CEntity = ent;
+    };
+
 #endif
 
     car_t() {
@@ -126,5 +140,12 @@ struct car_t {
     }
 };
 
+inline ped_t *get_ped(librg_entity_t *entity) {
+    mod_assert(entity && entity->user_data);
+    return (ped_t *)(entity->user_data);
+}
 
-
+inline car_t *get_car(librg_entity_t *entity) {
+    mod_assert(entity && entity->user_data);
+    return (car_t *)(entity->user_data);
+}
