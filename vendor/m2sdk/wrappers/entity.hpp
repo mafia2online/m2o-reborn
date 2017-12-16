@@ -114,6 +114,7 @@ namespace M2
             if (entity->IsActive()) {
                 return false;
             }
+            entity->Release();
             entity->Destructor();
             Mem::InvokeFunction<Mem::call_cdecl, int>(0x4019F0, entity);
             entity = nullptr;
