@@ -332,15 +332,6 @@ namespace tools {
             case WM_SYSKEYDOWN:
             case WM_SYSKEYUP:
             case WM_CHAR:
-            case WM_LBUTTONDOWN:
-            case WM_LBUTTONUP:
-            case WM_RBUTTONDOWN:
-            case WM_RBUTTONUP:
-            case WM_MBUTTONDOWN:
-            case WM_MBUTTONUP:
-            case WM_MOUSEWHEEL:
-            case WM_MOUSEMOVE:
-            case WM_LBUTTONDBLCLK:
                 zpl_mutex_lock(&mod.mutexes.wnd_msg);
                 mod.wnd_msg.push({ hWnd, uMsg, wParam, lParam });
                 zpl_mutex_unlock(&mod.mutexes.wnd_msg);

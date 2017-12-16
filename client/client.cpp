@@ -100,6 +100,7 @@ typedef struct {
 typedef struct {
     int x;
     int y;
+    int z; /* wheel */
 
     struct _DIMOUSESTATE state;
 
@@ -165,6 +166,12 @@ struct mod_t {
         zpl_mutex_t log;
         zpl_mutex_t wnd_msg;
     } mutexes;
+
+    struct {
+        u32 limit;
+        b32 enabled;
+        std::queue<std::string> queue;
+    } console;
 
     // other
     zpl_file_t debug_log;
@@ -286,7 +293,7 @@ void mod_exit(std::string reason)
     zpl_mutex_destroy(&mod.mutexes.log);
     zpl_mutex_destroy(&mod.mutexes.wnd_msg);
 
-    MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
+    // MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
 
     exit(0);
 }
@@ -301,8 +308,16 @@ void mod_log(const char* format, ...) {
     zpl_mutex_lock(&mod.mutexes.log);
     zpl_printf(message);
     zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
+
+    mod.console.queue.push(std::string(message));
+
+    if (mod.console.queue.size() > mod.console.limit) {
+        mod.console.queue.pop();
+    }
+
     zpl_mutex_unlock(&mod.mutexes.log);
 }
+
 
 // =======================================================================//
 // !
@@ -334,6 +349,9 @@ void mod_main(HMODULE module)
     zpl_file_remove(mod.paths.debug.c_str());
     zpl_file_create(&mod.debug_log, mod.paths.debug.c_str());
     zpl_file_seek(&mod.debug_log, 0);
+
+    mod.console.limit   = 256;
+    mod.console.enabled = true;
 
     mod.module = module;
 

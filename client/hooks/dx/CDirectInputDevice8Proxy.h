@@ -163,6 +163,7 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
 
             mod.mouse.x += mod.mouse.state.lX;
             mod.mouse.y += mod.mouse.state.lY;
+            mod.mouse.z = mod.mouse.state.lZ;
 
             int screenWidth, screenHeight;
             graphics_dimensions(&screenWidth, &screenHeight);
@@ -190,6 +191,7 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
             if (mod.input_blocked) {
                 ((DIMOUSESTATE*)lpvData)->lX = 0;
                 ((DIMOUSESTATE*)lpvData)->lY = 0;
+                ((DIMOUSESTATE*)lpvData)->lZ = 0;
 
                 for (usize i = 0; i < 4; i++) {
                     ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;

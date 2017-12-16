@@ -126,12 +126,9 @@ inline void graphics_device_prerender(void) {
 }
 
 /**
- * On device render callback
+ * Hanlding input in for gui in the same thread
  */
-inline void graphics_device_render(void) {
-    if (!mod.window) {
-        return;
-    }
+inline void graphics_input_handling() {
     mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 
     // start input capture
@@ -142,6 +139,9 @@ inline void graphics_device_render(void) {
         // input mouse btns
         for (usize i = 0; i < 3; i++)
             nk_input_button(nk_ctx, mod.mouse.buttons[i].id, mod.mouse.x, mod.mouse.y, mod.mouse.buttons[i].state);
+
+        // input scroll
+        nk_input_scroll(nk_ctx, nk_vec2(0, (float)mod.mouse.z / WHEEL_DELTA));
 
         // input mouse move
         nk_input_motion(nk_ctx, mod.mouse.x, mod.mouse.y);
@@ -154,12 +154,58 @@ inline void graphics_device_render(void) {
     zpl_mutex_try_lock(&mod.mutexes.wnd_msg);
     while (!mod.wnd_msg.empty()) {
         auto msg = mod.wnd_msg.front(); mod.wnd_msg.pop();
-        nk_d3d9_handle_event(msg.hWnd, msg.uMsg, msg.wParam, msg.lParam);
+
+        if (mod.input_blocked) {
+            nk_d3d9_handle_event(msg.hWnd, msg.uMsg, msg.wParam, msg.lParam);
+        }
+
+        switch (msg.uMsg) {
+            case WM_KEYUP:
+            case WM_SYSKEYUP:
+            {
+                int down = !((msg.lParam >> 31) & 1);
+                int ctrl = GetKeyState(VK_CONTROL) & (1 << 15);
+
+                switch (msg.wParam) {
+                    case VK_CONTROL:
+                    case VK_LCONTROL:
+                    case VK_RCONTROL:
+                        // TODO: add ctrl+a ctrl+v ctrl+c
+                        mod_log("pressed ctrl\n");
+                        break;
+
+                    /* trigger exec in debug console */
+                    case VK_RETURN:
+                        if (mod.console.enabled) {
+                            mod_debug_console_execute();
+                        }
+                        break;
+
+                    /* trigger the debug console */
+                    case VK_OEM_3:
+                        mod.console.enabled = !mod.console.enabled;
+                        mod.input_blocked   = (mod.console.enabled);
+                        break;
+                }
+            } break;
+
+        }
     }
     zpl_mutex_unlock(&mod.mutexes.wnd_msg);
 
     // finish input queue
     nk_input_end(nk_ctx);
+}
+
+/**
+ * On device render callback
+ */
+inline void graphics_device_render(void) {
+    if (!mod.window) {
+        return;
+    }
+
+    graphics_input_handling();
 
     if (mod.state.render) {
         mod.state.render();
