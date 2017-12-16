@@ -8,18 +8,16 @@
  * The entity enters the stream zone
  */
 void module_car_callback_create(librg_event_t *event) {
-    auto entity = event->entity; print_posm(entity->position, "creating vehicle at:");
-    auto car = new car_t(M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0));
-    mod_assert(car->CEntity);
+    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
 
-    car->CEntity->SetPosition(entity->position);
-
-    if (car->CEntity->IsActive()) {
+    if (entity->IsActive()) {
+        print_posm(event->entity->position, "[info] creating car at");
+        entity->SetPosition(event->entity->position);
         event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-        event->entity->user_data = car;
+        event->entity->user_data = new car_t(entity);
 
         //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
-        car->CCar->m_pVehicle.SetEngineOn(true, false);
+        ((M2::C_Car *)entity)->m_pVehicle.SetEngineOn(true, false);
     }
 }
 
@@ -38,6 +36,8 @@ void module_car_callback_remove(librg_event_t *event) {
 // !
 // =======================================================================//
 
+#define MOD_CAR_SPEED_TRESHOLD 0.6f
+
 /**
  * The entity in our stream zone gets updated
  */
@@ -46,19 +46,24 @@ void module_car_callback_update(librg_event_t *event) {
 
     // make sure we have all objects
     mod_assert(car && car->CEntity);
+    librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    interpolate_t *interpolate = &car->interpolate;
+    // read up synced values
+    car->CCar->m_pVehicle.SetSteer(car->stream.steer);
+
+    if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
+        car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
+    } else {
+        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+    }
 
     // interpolation stuff
+    interpolate_t *interpolate = &car->interpolate;
     interpolate->lposition = interpolate->tposition;
     interpolate->lrotation = interpolate->trotation;
     interpolate->tposition = event->entity->position;
     interpolate->trotation = car->stream.rotation;
     interpolate->delta = 0.0f;
-
-    librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
-
-    car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
 }
 
 /**
@@ -97,11 +102,8 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     car->interpolate.delta += (mod.last_delta / 40.666f);
     car->interpolate.delta = zplm_clamp(car->interpolate.delta, 0.f, 1.0f);
 
-    /* steering */
-    car->CCar->m_pVehicle.SetSteer(car->stream.steer);
-
     /* position interpolation */
-    if (car->interpolate.lposition != car->interpolate.tposition && car->interpolate.step++ > 16) {
+    if (car->interpolate.lposition != car->interpolate.tposition && car->interpolate.step++ > 8) {
         auto curr_pos = car->CEntity->GetPosition();
         auto diff_pos = zplm_vec3_mag2(curr_pos - entity->position);
 

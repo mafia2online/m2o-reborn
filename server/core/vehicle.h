@@ -13,7 +13,7 @@ void module_car_create(librg_message_t *msg) {
     vehicle->position = vec3(
         player->position.x + 3.0f,
         player->position.y,
-        player->position.z + 1.0f
+        player->position.z + 0.05f
     );
 
     // log
@@ -32,7 +32,7 @@ void module_car_enter_start(librg_message_t *msg) {
     mod_assert_msg(vehicle && player, "trying to enter invalid vehicle");
 
     auto seat = librg_data_ru8(msg->data);
-    auto ped = (ped_t *)player->user_data;
+    auto ped = get_ped(player);
 
     ped->vehicle = vehicle;
     ped->seat = seat;
@@ -74,7 +74,7 @@ void module_car_exit_start(librg_message_t *msg) {
 
 void module_car_exit_finish(librg_message_t *msg) {
     auto player  = librg_entity_find(msg->ctx, msg->peer);
-    auto ped = (ped_t *)player->user_data;
+    auto ped = get_ped(player);
     ped->vehicle = nullptr;
     ped->seat = 0;
 

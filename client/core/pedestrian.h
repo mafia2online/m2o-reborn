@@ -8,18 +8,13 @@
  * The entity enters the stream zone
  */
 void module_ped_callback_create(librg_event_t *event) {
-    M2::C_Entity *human = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 1);
-    human->SetPosition(event->entity->position);
-    if (human->IsActive()) {
-        mod_log("Created at %x!\n", human);
+    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 1);
 
-        auto ped = new ped_t();
-
-        ped->CEntity = human;
-        //ped->pGameModelManager = pPedModelManager;
-
+    if (entity->IsActive()) {
+        print_posm(event->entity->position, "[info] creating ped at");
+        entity->SetPosition(event->entity->position);
         event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-        event->entity->user_data = ped;
+        event->entity->user_data = new ped_t(entity);
     }
 }
 
