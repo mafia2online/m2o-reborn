@@ -47,7 +47,7 @@ void on_connect_disconnect(librg_event_t *event) {
 }
 
 void entity_on_create(librg_event_t *event) {
-    mod_log("sending a create packet for entity: %d\n", event->entity->id);
+    mod_log("[info] sending a create packet for entity: %d\n", event->entity->id);
 }
 
 void entity_on_update(librg_event_t *event) {
@@ -64,7 +64,7 @@ void entity_on_csupdate(librg_event_t *event) {
 }
 
 void entity_on_remove(librg_event_t *event) {
-    mod_log("sending a remove packet for entity: %d\n", event->entity->id);
+    mod_log("[info] sending a remove packet for entity: %d\n", event->entity->id);
 }
 
 void mod_register_routes(librg_ctx_t *ctx) {

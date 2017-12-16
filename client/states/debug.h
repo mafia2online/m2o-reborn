@@ -66,6 +66,7 @@ void debug_console_render() {
     struct nk_style_window original_window  = nk_ctx->style.window;
     struct nk_style_text original_text      = nk_ctx->style.text;
 
+    bool enabling_console = false;
     int ysize = mod.console.enabled ? MOD_CONSOLE_HEIGHT : 32;
 
     int x, y;
@@ -114,7 +115,7 @@ void debug_console_render() {
 
             nk_layout_row_push(nk_ctx, 0.06f);
             if (nk_button_label(nk_ctx, mod.console.enabled ? "Hide (~)" : "Show (~)")) {
-                mod.console.enabled = !mod.console.enabled;
+                enabling_console = true;
             }
         }
         nk_layout_row_end(nk_ctx);
@@ -130,6 +131,10 @@ void debug_console_render() {
             }
             nk_group_scrolled_end(nk_ctx);
         }
+    }
+
+    if (enabling_console) {
+        mod.console.enabled = !mod.console.enabled;
     }
 
     /* reset styles back */
