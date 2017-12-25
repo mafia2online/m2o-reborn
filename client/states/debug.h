@@ -101,7 +101,7 @@ void debug_console_render() {
                     title_state_data.port_input,
                     ctx->network.peer->lastRoundTripTime,
                     ctx->entity.count,
-                    1 /* TODO: do it */
+                    mod.stats.streamed_entities
                 );
             } else {
                 nk_labelf(nk_ctx, NK_TEXT_RIGHT, "state: not connected");

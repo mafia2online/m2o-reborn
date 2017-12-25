@@ -8,6 +8,7 @@
 // server modules
 #include "core/settings.h"
 #include "core/vehicle.h"
+#include "core/pedestrian.h"
 
 struct mod_t {
     mod_settings_t settings;
@@ -43,7 +44,7 @@ int main() {
 
     /* fill up default settings */
     ctx->mode            = LIBRG_MODE_SERVER;
-    ctx->tick_delay      = 32;
+    ctx->tick_delay      = MOD_SERVER_TICK_DELAY;
     ctx->world_size      = zplm_vec3(5000.0f, 5000.0f, 0.0f);
     ctx->max_entities    = 16000;
     ctx->max_connections = 100;

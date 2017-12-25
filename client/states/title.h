@@ -7,7 +7,7 @@ struct {
 } title_state_data;
 
 void title_state_init() {
-    zpl_strcpy(title_state_data.hostname_input, "localhost");
+    zpl_strcpy(title_state_data.hostname_input, "inlife.no-ip.org");
     zpl_strcpy(title_state_data.port_input, "27010");
 }
 

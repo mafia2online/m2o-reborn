@@ -12,7 +12,9 @@ void mod_disconnected(librg_event_t *);
 void mod_entity_create(librg_event_t *);
 void mod_entity_update(librg_event_t *);
 void mod_entity_remove(librg_event_t *);
-void mod_entity_client(librg_event_t *);
+void mod_entity_client_add(librg_event_t *);
+void mod_entity_client_update(librg_event_t *);
+void mod_entity_client_remove(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 
 /**
@@ -42,13 +44,19 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, mod_entity_create);
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, mod_entity_update);
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, mod_entity_remove);
-    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_ADD, mod_entity_client_add);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client_update);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, mod_entity_client_remove);
 
     // call inits for modules
     module_ped_init();
     module_car_init();
 
-    discordInit();
+    discord_init();
+}
+
+void mod_game_stop() {
+    discord_free();
 }
 
 /**
@@ -62,7 +70,7 @@ void mod_game_tick() {
     librg_tick(ctx);
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), mod_entity_interpolate);
 
-    updateDiscordPresence();
+    discord_update_presence();
 
     if (GetAsyncKeyState(VK_F3) & 0x1) {
         vec3_t dest;
@@ -76,14 +84,12 @@ void mod_game_tick() {
         );
     }
 
-
     /* show/hide mouse */
     if (GetAsyncKeyState(VK_F1) & 0x1) {
         mod.input_blocked = !mod.input_blocked;
     }
     /* connect to the server */
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
-        //game_connect();
         librg_network_start(ctx, { 27010, "localhost" });
         mod.spawned = true;
     }
@@ -181,11 +187,25 @@ void mod_entity_remove(librg_event_t *event) {
         case TYPE_CAR: { module_car_callback_remove(event); } break;
     }
 }
-
-void mod_entity_client(librg_event_t *event) {
+void mod_entity_client_update(librg_event_t *event) {
     switch (event->entity->type) {
         case TYPE_PED: { module_ped_callback_clientstream(event); } break;
         case TYPE_CAR: { module_car_callback_clientstream(event); } break;
+    }
+}
+
+void mod_entity_client_add(librg_event_t *event) {
+    mod.stats.streamed_entities++;
+    event->entity->flags &= ~MOD_ENTITY_INTERPOLATED;
+}
+
+void mod_entity_client_remove(librg_event_t *event) {
+    mod.stats.streamed_entities--;
+    switch (event->entity->type) {
+        case TYPE_PED:
+        case TYPE_CAR:
+            event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+            break;
     }
 }
 

@@ -20,6 +20,18 @@ void module_car_create(librg_message_t *msg) {
     print_posm(vehicle->position, "created a vehicle at: ");
 }
 
+void module_car_callback_create(librg_event_t *event) {
+    if (!(event->entity->flags & LIBRG_ENTITY_CONTROLLED)) {
+        mod_log("[info] setting closest player as an owner");
+        librg_entity_control_set(event->ctx, event->entity->id, event->peer);
+    }
+}
+
+void module_car_callback_remove(librg_event_t *event) {
+
+}
+
+
 // =======================================================================//
 // !
 // ! Vehicle events
@@ -51,7 +63,6 @@ void module_car_enter_start(librg_message_t *msg) {
 
 void module_car_enter_finish(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
-    player->flags |= MOD_ENTITY_DRIVER;
 
     mod_message_send_instream_except(msg->ctx, MOD_CAR_ENTER_FINISH, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);
@@ -61,8 +72,6 @@ void module_car_enter_finish(librg_message_t *msg) {
 void module_car_exit_start(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
     mod_log("player: %d is trying to leave his current car\n", player->id);
-
-    player->flags &= ~MOD_ENTITY_DRIVER;
 
     // TODO: does he still need to control and stream that car? most probably yea
     // librg_entity_control_remove(msg->ctx, player->vehicle->id);

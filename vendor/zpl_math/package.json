@@ -1,28 +1,29 @@
 {
-  "_from": "zpl_math.c@^1.1.0",
+  "_from": "zpl_math.c@1.1.0",
   "_id": "zpl_math.c@1.1.0",
   "_inBundle": false,
   "_integrity": "sha512-bcVKHZLxYzmIOQyyLnvo9z8ouOBnG8nYMuKmVUY9H3gKha/3hl3fj+xOBYCFQkyQJMYYyTJOIiFb2ngcVHWcMA==",
   "_location": "/zpl_math.c",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "zpl_math.c@^1.1.0",
+    "raw": "zpl_math.c@1.1.0",
     "name": "zpl_math.c",
     "escapedName": "zpl_math.c",
-    "rawSpec": "^1.1.0",
+    "rawSpec": "1.1.0",
     "saveSpec": null,
-    "fetchSpec": "^1.1.0"
+    "fetchSpec": "1.1.0"
   },
   "_requiredBy": [
-    "/librg.c",
+    "#USER",
+    "/",
     "/zpl_cull.c"
   ],
   "_resolved": "https://registry.npmjs.org/zpl_math.c/-/zpl_math.c-1.1.0.tgz",
   "_shasum": "afb873885ddc25d209e8ca3e27146d9f25529aa5",
-  "_spec": "zpl_math.c@^1.1.0",
-  "_where": "/Users/inlife/Projects/m2o/m2o-reborn/vendor/node_modules/librg.c",
+  "_spec": "zpl_math.c@1.1.0",
+  "_where": "/Users/inlife/Projects/reguider/librg",
   "author": {
     "name": "Dominik Madarasz",
     "email": "zaklaus@outlook.com"

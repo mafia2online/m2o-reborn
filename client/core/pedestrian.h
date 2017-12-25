@@ -50,8 +50,8 @@ void module_ped_callback_update(librg_event_t *event) {
     interpolate_t *interpolate = &ped->interpolate;
 
     // interpolation stuff
-    interpolate->lposition = interpolate->tposition;
-    interpolate->tposition = entity->position;
+    interpolate->last_position = interpolate->targ_position;
+    interpolate->targ_position = entity->position;
     interpolate->delta = 0.0f;
 
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
@@ -86,7 +86,7 @@ void module_ped_callback_update(librg_event_t *event) {
         // our prev position will be always our current
         // so that after we appear on the ground again
         // we won't be interpolated from somewhere far away
-        interpolate->lposition = entity->position;
+        interpolate->last_position = entity->position;
     }
 }
 
@@ -174,9 +174,9 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
     }
 
     vec3_t dposition;
-    zplm_vec3_lerp(&dposition, ped->interpolate.lposition, ped->interpolate.tposition, ped->interpolate.delta);
+    zplm_vec3_lerp(&dposition, ped->interpolate.last_position, ped->interpolate.targ_position, ped->interpolate.delta);
 
-    //if (dposition == interpolate->tposition) return;
+    //if (dposition == interpolate->targ_position) return;
     ped->CHuman->SetPos(dposition);
 }
 

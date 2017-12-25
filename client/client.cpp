@@ -173,6 +173,10 @@ struct mod_t {
         std::queue<std::string> queue;
     } console;
 
+    struct {
+        u32 streamed_entities;
+    } stats;
+
     // other
     zpl_file_t debug_log;
     std::queue<mod_wndmsg_t> wnd_msg;
@@ -282,9 +286,8 @@ void mod_path_register(HMODULE module)
 void mod_exit(std::string reason)
 {
     mod_log("exiting %s\n", reason.c_str());
+    mod_game_stop();
 
-    Discord_Shutdown();
-    //model_free();
     librg_free(ctx);
     delete ctx;
 

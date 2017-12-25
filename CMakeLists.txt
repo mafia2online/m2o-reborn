@@ -103,7 +103,7 @@ file(GLOB_RECURSE CLIENT_FILES
 )
 
 set(SERVER_LIBRARIES)
-set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours discord-rpcd)
+set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours discord-rpc)
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 

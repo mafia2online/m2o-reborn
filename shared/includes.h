@@ -39,6 +39,8 @@ typedef zplm_quat_t quat_t;
 #define mod_assert librg_assert
 #define mod_assert_msg librg_assert_msg
 
+#define MOD_SERVER_TICK_DELAY 1000
+
 // TODO: move to components.h
 /* events/messages */
 enum {

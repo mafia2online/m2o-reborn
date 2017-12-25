@@ -4,7 +4,7 @@ static const char* APPLICATION_ID = "385521976564908032";
 static int FrustrationLevel = 0;
 static int64_t StartTime;
 
-static void updateDiscordPresence()
+static void discord_update_presence()
 {
     //char buffer[256];
     DiscordRichPresence discordPresence;
@@ -52,7 +52,7 @@ static void handleDiscordSpectate(const char* secret)
     printf("\nDiscord: spectate (%s)\n", secret);
 }
 
-static void discordInit()
+static void discord_init()
 {
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
@@ -64,3 +64,7 @@ static void discordInit()
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
 }
 
+static void discord_free()
+{
+    Discord_Shutdown();
+}

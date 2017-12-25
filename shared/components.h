@@ -32,25 +32,71 @@ enum {
 // !
 // =======================================================================//
 
-/**
- * Struct for storing the interpolation stuff
- */
-struct interpolate_t {
-    vec3_t lposition;
-    vec3_t tposition;
+#ifdef MOD_CLIENT
 
-    quat_t lrotation;
-    quat_t trotation;
+    // TODO: remove
+    struct interpolate_t {
+        vec3_t last_position;
+        vec3_t targ_position;
 
-    f32 delta;
-    i32 step;
-};
+        vec3_t last_pos_speed;
+        vec3_t targ_pos_speed;
+
+        quat_t last_rotation;
+        quat_t targ_rotation;
+
+        vec3_t last_rot_speed;
+        vec3_t targ_rot_speed;
+
+        f32 delta;
+        i32 step;
+    };
+
+    struct interpolate1_t {
+        float last;
+        float targ;
+
+        float last_speed;
+        float targ_speed;
+    };
+
+    struct interpolate2_t {
+        vec2_t last;
+        vec2_t targ;
+
+        vec2_t last_speed;
+        vec2_t targ_speed;
+    };
+
+    struct interpolate3_t {
+        vec3_t last;
+        vec3_t targ;
+
+        vec3_t last_speed;
+        vec3_t targ_speed;
+    };
+
+    struct interpolate4_t {
+        quat_t last;
+        quat_t targ;
+
+        quat_t last_speed;
+        quat_t targ_speed;
+    };
+
+#endif
 
 /**
  * Struct for storing the
  * pedestrian type of entity data
  */
 struct ped_t {
+    u16 model;
+    u8  state;
+
+    librg_entity_t *vehicle;
+    u32 vehicle_id;
+    u8 seat;
 
     /**
      * Internal packed struct
@@ -58,7 +104,6 @@ struct ped_t {
      */
     #pragma pack(push, 1)
     struct {
-        // 128
         zplm_vec3_t direction;
         vec3_t look_at;
         f32 speed;
@@ -71,10 +116,8 @@ struct ped_t {
     } stream;
     #pragma pack(pop)
 
-    librg_entity_t *vehicle;
-    u8 seat;
-
 #ifdef MOD_CLIENT
+    f32 inter_delta;
     interpolate_t interpolate;
 
     /* game entity */
@@ -95,14 +138,27 @@ struct ped_t {
     ped_t() { zpl_zero_item(this); }
 };
 
+
+
+
 /**
  * Struct for storing the
  * vehicle type of entity data
  */
 struct car_t {
-
     u16 model;
     i8  gear;
+
+    union {
+        struct {
+            u32 seat_1;
+            u32 seat_2;
+            u32 seat_3;
+            u32 seat_4;
+        };
+
+        u32 passengers[4];
+    };
 
     /**
      * Internal packed struct
@@ -118,7 +174,10 @@ struct car_t {
     #pragma pack(pop)
 
 #ifdef MOD_CLIENT
-    interpolate_t interpolate;
+    f32 inter_delta;
+    interpolate1_t inter_steer;
+    interpolate3_t inter_pos;
+    interpolate4_t inter_rot;
 
     /* game entity */
     union {

@@ -24,7 +24,6 @@ void on_connection_request(librg_event_t *event) {
  */
 void on_connect_accepted(librg_event_t *event) {
     auto entity = event->entity;
-
     // entity->position = vec3(-421.75f, 479.31f, 0.05f);
 
     mod_log("spawning player %u at: %f %f %f\n",
@@ -34,11 +33,7 @@ void on_connect_accepted(librg_event_t *event) {
         entity->position.z
     );
 
-    //auto object = new ped_t;
-    //zpl_zero_item(object); // fill object with 0s
     entity->user_data = new ped_t();
-
-    // TODO: allocate stuff
     librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 }
 
@@ -48,6 +43,11 @@ void on_connect_disconnect(librg_event_t *event) {
 
 void entity_on_create(librg_event_t *event) {
     mod_log("[info] sending a create packet for entity: %d\n", event->entity->id);
+
+    switch (event->entity->type) {
+        case TYPE_PED: { module_ped_callback_create(event); } break;
+        case TYPE_CAR: { module_car_callback_create(event); } break;
+    }
 }
 
 void entity_on_update(librg_event_t *event) {
@@ -64,7 +64,14 @@ void entity_on_csupdate(librg_event_t *event) {
 }
 
 void entity_on_remove(librg_event_t *event) {
+    if (!event->entity) return; // entity has been deleted
+
     mod_log("[info] sending a remove packet for entity: %d\n", event->entity->id);
+
+    switch (event->entity->type) {
+        case TYPE_PED: { module_ped_callback_remove(event); } break;
+        case TYPE_CAR: { module_car_callback_remove(event); } break;
+    }
 }
 
 void mod_register_routes(librg_ctx_t *ctx) {
