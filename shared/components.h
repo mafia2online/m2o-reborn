@@ -34,24 +34,6 @@ enum {
 
 #ifdef MOD_CLIENT
 
-    // TODO: remove
-    struct interpolate_t {
-        vec3_t last_position;
-        vec3_t targ_position;
-
-        vec3_t last_pos_speed;
-        vec3_t targ_pos_speed;
-
-        quat_t last_rotation;
-        quat_t targ_rotation;
-
-        vec3_t last_rot_speed;
-        vec3_t targ_rot_speed;
-
-        f32 delta;
-        i32 step;
-    };
-
     struct interpolate1_t {
         float last;
         float targ;
@@ -74,6 +56,13 @@ enum {
 
         vec3_t last_speed;
         vec3_t targ_speed;
+    };
+
+    struct interpolate3_hermite_t {
+        vec3_t A;
+        vec3_t B;
+        vec3_t C;
+        vec3_t D;
     };
 
     struct interpolate4_t {
@@ -106,6 +95,7 @@ struct ped_t {
     struct {
         zplm_vec3_t direction;
         vec3_t look_at;
+        vec3_t vspeed;
         f32 speed;
 
         // 32
@@ -118,7 +108,7 @@ struct ped_t {
 
 #ifdef MOD_CLIENT
     f32 inter_delta;
-    interpolate_t interpolate;
+    interpolate3_hermite_t inter_pos;
 
     /* game entity */
     union {
@@ -175,9 +165,9 @@ struct car_t {
 
 #ifdef MOD_CLIENT
     f32 inter_delta;
-    interpolate1_t inter_steer;
-    interpolate3_t inter_pos;
+    interpolate3_hermite_t inter_pos;
     interpolate4_t inter_rot;
+    interpolate1_t inter_steer;
 
     /* game entity */
     union {

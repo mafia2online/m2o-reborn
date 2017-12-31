@@ -3381,7 +3381,7 @@ extern "C" {
 
     void zpl_sync_destroy(zpl_sync_t *s) {
         if (s->waiting) {
-            ZPL_PANIC("Cannot destroy while threads are waiting!")
+            ZPL_PANIC("Cannot destroy while threads are waiting!");
         }
 
         zpl_mutex_destroy(&s->mutex);

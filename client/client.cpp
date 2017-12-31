@@ -235,7 +235,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include <components.h>
 #include <extensions.h>
 
-//#include "core/model.h"
+#include "helpers/cubic_hermite.h"
 
 // actual client stuff
 #include "states/title.h"

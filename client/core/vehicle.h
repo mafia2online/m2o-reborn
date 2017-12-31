@@ -16,12 +16,12 @@ void module_car_callback_create(librg_event_t *event) {
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating car at");
-        entity->SetPosition(event->entity->position);
+
         event->entity->flags |= MOD_ENTITY_INTERPOLATED;
         event->entity->user_data = new car_t(entity);
 
-        //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
-        ((M2::C_Car *)entity)->m_pVehicle.SetEngineOn(true, false);
+        get_car(event->entity)->CCar->SetPos(event->entity->position);
+        get_car(event->entity)->CCar->m_pVehicle.SetEngineOn(true, false);
     }
 }
 
@@ -52,20 +52,31 @@ void module_car_callback_update(librg_event_t *event) {
 
     /* update interpolation tables */
 
-    car->inter_pos.last = car->inter_pos.targ;
-    car->inter_pos.targ = event->entity->position;
-    car->inter_pos.last_speed = car->inter_pos.targ_speed;
-    car->inter_pos.targ_speed = car->stream.speed;
+    car->inter_pos.A = car->inter_pos.B;
+    car->inter_pos.B = car->inter_pos.C;
+    car->inter_pos.C = car->inter_pos.D;
+    car->inter_pos.D = event->entity->position;
 
-    if (car->inter_pos.last == zplm_vec3_zero()) {
-        car->inter_pos.last = car->inter_pos.targ;
+    if (car->inter_pos.C == zplm_vec3_zero()) {
+        car->inter_pos.A = car->inter_pos.D;
+        car->inter_pos.B = car->inter_pos.D;
+        car->inter_pos.C = car->inter_pos.D;
     }
 
-    car->inter_steer.last = car->inter_steer.targ;
-    car->inter_steer.targ = car->stream.steer;
+    car->CCar->SetRot(car->stream.rotation);
+    car->CCar->m_pVehicle.SetSteer(car->stream.steer);
 
-    car->inter_rot.last = car->inter_rot.targ;
-    car->inter_rot.targ = car->stream.rotation;
+    // if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
+    //     car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
+    // } else {
+    //     car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+    // }
+
+    // car->inter_steer.last = car->inter_steer.targ;
+    // car->inter_steer.targ = car->stream.steer;
+
+    // car->inter_rot.last = car->inter_rot.targ;
+    // car->inter_rot.targ = car->stream.rotation;
 
     car->inter_delta = 0.0f;
 }
@@ -91,56 +102,51 @@ void module_car_callback_clientstream(librg_event_t *event) {
 // !
 // =======================================================================//
 
+
 void module_car_callback_interpolate(librg_entity_t *entity) {
     auto car = get_car(entity); mod_assert(car && car->CEntity);
 
-    // // skip entity if we are the driver
-    // if (mod.player->flags & MOD_ENTITY_DRIVER && get_ped(mod.player)->vehicle == entity) {
-    //     if (get_ped(mod.player)->vehicle->client_peer != mod.player->client_peer)
-    //         return;
-    // }
-
     // last delta tick against constant tick delay
+    f32 alpha = car->inter_delta / (f32)MOD_SERVER_TICK_DELAY;
     car->inter_delta += mod.last_delta;
-    auto alpha = zpl_clamp01(car->inter_delta / MOD_SERVER_TICK_DELAY);
 
-    /* position interpolation */
-    // vec3_t dposition;
-    // zplm_vec3_lerp(&dposition,
-    //     car->interpolate.last_position,
-    //     car->interpolate.tposition,
+    //vec3_t dest_position;
+    //zplm_vec3_lerp(&dest_position, car->inter_pos.C, car->inter_pos.D, alpha);
+
+    car->CCar->SetPos(cubic_hermite_v3_interpolate(&car->inter_pos, alpha));
+
+    // vec3_t dest_position;
+    // zplm_vec3_cslerp(&dest_position,
+    //     car->inter_pos.last,
+    //     car->inter_pos.last_speed,
+    //     car->inter_pos.targ,
+    //     car->inter_pos.targ_speed,
     //     alpha
     // );
 
-    vec3_t dest_position;
-    zplm_vec3_cslerp(&dest_position,
-        car->inter_pos.last,
-        car->inter_pos.last_speed,
-        car->inter_pos.targ,
-        car->inter_pos.targ_speed,
-        alpha
-    );
+    // vec3_t dest_position_speed = {0};
+    // zplm_vec3_dcslerp(&dest_position_speed,
+    //     car->inter_pos.last,
+    //     car->inter_pos.last_speed,
+    //     car->inter_pos.targ,
+    //     car->inter_pos.targ_speed,
+    //     alpha
+    // );
 
-    vec3_t dest_position_speed;
-    zplm_vec3_dcslerp(&dest_position_speed,
-        car->inter_pos.last,
-        car->inter_pos.last_speed,
-        car->inter_pos.targ,
-        car->inter_pos.targ_speed,
-        alpha
-    );
+    // f32 steer_alpha = zpl_clamp01(car->inter_delta / /*MOD_SERVER_TICK_DELAY*/ 32.f);
+    // f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, steer_alpha);
 
-    f32 steer_alpha = zpl_clamp01(car->inter_delta / /*MOD_SERVER_TICK_DELAY*/ 32.f);
-    f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, steer_alpha);
+    // if (dest_position != zplm_vec3_zero() && zplm_vec3_mag2(car->stream.speed) > 0.1f) {
+        // car->CEntity->SetPosition(dest_position);
+    // }
 
-    car->CCar->SetPos(dest_position);
-    car->CCar->m_pVehicle.SetSteer(dest_steer);
+    // car->CCar->m_pVehicle.SetSteer(dest_steer);
 
-    if (zplm_vec3_mag2(dest_position_speed) > MOD_CAR_SPEED_TRESHOLD) {
-        car->CCar->m_pVehicle.SetSpeed(dest_position_speed); // TODO: add speed interpolation
-    } else {
-        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
-    }
+    // if (zplm_vec3_mag2(dest_position_speed) > MOD_CAR_SPEED_TRESHOLD) {
+    //     // car->CCar->m_pVehicle.SetSpeed(dest_position_speed);
+    // } else {
+    //     car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+    // }
 
     // auto curr_pos = car->CEntity->GetPosition();
     // auto diff_pos = zplm_vec3_mag2(curr_pos - dposition);
@@ -149,20 +155,21 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     //     car->CCar->SetPos(dposition);
     // }
 
-    /* rotation interpolation */
-    // if (car->interpolate.lrotation != car->interpolate.trotation) {
-        auto curr_rot = car->CEntity->GetRotation();
-        auto diff_rot = zplm_quat_angle(curr_rot - car->stream.rotation);
+    // /* rotation interpolation */
+    // if (car->inter_rot.last != car->inter_rot.targ) {
+    //     auto curr_rot = car->CEntity->GetRotation();
+    //     auto diff_rot = zplm_quat_angle(curr_rot - car->stream.rotation);
 
-        if (diff_rot > MOD_CAR_ROTATION_TRESHOLD) {
-            auto last = car->inter_rot.last;
-            auto dest = car->inter_rot.targ;
+    //     if (diff_rot > MOD_CAR_ROTATION_TRESHOLD) {
+    //         auto last = car->inter_rot.last;
+    //         auto dest = car->inter_rot.targ;
 
-            quat_t dest_rotation;
-            zplm_quat_nlerp(&dest_rotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, alpha);
-            car->CCar->SetRot(dest_rotation);
-            //car->CCar->SetRot(car->stream.rotation);
-        }
+    //         quat_t dest_rotation;
+    //         zplm_quat_nlerp(&dest_rotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, alpha);
+    //         car->CCar->SetRot(dest_rotation);
+    //         //car->CCar->SetRot(car->stream.rotation);
+    //     }
+    // }
 }
 
 // =======================================================================//

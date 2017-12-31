@@ -54,6 +54,7 @@ int main() {
 
     mod_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
     mod_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
+    mod_log("server tick_delay: %d\n", ctx->tick_delay);
 
     librg_init(ctx);
     mod_register_routes(ctx);
