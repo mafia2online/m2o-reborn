@@ -46,6 +46,32 @@ namespace M2
 		C_HumanScript	*GetScript() { return reinterpret_cast<ICHuman2 *>(this)->m_pScript; }
 		C_HumanWeaponController	*GetWeaponController() { return reinterpret_cast<ICHuman2 *>(this)->m_pWeaponController; }
 
+        vec3_t GetDir()
+        {
+            vec3_t direction;
+            Mem::InvokeFunction<Mem::call_this, int>(0x93A0E0, this, &direction);
+            return direction;
+        }
+
+        vec3_t GetPos()
+        {
+            vec3_t position;
+            Mem::InvokeFunction<Mem::call_this, int>(0x919E30, this, &position);
+            return position;
+        }
+
+        quat_t GetRot()
+        {
+            quat_t rotation;
+            Mem::InvokeFunction<Mem::call_this, int>(0x91A310, this, &rotation);
+            return rotation;
+        }
+
+        double GetScale()
+        {
+            return Mem::InvokeFunction<Mem::call_this, double>(0x9382E0, this);
+        }
+
         void SetColor(int color)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x9389B0, this, color);
