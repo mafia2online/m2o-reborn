@@ -82,6 +82,13 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, long double>(0x09BA9D0, this);
 		}
 
+        vec3_t GetDir()
+        {
+            vec3_t direction;
+            Mem::InvokeFunction<Mem::call_this, int>(0x4454F0, this, &direction);
+            return direction;
+        }
+
 		long double GetFuelTankCapacity()
 		{
 			return Mem::InvokeFunction<Mem::call_this, long double>(0x09BD0B0, this);
@@ -97,10 +104,29 @@ namespace M2
             return Mem::InvokeFunction<Mem::call_this, int>(0x46C630, this, name);
         }
 
+        vec3_t GetPos()
+        {
+            vec3_t position;
+            Mem::InvokeFunction<Mem::call_this, int>(0x4D2120, this, &position);
+            return position;
+        }
+
 		double GetRepairPrice()
 		{
 			return Mem::InvokeFunction<Mem::call_this, double>(0x04476E0, this);
 		}
+
+        quat_t GetRot()
+        {
+            quat_t rotation;
+            Mem::InvokeFunction<Mem::call_this, int>(0x46AC10, this, &rotation);
+            return rotation;
+        }
+
+        double GetScale()
+        {
+            return Mem::InvokeFunction<Mem::call_this, double>(0x46AC70, this);
+        }
         
         vec3_t GetWheelPos(int index)
         {
