@@ -231,11 +231,11 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // after memory hooks :C
 #include <m2sdk.h>
 
+#include "helpers/cubic_hermite.h"
+
 // shared
 #include <components.h>
 #include <extensions.h>
-
-#include "helpers/cubic_hermite.h"
 
 // actual client stuff
 #include "states/title.h"
@@ -246,7 +246,6 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "core/pedestrian.h"
 #include "core/vehicle.h"
 #include "core/discord.h"
-//#include "core/hacks.h"
 #include "core/mod.h"
 
 // NOTE(zaklaus): Tell the OS to prefer dedicated video card.
@@ -366,7 +365,7 @@ void mod_main(HMODULE module)
     ctx->tick_delay     = 32;
     ctx->mode           = LIBRG_MODE_CLIENT;
     ctx->world_size     = zplm_vec3(5000.0f, 5000.0f, 5000.0f);
-    ctx->max_entities   = 1000;
+    ctx->max_entities   = MOD_ENTITY_LIMIT;
 
     librg_init(ctx);
 

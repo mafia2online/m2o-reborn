@@ -9,7 +9,7 @@ void module_car_create(librg_message_t *msg) {
     auto vehicle = librg_entity_create(msg->ctx, TYPE_CAR);
     mod_assert(player && vehicle);
 
-    vehicle->user_data = new car_t();
+    vehicle->user_data = new car_t(vehicle);
     vehicle->position = vec3(
         player->position.x + 3.0f,
         player->position.y,
@@ -23,7 +23,7 @@ void module_car_create(librg_message_t *msg) {
 void module_car_callback_create(librg_event_t *event) {
     if (!(event->entity->flags & LIBRG_ENTITY_CONTROLLED)) {
         mod_log("[info] setting closest player as an owner\n");
-        librg_entity_control_set(event->ctx, event->entity->id, event->peer);
+        //librg_entity_control_set(event->ctx, event->entity->id, event->peer);
     }
 }
 

@@ -46,8 +46,8 @@ int main() {
     ctx->mode            = LIBRG_MODE_SERVER;
     ctx->tick_delay      = MOD_SERVER_TICK_DELAY;
     ctx->world_size      = zplm_vec3(5000.0f, 5000.0f, 0.0f);
-    ctx->max_entities    = 16000;
-    ctx->max_connections = 100;
+    ctx->max_entities    = MOD_ENTITY_LIMIT;
+    ctx->max_connections = 1000;
 
     librg_address_t address = { 27010, NULL };
     settings_read(ctx, &address, &mod.settings);

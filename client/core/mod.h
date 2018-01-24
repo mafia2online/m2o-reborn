@@ -195,11 +195,14 @@ void mod_entity_client_update(librg_event_t *event) {
 }
 
 void mod_entity_client_add(librg_event_t *event) {
+    mod_log("[info] adding an entity %d to clientstream\n", event->entity->id);
     mod.stats.streamed_entities++;
     event->entity->flags &= ~MOD_ENTITY_INTERPOLATED;
 }
 
 void mod_entity_client_remove(librg_event_t *event) {
+    mod_log("[info] removing an entity %d from clientstream\n", event->entity->id);
+
     mod.stats.streamed_entities--;
     switch (event->entity->type) {
         case TYPE_PED:

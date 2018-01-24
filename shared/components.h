@@ -23,7 +23,7 @@ enum {
 /* entity flags */
 enum {
     MOD_ENTITY_INTERPOLATED = (1 << 20),
-    MOD_ENTITY_DRIVER       = (1 << 21),
+    MOD_ENTITY_DRIVER       = (1 << 21), 
 };
 
 // =======================================================================//
@@ -58,13 +58,6 @@ enum {
         vec3_t targ_speed;
     };
 
-    struct interpolate3_hermite_t {
-        vec3_t A;
-        vec3_t B;
-        vec3_t C;
-        vec3_t D;
-    };
-
     struct interpolate4_t {
         quat_t last;
         quat_t targ;
@@ -83,9 +76,10 @@ struct ped_t {
     u16 model;
     u8  state;
 
-    librg_entity_t *vehicle;
-    u32 vehicle_id;
     u8 seat;
+    librg_entity_t *vehicle;
+
+    u32 target_entityid;
 
     /**
      * Internal packed struct
@@ -122,10 +116,14 @@ struct ped_t {
     ped_t(M2::C_Entity *ent) {
         zpl_zero_item(this);
         CEntity = ent;
+        target_entityid = MOD_INVALID_ENTITY;
     };
 #endif
 
-    ped_t() { zpl_zero_item(this); }
+    ped_t() {
+        zpl_zero_item(this);
+        target_entityid = MOD_INVALID_ENTITY;
+    }
 };
 
 
@@ -137,37 +135,12 @@ struct ped_t {
  */
 struct car_t {
     u16 model;
-    i8  gear;
+    u8 state;
+    i8 gear;
 
-    union {
-        struct {
-            u32 seat_1;
-            u32 seat_2;
-            u32 seat_3;
-            u32 seat_4;
-        };
-
-        u32 passengers[4];
-    };
-
-    /**
-     * Internal packed struct
-     * for continious data sync
-     */
-    #pragma pack(push, 1)
-    struct {
-        quat_t rotation;
-        vec3_t speed;
-        f32 steer;
-        f32 brake;
-    } stream;
-    #pragma pack(pop)
+    librg_entity_t *librg_entity;
 
 #ifdef MOD_CLIENT
-    f32 inter_delta;
-    interpolate3_hermite_t inter_pos;
-    interpolate4_t inter_rot;
-    interpolate1_t inter_steer;
 
     /* game entity */
     union {
@@ -177,17 +150,67 @@ struct car_t {
 
     M2::C_SyncObject *sync;
 
-    car_t(M2::C_Entity *ent) {
-        zpl_zero_item(this);
-        CEntity = ent;
+    f32 inter_delta;
+    interpolate3_hermite_t inter_pos;
+    interpolate4_t inter_rot;
+    interpolate1_t inter_steer;
+
+    void setCEntity(M2::C_Entity *entity) {
+        this->CEntity = entity;
     };
 
 #endif
 
-    car_t() {
+    /**
+     * Internal packed struct
+     * for continious data sync
+     */
+    #pragma pack(push, 1)
+        struct {
+            quat_t rotation;
+            vec3_t speed;
+            f32 steer;
+            f32 brake;
+        } stream;
+    #pragma pack(pop)
+
+    car_t(librg_entity_t *entity) {
         zpl_zero_item(this);
+        this->librg_entity = entity;
+    }
+
+    void dbg() {
+        mod_log("[dbg]: \n" \
+            "car_t {\n\t" \
+                "model: %d, \n\t" \
+                "position: [%.2f, %.2f, %.2f], \n\t" \
+                "rotation: [%.2f, %.2f, %.2f, %.2f], \n\t" \
+                "speed: [%.2f, %.2f, %.2f], \n\t" \
+                "steer: %.2f, \n\t" \
+                "brake: %.2f, \n"\
+            "}\n",
+            this->model,
+            this->librg_entity->position.x,
+            this->librg_entity->position.y,
+            this->librg_entity->position.z,
+            this->stream.rotation.x,
+            this->stream.rotation.y,
+            this->stream.rotation.z,
+            this->stream.rotation.w,
+            this->stream.speed.x,
+            this->stream.speed.y,
+            this->stream.speed.z,
+            this->stream.steer,
+            this->stream.brake
+        );
     }
 };
+
+// =======================================================================//
+// !
+// ! Helper methods
+// !
+// =======================================================================//
 
 inline ped_t *get_ped(librg_entity_t *entity) {
     mod_assert(entity && entity->user_data);

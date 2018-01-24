@@ -40,6 +40,8 @@ typedef zplm_quat_t quat_t;
 #define mod_assert_msg librg_assert_msg
 
 #define MOD_SERVER_TICK_DELAY 64
+#define MOD_ENTITY_LIMIT 16000
+#define MOD_INVALID_ENTITY MOD_ENTITY_LIMIT
 
 // TODO: move to components.h
 /* events/messages */
@@ -50,4 +52,5 @@ enum {
     MOD_CAR_EXIT_START,
     MOD_CAR_EXIT_FINISH,
     MOD_CAR_INTERACTION_FINISH,
+    MOD_PED_CREATE,
 };

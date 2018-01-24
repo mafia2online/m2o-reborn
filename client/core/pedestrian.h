@@ -8,14 +8,28 @@
  * The entity enters the stream zone
  */
 void module_ped_callback_create(librg_event_t *event) {
-    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 1);
+    auto ped = new ped_t();
+
+    ped->model = librg_data_ru16(event->data);
+    ped->state = librg_data_ru8(event->data);
+
+    // state on the moment player is created
+    if (ped->state == PED_IN_CAR || ped->state == PED_ENTERING_CAR) {
+        ped->state  = PED_ENTERING_CAR;
+        ped->seat   = librg_data_ru8(event->data);
+        ped->target_entityid = librg_data_ru32(event->data);
+    }
+
+    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+    event->entity->user_data = ped;
+
+    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, ped->model);
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating ped at");
         entity->SetPosition(event->entity->position);
 
-        event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-        event->entity->user_data = new ped_t(entity);
+        ped->CEntity = entity;
     }
 }
 
@@ -38,6 +52,26 @@ void module_ped_callback_remove(librg_event_t *event) {
 // !
 // =======================================================================//
 
+void module_ped_tasks_update(ped_t *ped) {
+    if (ped->state == PED_ENTERING_CAR && ped->target_entityid != MOD_INVALID_ENTITY) {
+        if (librg_entity_valid(ctx, ped->target_entityid)) {
+            mod_log("[info] found a valid car, trying to put player ped in");
+
+            ped->vehicle = librg_entity_fetch(ctx, ped->target_entityid);
+            auto car = get_car(ped->vehicle);
+
+            // TODO: add seat sync
+            M2::C_SyncObject *pSyncObject = nullptr;
+            ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
+                &pSyncObject, (M2::C_Vehicle *)car->CEntity,
+                true, (M2::E_VehicleSeat)ped->seat, false
+            );
+
+            ped->target_entityid = MOD_INVALID_ENTITY;
+        }
+    }
+}
+
 /**
  * The entity in our stream zone gets updated
  */
@@ -50,26 +84,14 @@ void module_ped_callback_update(librg_event_t *event) {
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
 
     /* update interpolation tables */
-
-    ped->inter_pos.A = ped->inter_pos.B;
-    ped->inter_pos.B = ped->inter_pos.C;
-    ped->inter_pos.C = ped->inter_pos.D;
-    ped->inter_pos.D = event->entity->position;
+    cubic_hermite_v3_value(&ped->inter_pos, event->entity->position);
 
     // ped->inter_pos.targ = event->entity->position;
     // ped->inter_pos.last_speed = ped->inter_pos.targ_speed;
     // ped->inter_pos.targ_speed = ped->stream.vspeed;
-
-    if (ped->inter_pos.C == zplm_vec3_zero()) {
-        ped->inter_pos.A = ped->inter_pos.D;
-        ped->inter_pos.B = ped->inter_pos.D;
-        ped->inter_pos.C = ped->inter_pos.D;
-    }
-
     // ped->inter_rot.last = ped->inter_rot.targ;
     // ped->inter_rot.targ = ped->stream.rotation;
 
-    ped->inter_delta = 0.0f;
 
     // ped->CHuman->GetScript()->ScrLookAt(
     //     &ped->sync, nullptr, ped->stream.look_at, true
@@ -103,6 +125,10 @@ void module_ped_callback_update(librg_event_t *event) {
     //     // we won't be interpolated from somewhere far away
     //     interpolate->last_position = entity->position;
     // }
+
+    ped->inter_delta = 0.0f;
+
+    module_ped_tasks_update(ped);
 }
 
 #define valid_dir(x) (zplm_abs(x) > 0.0f && zplm_abs(x) < 1.0f)
@@ -120,10 +146,10 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     // TODO: add checks for being on the ground
 
     // read new values of entity
-    auto new_position = ped->CEntity->GetPosition();
-    auto diff_position = new_position - entity->position;
-    entity->position = new_position;
+    auto new_position   = ped->CEntity->GetPosition();
+    auto diff_position  = new_position - entity->position;
 
+    entity->position    = new_position;
     ped->stream.vspeed = diff_position;
 
     // if (event->entity->id != mod.player->id) {
