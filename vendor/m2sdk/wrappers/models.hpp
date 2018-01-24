@@ -44,7 +44,7 @@ static char * PlayerModels[M2_PED_MODELS][2] =
     { "/sds/player/", "vitvez" },{ "/sds/player/", "vitvop" },{ "/sds/player/", "vitvov" },
     { "/sds/player/", "vitvov2i" },{ "/sds/player/", "vitvov3" },
 
-    // Mission Characters
+    // Mission Characters - They are bugged
     { "/sds/hchar/", "albert" },{ "/sds/hchar/", "brianc" },{ "/sds/hchar/", "consig" },
     { "/sds/hchar/", "derek" },{ "/sds/hchar/", "desmond" },{ "/sds/hchar/", "joeoblf" },
     { "/sds/hchar/", "eddies" },{ "/sds/hchar/", "franca" },{ "/sds/hchar/", "frank" },
@@ -240,26 +240,40 @@ namespace M2
                 m_pModelManagers.clear();
             }
 
-            GameModelManager* ModelAlreadyLoaded(const char *directory, const char *model)
+            GameModelManager *GetModelManagerByName(const char * szModelName)
             {
-                for (std::list<GameModelManager*>::iterator iter = m_pModelManagers.begin(); iter != m_pModelManagers.end(); iter++)
+                for (std::list < GameModelManager * >::iterator iter = m_pModelManagers.begin(); iter != m_pModelManagers.end(); iter++)
                 {
-                    GameModelManager *manager = *iter;
-                    if (manager->directory == directory && manager->model == model) {
+                    GameModelManager * manager = (*iter);
+
+                    if (!manager->GetModelManager() || !manager->GetModelManager()->m_pSlot)
+                        continue;
+
+                    if (!strcmp(szModelName, manager->GetModelManager()->m_sModelName))
                         return manager;
-                    }
                 }
+
                 return nullptr;
+            }
+
+            void PreloadAllModels()
+            {
+                for (int i = 0; i <= M2_PED_MODELS; i++)
+                {
+                    Load(PlayerModels[i][0], PlayerModels[i][1]);
+                }
             }
 
             GameModelManager    *Load(const char *directory, const char *model)
             {
-                GameModelManager *mgr = ModelAlreadyLoaded(directory, model);
+                GameModelManager *mgr = GetModelManagerByName(model);
                 if (mgr != nullptr) {
-                    mod_log("[ModelManager]: Using preallocated model\n");
+                    mod_log("[ModelManager]: Using preallocated model (size %d)\n", m_pModelManagers.size());
                     return mgr;
                 }
-                mod_log("[ModelManager]: Using a new model\n");
+
+                mod_log("[ModelManager]: Using a new model (Size %d)\n", m_pModelManagers.size());
+
                 if (m_pModelManagers.size() >= MODELMGR_MAX) {
                     mod_log("[ModelManager]: Max models error\n");
                     return nullptr;
@@ -276,7 +290,6 @@ namespace M2
                     mod_log("[ModelManager]: Can't load model\n");
                     return nullptr;
                 }
-
                 pModelManager->directory = directory;
                 pModelManager->model = model;
                 m_pModelManagers.push_back(pModelManager);
@@ -320,22 +333,6 @@ namespace M2
                 }
 
                 m_pModelManagers.clear();
-            }
-
-            GameModelManager *GetModelManagerByName(const char * szModelName)
-            {
-                for (std::list < GameModelManager * >::iterator iter = m_pModelManagers.begin(); iter != m_pModelManagers.end(); iter++)
-                {
-                    GameModelManager * manager = (*iter);
-
-                    if (!manager->GetModelManager() || !manager->GetModelManager()->m_pSlot)
-                        continue;
-
-                    if (!strcmp(szModelName, manager->GetModelManager()->m_sModelName))
-                        return manager;
-                }
-
-                return nullptr;
             }
         };
     };
