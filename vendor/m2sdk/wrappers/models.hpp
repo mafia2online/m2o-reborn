@@ -146,6 +146,8 @@ namespace M2
 
         public:
             ICPlayerModelManager    *GetModelManager() { return m_pModelManager; }
+            const char *directory;
+            const char *model;
 
         public:
             GameModelManager(): m_pModelManager(nullptr)
@@ -238,8 +240,26 @@ namespace M2
                 m_pModelManagers.clear();
             }
 
+            GameModelManager* ModelAlreadyLoaded(const char *directory, const char *model)
+            {
+                for (std::list<GameModelManager*>::iterator iter = m_pModelManagers.begin(); iter != m_pModelManagers.end(); iter++)
+                {
+                    GameModelManager *manager = *iter;
+                    if (manager->directory == directory && manager->model == model) {
+                        return manager;
+                    }
+                }
+                return nullptr;
+            }
+
             GameModelManager    *Load(const char *directory, const char *model)
             {
+                GameModelManager *mgr = ModelAlreadyLoaded(directory, model);
+                if (mgr != nullptr) {
+                    mod_log("[ModelManager]: Using preallocated model\n");
+                    return mgr;
+                }
+                mod_log("[ModelManager]: Using a new model\n");
                 if (m_pModelManagers.size() >= MODELMGR_MAX) {
                     mod_log("[ModelManager]: Max models error\n");
                     return nullptr;
@@ -257,6 +277,8 @@ namespace M2
                     return nullptr;
                 }
 
+                pModelManager->directory = directory;
+                pModelManager->model = model;
                 m_pModelManagers.push_back(pModelManager);
                 return pModelManager;
             }

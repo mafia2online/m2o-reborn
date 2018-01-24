@@ -22,9 +22,9 @@ namespace M2
 
     namespace Wrappers
     {
+        static M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
         C_Entity *CreateEntity(eEntityType type, int modelID)
-        {
-            M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
+        {        
             M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
             mod_assert(pModelManager);
 
@@ -115,10 +115,15 @@ namespace M2
                 return false;
             }
             entity->Release();
-            entity->Destructor();
-            Mem::InvokeFunction<Mem::call_cdecl, int>(0x4019F0, entity);
-            entity = nullptr;
-
+            if (entity) {
+                entity->Destructor();
+            }
+            if (entity) {
+                Mem::InvokeFunction<Mem::call_cdecl, int>(0x4019F0, entity);
+            }
+            if (entity) {
+                entity = nullptr;
+            }
             return true;
         }
     };
