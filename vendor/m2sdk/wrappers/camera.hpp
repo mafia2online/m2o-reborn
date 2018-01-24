@@ -9,17 +9,19 @@ namespace M2
         /**
          * Returns an aproximate position of the place local player is looking at
          */
-        void GetLookAt(vec3_t *lookAt)
+        vec3_t GetLookAt()
         {
+            vec3_t lookAt;
             auto camera = M2::C_GameCamera::Get()->GetCamera(1);
             if (!camera)
-                return;
+                return lookAt;
 
             auto vCamPos = camera->m_vecCamPos;
             auto vCamUp = camera->m_vecCamUp;
             auto vDir = (vCamUp - vCamPos);
 
-            *lookAt = (vCamPos + vDir * DIRECTION_MULTIPLIER);
+            lookAt = (vCamPos + vDir * DIRECTION_MULTIPLIER);
+            return lookAt;
         }
     };
 };
