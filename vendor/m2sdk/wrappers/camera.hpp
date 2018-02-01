@@ -11,7 +11,7 @@ namespace M2
          */
         vec3_t GetLookAt()
         {
-            vec3_t lookAt;
+            vec3_t lookAt = {0};
             auto camera = M2::C_GameCamera::Get()->GetCamera(1);
             if (!camera)
                 return lookAt;

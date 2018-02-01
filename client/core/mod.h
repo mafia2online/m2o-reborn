@@ -75,7 +75,7 @@ void mod_game_tick() {
     discord_update_presence();
 
     if (GetAsyncKeyState(VK_F3) & 0x1) {
-        vec3_t dest;
+        vec3_t dest = {0};
         //M2::Wrappers::GetLookAt(&dest);
 
         print_posm(dest, "trying to look at");
