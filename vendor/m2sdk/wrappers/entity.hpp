@@ -23,8 +23,19 @@ namespace M2
     namespace Wrappers
     {
         static M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
+
+        void PreloadModels()
+        {
+            if (!pModelManager) {
+                return;
+            }
+            pModelManager->PreloadAllModels();
+        }
         C_Entity *CreateEntity(eEntityType type, int modelID)
-        {        
+        {
+            if (!pModelManager) {
+                return nullptr;
+            }
             M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
             mod_assert(pModelManager);
 
