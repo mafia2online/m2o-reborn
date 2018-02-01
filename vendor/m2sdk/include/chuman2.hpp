@@ -19,6 +19,31 @@
 
 namespace M2
 {
+    enum E_Command : int
+    {
+        COMMAND_STAND = 0,
+        COMMAND_MOVEDIR = 1,
+        COMMAND_MOVETO = 2,
+        COMMAND_OBSTACLE = 4,
+        COMMAND_SPECIAL = 5,
+        COMMAND_COVER = 6,
+        COMMAND_ANIMPLAY = 7,
+        COMMAND_ACTION = 8,
+        COMMAND_CAR = 9,
+        COMMAND_FIGHT = 10,
+        COMMAND_DEATH = 11,
+        COMMAND_USEOBJECT = 12,
+        COMMAND_ANIMPLAYEFFECT = 13,
+        COMMAND_ADDITACTION = 14
+    };
+
+    struct S_HumanCommandMoveDir
+    {
+        float x;
+        float y;
+        float z;
+    };
+
     class unknow
     {
     public:
@@ -45,6 +70,26 @@ namespace M2
 		C_HumanInventory	*GetInventory() { return reinterpret_cast<ICHuman2 *>(this)->m_pInventory; }
 		C_HumanScript	*GetScript() { return reinterpret_cast<ICHuman2 *>(this)->m_pScript; }
 		C_HumanWeaponController	*GetWeaponController() { return reinterpret_cast<ICHuman2 *>(this)->m_pWeaponController; }
+
+        void AddCommand(E_Command cmdtype, void *cmd)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x94D400, this, cmdtype, cmd);
+        }
+
+        void ChangeModel(C_Frame *model, int unk, bool unk2, bool unk3)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x94F7E0, this, model, unk, unk2, unk3);
+        }
+
+        void CleanCommands()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x94D6B0, this, 1, 1);
+        }
+
+        void *GetCurrentMoveCommand(void *unk)
+        {
+            return Mem::InvokeFunction<Mem::call_this, void *>(0x94D540, this, unk);
+        }
 
         vec3_t GetDir()
         {

@@ -15,5 +15,10 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, int>(0xB27170, this, music, true, 1, 1, 1);
         }
+
+        void StopGameMusic(float unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0xB17FC0, this, unk);
+        }
     };
 };

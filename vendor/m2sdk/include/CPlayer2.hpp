@@ -49,5 +49,10 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x438230, this, lock);
 		}
+
+        void UpdateMoveCmd(S_HumanCommandMoveDir *command, S_InputCtrl &input, vec3_t const &pos, vec2_t &dir, float unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x4268C0, this, command, &input, &pos, &dir, unk);
+        }
 	};
 };
