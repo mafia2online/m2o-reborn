@@ -256,6 +256,86 @@ namespace tools {
         __asm jmp[_CHuman2__AddCommand];
     }*/
 
+    DWORD _CHuman2__AddCommand;
+    void __declspec(naked) CHuman2__AddCommand()
+    {
+        __asm mov     eax, [esp + 4];
+        __asm push    esi;
+
+
+
+        __asm pushad;
+
+        static M2::E_Command cmdtype;
+        __asm mov cmdtype, eax;
+
+        static char* cmd;
+        __asm mov edi, [esp + 16];
+        __asm mov cmd, edi;
+
+        mod_log("CHuman2__AddCommand: type %d humancmdptr %x", cmdtype, cmd);
+        __asm popad;
+
+
+        __asm jmp[_CHuman2__AddCommand];
+    }
+
+    DWORD _CSDSModelManager__CreateModel;
+    DWORD pGlobalGame = 0x1ABFE14;
+    void __declspec(naked) CSDSModelManager__CreateModel()
+    {
+        /*__asm push ebx;
+        __asm push esi;
+        __asm mov esi, ecx;
+
+
+        __asm pushad;
+
+        static char *model;
+        __asm mov edx, [esp + 12];
+        __asm mov model, edx;
+        mod_log("test %s\n", model);
+
+        __asm popad;*/
+
+        /*__asm sub esp, 8;
+        __asm push ebx;
+        __asm push ebp;
+
+
+        __asm pushad;
+        static char *model;
+        __asm mov edi, [esp + 16];
+        __asm mov model, edi;
+
+        mod_log("test : %s\n", model);
+
+        __asm popad;*/
+
+        __asm sub esp, 104h;
+        __asm push esi;
+        __asm push edi;
+
+        __asm pushad;
+
+        static char *model;
+        __asm mov edi, [esp + 16];
+        __asm mov model, edi;
+
+
+        static char *path;
+        __asm mov eax, pGlobalGame;
+        __asm mov ecx, [eax + 0x20];
+        __asm mov path, ecx;
+        mod_log("LoadModel %s(%s)\n", model, path);
+
+        __asm popad;
+
+
+
+        __asm jmp[_CSDSModelManager__CreateModel];
+    }
+
     /**
      * Game hooking calls
      */
@@ -284,6 +364,9 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0xA3E8E1, (DWORD)CCarActionEnter__TestAction__Hook);
         Mem::Hooks::InstallJmpPatch(0xA3F0A6, (DWORD)CCarActionBreakIn__TestAction__Hook);
         Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
+
+        //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
+        //_CSDSModelManager__CreateModel = (DWORD)Mem::Hooks::InstallNotDumbJMP(0xAE12C0, (DWORD)CSDSModelManager__CreateModel, 8);
 
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);

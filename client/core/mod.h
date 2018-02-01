@@ -74,41 +74,6 @@ void mod_game_tick() {
 
     discord_update_presence();
 
-    if (GetAsyncKeyState(VK_F3) & 0x1) {
-        vec3_t dest = {0};
-        //M2::Wrappers::GetLookAt(&dest);
-
-        print_posm(dest, "trying to look at");
-
-        M2::C_SyncObject *sync = nullptr;
-        ((M2::C_Human2*)M2::C_Game::Get()->GetLocalPed())->GetScript()->ScrLookAt(
-            &sync, (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed(), dest, true
-        );
-    }
-
-    if (GetAsyncKeyState(VK_F4) & 0x1) {
-        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-
-        M2::C_Entity *ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
-        ent->SetPosition(player + vec3(0, 0, 0.2f));
-        swag.push_back(ent);
-    }
-
-    if (GetAsyncKeyState(VK_F6) & 0x1) {
-        if (swag.size() <= 0) {
-            return;
-        }
-        for (std::vector<M2::C_Entity*>::iterator it = swag.begin(), e = swag.end(); it != e; ++it)
-        {
-            if (!*it) {
-                continue;
-            }
-            M2::Wrappers::DestroyEntity(*it);
-            mod_log("Removing entity");
-        }
-        swag.clear();
-    }
-
     /* show/hide mouse */
     if (GetAsyncKeyState(VK_F1) & 0x1) {
         mod.input_blocked = !mod.input_blocked;
@@ -118,6 +83,44 @@ void mod_game_tick() {
         librg_network_start(ctx, { 27010, "localhost" });
         mod.spawned = true;
     }
+
+    static quat_t test;
+    static int bite = 0;
+    if (GetAsyncKeyState(VK_F2) & 0x1) {
+        auto vehicle = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
+        
+        test = vehicle->GetRot();
+        print_pos(test);
+    }
+    static std::vector<M2::C_Entity*> swag;
+    static M2::C_Entity *ent;
+    static bool addCommand = false;
+    if (GetAsyncKeyState(VK_F4) & 0x1) {
+        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, bite);
+        ent->SetPosition(player);
+        bite++;
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1)
+    {
+        addCommand = !addCommand;
+    }
+
+    if (GetAsyncKeyState(VK_F7) & 0x1) {
+        M2::Wrappers::DestroyEntity(ent);
+    }
+
+    if (addCommand) {
+        vec3_t dir = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetDir();
+        M2::S_HumanCommandMoveDir *moveCMD = new M2::S_HumanCommandMoveDir;
+        moveCMD->x = dir.x;
+        moveCMD->y = dir.y;
+        moveCMD->z = dir.z;
+        reinterpret_cast<M2::C_Human2*>(ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCMD);
+    }
+
 
 #if 0
     if (GetAsyncKeyState(VK_LEFT) & 0x1) {
