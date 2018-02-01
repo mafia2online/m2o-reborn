@@ -59,6 +59,8 @@ void mod_game_stop() {
     discord_free();
 }
 
+static std::vector<M2::C_Entity*> swag;
+
 /**
  * Game tick event
  * takes about ~16 ms per tick
@@ -74,7 +76,7 @@ void mod_game_tick() {
 
     if (GetAsyncKeyState(VK_F3) & 0x1) {
         vec3_t dest;
-        M2::Wrappers::GetLookAt(&dest);
+        //M2::Wrappers::GetLookAt(&dest);
 
         print_posm(dest, "trying to look at");
 
@@ -82,6 +84,29 @@ void mod_game_tick() {
         ((M2::C_Human2*)M2::C_Game::Get()->GetLocalPed())->GetScript()->ScrLookAt(
             &sync, (M2::C_Entity*)M2::C_Game::Get()->GetLocalPed(), dest, true
         );
+    }
+
+    if (GetAsyncKeyState(VK_F4) & 0x1) {
+        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+
+        M2::C_Entity *ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
+        ent->SetPosition(player + vec3(0, 0, 0.2f));
+        swag.push_back(ent);
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        if (swag.size() <= 0) {
+            return;
+        }
+        for (std::vector<M2::C_Entity*>::iterator it = swag.begin(), e = swag.end(); it != e; ++it)
+        {
+            if (!*it) {
+                continue;
+            }
+            M2::Wrappers::DestroyEntity(*it);
+            mod_log("Removing entity");
+        }
+        swag.clear();
     }
 
     /* show/hide mouse */
