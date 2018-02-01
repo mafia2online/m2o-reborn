@@ -12,9 +12,6 @@ void title_state_init() {
 }
 
 void title_state_render() {
-    // int w, h;
-    // graphics_dimensions(&w, &h);
-    // f32 centerx, centery;
 
     if (nk_begin(nk_ctx, "Mafia 2 Online: Reborn", nk_rect(10, 10, 210, 150), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
         /* 2 columes */

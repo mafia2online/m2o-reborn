@@ -11,7 +11,7 @@ namespace tools {
      */
     std::string filepatcher_sds_files[] = {
         "sdsconfig.bin",
-        //"StreamMapa.bin",
+        "StreamMapa.bin",
         "tables.sds",
         "gui.sds",
         "gui-main.sds"
@@ -52,7 +52,7 @@ namespace tools {
             std::string newfilename = mod.paths.game_files + "\\" + filename;
 
             // substiture the file
-            mod_log("file_patcher: redirecting game file %s to %s\n", filename.c_str(), newfilename.c_str());
+            mod_log("[info] patching file %s\n", filename.c_str());
             hFile = filepatcher__original(newfilename.c_str(), dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 
             if (hFile == INVALID_HANDLE_VALUE) {

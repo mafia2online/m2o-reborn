@@ -231,6 +231,30 @@ namespace tools {
             retn    4
         }
     }
+    /*
+    DWORD _CHuman2__AddCommand;
+    void __declspec(naked) CHuman2__AddCommand()
+    {
+        __asm mov     eax, [esp + 4];
+        __asm push    esi;
+
+
+
+        __asm pushad;
+
+        static int cmdtype;
+        __asm mov cmdtype, eax;
+
+        static char* cmd;
+        __asm mov edi, [esp + 16];
+        __asm mov cmd, edi;
+
+        mod_log("CHuman2__AddCommand: type %d humancmdptr %x\n", cmdtype, cmd);
+        __asm popad;
+
+
+        __asm jmp[_CHuman2__AddCommand];
+    }*/
 
     /**
      * Game hooking calls

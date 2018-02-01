@@ -1,27 +1,28 @@
 {
-  "_from": "enet.c@^1.4.5",
+  "_from": "enet.c@1.4.5",
   "_id": "enet.c@1.4.5",
   "_inBundle": false,
   "_integrity": "sha512-3vT2kHdxcsW8K4aKy90il81WxGQ6tw2smD96k8fdAuwljSS1CwuArYRqjVbqbQjrtcUQIJyY68JIz8KQQmIrPg==",
   "_location": "/enet.c",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "enet.c@^1.4.5",
+    "raw": "enet.c@1.4.5",
     "name": "enet.c",
     "escapedName": "enet.c",
-    "rawSpec": "^1.4.5",
+    "rawSpec": "1.4.5",
     "saveSpec": null,
-    "fetchSpec": "^1.4.5"
+    "fetchSpec": "1.4.5"
   },
   "_requiredBy": [
-    "/librg.c"
+    "#USER",
+    "/"
   ],
   "_resolved": "https://registry.npmjs.org/enet.c/-/enet.c-1.4.5.tgz",
   "_shasum": "a86bd0fcac4b2db70f4c1e15f0ec522edcfdacc3",
-  "_spec": "enet.c@^1.4.5",
-  "_where": "/Users/inlife/Projects/m2o/m2o-reborn/vendor/node_modules/librg.c",
+  "_spec": "enet.c@1.4.5",
+  "_where": "/Users/inlife/Projects/reguider/librg",
   "author": {
     "name": "Lee Salzman"
   },

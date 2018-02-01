@@ -4,20 +4,28 @@
 // !
 // =======================================================================//
 
+#define MOD_CAR_SPEED_TRESHOLD 0.6f
+#define MOD_CAR_POSITION_TRESHOLD 0.02f
+#define MOD_CAR_ROTATION_TRESHOLD 0.15f
+
 /**
  * The entity enters the stream zone
  */
 void module_car_callback_create(librg_event_t *event) {
-    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
+    mod_log("[info] trying to spawn a car\n");
+    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 42);
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating car at");
-        entity->SetPosition(event->entity->position);
-        event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-        event->entity->user_data = new car_t(entity);
 
-        //object->m_pVehicle.m_pEffectManager->EmitCarFire(true);
-        ((M2::C_Car *)entity)->m_pVehicle.SetEngineOn(true, false);
+        event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+        event->entity->user_data = new car_t(event->entity);
+
+        get_car(event->entity)->setCEntity(entity);
+        get_car(event->entity)->CCar->SetPos(event->entity->position);
+        //get_car(event->entity)->CCar->SetRot(event->entity->position);
+        get_car(event->entity)->CCar->m_pVehicle.SetEngineOn(true, false);
+        get_car(event->entity)->dbg();
     }
 }
 
@@ -36,8 +44,6 @@ void module_car_callback_remove(librg_event_t *event) {
 // !
 // =======================================================================//
 
-#define MOD_CAR_SPEED_TRESHOLD 0.6f
-
 /**
  * The entity in our stream zone gets updated
  */
@@ -48,22 +54,24 @@ void module_car_callback_update(librg_event_t *event) {
     mod_assert(car && car->CEntity);
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    // read up synced values
+    /* update interpolation tables */
+    cubic_hermite_v3_value(&car->inter_pos, event->entity->position);
+
+    // car->CCar->SetRot(car->stream.rotation);
     car->CCar->m_pVehicle.SetSteer(car->stream.steer);
 
-    if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
-        car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
-    } else {
-        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+    car->inter_steer.last = car->inter_steer.targ;
+    car->inter_steer.targ = car->stream.steer;
+
+    car->inter_rot.last = car->inter_rot.targ;
+    car->inter_rot.targ = car->stream.rotation;
+
+    quat_t empty_quat = { 0 };
+    if (car->inter_rot.last == empty_quat) {
+        car->inter_rot.last = car->stream.rotation;
     }
 
-    // interpolation stuff
-    interpolate_t *interpolate = &car->interpolate;
-    interpolate->lposition = interpolate->tposition;
-    interpolate->lrotation = interpolate->trotation;
-    interpolate->tposition = event->entity->position;
-    interpolate->trotation = car->stream.rotation;
-    interpolate->delta = 0.0f;
+    car->inter_delta = 0.0f;
 }
 
 /**
@@ -87,43 +95,38 @@ void module_car_callback_clientstream(librg_event_t *event) {
 // !
 // =======================================================================//
 
-#define MOD_CAR_ROTATION_TRESHOLD 0.15f
 
 void module_car_callback_interpolate(librg_entity_t *entity) {
     auto car = get_car(entity); mod_assert(car && car->CEntity);
 
-    // skip entity if we are the driver
-    if (mod.player->flags & MOD_ENTITY_DRIVER && get_ped(mod.player)->vehicle == entity) {
-        if (get_ped(mod.player)->vehicle->client_peer != mod.player->client_peer)
-            return;
-    }
-
     // last delta tick against constant tick delay
-    car->interpolate.delta += (mod.last_delta / 40.666f);
-    car->interpolate.delta = zplm_clamp(car->interpolate.delta, 0.f, 1.0f);
+    f32 alpha = car->inter_delta / (f32)MOD_SERVER_TICK_DELAY;
+    car->inter_delta += mod.last_delta;
 
-    /* position interpolation */
-    if (car->interpolate.lposition != car->interpolate.tposition && car->interpolate.step++ > 8) {
-        auto curr_pos = car->CEntity->GetPosition();
-        auto diff_pos = zplm_vec3_mag2(curr_pos - entity->position);
+    f32 steer_alpha = zpl_clamp01(car->inter_delta / /*MOD_SERVER_TICK_DELAY*/ 32.f);
+    f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, steer_alpha);
 
-        vec3_t dposition;
-        zplm_vec3_lerp(&dposition, car->interpolate.lposition, car->interpolate.tposition, car->interpolate.delta);
-        car->CCar->SetPos(dposition);
+    car->CCar->m_pVehicle.SetSteer(dest_steer);
+    car->CCar->SetPos(cubic_hermite_v3_interpolate(&car->inter_pos, alpha));
+
+    if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
+        car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
+    } else {
+        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
     }
 
     /* rotation interpolation */
-    if (car->interpolate.lrotation != car->interpolate.trotation) {
+    if (car->inter_rot.last != car->inter_rot.targ) {
         auto curr_rot = car->CEntity->GetRotation();
         auto diff_rot = zplm_quat_angle(curr_rot - car->stream.rotation);
 
         if (diff_rot > MOD_CAR_ROTATION_TRESHOLD) {
-            auto last = car->interpolate.lrotation;
-            auto dest = car->interpolate.trotation;
+            auto last = car->inter_rot.last;
+            auto dest = car->inter_rot.targ;
 
-            quat_t drotation;
-            zplm_quat_nlerp(&drotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, car->interpolate.delta);
-            car->CCar->SetRot(drotation);
+            quat_t dest_rotation;
+            zplm_quat_nlerp(&dest_rotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, alpha);
+            car->CCar->SetRot(dest_rotation);
         }
     }
 }

@@ -32,7 +32,7 @@ zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
 
 void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_settings_t *settings) {
     zpl_file_t file;
-    zpl_file_error_e error = zpl_file_open(&file, "server.json");
+    zplFileError error = zpl_file_open(&file, "server.json");
 
     // create file if didnt exist
     if (error != 0) {

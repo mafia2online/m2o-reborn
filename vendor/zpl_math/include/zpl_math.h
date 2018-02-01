@@ -448,6 +448,8 @@ extern "C" {
 
     ZPLM_DEF void zplm_vec2_cslerp(zplm_vec2_t *d, zplm_vec2_t a, zplm_vec2_t v0, zplm_vec2_t b, zplm_vec2_t v1, float t);
     ZPLM_DEF void zplm_vec3_cslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t);
+    ZPLM_DEF void zplm_vec2_dcslerp(zplm_vec2_t *d, zplm_vec2_t a, zplm_vec2_t v0, zplm_vec2_t b, zplm_vec2_t v1, float t);
+    ZPLM_DEF void zplm_vec3_dcslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t);
 
     ZPLM_DEF void zplm_quat_lerp (zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t);
     ZPLM_DEF void zplm_quat_nlerp(zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t);
@@ -1952,9 +1954,37 @@ void zplm_vec3_cslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t
     float h01 = t2*(3 - 2*t);
     float h11 = t2*ti;
 
-    d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
+    // d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
     d->y = h00*a.y + h10*v0.y + h01*b.y + h11*v1.y;
-    d->z = h00*a.z + h10*v0.z + h01*b.z + h11*v1.z;
+    // d->z = h00*a.z + h10*v0.z + h01*b.z + h11*v1.z;
+    d->x = b.x;
+    // d->y = b.y;
+    d->z = b.z;
+}
+
+void zplm_vec2_dcslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t) {
+    float t2 = t * t;
+
+    float dh00 =  6 * t2 - 6 * t;
+    float dh10 =  3 * t2 - 4 * t + 1;
+    float dh01 = -6 * t2 + 6 * t;
+    float dh11 =  3 * t2 - 2 * t;
+
+    d->x = dh00 * a.x + dh10 * v0.x + dh01 * b.x + dh11 * v1.x;
+    d->y = dh00 * a.y + dh10 * v0.y + dh01 * b.y + dh11 * v1.y;
+}
+
+void zplm_vec3_dcslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t) {
+    float t2 = t * t;
+
+    float dh00 =  6 * t2 - 6 * t;
+    float dh10 =  3 * t2 - 4 * t + 1;
+    float dh01 = -6 * t2 + 6 * t;
+    float dh11 =  3 * t2 - 2 * t;
+
+    d->x = dh00 * a.x + dh10 * v0.x + dh01 * b.x + dh11 * v1.x;
+    d->y = dh00 * a.y + dh10 * v0.y + dh01 * b.y + dh11 * v1.y;
+    d->z = dh00 * a.z + dh10 * v0.z + dh01 * b.z + dh11 * v1.z;
 }
 
 void zplm_quat_lerp(zplm_quat_t *d, zplm_quat_t a, zplm_quat_t b, float t)  { zplm_vec4_lerp(&d->xyzw, a.xyzw, b.xyzw, t); }

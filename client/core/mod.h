@@ -12,7 +12,9 @@ void mod_disconnected(librg_event_t *);
 void mod_entity_create(librg_event_t *);
 void mod_entity_update(librg_event_t *);
 void mod_entity_remove(librg_event_t *);
-void mod_entity_client(librg_event_t *);
+void mod_entity_client_add(librg_event_t *);
+void mod_entity_client_update(librg_event_t *);
+void mod_entity_client_remove(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 
 /**
@@ -42,14 +44,22 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, mod_entity_create);
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, mod_entity_update);
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, mod_entity_remove);
-    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_ADD, mod_entity_client_add);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client_update);
+    librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, mod_entity_client_remove);
 
     // call inits for modules
     module_ped_init();
     module_car_init();
 
-    discordInit();
+    discord_init();
 }
+
+void mod_game_stop() {
+    discord_free();
+}
+
+static std::vector<M2::C_Entity*> swag;
 
 /**
  * Game tick event
@@ -62,11 +72,11 @@ void mod_game_tick() {
     librg_tick(ctx);
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), mod_entity_interpolate);
 
-    updateDiscordPresence();
+    discord_update_presence();
 
     if (GetAsyncKeyState(VK_F3) & 0x1) {
-        vec3_t dest;
-        M2::Wrappers::GetLookAt(&dest);
+        vec3_t dest = {0};
+        //M2::Wrappers::GetLookAt(&dest);
 
         print_posm(dest, "trying to look at");
 
@@ -76,6 +86,28 @@ void mod_game_tick() {
         );
     }
 
+    if (GetAsyncKeyState(VK_F4) & 0x1) {
+        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+
+        M2::C_Entity *ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 0);
+        ent->SetPosition(player + vec3(0, 0, 0.2f));
+        swag.push_back(ent);
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        if (swag.size() <= 0) {
+            return;
+        }
+        for (std::vector<M2::C_Entity*>::iterator it = swag.begin(), e = swag.end(); it != e; ++it)
+        {
+            if (!*it) {
+                continue;
+            }
+            M2::Wrappers::DestroyEntity(*it);
+            mod_log("Removing entity");
+        }
+        swag.clear();
+    }
 
     /* show/hide mouse */
     if (GetAsyncKeyState(VK_F1) & 0x1) {
@@ -83,7 +115,6 @@ void mod_game_tick() {
     }
     /* connect to the server */
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
-        //game_connect();
         librg_network_start(ctx, { 27010, "localhost" });
         mod.spawned = true;
     }
@@ -181,11 +212,28 @@ void mod_entity_remove(librg_event_t *event) {
         case TYPE_CAR: { module_car_callback_remove(event); } break;
     }
 }
-
-void mod_entity_client(librg_event_t *event) {
+void mod_entity_client_update(librg_event_t *event) {
     switch (event->entity->type) {
         case TYPE_PED: { module_ped_callback_clientstream(event); } break;
         case TYPE_CAR: { module_car_callback_clientstream(event); } break;
+    }
+}
+
+void mod_entity_client_add(librg_event_t *event) {
+    mod_log("[info] adding an entity %d to clientstream\n", event->entity->id);
+    mod.stats.streamed_entities++;
+    event->entity->flags &= ~MOD_ENTITY_INTERPOLATED;
+}
+
+void mod_entity_client_remove(librg_event_t *event) {
+    mod_log("[info] removing an entity %d from clientstream\n", event->entity->id);
+
+    mod.stats.streamed_entities--;
+    switch (event->entity->type) {
+        case TYPE_PED:
+        case TYPE_CAR:
+            event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+            break;
     }
 }
 

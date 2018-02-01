@@ -28,7 +28,7 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /Zi" CACHE STRING "Release compiler flags" FORCE)
 endif()
 
-set(CMAKE_BUILD_TYPE "Debug")
+# set(CMAKE_BUILD_TYPE "Debug")
 
 ###
 # Compile vendor dependencies
@@ -102,10 +102,12 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/discord_rpc/include/*.h"
 )
 
-set(SERVER_LIBRARIES)
-set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours discord-rpcd)
-set(LAUNCHER_LIBRARIES Psapi steam_api)
 
+set(DISCORD debug discord-rpcd optimized discord-rpc)
+
+set(SERVER_LIBRARIES)
+set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours ${DISCORD})
+set(LAUNCHER_LIBRARIES Psapi steam_api)
 
 ###
 # Adding executables
