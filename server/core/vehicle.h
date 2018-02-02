@@ -22,7 +22,7 @@ void module_car_create(librg_message_t *msg) {
 
 void module_car_callback_create(librg_event_t *event) {
     if (!(event->entity->flags & LIBRG_ENTITY_CONTROLLED)) {
-        mod_log("[info] setting closest player as an owner\n");
+        // mod_log("[info] setting closest player as an owner\n");
         //librg_entity_control_set(event->ctx, event->entity->id, event->peer);
     }
 }

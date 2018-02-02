@@ -1954,12 +1954,9 @@ void zplm_vec3_cslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t
     float h01 = t2*(3 - 2*t);
     float h11 = t2*ti;
 
-    // d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
+    d->x = h00*a.x + h10*v0.x + h01*b.x + h11*v1.x;
     d->y = h00*a.y + h10*v0.y + h01*b.y + h11*v1.y;
-    // d->z = h00*a.z + h10*v0.z + h01*b.z + h11*v1.z;
-    d->x = b.x;
-    // d->y = b.y;
-    d->z = b.z;
+    d->z = h00*a.z + h10*v0.z + h01*b.z + h11*v1.z;
 }
 
 void zplm_vec2_dcslerp(zplm_vec3_t *d, zplm_vec3_t a, zplm_vec3_t v0, zplm_vec3_t b, zplm_vec3_t v1, float t) {
