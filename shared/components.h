@@ -180,14 +180,14 @@ struct car_t {
     }
 
     void dbg() {
-        mod_log("[dbg]: \n" \
+        mod_log("[dbg]:\n" \
             "car_t {\n\t" \
-                "model: %d, \n\t" \
-                "position: [%.2f, %.2f, %.2f], \n\t" \
-                "rotation: [%.2f, %.2f, %.2f, %.2f], \n\t" \
-                "speed: [%.2f, %.2f, %.2f], \n\t" \
-                "steer: %.2f, \n\t" \
-                "brake: %.2f, \n"\
+                "model: %d,\n\t" \
+                "position: [%.2f, %.2f, %.2f],\n\t" \
+                "rotation: [%.2f, %.2f, %.2f, %.2f],\n\t" \
+                "speed: [%.2f, %.2f, %.2f],\n\t" \
+                "steer: %.2f,\n\t" \
+                "brake: %.2f,\n"\
             "}\n",
             this->model,
             this->librg_entity->position.x,

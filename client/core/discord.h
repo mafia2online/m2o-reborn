@@ -4,8 +4,7 @@ static const char* APPLICATION_ID = "385521976564908032";
 static int FrustrationLevel = 0;
 static int64_t StartTime;
 
-static void discord_update_presence()
-{
+static void discord_update_presence() {
     //char buffer[256];
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
@@ -27,33 +26,27 @@ static void discord_update_presence()
     Discord_RunCallbacks();
 }
 
-static void handleDiscordReady()
-{
-    printf("\nDiscord: ready\n");
+static void handleDiscordReady() {
+    mod_log("[info] discord ready");
 }
 
-static void handleDiscordDisconnected(int errcode, const char* message)
-{
-    printf("\nDiscord: disconnected (%d: %s)\n", errcode, message);
+static void handleDiscordDisconnected(int errcode, const char* message) {
+    mod_log("[info] discord disconnected (%d: %s)\n", errcode, message);
 }
 
-static void handleDiscordError(int errcode, const char* message)
-{
-    printf("\nDiscord: error (%d: %s)\n", errcode, message);
+static void handleDiscordError(int errcode, const char* message) {
+    mod_log("[info] discord error (%d: %s)\n", errcode, message);
 }
 
-static void handleDiscordJoin(const char* secret)
-{
-    printf("\nDiscord: join (%s)\n", secret);
+static void handleDiscordJoin(const char* secret){
+    mod_log("[info] discord join (%s)\n", secret);
 }
 
-static void handleDiscordSpectate(const char* secret)
-{
-    printf("\nDiscord: spectate (%s)\n", secret);
+static void handleDiscordSpectate(const char* secret) {
+    mod_log("[info] discord spectate (%s)\n", secret);
 }
 
-static void discord_init()
-{
+static void discord_init() {
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
     handlers.ready = handleDiscordReady;
@@ -64,7 +57,6 @@ static void discord_init()
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
 }
 
-static void discord_free()
-{
+static void discord_free() {
     Discord_Shutdown();
 }

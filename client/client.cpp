@@ -302,21 +302,31 @@ void mod_exit(std::string reason)
 
 void mod_log(const char* format, ...) {
     va_list ap;
-    char message[1024] = { 0 };
+    char message[2048] = { 0 };
     va_start(ap, format);
     vsprintf(message, format, ap);
     va_end(ap);
 
-    zpl_mutex_lock(&mod.mutexes.log);
-    zpl_printf(message);
-    zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
-
-    mod.console.queue.push(std::string(message));
-
-    if (mod.console.queue.size() > mod.console.limit) {
-        mod.console.queue.pop();
+    // add auto new line at the end
+    usize len = zpl_strlen(message);
+    if (message[len - 1] != '\n' && len < 2048) {
+        message[len + 0] = '\n';
+        message[len + 1] = '\0';
+        len++;
     }
 
+    zpl_mutex_lock(&mod.mutexes.log); {
+        zpl_printf(message);
+        zpl_file_write(&mod.debug_log, message, zpl_strlen(message));
+
+        message[len - 1] = '\0';
+        mod.console.queue.push(std::string(message));
+
+        if (mod.console.queue.size() > mod.console.limit) {
+            mod.console.queue.pop();
+        }
+
+    }
     zpl_mutex_unlock(&mod.mutexes.log);
 }
 
@@ -375,7 +385,7 @@ void mod_main(HMODULE module)
 
     Mem::Initialize();
 
-    mod_log("<CGame::HirePreHookers> Current Thread ID: %x\n", GetCurrentThreadId());
+    mod_log("[info] attaching to thread (%x) ...\n", GetCurrentThreadId());
 
     tools::filepatcher_install();
     tools::steam_drm_install();

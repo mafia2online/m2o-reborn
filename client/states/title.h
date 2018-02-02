@@ -26,7 +26,7 @@ void title_state_render() {
         /* 1 column */
         nk_layout_row_dynamic(nk_ctx, 30, 1);
         if (nk_button_label(nk_ctx, "Connect")) {
-            mod_log("connecting to: %s:%d\n", title_state_data.hostname_input, atoi(title_state_data.port_input));
+            mod_log("[info] connecting to: %s:%d\n", title_state_data.hostname_input, atoi(title_state_data.port_input));
             librg_network_start(ctx, { atoi(title_state_data.port_input), title_state_data.hostname_input });
         }
     }

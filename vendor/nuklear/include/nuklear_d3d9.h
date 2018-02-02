@@ -433,13 +433,15 @@ static void
 nk_d3d9_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
 {
     (void)usr;
-    if (!IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(NULL)) {
+    if (!OpenClipboard(NULL)) {
         return;
     }
 
     HGLOBAL mem = GetClipboardData(CF_UNICODETEXT);
     if (!mem) {
         CloseClipboard();
+        DWORD erro = GetLastError();
+        zpl_printf("[error] error occured pasting: %d\n", erro);
         return;
     }
 
@@ -465,7 +467,7 @@ nk_d3d9_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
         }
     }
 
-    GlobalUnlock(mem); 
+    GlobalUnlock(mem);
     CloseClipboard();
 }
 

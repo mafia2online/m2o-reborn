@@ -22,7 +22,7 @@ void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
  * World loaded, and we are ready to be telerpoted
  */
 void mod_game_init() {
-    mod_log("GameInit \\(^o^)/ (Thread: %x)\n", GetCurrentThreadId());
+    mod_log("[info] initializing game thread [%x] ...\n", GetCurrentThreadId());
 
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.

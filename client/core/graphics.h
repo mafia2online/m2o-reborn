@@ -9,7 +9,7 @@
  * @return
  */
 bool graphics_init() {
-    mod_log("graphics_init\n");
+    mod_log("[info] initializing graphics...\n");
     CDirect3D9Hook::Install();
     return true;
 }
@@ -63,7 +63,7 @@ void mod_nk_create() {
  * @param pPresentationParameters
  */
 void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
-    mod_log("CGraphicsManager::OnDeviceCreate(%x, %x)\n", pDevice, pPresentationParameters);
+    mod_log("[info] creating dx9 device [%x, %x] ...\n", pDevice, pPresentationParameters);
 
     mod.graphics.font_manager = (void *)new CFontManager(pDevice);
     mod.graphics.device = pDevice;
@@ -150,6 +150,8 @@ inline void graphics_input_handling() {
         nk_style_hide_cursor(nk_ctx);
     }
 
+    static bool __pressed_ctrl = false;
+
     // handle queue of msgs
     zpl_mutex_try_lock(&mod.mutexes.wnd_msg);
     while (!mod.wnd_msg.empty()) {
@@ -160,18 +162,24 @@ inline void graphics_input_handling() {
         }
 
         switch (msg.uMsg) {
-            case WM_KEYUP:
-            case WM_SYSKEYUP:
-            {
-                int down = !((msg.lParam >> 31) & 1);
-                int ctrl = GetKeyState(VK_CONTROL) & (1 << 15);
-
+            case WM_KEYDOWN:
+            case WM_SYSKEYDOWN: {
                 switch (msg.wParam) {
                     case VK_CONTROL:
                     case VK_LCONTROL:
                     case VK_RCONTROL:
-                        // TODO: add ctrl+a ctrl+v ctrl+c
-                        mod_log("pressed ctrl\n");
+                        __pressed_ctrl = true;
+                        break;
+                }
+            } break;
+
+            case WM_KEYUP:
+            case WM_SYSKEYUP: {
+                switch (msg.wParam) {
+                    case VK_CONTROL:
+                    case VK_LCONTROL:
+                    case VK_RCONTROL:
+                        __pressed_ctrl = false;
                         break;
 
                     /* trigger exec in debug console */
@@ -188,7 +196,20 @@ inline void graphics_input_handling() {
                         break;
                 }
             } break;
+        }
 
+        if (msg.uMsg == WM_CHAR && __pressed_ctrl) {
+            int down = !((msg.lParam >> 31) & 1);
+            // mod_log("%d", msg.wParam); /* dbg char */
+
+            switch (msg.wParam) {
+                case 1: nk_input_key(&d3d9.ctx, NK_KEY_TEXT_SELECT_ALL, true); nk_input_key(&d3d9.ctx, NK_KEY_TEXT_SELECT_ALL, false); break;
+                case 3: nk_input_key(&d3d9.ctx, NK_KEY_COPY, true); nk_input_key(&d3d9.ctx, NK_KEY_COPY, false); break;
+                case 22: nk_input_key(&d3d9.ctx, NK_KEY_PASTE, true); nk_input_key(&d3d9.ctx, NK_KEY_PASTE, false); break;
+                case 24: nk_input_key(&d3d9.ctx, NK_KEY_CUT, true); nk_input_key(&d3d9.ctx, NK_KEY_CUT, false); break;
+                case 26: nk_input_key(&d3d9.ctx, NK_KEY_TEXT_UNDO, true); nk_input_key(&d3d9.ctx, NK_KEY_TEXT_UNDO, false); break;
+                case 18: nk_input_key(&d3d9.ctx, NK_KEY_TEXT_REDO, true); nk_input_key(&d3d9.ctx, NK_KEY_TEXT_REDO, false); break;
+            }
         }
     }
     zpl_mutex_unlock(&mod.mutexes.wnd_msg);

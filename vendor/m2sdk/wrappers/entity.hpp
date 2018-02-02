@@ -105,7 +105,7 @@ namespace M2
             }
 
             if (entity->m_dwFlags & 0x20)
-                mod_log("Flags set sucessfully!\n");
+                mod_log("[ModelManager] Flags set sucessfully!\n");
             else {
                 entity->Release();
                 return nullptr;
