@@ -115,7 +115,7 @@ namespace M2
             return entity;
         }
 
-        bool DestroyEntity(C_Entity *entity)
+        bool DestroyEntity(C_Entity *entity, eEntityType type)
         {
             if (entity == nullptr) {
                 mod_log("entity null\n");
@@ -129,7 +129,7 @@ namespace M2
             if (entity) {
                 entity->Destructor();
             }
-            if (entity) {
+            if (entity && type == eEntityType::MOD_ENTITY_PED) {
                 Mem::InvokeFunction<Mem::call_cdecl, int>(0x4019F0, entity);
             }
             if (entity) {

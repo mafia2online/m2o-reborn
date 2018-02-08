@@ -34,7 +34,7 @@ void module_car_callback_create(librg_event_t *event) {
  */
 void module_car_callback_remove(librg_event_t *event) {
     auto car = get_car(event->entity); mod_assert(car && car->CEntity);
-    M2::Wrappers::DestroyEntity(car->CEntity);
+    M2::Wrappers::DestroyEntity(car->CEntity, M2::eEntityType::MOD_ENTITY_CAR);
     delete car;
 }
 

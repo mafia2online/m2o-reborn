@@ -41,7 +41,7 @@ void module_ped_callback_remove(librg_event_t *event) {
     mod_log("destroying entity %d\n", event->entity->id);
 
     auto ped = get_ped(event->entity); mod_assert(ped && ped->CEntity);
-    M2::Wrappers::DestroyEntity(ped->CEntity);
+    M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
 
     delete ped;
 }
