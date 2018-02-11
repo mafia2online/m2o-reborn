@@ -227,7 +227,7 @@ namespace tools {
         }
     }
 
-    __declspec(naked) void MineDeathHook()
+    __declspec(naked) void CHuman2__SetupDeath_Hook()
 
     {
         __asm
@@ -244,6 +244,32 @@ namespace tools {
             call    _CHuman2__SetupDeath
 
             jmp MineDeathHook_JumpBack
+        }
+    }
+
+    DWORD _CHuman2__DoDamage = 0x09907D0;
+    DWORD _DoDamage__JumpBack = 0x042FC6F;
+    void OnHumanDoDamage(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)
+    {
+        //Do things here
+    }
+
+    __declspec(naked) void CHuman2__DoDamage__Hook()
+    {
+        __asm
+        {
+            pushad;
+            push esi;
+            push edi;
+            call OnHumanDoDamage;
+            add esp, 0x8;
+            popad;
+
+            push edi;
+            mov ecx, esi;
+            call _CHuman2__DoDamage;
+
+            jmp _DoDamage__JumpBack;
         }
     }
 
@@ -349,7 +375,8 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
 
         // Hooking human death
-        Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&MineDeathHook);
+        Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&CHuman2__SetupDeath_Hook);
+        Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
 
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
 
