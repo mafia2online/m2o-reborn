@@ -149,6 +149,11 @@ namespace M2
 			return Mem::InvokeFunction<Mem::call_this, bool>(0x09A2280, this, seat);
 		}
 
+        void KillAllHumans()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x9A1BA0, this);
+        }
+
 		void LockEntryPoints()
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x09CCA50, this);

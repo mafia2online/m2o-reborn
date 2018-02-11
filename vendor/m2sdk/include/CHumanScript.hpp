@@ -344,6 +344,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, bool>(0x91DFF0, this, demi);
         }
 
+        void SetHealth(float health)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x93B8C0, this, health);
+        }
+
         void SetLookPointOfInterest(bool look)
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x91E380, this, look);

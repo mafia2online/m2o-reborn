@@ -22,5 +22,10 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x421AE0, this, C_Human2FaceController);
         }
+
+        void ShupUp()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x428850, this);
+        }
     };
 };

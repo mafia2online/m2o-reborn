@@ -11,10 +11,55 @@
 namespace M2
 {
 	class ICEntityMessageDamage
-	{
+    {
 	};
 
 	class C_EntityMessageDamage : public ICEntityMessageDamage
 	{
+    public:
+        double GetDamage()
+        {
+            return Mem::InvokeFunction<Mem::call_this, double>(0x1166AC0, this);
+        }
+
+        int GetDamageType()
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x1166A60, this);
+        }
+
+        vec3_t& GetDir()
+        {
+            return Mem::InvokeFunction<Mem::call_this, vec3_t&>(0x1166A80, this);
+        }
+
+        M2::C_Frame *GetFrame()
+        {
+            return Mem::InvokeFunction<Mem::call_this, M2::C_Frame*>(0x1166AF0, this);
+        }
+
+        char *GetNormal()
+        {
+            return Mem::InvokeFunction<Mem::call_this, char*>(0x1166A90, this);
+        }
+
+        DWORD GetOwnerGuid()
+        {
+            return Mem::InvokeFunction<Mem::call_this, DWORD>(0x1166AE0, this);
+        }
+
+        vec3_t& GetPos()
+        {
+            return Mem::InvokeFunction<Mem::call_this, vec3_t&>(0x1166A70, this);
+        }
+
+        double GetPower()
+        {
+            return Mem::InvokeFunction<Mem::call_this, double>(0x1166AA0, this);
+        }
+
+        int GetWeaponId()
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x1166AB0, this);
+        }
 	};
 };

@@ -51,6 +51,9 @@ namespace tools {
         __asm jmp[GameInitHook_Return];
     }
 
+    /**
+    * Hooking vehicle methods 
+    */
     void __declspec(naked) GameStartDriveHook__1()
     {
         __asm call[_callDrive];
@@ -88,6 +91,63 @@ namespace tools {
         __asm jmp[GameEndDrive__Return];
     }
 
+    DWORD CPlayer__EnterCar__Call = 0x42CAC0;
+    DWORD CPlayer__EnterCar_JumpBack = 0x437945;
+    void __declspec(naked) CPlayer2__EnterCar()
+    {
+        __asm
+        {
+            mov eax, dword ptr ss : [esp + 0x10]
+            mov ecx, dword ptr ds : [edi + 0x44]
+
+            pushad
+            push eax
+            push ecx
+            push esi
+            call game_player_enter_car
+            add esp, 0xC
+            popad
+
+            push eax
+            push ecx
+            mov ecx, esi
+            call CPlayer__EnterCar__Call
+            jmp CPlayer__EnterCar_JumpBack
+        }
+    }
+
+    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+    DWORD CHuman2CarWrapper__GetDoor = 0x940C80;
+    static M2::C_Car *tryToEnterCar = nullptr;
+    void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+    {
+        __asm
+        {
+            mov ecx, esi;
+            call CHuman2CarWrapper__GetCar;
+            mov tryToEnterCar, eax;
+        }
+
+
+        if (player_request_vehicle_enter(tryToEnterCar) == true) {
+            __asm {
+                mov     al, 1
+                pop     esi
+                retn    8
+            }
+        }
+        else {
+            __asm {
+                mov     al, 0
+                pop     esi
+                retn    8
+            }
+        }
+    }
+
+    /**
+    * Hooks for bugfixes
+    */
     void *_this;
     void _declspec(naked) FrameReleaseFix()
     {
@@ -116,7 +176,6 @@ namespace tools {
     }
 
     /* Entity Messages */
-
     typedef bool(__cdecl * CScriptEntity__RecvMessage_t) (void *lua, void *a2, const char *function, M2::C_EntityMessage *message);
     CScriptEntity__RecvMessage_t onReceiveMessage;
     int OnReceiveMessageHook(void *lua, void *a2, const char *function, M2::C_EntityMessage *pMessage)
@@ -154,57 +213,37 @@ namespace tools {
         __asm jmp[CPlayer2__UpdateInput__Return];
     }
 
-    DWORD CPlayer__EnterCar__Call = 0x42CAC0;
-    DWORD CPlayer__EnterCar_JumpBack = 0x437945;
-    void __declspec(naked) CPlayer2__EnterCar()
+    /* Human death */
+    DWORD MineDeathHook_JumpBack = 0x00990CFF;
+    DWORD _CHuman2__SetupDeath = 0x0098C160;
+
+    void OnHumanSetupDeath(M2::C_Human2* human, M2::C_EntityMessageDamage* damage)
     {
-        __asm
-        {
-            mov eax, dword ptr ss : [esp + 0x10]
-            mov ecx, dword ptr ds : [edi + 0x44]
-
-            pushad
-                push eax
-                push ecx
-                push esi
-                call game_player_enter_car
-                add esp, 0xC
-            popad
-
-            push eax
-            push ecx
-            mov ecx, esi
-            call CPlayer__EnterCar__Call
-            jmp CPlayer__EnterCar_JumpBack
+        if (human == reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())) {
+            mod_log("The player just died\n");
+        }
+        else {
+            mod_log("An human just died\n");
         }
     }
 
-    DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
-    DWORD CHuman2CarWrapper__GetDoor = 0x940C80;
-    static M2::C_Car *tryToEnterCar = nullptr;
-    void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+    __declspec(naked) void MineDeathHook()
+
     {
         __asm
         {
-            mov ecx, esi;
-            call CHuman2CarWrapper__GetCar;
-            mov tryToEnterCar, eax;
-        }
+            pushad
+            push esi
+            push ebp
+            call OnHumanSetupDeath
+            add esp, 0x8
+            popad
 
+            push    esi
+            mov     ecx, ebp
+            call    _CHuman2__SetupDeath
 
-        if (player_request_vehicle_enter(tryToEnterCar) == true) {
-            __asm {
-                mov     al, 1
-                pop     esi
-                retn    8
-            }
-        }
-        else {
-            __asm {
-                mov     al, 0
-                pop     esi
-                retn    8
-            }
+            jmp MineDeathHook_JumpBack
         }
     }
 
@@ -280,62 +319,6 @@ namespace tools {
         __asm jmp[_CHuman2__AddCommand];
     }
 
-    DWORD _CSDSModelManager__CreateModel;
-    DWORD pGlobalGame = 0x1ABFE14;
-    void __declspec(naked) CSDSModelManager__CreateModel()
-    {
-        /*__asm push ebx;
-        __asm push esi;
-        __asm mov esi, ecx;
-
-
-        __asm pushad;
-
-        static char *model;
-        __asm mov edx, [esp + 12];
-        __asm mov model, edx;
-        mod_log("test %s\n", model);
-
-        __asm popad;*/
-
-        /*__asm sub esp, 8;
-        __asm push ebx;
-        __asm push ebp;
-
-
-        __asm pushad;
-        static char *model;
-        __asm mov edi, [esp + 16];
-        __asm mov model, edi;
-
-        mod_log("test : %s\n", model);
-
-        __asm popad;*/
-
-        __asm sub esp, 104h;
-        __asm push esi;
-        __asm push edi;
-
-        __asm pushad;
-
-        static char *model;
-        __asm mov edi, [esp + 16];
-        __asm mov model, edi;
-
-
-        static char *path;
-        __asm mov eax, pGlobalGame;
-        __asm mov ecx, [eax + 0x20];
-        __asm mov path, ecx;
-        mod_log("LoadModel %s(%s)\n", model, path);
-
-        __asm popad;
-
-
-
-        __asm jmp[_CSDSModelManager__CreateModel];
-    }
-
     /**
      * Game hooking calls
      */
@@ -365,8 +348,10 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0xA3F0A6, (DWORD)CCarActionBreakIn__TestAction__Hook);
         Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
 
+        // Hooking human death
+        Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&MineDeathHook);
+
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
-        //_CSDSModelManager__CreateModel = (DWORD)Mem::Hooks::InstallNotDumbJMP(0xAE12C0, (DWORD)CSDSModelManager__CreateModel, 8);
 
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);
