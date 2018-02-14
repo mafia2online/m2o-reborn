@@ -345,6 +345,21 @@ namespace tools {
         __asm jmp[_CHuman2__AddCommand];
     }
 
+    DWORD __LoadCityPart;
+    void __declspec(naked) LoadCityPartsHook()
+    {
+        __asm {
+            push ebx;
+            push ebp;
+            push esi;
+            push edi;
+            mov edi, [ecx + 16];
+        }
+        __asm pushad;
+        mod_log("load city part\n");
+        __asm popad;
+        __asm jmp[__LoadCityPart];
+    }
     /**
      * Game hooking calls
      */
@@ -379,6 +394,7 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
 
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
+        __LoadCityPart = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x4743C0, (DWORD)LoadCityPartsHook, 5);
 
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);

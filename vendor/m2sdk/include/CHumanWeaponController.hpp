@@ -48,5 +48,15 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, bool>(0x04355F0, this, unk, unk2);
 		}
+
+        void DoWeaponDrop(int unk, int unk2)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x431F30, this, unk, unk2);
+        }
+
+        void DoWeaponDropBest()
+        {
+            Mem::InvokeFunction<Mem::call_this, unsigned int>(0x432020, this);
+        }
 	};
 };
