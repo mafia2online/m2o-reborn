@@ -51,6 +51,8 @@ int main() {
         "==================================================\n";
     zpl_printf("%s", test);
 
+    m2o_api_vtable api = m2o_api_init();
+
     // allocate ctx
     ctx = new librg_ctx_t;
     zpl_zero_item(ctx);

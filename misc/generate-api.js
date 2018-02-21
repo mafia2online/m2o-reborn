@@ -8,7 +8,7 @@ const targets = [
 ];
 
 (function () {
-    /* parse the stuff */
+    /* parse the stuff*/
     const results = targets
         .map(file => fs.readFileSync(file))
         .map(data => data.toString('utf8'))
@@ -21,16 +21,6 @@ const targets = [
                 .trim()
             )
         )
-
-    /* generate the internal headers */
-    const internalHeader = results
-        .map(lines => lines
-            .map(line =>  line + ';')
-            .join('\n')
-        )
-        .join('\n\n')
-
-    fs.writeFileSync('server/api/api.h', internalHeader)
 
     /* generate public API headers */
     const matches = results
@@ -48,18 +38,30 @@ const targets = [
     const publicHeaders = [
         typedefs.join('\n'),
         '',
-        'typedef struct m2o_plugin_vtable {',
+        'typedef struct m2o_api_vtable {',
         vtable.join('\n'),
-        '} m2o_plugin_vtable;',
+        '} m2o_api_vtable;',
     ];
 
     fs.writeFileSync('binary/includes/api.h', publicHeaders.join('\n'))
-    fs.writeFileSync('server/api/public.h', publicHeaders.join('\n'))
+
+    /* generate the internal headers */
+    const internalHeader = results
+        .map(lines => lines
+            .map(line =>  line + ';')
+            .join('\n')
+        )
+        .join('\n\n')
+
 
     /* generate api vtable implementation */
     const apiImplementation = [
-        'm2o_plugin_vtable m2o_api_init() {',
-        '    m2o_plugin_vtable api;',
+        internalHeader,
+        '',
+        publicHeaders.join('\n'),
+        '',
+        'm2o_api_vtable m2o_api_init() {',
+        '    m2o_api_vtable api;',
         '',
         matches
             .map(match => `api.${match[1]} = ${match[0]};`)
@@ -70,5 +72,5 @@ const targets = [
         '}',
     ];
 
-    fs.writeFileSync('server/api/api_impl.h', apiImplementation.join('\n'))
+    fs.writeFileSync('server/api/api.h', apiImplementation.join('\n'))
 })()
