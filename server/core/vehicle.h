@@ -5,19 +5,17 @@
 // =======================================================================//
 
 void module_car_create(librg_message_t *msg) {
-    auto player  = librg_entity_find(msg->ctx, msg->peer);
-    auto vehicle = librg_entity_create(msg->ctx, TYPE_CAR);
-    mod_assert(player && vehicle);
+    auto player     = librg_entity_find(msg->ctx, msg->peer);
+    auto vehicleid  = m2o_vehicle_create();
 
-    vehicle->user_data = new car_t(vehicle);
-    vehicle->position = vec3(
+    m2o_vehicle_position_set(vehicleid, vec3(
         player->position.x + 3.0f,
         player->position.y,
         player->position.z + 0.05f
-    );
+    ));
 
     // log
-    print_posm(vehicle->position, "created a vehicle at: ");
+    print_posm(m2o_vehicle_position_get(vehicleid), "created a vehicle at: ");
 }
 
 void module_car_callback_create(librg_event_t *event) {
@@ -53,7 +51,7 @@ void module_car_enter_start(librg_message_t *msg) {
         librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
     }
 
-    mod_log("[info] ped: %lu becomes member of: %lu on seat: %u\n", player->id, vehicle->id, seat);
+    mod_log("[info] ped: %u becomes member of: %u on seat: %u\n", player->id, vehicle->id, seat);
     mod_message_send_instream_except(msg->ctx, MOD_CAR_ENTER_START, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);
         librg_data_wu32(data, vehicle->id);

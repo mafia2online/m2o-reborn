@@ -54,3 +54,6 @@ enum {
     MOD_CAR_INTERACTION_FINISH,
     MOD_PED_CREATE,
 };
+
+#define m2o_export
+#define m2o_import

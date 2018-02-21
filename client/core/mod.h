@@ -109,7 +109,7 @@ void mod_game_tick() {
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
-        M2::Wrappers::DestroyEntity(ent);
+        M2::Wrappers::DestroyEntity(ent, M2::MOD_ENTITY_CAR);
     }
 
     if (addCommand) {
