@@ -39,7 +39,7 @@ void on_connect_accepted(librg_event_t *event) {
 }
 
 void on_connect_disconnect(librg_event_t *event) {
-    delete event->entity->user_data;
+    delete (char *)event->entity->user_data;
 }
 
 void entity_on_create(librg_event_t *event) {
@@ -67,7 +67,6 @@ void entity_on_csupdate(librg_event_t *event) {
 
 void entity_on_remove(librg_event_t *event) {
     if (!event->entity) return; // entity has been deleted
-
     mod_log("[info] sending a remove packet for entity: %d\n", event->entity->id);
 
     if (event->entity->flags & LIBRG_ENTITY_CONTROLLED) {

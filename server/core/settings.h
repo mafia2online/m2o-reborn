@@ -5,13 +5,14 @@ struct mod_settings_t {
 
 #define settings_default                \
     "{\n"                               \
+    "   /* connection settings */\n"    \
     "   hostname: \"my m2o server\",\n" \
     "   password: \"\",\n"              \
+    "   max_connections: 128,\n"        \
     "   port: 27010,\n\n"               \
                                         \
-    "   /* settings for amounts */\n"   \
-    "   max_connections: 128,\n"        \
-    "   resources: [],\n"               \
+    "   /* server parameters */\n"      \
+    "   stream_range: 250,\n"           \
     "}\n"
 
 zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
@@ -55,6 +56,13 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_settings_t *s
     // read up the data
     settings_readto(&root, "port", integer, address->port);
     settings_readto(&root, "max_connections", integer, ctx->max_connections);
+    // settings_readto(&root, "tick_delay", integer, ctx->tick_delay);
+
+    u32 stream_range;
+    settings_readto(&root, "stream_range", integer, stream_range);
+    librg_option_set(LIBRG_DEFAULT_STREAM_RANGE, stream_range);
+
+    librg_log("read the default distance: %u\n", librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
 
     settings_readto(&root, "hostname", string, settings->hostname);
     settings_readto(&root, "password", string, settings->password);

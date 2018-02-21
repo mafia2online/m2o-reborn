@@ -2,8 +2,10 @@
 #include "includes.h"
 
 // shared
-#include <components.h>
-#include <extensions.h>
+#include "components.h"
+#include "extensions.h"
+
+#include "api/api.h"
 
 // server modules
 #include "core/settings.h"
@@ -18,6 +20,9 @@ static mod_t mod;
 librg_ctx_t *ctx;
 
 #include "core/router.h"
+
+#include "api/errors.h"
+#include "api/vehicle.h"
 
 /* simple bandwidth measurer */
 void mod_measure(void *user_data) {
@@ -38,6 +43,14 @@ void mod_measure(void *user_data) {
 }
 
 int main() {
+    const char *test = \
+        "===============    M2O-SERVER    =================\n" \
+        "==                                              ==\n" \
+        "==                 ¯\\_(ツ)_/¯                   ==\n" \
+        "==                                              ==\n" \
+        "==================================================\n";
+    zpl_printf("%s", test);
+
     // allocate ctx
     ctx = new librg_ctx_t;
     zpl_zero_item(ctx);
