@@ -57,3 +57,7 @@ enum {
 
 #define m2o_export
 #define m2o_import
+
+#define M2O_FETCH_ENTITY(dest, id, returned) \
+    auto dest = librg_entity_fetch(ctx, id); \
+    if (!dest) { m2o_set_last_error(M2O_UNDEFINED_ENTITY); return returned; }

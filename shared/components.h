@@ -23,7 +23,7 @@ enum {
 /* entity flags */
 enum {
     MOD_ENTITY_INTERPOLATED = (1 << 20),
-    MOD_ENTITY_DRIVER       = (1 << 21), 
+    MOD_ENTITY_DRIVER       = (1 << 21),
 };
 
 // =======================================================================//

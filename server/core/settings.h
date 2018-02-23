@@ -1,18 +1,13 @@
-struct mod_settings_t {
-    std::string hostname;
-    std::string password;
-};
-
-#define settings_default                \
-    "{\n"                               \
-    "   /* connection settings */\n"    \
-    "   hostname: \"my m2o server\",\n" \
-    "   password: \"\",\n"              \
-    "   max_connections: 128,\n"        \
-    "   port: 27010,\n\n"               \
-                                        \
-    "   /* server parameters */\n"      \
-    "   stream_range: 250,\n"           \
+#define settings_default                    \
+    "{\n"                                   \
+    "    /* connection settings */\n"       \
+    "    hostname: \"my m2o server\",\n"    \
+    "    password: \"\",\n"                 \
+    "    max_connections: 128,\n"           \
+    "    port: 27010,\n\n"                  \
+                                            \
+    "    /* server parameters */\n"         \
+    "    stream_range: 250,\n"              \
     "}\n"
 
 zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
@@ -31,7 +26,7 @@ zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
         if (element) { dest = element->type; } \
     } while(0)
 
-void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_settings_t *settings) {
+void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
     zpl_file_t file;
     zplFileError error = zpl_file_open(&file, "server.json");
 
@@ -64,8 +59,8 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_settings_t *s
 
     librg_log("read the default distance: %u\n", librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
 
-    settings_readto(&root, "hostname", string, settings->hostname);
-    settings_readto(&root, "password", string, settings->password);
+    settings_readto(&root, "hostname", string, mod->settings.hostname);
+    settings_readto(&root, "password", string, mod->settings.password);
 
     // free
     zplj_free(&root);

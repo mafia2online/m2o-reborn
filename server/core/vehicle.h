@@ -4,7 +4,7 @@
 // !
 // =======================================================================//
 
-void module_car_create(librg_message_t *msg) {
+void on_car_create_command(librg_message_t *msg) {
     auto player     = librg_entity_find(msg->ctx, msg->peer);
     auto vehicleid  = m2o_vehicle_create();
 
@@ -18,14 +18,14 @@ void module_car_create(librg_message_t *msg) {
     print_posm(m2o_vehicle_position_get(vehicleid), "created a vehicle at: ");
 }
 
-void module_car_callback_create(librg_event_t *event) {
+void on_car_create(librg_event_t *event) {
     if (!(event->entity->flags & LIBRG_ENTITY_CONTROLLED)) {
         // mod_log("[info] setting closest player as an owner\n");
         //librg_entity_control_set(event->ctx, event->entity->id, event->peer);
     }
 }
 
-void module_car_callback_remove(librg_event_t *event) {
+void on_car_remove(librg_event_t *event) {
 
 }
 
@@ -36,7 +36,7 @@ void module_car_callback_remove(librg_event_t *event) {
 // !
 // =======================================================================//
 
-void module_car_enter_start(librg_message_t *msg) {
+void on_car_enter_start(librg_message_t *msg) {
     auto player  = librg_entity_find(msg->ctx, msg->peer);
     auto vehicle = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
     mod_assert_msg(vehicle && player, "trying to enter invalid vehicle");
@@ -59,7 +59,7 @@ void module_car_enter_start(librg_message_t *msg) {
     });
 }
 
-void module_car_enter_finish(librg_message_t *msg) {
+void on_car_enter_finish(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
 
     mod_message_send_instream_except(msg->ctx, MOD_CAR_ENTER_FINISH, player->id, player->client_peer, [&](librg_data_t *data) {
@@ -67,7 +67,7 @@ void module_car_enter_finish(librg_message_t *msg) {
     });
 }
 
-void module_car_exit_start(librg_message_t *msg) {
+void on_car_exit_start(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
     mod_log("player: %d is trying to leave his current car\n", player->id);
 
@@ -79,7 +79,7 @@ void module_car_exit_start(librg_message_t *msg) {
     });
 }
 
-void module_car_exit_finish(librg_message_t *msg) {
+void on_car_exit_finish(librg_message_t *msg) {
     auto player  = librg_entity_find(msg->ctx, msg->peer);
     auto ped = get_ped(player);
     ped->vehicle = nullptr;

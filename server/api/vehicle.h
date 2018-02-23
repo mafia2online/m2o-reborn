@@ -1,11 +1,8 @@
-#define M2O_FETCH_ENTITY(dest, id, returned) \
-    auto dest = librg_entity_fetch(ctx, id); \
-    if (!dest) { m2o_set_last_error(M2O_UNDEFINED_ENTITY); return returned; }
-
 m2o_export u32 m2o_vehicle_create() {
-    auto vehicle = librg_entity_create(ctx, TYPE_CAR);
-    vehicle->user_data = new car_t(vehicle);
-    return vehicle->id;
+    mod_log("creating a vehicle\n");
+    auto entity = librg_entity_create(ctx, TYPE_CAR);
+    entity->user_data = new car_t(entity);
+    return entity->id;
 }
 
 m2o_export bool m2o_vehicle_destroy(u32 vehicleid) {

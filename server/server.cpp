@@ -4,25 +4,30 @@
 // shared
 #include "components.h"
 #include "extensions.h"
-
 #include "api/api.h"
 
-// server modules
-#include "core/settings.h"
-#include "core/vehicle.h"
-#include "core/pedestrian.h"
-
 struct mod_t {
-    mod_settings_t settings;
+    m2o_api_vtable api;
+
+    struct {
+        std::string hostname;
+        std::string password;
+    } settings;
 };
 
 static mod_t mod;
 librg_ctx_t *ctx;
 
+// server modules
+#include "core/settings.h"
+#include "core/vehicle.h"
+#include "core/pedestrian.h"
+#include "core/plugins.h"
 #include "core/router.h"
 
 #include "api/errors.h"
 #include "api/vehicle.h"
+#include "api/pedestrian.h"
 
 /* simple bandwidth measurer */
 void mod_measure(void *user_data) {
@@ -51,8 +56,6 @@ int main() {
         "==================================================\n";
     zpl_printf("%s", test);
 
-    m2o_api_vtable api = m2o_api_init();
-
     // allocate ctx
     ctx = new librg_ctx_t;
     zpl_zero_item(ctx);
@@ -65,7 +68,7 @@ int main() {
     ctx->max_connections = 1000;
 
     librg_address_t address = { 27010, NULL };
-    settings_read(ctx, &address, &mod.settings);
+    settings_read(ctx, &address, &mod);
 
     mod_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
     mod_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
@@ -80,6 +83,9 @@ int main() {
     zpl_timer_start(tick_timer, 1000);
 
     librg_network_start(ctx, address);
+
+    m2o_api_init(&mod.api);
+    m2o_plugins_init(&mod.api);
 
     while (true) {
         librg_tick(ctx);
