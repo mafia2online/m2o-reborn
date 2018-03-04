@@ -9,10 +9,7 @@
 #define MOD_NAME "Mafia 2 Online - Reloaded"
 
 #define LIBRG_IMPLEMENTATION
-#define ZPLJ_IMPLEMENTATION
-
 #include <librg.h>
-#include <zpl_json.h>
 
 // third party headers
 #include <string>
@@ -23,7 +20,7 @@ typedef zplm_vec2_t vec2_t;
 typedef zplm_vec3_t vec3_t;
 typedef zplm_quat_t quat_t;
 
-#define vec3 zplm_vec3
+#define vec3 zplm_vec3f
 
 // helpers
 #define when(init, name) auto name = init; if (name)

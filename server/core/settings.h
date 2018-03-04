@@ -10,9 +10,9 @@
     "    stream_range: 250,\n"              \
     "}\n"
 
-zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
+zpl_json_object *settings_read_value(zpl_json_object *obj, char *name) {
     for (i32 i = 0; i < zpl_array_count(obj->nodes); ++i) {
-        zplj_object_t *ptr = (obj->nodes + i);
+        zpl_json_object *ptr = (obj->nodes + i);
         if (!strcmp(ptr->name, name)) {
             return ptr;
         }
@@ -22,7 +22,7 @@ zplj_object_t *settings_read_value(zplj_object_t *obj, char *name) {
 }
 
 #define settings_readto(handle, name, type, dest) do { \
-        zplj_object_t *element = settings_read_value(handle, (char *)name); \
+        zpl_json_object *element = settings_read_value(handle, (char *)name); \
         if (element) { dest = element->type; } \
     } while(0)
 
@@ -45,8 +45,8 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
     zpl_file_close(&file);
 
     // parse json
-    zplj_object_t root = {0}; u8 error2;
-    zplj_parse(&root, file_size, content, zpl_heap_allocator(), true, &error2);
+    zpl_json_object root = {0}; u8 error2;
+    zpl_json_parse(&root, file_size, content, zpl_heap_allocator(), true, &error2);
 
     // read up the data
     settings_readto(&root, "port", integer, address->port);
@@ -63,6 +63,6 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
     settings_readto(&root, "password", string, mod->settings.password);
 
     // free
-    zplj_free(&root);
+    zpl_json_free(&root);
     zpl_mfree(content);
 }

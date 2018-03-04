@@ -112,7 +112,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
         car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
     } else {
-        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+        car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
     }
 
     /* rotation interpolation */

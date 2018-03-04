@@ -85,7 +85,7 @@ void mod_game_tick() {
     }
 
     static quat_t test;
-    static int bite = 0;
+    static int bite = 168;
     if (GetAsyncKeyState(VK_F2) & 0x1) {
         auto vehicle = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
         
@@ -97,10 +97,14 @@ void mod_game_tick() {
     static bool addCommand = false;
     if (GetAsyncKeyState(VK_F4) & 0x1) {
         auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-
+        player = player + vec3(0, 1.0f, -1.5f);
         ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, bite);
         ent->SetPosition(player);
         bite++;
+
+        // TODO: add seat sync
+        M2::C_SyncObject *pSyncObject = nullptr;
+        ((M2::C_Human2 *)ent)->GetScript()->ScrAttack((M2::C_Entity*)M2::C_Game::Get()->GetLocalPed());
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1)

@@ -63,7 +63,7 @@ int main() {
     /* fill up default settings */
     ctx->mode            = LIBRG_MODE_SERVER;
     ctx->tick_delay      = MOD_SERVER_TICK_DELAY;
-    ctx->world_size      = zplm_vec3(5000.0f, 5000.0f, 0.0f);
+    ctx->world_size      = zplm_vec3f(5000.0f, 5000.0f, 0.0f);
     ctx->max_entities    = MOD_ENTITY_LIMIT;
     ctx->max_connections = 1000;
 
@@ -72,7 +72,7 @@ int main() {
 
     mod_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
     mod_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
-    mod_log("server tick_delay: %d\n", ctx->tick_delay);
+    mod_log("server tick_delay: %f\n", ctx->tick_delay);
 
     librg_init(ctx);
     mod_register_routes(ctx);

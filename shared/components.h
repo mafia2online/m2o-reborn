@@ -75,6 +75,7 @@ enum {
 struct ped_t {
     u16 model;
     u8  state;
+    char name[64];
 
     u8 seat;
     librg_entity_t *vehicle;

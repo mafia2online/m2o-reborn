@@ -19,6 +19,6 @@ m2o_export bool m2o_vehicle_position_set(u32 vehicleid, vec3_t position) {
 }
 
 m2o_export vec3_t m2o_vehicle_position_get(u32 vehicleid) {
-    M2O_FETCH_ENTITY(entity, vehicleid, zplm_vec3_zero());
+    M2O_FETCH_ENTITY(entity, vehicleid, zplm_vec3f_zero());
     return entity->position;
 }
