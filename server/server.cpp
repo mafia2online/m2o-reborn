@@ -44,7 +44,7 @@ void mod_measure(void *user_data) {
     lastdl = ctx->network.host->totalReceivedData;
     lastup = ctx->network.host->totalSentData;
 
-    mod_log("librg_update: took %.3f ms. Current used bandwidth D/U: (%.3f / %.3f) mbps. \r", ctx->last_update, dl, up);
+    mod_log("[info] update took %.3f ms. Current used bandwidth D/U: (%.3f / %.3f) mbps. \r", ctx->last_update, dl, up);
 }
 
 int main() {
@@ -70,17 +70,25 @@ int main() {
     librg_address_t address = { 27010, NULL };
     settings_read(ctx, &address, &mod);
 
-    mod_log("starting on port: %u with conn: %u\n", address.port, ctx->max_connections);
-    mod_log("my hostname: %s, my password: %s\n", mod.settings.hostname.c_str(), mod.settings.password.c_str());
-    mod_log("server tick_delay: %f\n", ctx->tick_delay);
+    mod_log("[info] settings:\n\n");
+
+    mod_log("\thostname: %s\n", mod.settings.hostname.c_str());
+    mod_log("\tpassword: (%s)\n", mod.settings.password.size() ? "yes" : "no");
+    mod_log("\tport: %d\n\n", address.port);
+
+    mod_log("\tmax_connections: %d\n", ctx->max_connections);
+    mod_log("\tstream_range: %f\n", (f32)librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
+    mod_log("\ttick_delay: %f\n\n", ctx->tick_delay);
+
+    mod_log("[info] starting the server...\n");
 
     librg_init(ctx);
     mod_register_routes(ctx);
 
     zpl_timer_t *tick_timer = zpl_timer_add(ctx->timers);
     tick_timer->user_data = (void *)ctx; /* provide ctx as a argument to timer */
-    zpl_timer_set(tick_timer, 1000 * 1000, -1, mod_measure);
-    zpl_timer_start(tick_timer, 1000);
+    zpl_timer_set(tick_timer, 1.0, -1, mod_measure);
+    zpl_timer_start(tick_timer, 0);
 
     librg_network_start(ctx, address);
 

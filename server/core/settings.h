@@ -7,7 +7,8 @@
     "    port: 27010,\n\n"                  \
                                             \
     "    /* server parameters */\n"         \
-    "    stream_range: 250,\n"              \
+    "    stream_range: 250.0,\n"            \
+    "    tick_delay: 100.0,\n"              \
     "}\n"
 
 zpl_json_object *settings_read_value(zpl_json_object *obj, char *name) {
@@ -50,14 +51,13 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
 
     // read up the data
     settings_readto(&root, "port", integer, address->port);
+    settings_readto(&root, "tick_delay", real, ctx->tick_delay);
     settings_readto(&root, "max_connections", integer, ctx->max_connections);
-    // settings_readto(&root, "tick_delay", integer, ctx->tick_delay);
 
-    u32 stream_range;
-    settings_readto(&root, "stream_range", integer, stream_range);
-    librg_option_set(LIBRG_DEFAULT_STREAM_RANGE, stream_range);
-
-    librg_log("read the default distance: %u\n", librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
+    f32 stream_range;
+    settings_readto(&root, "stream_range", real, stream_range);
+    if (!stream_range) { stream_range = 250; }
+    librg_option_set(LIBRG_DEFAULT_STREAM_RANGE, (u32)stream_range);
 
     settings_readto(&root, "hostname", string, mod->settings.hostname);
     settings_readto(&root, "password", string, mod->settings.password);
