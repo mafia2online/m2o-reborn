@@ -208,7 +208,7 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
     auto ped = get_ped(entity); mod_assert(ped && ped->CEntity);
 
     // last delta tick against constant tick delay
-    f32 alpha = ped->inter_delta / (f32)MOD_SERVER_TICK_DELAY;
+    f32 alpha = ped->inter_delta / ctx->timesync.server_delay;
     ped->inter_delta += mod.last_delta;
 
     if (ped->stream.state != PED_ON_GROUND) {

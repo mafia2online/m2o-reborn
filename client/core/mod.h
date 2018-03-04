@@ -66,8 +66,8 @@ static std::vector<M2::C_Entity*> swag;
  * takes about ~16 ms per tick
  */
 void mod_game_tick() {
-    mod.last_delta  = (zpl_utc_time_now() - mod.last_update) / 1000.f;
-    mod.last_update = zpl_utc_time_now();
+    mod.last_delta  = (zpl_time_now() - mod.last_update);
+    mod.last_update = zpl_time_now();
 
     librg_tick(ctx);
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), mod_entity_interpolate);

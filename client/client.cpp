@@ -154,12 +154,12 @@ struct mod_t {
     librg_entity_t  *player;
 
     // game tick props
-    u64 last_update;
-    f32 last_delta;
+    f64 last_update;
+    f64 last_delta;
 
     // game related states
-    b32 input_blocked = true;
-    b32 spawned;
+    bool input_blocked = true;
+    bool spawned;
 
     // collection of mutexes
     struct {
@@ -169,7 +169,7 @@ struct mod_t {
 
     struct {
         u32 limit;
-        b32 enabled;
+        bool enabled;
         std::queue<std::string> queue;
     } console;
 
