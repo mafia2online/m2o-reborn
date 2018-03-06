@@ -23,7 +23,7 @@ inline void cubic_hermite_v3_value(interpolate3_hermite_t *src, vec3_t value) {
     src->C = src->D;
     src->D = value;
 
-    if (src->C == zplm_vec3_zero()) {
+    if (src->C == zplm_vec3f_zero()) {
         src->A = src->D;
         src->B = src->D;
         src->C = src->D;

@@ -23,7 +23,7 @@ enum {
 /* entity flags */
 enum {
     MOD_ENTITY_INTERPOLATED = (1 << 20),
-    MOD_ENTITY_DRIVER       = (1 << 21), 
+    MOD_ENTITY_DRIVER       = (1 << 21),
 };
 
 // =======================================================================//
@@ -75,6 +75,7 @@ enum {
 struct ped_t {
     u16 model;
     u8  state;
+    char name[64];
 
     u8 seat;
     librg_entity_t *vehicle;

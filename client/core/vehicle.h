@@ -100,7 +100,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     auto car = get_car(entity); mod_assert(car && car->CEntity);
 
     // last delta tick against constant tick delay
-    f32 alpha = car->inter_delta / (f32)MOD_SERVER_TICK_DELAY;
+    f32 alpha = car->inter_delta / ctx->timesync.server_delay;
     car->inter_delta += mod.last_delta;
 
     f32 steer_alpha = zpl_clamp01(car->inter_delta / /*MOD_SERVER_TICK_DELAY*/ 32.f);
@@ -112,7 +112,7 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
         car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
     } else {
-        car->CCar->m_pVehicle.SetSpeed(zplm_vec3_zero());
+        car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
     }
 
     /* rotation interpolation */

@@ -1,20 +1,19 @@
-void module_ped_create(librg_message_t *msg) {
+void on_ped_create_command(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
-    auto ped = librg_entity_create(msg->ctx, TYPE_PED);
-    mod_assert(player && ped);
+    mod_assert(player);
 
-    ped->user_data = new ped_t();
-    ped->position = vec3(
+    auto ped = m2o_ped_create();
+    m2o_ped_position_set(ped, vec3(
         player->position.x + 1.0f,
         player->position.y,
         player->position.z + 0.05f
-    );
+    ));
 
     // log
-    print_posm(ped->position, "created a ped at: ");
+    print_posm(m2o_ped_position_get(ped), "created a ped at: ");
 }
 
-void module_ped_callback_create(librg_event_t *event) {
+void on_ped_create(librg_event_t *event) {
     auto ped = get_ped(event->entity);
 
     librg_data_wu16(event->data, ped->model);
@@ -27,6 +26,6 @@ void module_ped_callback_create(librg_event_t *event) {
     }
 }
 
-void module_ped_callback_remove(librg_event_t *event) {
+void on_ped_remove(librg_event_t *event) {
 
 }
