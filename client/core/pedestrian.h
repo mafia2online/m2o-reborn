@@ -148,6 +148,9 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
     auto ped = get_ped(event->entity);
 
+    // constnaly set our health to top (DEBUG)
+    ped->CHuman->GetScript()->SetHealth(720.0f);
+
     // make sure we have all objects
     mod_assert(ped && ped->CEntity);
 
