@@ -130,9 +130,10 @@ typedef union mod_state_t {
         state_callback_t *init;
         state_callback_t *tick;
         state_callback_t *render;
+        state_callback_t *prerender;
     };
 
-    state_callback_t *callbacks[3];
+    state_callback_t *callbacks[4];
 } mod_state_t;
 #undef STATE_CB
 
@@ -195,6 +196,7 @@ bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
 bool graphics_init();
 void graphics_terminate();
 void graphics_dimensions(int *w, int *h);
+void graphics_world_to_screen(vec3_t *, vec3_t);
 void graphics_device_create(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 void graphics_device_prerender();
 void graphics_device_render();
@@ -262,8 +264,7 @@ int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
  * Register all current mod paths
  * @param module
  */
-void mod_path_register(HMODULE module)
-{
+void mod_path_register(HMODULE module) {
     char temp_path_raw[MAX_PATH] = { '\0' };
     GetModuleFileName(module, temp_path_raw, MAX_PATH);
 
@@ -282,8 +283,7 @@ void mod_path_register(HMODULE module)
  * Trigger exiting from the mod
  * @param reason
  */
-void mod_exit(std::string reason)
-{
+void mod_exit(std::string reason) {
     mod_log("exiting %s\n", reason.c_str());
     mod_game_stop();
 
@@ -341,8 +341,7 @@ void mod_log(const char* format, ...) {
  * Trigger attachment to process
  * @param module
  */
-void mod_main(HMODULE module)
-{
+void mod_main(HMODULE module) {
     zpl_mutex_init(&mod.mutexes.log);
     zpl_mutex_init(&mod.mutexes.wnd_msg);
 
@@ -412,8 +411,7 @@ void mod_main(HMODULE module)
 /**
  * Our main process function
  */
-BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserved)
-{
+BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             DisableThreadLibraryCalls(module);
