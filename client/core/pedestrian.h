@@ -17,9 +17,9 @@ void module_ped_callback_create(librg_event_t *event) {
 
     // state on the moment player is created
     if (ped->state == PED_IN_CAR || ped->state == PED_ENTERING_CAR) {
+        ped->target_entityid = librg_data_ru32(event->data);
         ped->state  = PED_ENTERING_CAR;
         ped->seat   = librg_data_ru8(event->data);
-        ped->target_entityid = librg_data_ru32(event->data);
     }
 
     event->entity->flags |= MOD_ENTITY_INTERPOLATED;
@@ -32,6 +32,8 @@ void module_ped_callback_create(librg_event_t *event) {
         entity->SetPosition(event->entity->position);
 
         ped->CEntity = entity;
+    } else {
+        mod_log("[warning] could not create a ped for entity: %d\n", event->entity->id);
     }
 }
 
@@ -40,10 +42,13 @@ void module_ped_callback_create(librg_event_t *event) {
  */
 void module_ped_callback_remove(librg_event_t *event) {
     if (event->entity->id == mod.player->id) return;
-    mod_log("destroying entity %d\n", event->entity->id);
+    mod_log("destroying ped entity %d\n", event->entity->id);
+    auto ped = get_ped(event->entity);
 
-    auto ped = get_ped(event->entity); mod_assert(ped && ped->CEntity);
-    M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
+    if (ped->CEntity) { /* maybe it was deleted when we removed car from streamzone */
+        M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
+        ped->CEntity = nullptr;
+    }
 
     delete ped;
 }
@@ -62,7 +67,6 @@ void module_ped_tasks_update(ped_t *ped) {
             ped->vehicle = librg_entity_fetch(ctx, ped->target_entityid);
             auto car = get_car(ped->vehicle);
 
-            // TODO: add seat sync
             M2::C_SyncObject *pSyncObject = nullptr;
             ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
                 &pSyncObject, (M2::C_Vehicle *)car->CEntity,
@@ -80,6 +84,9 @@ void module_ped_tasks_update(ped_t *ped) {
 void module_ped_callback_update(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
     auto ped = get_ped(event->entity);
+
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
 
     // make sure we have all objects
     mod_assert(ped && ped->CEntity);
@@ -206,7 +213,10 @@ void module_ped_callback_clientstream(librg_event_t *event) {
 // =======================================================================//
 
 void module_ped_callback_interpolate(librg_entity_t *entity) {
-    auto ped = get_ped(entity); mod_assert(ped && ped->CEntity);
+    auto ped = get_ped(entity);
+
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
 
     // last delta tick against constant tick delay
     f32 alpha = ped->inter_delta / ctx->timesync.server_delay;

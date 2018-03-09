@@ -19,10 +19,11 @@ void on_car_create_command(librg_message_t *msg) {
 }
 
 void on_car_create(librg_event_t *event) {
-    if (!(event->entity->flags & LIBRG_ENTITY_CONTROLLED)) {
-        // mod_log("[info] setting closest player as an owner\n");
-        //librg_entity_control_set(event->ctx, event->entity->id, event->peer);
-    }
+    auto car = get_car(event->entity);
+
+    librg_data_wu16(event->data, car->model);
+    librg_data_wu8(event->data, car->state);
+    librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
 }
 
 void on_car_remove(librg_event_t *event) {
@@ -44,6 +45,7 @@ void on_car_enter_start(librg_message_t *msg) {
     auto seat = librg_data_ru8(msg->data);
     auto ped = get_ped(player);
 
+    ped->state = PED_IN_CAR;
     ped->vehicle = vehicle;
     ped->seat = seat;
 
@@ -82,6 +84,8 @@ void on_car_exit_start(librg_message_t *msg) {
 void on_car_exit_finish(librg_message_t *msg) {
     auto player  = librg_entity_find(msg->ctx, msg->peer);
     auto ped = get_ped(player);
+
+    ped->state = PED_ON_GROUND;
     ped->vehicle = nullptr;
     ped->seat = 0;
 

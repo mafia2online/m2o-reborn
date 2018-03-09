@@ -12,20 +12,26 @@
  * The entity enters the stream zone
  */
 void module_car_callback_create(librg_event_t *event) {
-    mod_log("[info] trying to spawn a car\n");
+    auto car = new car_t(event->entity);
+
+    car->model = librg_data_ru16(event->data);
+    car->state = librg_data_ru8(event->data);
+    librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
+
+    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+    event->entity->user_data = car;
+
     M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 42);
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating car at");
-
-        event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-        event->entity->user_data = new car_t(event->entity);
-
-        get_car(event->entity)->setCEntity(entity);
-        get_car(event->entity)->CCar->SetPos(event->entity->position);
-        //get_car(event->entity)->CCar->SetRot(event->entity->position);
-        get_car(event->entity)->CCar->m_pVehicle.SetEngineOn(true, false);
-        get_car(event->entity)->dbg();
+        car->setCEntity(entity);
+        car->CCar->SetPos(event->entity->position);
+        car->CCar->SetRot(car->stream.rotation);
+        car->CCar->m_pVehicle.SetEngineOn(true, false);
+        car->dbg();
+    } else {
+        mod_log("[warning] could not spawn a vehicle for entity: %d\n", event->entity->id);
     }
 }
 
@@ -34,6 +40,22 @@ void module_car_callback_create(librg_event_t *event) {
  */
 void module_car_callback_remove(librg_event_t *event) {
     auto car = get_car(event->entity); mod_assert(car && car->CEntity);
+    mod_log("destroying vehicle entity %d\n", event->entity->id);
+
+    // iterate and remove all peds that are in the car
+    librg_entity_iteratex(ctx, LIBRG_ENTITY_ALIVE, librg_lambda(entityid), {
+        auto entity = librg_entity_fetch(ctx, entityid);
+        if (entity->type != TYPE_PED) continue;
+        auto ped = get_ped(entity);
+
+        if (ped->vehicle == event->entity && ped->CEntity) {
+            mod_log("[info] removing ped from the vehicle\n");
+            // TODO: make it actually remove, for now just delete everyone
+            M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
+            ped->CEntity = nullptr;
+        }
+    });
+
     M2::Wrappers::DestroyEntity(car->CEntity, M2::eEntityType::MOD_ENTITY_CAR);
     delete car;
 }
@@ -234,7 +256,7 @@ void module_car_remote_enter_start(librg_message_t *msg) {
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->CEntity,
-        true, (M2::E_VehicleSeat)seat, 1
+        true, (M2::E_VehicleSeat)seat, true
     );
 }
 
@@ -261,11 +283,10 @@ void module_car_remote_exit_start(librg_message_t *msg) {
 
     mod_log("[info] removing ped: %u from the car: %u\n", player->id, ped->vehicle->id);
 
-    // TODO: add seat sync
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->CEntity,
-        true, (M2::E_VehicleSeat)ped->seat, 1
+        false, (M2::E_VehicleSeat)ped->seat, true
     );
 }
 
