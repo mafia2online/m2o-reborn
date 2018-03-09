@@ -29,9 +29,9 @@ void module_ped_callback_create(librg_event_t *event) {
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating ped at");
-        entity->SetPosition(event->entity->position);
-
         ped->CEntity = entity;
+        ped->CEntity->SetPosition(event->entity->position);
+        ped->CHuman->GetScript()->SetDemigod(true); /* peds can be killed only from local client side */
     } else {
         mod_log("[warning] could not create a ped for entity: %d\n", event->entity->id);
     }

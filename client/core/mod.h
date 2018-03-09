@@ -221,6 +221,7 @@ void mod_connected(librg_event_t *event) {
 
 void mod_disconnected(librg_event_t *event) {
     mod_log("[info] disconnected form the server\n");
+    mod_connecting = 0;
 
     auto CEntity = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
 
