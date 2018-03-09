@@ -16,7 +16,7 @@ void title_state_init() {
 
 void title_state_render() {
     static int x, y;
-    static int w = 210, h = 200;
+    static int w = 210, h = 180;
     graphics_dimensions(&x, &y);
 
     if (nk_begin(nk_ctx, "Mafia 2 Online: Reborn", nk_rect(x / 2 - w / 2, y / 2 - h / 2, w, h), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {

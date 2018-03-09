@@ -47,7 +47,7 @@ void on_car_enter_start(librg_message_t *msg) {
     ped->vehicle = vehicle;
     ped->seat = seat;
 
-    if (seat == 1 || !(vehicle->flags & LIBRG_ENTITY_CONTROLLED)) {
+    if (seat == 1) {
         librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
     }
 
