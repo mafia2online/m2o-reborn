@@ -42,8 +42,8 @@ void trigger_event(const char *name, evarg *args) {
 
         switch (value->type) {
             case EVARG_REAL:    zpl_printf("got a real: %f\n", value->real); break;
-            case EVARG_INTEGER: zpl_printf("got an integer: %d\n", value->integer); break;
             case EVARG_STRING:  zpl_printf("got a string: %s\n", value->string); break;
+            case EVARG_INTEGER: zpl_printf("got an integer: %d\n", value->integer); break;
         }
     }
 
