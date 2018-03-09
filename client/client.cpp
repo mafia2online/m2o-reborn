@@ -242,6 +242,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // actual client stuff
 #include "states/title.h"
 #include "states/debug.h"
+// #include "states/connected.h"
 
 // core stuff
 #include "core/graphics.h"

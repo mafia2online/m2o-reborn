@@ -14,8 +14,6 @@ void title_state_init() {
     zpl_strcpy(title_state_data.username_input, "Angry Mafioso");
 }
 
-// client prod gui
-// unkillable peds
 static int mod_connecting = 0;
 
 void title_state_render() {

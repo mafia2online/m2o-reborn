@@ -1,9 +1,3 @@
-// TODO: remove
-void mod_disconnected(librg_event_t *);
-
-// EXAMPLE: draw custom rectangle
-// nk_fill_rect(nk_window_get_canvas(nk_ctx), nk_rect(0, 0, 100, 100), 10.0, nk_rgb(255,0,0));
-
 // =======================================================================//
 // !
 // ! Debug handler
@@ -60,7 +54,7 @@ void mod_debug_console_execute() {
 // !
 // =======================================================================//
 
-void debug_console_render() {
+void mod_chat_render() {
 
     static struct nk_scroll log_scroll = { 0, 0 };
     struct nk_style_window original_window  = nk_ctx->style.window;
@@ -146,21 +140,21 @@ void debug_console_render() {
 
 void connected_state_render()
 {
-    debug_console_render();
+    mod_chat_render();
 
-    if (nk_begin(nk_ctx, "thething", nk_rect(10, 10, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
-        /* fixed widget pixel width */
-        nk_layout_row_dynamic(nk_ctx, 30, 1);
+    // if (nk_begin(nk_ctx, "thething", nk_rect(10, 10, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
+    //     /* fixed widget pixel width */
+    //     nk_layout_row_dynamic(nk_ctx, 30, 1);
 
-        if (nk_button_label(nk_ctx, "spawn ped")) {
-            librg_message_send(ctx, MOD_PED_CREATE, nullptr, 0);
-        }
+    //     if (nk_button_label(nk_ctx, "spawn ped")) {
+    //         librg_message_send(ctx, MOD_PED_CREATE, nullptr, 0);
+    //     }
 
-        if (nk_button_label(nk_ctx, "spawn car")) {
-            librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
-        }
-    }
-    nk_end(nk_ctx);
+    //     if (nk_button_label(nk_ctx, "spawn car")) {
+    //         librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
+    //     }
+    // }
+    // nk_end(nk_ctx);
 }
 
 #define MOD_DEBUG_STATE { nullptr, nullptr, connected_state_render }
