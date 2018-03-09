@@ -204,11 +204,11 @@ void mod_connected(librg_event_t *event) {
     ped->CPlayer->LockControls(false);
     ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    #if _DEBUG
+    // #if _DEBUG
     mod.state = MOD_DEBUG_STATE;
-    #else
-    mod.state = MOD_CONNECTED_STATE;
-    #endif
+    // #else
+    // mod.state = MOD_CONNECTED_STATE;
+    // #endif
 
     mod.player = event->entity;
     mod.player->user_data = ped;
