@@ -50,6 +50,7 @@ enum {
     MOD_CAR_EXIT_FINISH,
     MOD_CAR_INTERACTION_FINISH,
     MOD_PED_CREATE,
+    MOD_USER_SET_NAME,
 };
 
 #define m2o_export

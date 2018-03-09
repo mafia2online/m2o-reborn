@@ -12,6 +12,8 @@ void module_ped_callback_create(librg_event_t *event) {
 
     ped->model = librg_data_ru16(event->data);
     ped->state = librg_data_ru8(event->data);
+    auto namelen = librg_data_ru8(event->data);
+    librg_data_rptr(event->data, ped->name, namelen);
 
     // state on the moment player is created
     if (ped->state == PED_IN_CAR || ped->state == PED_ENTERING_CAR) {
@@ -91,7 +93,6 @@ void module_ped_callback_update(librg_event_t *event) {
     // ped->inter_pos.targ_speed = ped->stream.vspeed;
     // ped->inter_rot.last = ped->inter_rot.targ;
     // ped->inter_rot.targ = ped->stream.rotation;
-
 
     // ped->CHuman->GetScript()->ScrLookAt(
     //     &ped->sync, nullptr, ped->stream.look_at, true
@@ -189,10 +190,10 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     // ped->stream.is_accelerating = (ped_speed > ped->stream.speed);
     // ped->stream.speed = ped_speed;
 
-    // // assign and send new values
+    // assign and send new values
     // vec3_t newdir; zplm_vec3_norm0(&newdir, diff_position);
     // if ((valid_dir(newdir.x) || valid_dir(newdir.y)) && ped->stream.is_accelerating) {
-    //     ped->stream.direction = (ped->stream.direction + newdir) * 0.5f; // calc average
+    //     ped->stream.direction = (ped->stream.direction * 3.0 + newdir) / 4.f; // calc average
     // }
 
     librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream));

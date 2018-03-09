@@ -99,6 +99,7 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
 
     auto fm = (CFontManager *)mod.graphics.font_manager;
 
+    fm->AddFont("Ingame", "Aurora BdCn BT", 22, false);
     fm->AddFont("TitleUIFont", "Aurora BdCn BT", 26, false);
     fm->AddFont("TitleUIFontBig", "Aurora BdCn BT", 32, false);
 

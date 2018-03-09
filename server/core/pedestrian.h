@@ -18,6 +18,8 @@ void on_ped_create(librg_event_t *event) {
 
     librg_data_wu16(event->data, ped->model);
     librg_data_wu8(event->data, ped->state);
+    librg_data_wu8(event->data, zpl_strlen(ped->name));
+    librg_data_wptr(event->data, ped->name, zpl_strlen(ped->name));
 
     // we are in the car
     if (ped->state == PED_IN_CAR) {

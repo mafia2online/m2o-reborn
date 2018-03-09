@@ -144,32 +144,8 @@ void debug_console_render() {
     nk_end(nk_ctx);
 }
 
-#define MOD_USERNAME_DRAW_DISTANCE 250.0f
-vec3_t last_player_position;
-
-void draw_entity_nametag(librg_ctx_t *ctx, librg_entity_t *entity) {
-    if (entity->type != TYPE_PED) return;
-    if (entity->id == mod.player->id) return;
-
-    auto ped = get_ped(entity);
-    auto textlen = zpl_strlen(ped->name);
-
-    if (textlen < 1) return;
-    if (!ped->CHuman) return;
-    if (zplm_vec3_mag2(last_player_position - entity->position) > MOD_USERNAME_DRAW_DISTANCE) return;
-
-    vec3_t screen;
-    graphics_world_to_screen(&screen, ped->CHuman->GetPos());
-    if (screen.z > 1) return;
-
-    auto fm   = (CFontManager *)mod.graphics.font_manager;
-    auto font = fm->GetFont("Ingame");
-
-    if (font) fm->DrawTextA(ped->name, screen.x - textlen * 4, screen.y, D3DCOLOR_XRGB(255, 255, 255), *font, true);
-    //if (font)  fm->DrawTextW(ped->cached_name, screen.x, screen.y, D3DCOLOR_XRGB(179, 48, 48), *font, true);
-}
-
-void debug_state_render() {
+void connected_state_render()
+{
     debug_console_render();
 
     if (nk_begin(nk_ctx, "thething", nk_rect(10, 10, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
@@ -185,9 +161,6 @@ void debug_state_render() {
         }
     }
     nk_end(nk_ctx);
-
-    last_player_position = mod.player->position;
-    librg_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, draw_entity_nametag);
 }
 
-#define MOD_DEBUG_STATE { nullptr, nullptr, debug_state_render }
+#define MOD_DEBUG_STATE { nullptr, nullptr, connected_state_render }

@@ -7,6 +7,7 @@
 /* some interfaces */
 void module_ped_callback_create();
 void module_car_callback_create();
+void mod_connect_requested(librg_event_t *);
 void mod_connected(librg_event_t *);
 void mod_disconnected(librg_event_t *);
 void mod_entity_create(librg_event_t *);
@@ -16,6 +17,7 @@ void mod_entity_client_add(librg_event_t *);
 void mod_entity_client_update(librg_event_t *);
 void mod_entity_client_remove(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
+void mod_user_name_set(librg_message_t *);
 
 /**
  * Game initialization event
@@ -38,6 +40,7 @@ void mod_game_init() {
     // }
 
     // setup callbacks
+    librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, mod_connect_requested);
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, mod_connected);
     librg_event_add(ctx, LIBRG_CONNECTION_REFUSE, mod_disconnected);
     librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, mod_disconnected);
@@ -47,6 +50,8 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_ADD, mod_entity_client_add);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, mod_entity_client_update);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, mod_entity_client_remove);
+
+    librg_network_add(ctx, MOD_USER_SET_NAME, mod_user_name_set);
 
     // call inits for modules
     module_ped_init();
@@ -88,7 +93,7 @@ void mod_game_tick() {
     static int bite = 168;
     if (GetAsyncKeyState(VK_F2) & 0x1) {
         auto vehicle = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
-        
+
         test = vehicle->GetRot();
         print_pos(test);
     }
@@ -166,6 +171,32 @@ void mod_game_tick() {
 // !
 // =======================================================================//
 
+void mod_connect_requested(librg_event_t *event) {
+    // TODO: password sending
+}
+
+void mod_user_name_set(librg_message_t *msg) {
+    auto entity = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
+    mod_assert(entity);
+
+    u8 strsize = librg_data_ru8(msg->data);
+    auto ped   = get_ped(entity);
+    librg_data_rptr(msg->data, ped->name, strsize);
+
+    // client-specific
+    zpl_utf8_to_ucs2((u16 *)ped->cached_name, strsize, (const u8 *)ped->name);
+
+    mod_log("set new name for client %u: %s\n", entity->id, ped->name);
+}
+
+void mod_request_username_change(u32 entity_id, const char *username) {
+    mod_assert(username);
+    mod_message_send(ctx, MOD_USER_SET_NAME, [&](librg_data_t *data) {
+        librg_data_wu8(data, zpl_strlen(username));
+        librg_data_wptr(data, (void *)username, zpl_strlen(username));
+    });
+}
+
 void mod_connected(librg_event_t *event) {
     mod_log("[info] connected to the server\n");
     auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
@@ -173,9 +204,17 @@ void mod_connected(librg_event_t *event) {
     ped->CPlayer->LockControls(false);
     ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    mod.state  = MOD_DEBUG_STATE;
+    #if _DEBUG
+    mod.state = MOD_DEBUG_STATE;
+    #else
+    mod.state = MOD_CONNECTED_STATE;
+    #endif
+
     mod.player = event->entity;
     mod.player->user_data = ped;
+
+    // send our nickname
+    mod_request_username_change(event->entity->id, title_state_data.username_input);
 
     mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
 }

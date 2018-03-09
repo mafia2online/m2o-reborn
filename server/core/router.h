@@ -79,6 +79,22 @@ void on_entity_remove(librg_event_t *event) {
     }
 }
 
+void on_user_name_set(librg_message_t *msg) {
+    // TODO: read in a temp var first, and then apply to struct
+    u8 strsize = librg_data_ru8(msg->data);
+    auto entity = librg_entity_find(msg->ctx, msg->peer);
+    auto ped    = get_ped(entity);
+    librg_data_rptr(msg->data, ped->name, strsize);
+
+    mod_log("[info] client %d requested name change to: %s\n", entity->id, ped->name);
+
+    mod_message_send_instream_except(ctx, MOD_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
+        librg_data_wu32(data, entity->id);
+        librg_data_wu8(data, strsize);
+        librg_data_wptr(data, (void *)ped->name, strsize);
+    });
+}
+
 void mod_register_routes(librg_ctx_t *ctx) {
     librg_event_add(ctx, LIBRG_CONNECTION_REQUEST,      on_connection_request);
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT,       on_connect_accepted);
@@ -95,4 +111,6 @@ void mod_register_routes(librg_ctx_t *ctx) {
     librg_network_add(ctx, MOD_CAR_ENTER_FINISH,        on_car_enter_finish);
     librg_network_add(ctx, MOD_CAR_EXIT_START,          on_car_exit_start);
     librg_network_add(ctx, MOD_CAR_EXIT_FINISH,         on_car_exit_finish);
+
+    librg_network_add(ctx, MOD_USER_SET_NAME,           on_user_name_set);
 }
