@@ -348,10 +348,8 @@ void mod_main(HMODULE module) {
 
     // console, yay
     tools::console_attach();
-    tools::console_color_fg(3);
-    {
-        mod_log("the\nm2o-reborn\n");
-        mod_log("starting...\n");
+    tools::console_color_fg(3); {
+        mod_log("%s\n", MOD_VERSION_PRETTY);
     }
     tools::console_color_fg(7);
 
@@ -376,6 +374,10 @@ void mod_main(HMODULE module) {
     ctx->mode           = LIBRG_MODE_CLIENT;
     ctx->world_size     = zplm_vec3f(5000.0f, 5000.0f, 0);
     ctx->max_entities   = MOD_ENTITY_LIMIT;
+
+    librg_option_set(LIBRG_PLATFORM_ID, 218);
+    librg_option_set(LIBRG_PLATFORM_BUILD, MOD_VERSION_NUMBER);
+    librg_option_set(LIBRG_PLATFORM_PROTOCOL, MOD_VERSION_PROTOCOL);
 
     librg_init(ctx);
 

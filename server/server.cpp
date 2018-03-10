@@ -54,7 +54,12 @@ int main() {
         "==                 ¯\\_(ツ)_/¯                   ==\n" \
         "==                                              ==\n" \
         "==================================================\n";
-    zpl_printf("%s", test);
+    mod_log("%s", test);
+    mod_log("[info] server version: %s\n", MOD_VERSION_STRING);
+
+    librg_option_set(LIBRG_PLATFORM_ID, 218);
+    librg_option_set(LIBRG_PLATFORM_BUILD, MOD_VERSION_NUMBER);
+    librg_option_set(LIBRG_PLATFORM_PROTOCOL, MOD_VERSION_PROTOCOL);
 
     // allocate ctx
     ctx = new librg_ctx_t;
@@ -62,7 +67,7 @@ int main() {
 
     /* fill up default settings */
     ctx->mode            = LIBRG_MODE_SERVER;
-    ctx->tick_delay      = MOD_SERVER_TICK_DELAY;
+    ctx->tick_delay      = 64.0f;
     ctx->world_size      = zplm_vec3f(5000.0f, 5000.0f, 0.0f);
     ctx->max_entities    = MOD_ENTITY_LIMIT;
     ctx->max_connections = 1000;

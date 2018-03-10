@@ -172,7 +172,7 @@ void draw_entity_nametag(librg_ctx_t *ctx, librg_entity_t *entity) {
 void debug_state_render() {
     debug_console_render();
 
-    if (nk_begin(nk_ctx, "thething", nk_rect(10, 10, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
+    if (nk_begin(nk_ctx, "thething", nk_rect(2, 20, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
         /* fixed widget pixel width */
         nk_layout_row_dynamic(nk_ctx, 30, 1);
 

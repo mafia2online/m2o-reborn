@@ -228,7 +228,11 @@ void mod_disconnected(librg_event_t *event) {
     ((M2::C_Player2*)CEntity)->LockControls(true);
     // object->SetPosition(zplm_vec3_zero()); // creates black textures :O
 
-    delete mod.player->user_data;
+    // if we have been disconnected before being connected
+    if (mod.player) {
+        delete mod.player->user_data;
+    }
+
     mod.state = MOD_TITLE_STATE;
     mod.player = nullptr;
 }
