@@ -75,7 +75,7 @@ enum {
 struct ped_t {
     u16 model;
     u8  state;
-    char name[64];
+    char name[128];
 
     u8 seat;
     librg_entity_t *vehicle;
@@ -102,6 +102,7 @@ struct ped_t {
     #pragma pack(pop)
 
 #ifdef MOD_CLIENT
+    wchar_t cached_name[64];
     f32 inter_delta;
     interpolate3_hermite_t inter_pos;
 

@@ -69,7 +69,8 @@ void on_entity_remove(librg_event_t *event) {
     if (!event->entity) return; // entity has been deleted
     mod_log("[info] sending a remove packet for entity: %d\n", event->entity->id);
 
-    if (event->entity->flags & LIBRG_ENTITY_CONTROLLED) {
+    if (librg_entity_control_get(event->ctx, event->entity->id) == event->peer) {
+        mod_log("removing control of entity: %d for peer: %x\n", event->entity->id, event->peer);
         librg_entity_control_remove(event->ctx, event->entity->id);
     }
 
@@ -77,6 +78,22 @@ void on_entity_remove(librg_event_t *event) {
         case TYPE_PED: { on_ped_remove(event); } break;
         case TYPE_CAR: { on_car_remove(event); } break;
     }
+}
+
+void on_user_name_set(librg_message_t *msg) {
+    // TODO: read in a temp var first, and then apply to struct
+    u8 strsize = librg_data_ru8(msg->data);
+    auto entity = librg_entity_find(msg->ctx, msg->peer);
+    auto ped    = get_ped(entity);
+    librg_data_rptr(msg->data, ped->name, strsize);
+
+    mod_log("[info] client %d requested name change to: %s\n", entity->id, ped->name);
+
+    mod_message_send_instream_except(ctx, MOD_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
+        librg_data_wu32(data, entity->id);
+        librg_data_wu8(data, strsize);
+        librg_data_wptr(data, (void *)ped->name, strsize);
+    });
 }
 
 void mod_register_routes(librg_ctx_t *ctx) {
@@ -95,4 +112,6 @@ void mod_register_routes(librg_ctx_t *ctx) {
     librg_network_add(ctx, MOD_CAR_ENTER_FINISH,        on_car_enter_finish);
     librg_network_add(ctx, MOD_CAR_EXIT_START,          on_car_exit_start);
     librg_network_add(ctx, MOD_CAR_EXIT_FINISH,         on_car_exit_finish);
+
+    librg_network_add(ctx, MOD_USER_SET_NAME,           on_user_name_set);
 }

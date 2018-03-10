@@ -1,12 +1,40 @@
+// =======================================================================//
+// !
+// ! Main configuration macro definitions
+// !
+// =======================================================================//
+
+#define MOD_NAME "Mafia 2 Online - Reborn"
+
+#define MOD_VERSION_MAJOR 1
+#define MOD_VERSION_MINOR 0
+#define MOD_VERSION_PATCH 0
+
+#define MOD_VERSION_PROTOCOL 1 /* changing parameter, blocks old clients from connecting */
+
+#define MOD_QUOTE_X(t) #t
+#define MOD_QUOTE(t) MOD_QUOTE_X(t)
+
+#define MOD_VERSION_STRING MOD_QUOTE(MOD_VERSION_MAJOR) "." MOD_QUOTE(MOD_VERSION_MINOR) "." MOD_QUOTE(MOD_VERSION_PATCH)
+#define MOD_VERSION_NUMBER LIBRG_VERSION_CREATE(MOD_VERSION_MAJOR, MOD_VERSION_MINOR, MOD_VERSION_PATCH)
+
+#define MOD_VERSION_PRETTY MOD_NAME ". v" MOD_VERSION_STRING
+#define MOD_ENTITY_LIMIT 16000
+#define MOD_INVALID_ENTITY MOD_ENTITY_LIMIT
+
+// =======================================================================//
+// !
+// ! Other sutff used everywhere
+// !
+// =======================================================================//
+
 #define _CRT_SECURE_NO_WARNINGS
-#define D_SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#ifdef _DEBUG
+// #ifdef _DEBUG
 #define LIBRG_DEBUG
-#endif
-
-#define MOD_NAME "Mafia 2 Online - Reloaded"
+// #endif
 
 #define LIBRG_IMPLEMENTATION
 #include <librg.h>
@@ -36,10 +64,6 @@ typedef zplm_quat_t quat_t;
 #define mod_assert librg_assert
 #define mod_assert_msg librg_assert_msg
 
-#define MOD_SERVER_TICK_DELAY 64
-#define MOD_ENTITY_LIMIT 16000
-#define MOD_INVALID_ENTITY MOD_ENTITY_LIMIT
-
 // TODO: move to components.h
 /* events/messages */
 enum {
@@ -50,6 +74,7 @@ enum {
     MOD_CAR_EXIT_FINISH,
     MOD_CAR_INTERACTION_FINISH,
     MOD_PED_CREATE,
+    MOD_USER_SET_NAME,
 };
 
 #define m2o_export

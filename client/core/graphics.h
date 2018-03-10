@@ -31,6 +31,34 @@ inline void graphics_dimensions(int *w, int *h) {
     *h = static_cast<int>(mod.graphics.present_params.BackBufferHeight);
 }
 
+void graphics_draw_text(const char *text, int x, int y, unsigned long color, bool bold) {
+    auto fm   = (CFontManager *)mod.graphics.font_manager;
+    auto font = fm->GetFont("small");
+
+    if (font) fm->DrawTextA(text, x, y, color, *font, bold);
+}
+
+void graphics_world_to_screen(vec3_t *screen, vec3_t world) {
+    auto camera = M2::C_GameCamera::Get()->GetCamera(1);
+
+    // Get the world view projection matrix
+    D3DXMATRIX mat;
+    memcpy(&mat, &camera->m_pGameCamera->m_worldViewProjection, sizeof(D3DXMATRIX));
+    D3DXMatrixTranspose(&mat, &mat);
+
+    // Get the viewport
+    D3DVIEWPORT9 viewport;
+    mod.graphics.device->GetViewport(&viewport);
+
+    // Transform the world coordinate by the worldViewProjection matrix
+    D3DXVECTOR3 vec;
+    D3DXVec3TransformCoord(&vec, &D3DXVECTOR3(world.x, world.y, world.z), &mat);
+
+    screen->x = viewport.X + (1.0f + vec.x) * viewport.Width / 2.0f;
+    screen->y = viewport.Y + (1.0f - vec.y) * viewport.Height / 2.0f;
+    screen->z = viewport.MinZ + vec.z * (viewport.MaxZ - viewport.MinZ);
+}
+
 // =======================================================================//
 // !
 // ! Generic gfx events
@@ -75,6 +103,13 @@ void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * 
     if (mod.state.init) {
         mod.state.init();
     }
+
+    auto fm = (CFontManager *)mod.graphics.font_manager;
+
+    fm->AddFont("small", "Aurora BdCn BT", 14, false);
+    fm->AddFont("Ingame", "Aurora BdCn BT", 22, false);
+    fm->AddFont("TitleUIFont", "Aurora BdCn BT", 26, false);
+    fm->AddFont("TitleUIFontBig", "Aurora BdCn BT", 32, false);
 
     mod_assert(nk_ctx && nk_atlas->temporary.alloc);
 }
@@ -123,6 +158,12 @@ void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * p
 inline void graphics_device_prerender(void) {
     // todo
     mod_assert(nk_ctx && nk_atlas->temporary.alloc);
+
+    if (mod.state.prerender) {
+        mod.state.prerender();
+    }
+
+    graphics_draw_text(MOD_VERSION_PRETTY, 2, 2, D3DCOLOR_XRGB(255, 255, 255), false);
 }
 
 /**
@@ -217,6 +258,7 @@ inline void graphics_input_handling() {
     // finish input queue
     nk_input_end(nk_ctx);
 }
+
 
 /**
  * On device render callback

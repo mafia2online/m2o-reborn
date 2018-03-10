@@ -12,12 +12,14 @@ void module_ped_callback_create(librg_event_t *event) {
 
     ped->model = librg_data_ru16(event->data);
     ped->state = librg_data_ru8(event->data);
+    auto namelen = librg_data_ru8(event->data);
+    librg_data_rptr(event->data, ped->name, namelen);
 
     // state on the moment player is created
     if (ped->state == PED_IN_CAR || ped->state == PED_ENTERING_CAR) {
+        ped->target_entityid = librg_data_ru32(event->data);
         ped->state  = PED_ENTERING_CAR;
         ped->seat   = librg_data_ru8(event->data);
-        ped->target_entityid = librg_data_ru32(event->data);
     }
 
     event->entity->flags |= MOD_ENTITY_INTERPOLATED;
@@ -27,9 +29,11 @@ void module_ped_callback_create(librg_event_t *event) {
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating ped at");
-        entity->SetPosition(event->entity->position);
-
         ped->CEntity = entity;
+        ped->CEntity->SetPosition(event->entity->position);
+        ped->CHuman->GetScript()->SetDemigod(true); /* peds can be killed only from local client side */
+    } else {
+        mod_log("[warning] could not create a ped for entity: %d\n", event->entity->id);
     }
 }
 
@@ -38,10 +42,13 @@ void module_ped_callback_create(librg_event_t *event) {
  */
 void module_ped_callback_remove(librg_event_t *event) {
     if (event->entity->id == mod.player->id) return;
-    mod_log("destroying entity %d\n", event->entity->id);
+    mod_log("destroying ped entity %d\n", event->entity->id);
+    auto ped = get_ped(event->entity);
 
-    auto ped = get_ped(event->entity); mod_assert(ped && ped->CEntity);
-    M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
+    if (ped->CEntity) { /* maybe it was deleted when we removed car from streamzone */
+        M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
+        ped->CEntity = nullptr;
+    }
 
     delete ped;
 }
@@ -60,7 +67,6 @@ void module_ped_tasks_update(ped_t *ped) {
             ped->vehicle = librg_entity_fetch(ctx, ped->target_entityid);
             auto car = get_car(ped->vehicle);
 
-            // TODO: add seat sync
             M2::C_SyncObject *pSyncObject = nullptr;
             ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
                 &pSyncObject, (M2::C_Vehicle *)car->CEntity,
@@ -79,6 +85,9 @@ void module_ped_callback_update(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
     auto ped = get_ped(event->entity);
 
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
+
     // make sure we have all objects
     mod_assert(ped && ped->CEntity);
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
@@ -91,7 +100,6 @@ void module_ped_callback_update(librg_event_t *event) {
     // ped->inter_pos.targ_speed = ped->stream.vspeed;
     // ped->inter_rot.last = ped->inter_rot.targ;
     // ped->inter_rot.targ = ped->stream.rotation;
-
 
     // ped->CHuman->GetScript()->ScrLookAt(
     //     &ped->sync, nullptr, ped->stream.look_at, true
@@ -139,6 +147,9 @@ void module_ped_callback_update(librg_event_t *event) {
 void module_ped_callback_clientstream(librg_event_t *event) {
     auto entity = event->entity; mod_assert(entity);
     auto ped = get_ped(event->entity);
+
+    // constnaly set our health to top (DEBUG)
+    ped->CHuman->GetScript()->SetHealth(720.0f);
 
     // make sure we have all objects
     mod_assert(ped && ped->CEntity);
@@ -189,10 +200,10 @@ void module_ped_callback_clientstream(librg_event_t *event) {
     // ped->stream.is_accelerating = (ped_speed > ped->stream.speed);
     // ped->stream.speed = ped_speed;
 
-    // // assign and send new values
+    // assign and send new values
     // vec3_t newdir; zplm_vec3_norm0(&newdir, diff_position);
     // if ((valid_dir(newdir.x) || valid_dir(newdir.y)) && ped->stream.is_accelerating) {
-    //     ped->stream.direction = (ped->stream.direction + newdir) * 0.5f; // calc average
+    //     ped->stream.direction = (ped->stream.direction * 3.0 + newdir) / 4.f; // calc average
     // }
 
     librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream));
@@ -205,7 +216,10 @@ void module_ped_callback_clientstream(librg_event_t *event) {
 // =======================================================================//
 
 void module_ped_callback_interpolate(librg_entity_t *entity) {
-    auto ped = get_ped(entity); mod_assert(ped && ped->CEntity);
+    auto ped = get_ped(entity);
+
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
 
     // last delta tick against constant tick delay
     f32 alpha = ped->inter_delta / ctx->timesync.server_delay;
