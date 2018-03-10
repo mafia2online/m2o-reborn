@@ -116,11 +116,10 @@ void mod_game_tick() {
 
     if (GetAsyncKeyState(VK_F6) & 0x1)
     {
-        addCommand = !addCommand;
+        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetScript()->SetHealth(0.0);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
-        M2::Wrappers::DestroyEntity(ent, M2::MOD_ENTITY_CAR);
     }
 
     if (addCommand) {
@@ -225,7 +224,7 @@ void mod_connected(librg_event_t *event) {
 
     // send our nickname
     mod_request_username_change(event->entity->id, title_state_data.username_input);
-    mod_player_respawn();
+    mod_player_spawn(false);
 }
 
 void mod_disconnected(librg_event_t *event) {

@@ -61,6 +61,7 @@
 #include "CSpeedometer.hpp"
 #include "CSyncObject.hpp"
 #include "CTextDatabase.hpp"
+#include "CTickedModuleManager.hpp"
 #include "CTimer.hpp"
 #include "CTrafficLightsMgr.hpp"
 #include "CTrafficStreaming.hpp"

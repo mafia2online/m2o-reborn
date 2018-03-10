@@ -242,12 +242,24 @@ void module_ped_init() {
 
 }
 
-void mod_player_respawn() {
+void mod_player_spawn(bool respawn) {
     auto ped = get_ped(mod.player);
+
+    ped->CPlayer->LockControls(true);
+
+    if (respawn) {
+        M2::C_GameGuiModule::Get()->FaderFadeIn(5);
+    }
 
     ped->CHuman->GetScript()->SetHealth(720.0f);
     ped->CPlayer->LockControls(false);
     ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
+    /* Disable game reloading after death */
+    *(BYTE *)0x1CC397D = 1;
+}
+
+void mod_player_respawn()
+{
+    mod_player_spawn(true);
 }

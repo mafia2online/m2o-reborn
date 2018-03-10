@@ -221,6 +221,7 @@ namespace tools {
     {
         if (human == reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())) {
             mod_log("The player just died\n");
+            mod_player_respawn();
         }
         else {
             mod_log("An human just died\n");
@@ -271,6 +272,20 @@ namespace tools {
 
             jmp _DoDamage__JumpBack;
         }
+    }
+
+    /* Game Module Implementation */
+    DWORD __GameModuleInstall = 0x4F2F0A;
+    void __declspec(naked) GameModuleInstall()
+    {
+        __asm {
+            mov eax, [edx + 1Ch];
+            push 0Ah;
+        }
+        __asm pushad;
+        gamemodule_install();
+        __asm popad;
+        __asm jmp[__GameModuleInstall];
     }
 
     /* Actions patching */
@@ -393,6 +408,9 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&CHuman2__SetupDeath_Hook);
         Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
 
+        // Hooking game module registering
+        Mem::Hooks::InstallJmpPatch(0x4F2F05, (DWORD)GameModuleInstall, 5);
+
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
         __LoadCityPart = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x4743C0, (DWORD)LoadCityPartsHook, 5);
 
@@ -408,9 +426,6 @@ namespace tools {
         // Always use vec3
         *(BYTE *)0x09513EB = 0x75;
         *(BYTE *)0x0950D61 = 0x75;
-
-        // Disable game reloading after death
-        *(BYTE *)0x1CC397D = 1;
 
         // Disable game controlling engine state and radio
         Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car

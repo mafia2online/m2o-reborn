@@ -214,6 +214,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // hooks
 #include "hooks/memory.h"
 #include "hooks/steamdrm.h"
+#include "hooks/gamemodule.h"
 #include "hooks/gamehooks.h"
 #include "hooks/filepatcher.h"
 #include "hooks/dx/CDirect3DDevice9Proxy.h"
