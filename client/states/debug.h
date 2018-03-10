@@ -29,25 +29,30 @@ void mod_debug_console_execute() {
         command = command_line.substr(0, pos);
     }
 
-    if (command.compare("q") == 0) {
+    if (command.compare("/q") == 0) {
         mod_exit("bye");
     }
 
-    if (command.compare("test") == 0) {
-        mod_log("test\n");
+    if (command.compare("/test") == 0) {
+        mod_log("test :O\n");
     }
 
-    if (command.compare("spawn") == 0) {
+    if (command.compare("/spawn") == 0) {
         ((ped_t *)mod.player->user_data)->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
     }
 
-    if (command.compare("heal") == 0) {
-        mod_log("SetHealth for Human is not reversed!\n");
-    }
-
+#if _DEBUG
     // send vehicle create request onto server
-    if (command.compare("car") == 0) {
+    if (command.compare("/car") == 0) {
         librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
+    }
+#endif
+
+    if (mod_console_command_buffer[0] != '/') {
+        mod_message_send(ctx, MOD_USER_MESSAGE, [&](librg_data_t *data) {
+            librg_data_wu32(data, mod_console_command_length);
+            librg_data_wptr(data, mod_console_command_buffer, mod_console_command_length);
+        });
     }
 
     // unfocus edit and reset command
@@ -172,7 +177,8 @@ void draw_entity_nametag(librg_ctx_t *ctx, librg_entity_t *entity) {
 void debug_state_render() {
     debug_console_render();
 
-    if (nk_begin(nk_ctx, "thething", nk_rect(2, 20, 200, 75), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE)) {
+#if _DEBUG
+    if (nk_begin(nk_ctx, "a great debug", nk_rect(2, 20, 200, 105), NK_WINDOW_TITLE | NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_NO_SCROLLBAR)) {
         /* fixed widget pixel width */
         nk_layout_row_dynamic(nk_ctx, 30, 1);
 
@@ -185,6 +191,7 @@ void debug_state_render() {
         }
     }
     nk_end(nk_ctx);
+#endif
 
     last_player_position = mod.player->position;
     librg_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, draw_entity_nametag);

@@ -18,6 +18,7 @@ void mod_entity_client_update(librg_event_t *);
 void mod_entity_client_remove(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 void mod_user_name_set(librg_message_t *);
+void mod_on_user_message(librg_message_t *);
 
 /**
  * Game initialization event
@@ -52,6 +53,7 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, mod_entity_client_remove);
 
     librg_network_add(ctx, MOD_USER_SET_NAME, mod_user_name_set);
+    librg_network_add(ctx, MOD_USER_MESSAGE, mod_on_user_message);
 
     // call inits for modules
     module_ped_init();
@@ -195,6 +197,17 @@ void mod_request_username_change(u32 entity_id, const char *username) {
         librg_data_wu8(data, zpl_strlen(username));
         librg_data_wptr(data, (void *)username, zpl_strlen(username));
     });
+}
+
+void mod_on_user_message(librg_message_t *msg) {
+    char message_buffer[632];
+    u32 strsize = librg_data_ru32(msg->data);
+    librg_data_rptr(msg->data, message_buffer, strsize);
+    message_buffer[strsize] = '\0';
+
+    for (int i = 0; i < strsize; i++) message_buffer[i] = message_buffer[i] == '%' ? '\045' : message_buffer[i];
+
+    mod_log("[chat] %s\n", message_buffer);
 }
 
 void mod_connected(librg_event_t *event) {

@@ -20,6 +20,7 @@
 #include <tchar.h>
 #include <mutex>
 #include <iomanip>
+#include <clocale>
 
 // stream stuff
 #include <iostream>
