@@ -48,7 +48,7 @@ void mod_debug_console_execute() {
     }
 #endif
 
-    if (mod_console_command_buffer[0] != '/') {
+    if (mod_console_command_buffer[0] != '/' && mod_console_command_length > 1) {
         mod_message_send(ctx, MOD_USER_MESSAGE, [&](librg_data_t *data) {
             librg_data_wu32(data, mod_console_command_length);
             librg_data_wptr(data, mod_console_command_buffer, mod_console_command_length);
