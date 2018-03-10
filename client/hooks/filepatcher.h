@@ -49,7 +49,7 @@ namespace tools {
         }
 
         if (file_found) {
-            std::string newfilename = mod.paths.game_files + "\\" + filename;
+            std::string newfilename = mod.paths.files + "\\" + filename;
 
             // substiture the file
             mod_log("[info] patching file %s\n", filename.c_str());

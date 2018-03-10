@@ -83,7 +83,6 @@ struct mod_path_t {
     std::string index;
     std::string files;
     std::string debug;
-    std::string game_files;
 };
 
 typedef struct {
@@ -279,7 +278,6 @@ void mod_path_register(HMODULE module) {
     mod.paths.index = temp_path;
     mod.paths.files = temp_path + "\\files";
     mod.paths.debug = temp_path + "\\debug.log";
-    mod.paths.game_files = temp_path + "\\game_files";
 }
 
 /**
