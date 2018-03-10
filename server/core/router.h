@@ -33,7 +33,6 @@ void on_connect_accepted(librg_event_t *event) {
         entity->position.z
     );
 
-    entity->stream_range = 20.0f;
     entity->user_data = new ped_t();
     librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 }

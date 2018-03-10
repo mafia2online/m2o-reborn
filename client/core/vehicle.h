@@ -125,16 +125,20 @@ void module_car_callback_interpolate(librg_entity_t *entity) {
     f32 alpha = car->inter_delta / ctx->timesync.server_delay;
     car->inter_delta += mod.last_delta;
 
-    f32 steer_alpha = zpl_clamp01(car->inter_delta / /*MOD_SERVER_TICK_DELAY*/ 32.f);
-    f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, steer_alpha);
+    f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, zpl_clamp01(alpha));
 
     car->CCar->m_pVehicle.SetSteer(dest_steer);
     car->CCar->SetPos(cubic_hermite_v3_interpolate(&car->inter_pos, alpha));
 
-    if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
-        car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
-    } else {
-        car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
+    // TODO: fix camera wiggle
+    // for now apply speed only if you are not in the car
+    auto player_ped = get_ped(mod.player);
+    if (player_ped->vehicle != entity) {
+        if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
+            car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
+        } else {
+            car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
+        }
     }
 
     /* rotation interpolation */
@@ -286,7 +290,7 @@ void module_car_remote_exit_start(librg_message_t *msg) {
     M2::C_SyncObject *pSyncObject = nullptr;
     ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
         &pSyncObject, (M2::C_Vehicle *)car->CEntity,
-        false, (M2::E_VehicleSeat)ped->seat, true
+        true, (M2::E_VehicleSeat)ped->seat, true
     );
 }
 
