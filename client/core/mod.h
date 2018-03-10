@@ -214,9 +214,6 @@ void mod_connected(librg_event_t *event) {
     mod_log("[info] connected to the server\n");
     auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
 
-    ped->CPlayer->LockControls(false);
-    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
-
     // #if _DEBUG
     mod.state = MOD_DEBUG_STATE;
     // #else
@@ -228,8 +225,7 @@ void mod_connected(librg_event_t *event) {
 
     // send our nickname
     mod_request_username_change(event->entity->id, title_state_data.username_input);
-
-    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
+    mod_player_respawn();
 }
 
 void mod_disconnected(librg_event_t *event) {
