@@ -97,6 +97,16 @@ set(SERVER_LIBRARIES)
 set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours ${DISCORD})
 set(LAUNCHER_LIBRARIES Psapi steam_api)
 
+if (WIN32)
+    # windows libraries for enet
+    set(SERVER_LIBRARIES ${SERVER_LIBRARIES} Ws2_32 Winmm)
+    set(CLIENT_LIBRARIES ${CLIENT_LIBRARIES} Ws2_32 Winmm)
+elseif (UNIX)
+    # unix math library for us
+    set(SERVER_LIBRARIES ${SERVER_LIBRARIES} m pthread dl)
+    set(CLIENT_LIBRARIES ${CLIENT_LIBRARIES} m pthread dl)
+endif()
+
 ###
 # Adding executables
 # Linking libraries
