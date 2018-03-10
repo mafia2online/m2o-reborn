@@ -75,6 +75,7 @@ enum {
     MOD_CAR_INTERACTION_FINISH,
     MOD_PED_CREATE,
     MOD_USER_SET_NAME,
+    MOD_USER_MESSAGE,
 };
 
 #define m2o_export

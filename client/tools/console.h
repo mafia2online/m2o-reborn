@@ -7,6 +7,10 @@ namespace tools {
         AllocConsole();
         AttachConsole(GetCurrentProcessId());
 
+        // Set our locale to the C locale, as Unicode output only functions in this locale
+        std::setlocale(LC_ALL, "C");
+        SetConsoleOutputCP(CP_UTF8);
+
         // Relay Input/Output
         FILE* x;
         freopen_s(&x, "CONOUT$", "w", stdout);

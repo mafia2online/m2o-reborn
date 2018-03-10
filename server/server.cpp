@@ -1,6 +1,10 @@
 #define MOD_SERVER
 #include "includes.h"
 
+#if defined(ZPL_SYSTEM_WINDOWS)
+#include <clocale>
+#endif
+
 // shared
 #include "components.h"
 #include "extensions.h"
@@ -48,6 +52,12 @@ void mod_measure(void *user_data) {
 }
 
 int main() {
+    #if defined(ZPL_SYSTEM_WINDOWS)
+    // Set our locale to the C locale, as Unicode output only functions in this locale
+    std::setlocale(LC_ALL, "C");
+    SetConsoleOutputCP(CP_UTF8);
+    #endif
+
     const char *test = \
         "===============    M2O-SERVER    =================\n" \
         "==                                              ==\n" \

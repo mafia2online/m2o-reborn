@@ -18,6 +18,7 @@ void mod_entity_client_update(librg_event_t *);
 void mod_entity_client_remove(librg_event_t *);
 void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 void mod_user_name_set(librg_message_t *);
+void mod_on_user_message(librg_message_t *);
 
 /**
  * Game initialization event
@@ -52,6 +53,7 @@ void mod_game_init() {
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, mod_entity_client_remove);
 
     librg_network_add(ctx, MOD_USER_SET_NAME, mod_user_name_set);
+    librg_network_add(ctx, MOD_USER_MESSAGE, mod_on_user_message);
 
     // call inits for modules
     module_ped_init();
@@ -197,12 +199,20 @@ void mod_request_username_change(u32 entity_id, const char *username) {
     });
 }
 
+void mod_on_user_message(librg_message_t *msg) {
+    char message_buffer[632];
+    u32 strsize = librg_data_ru32(msg->data);
+    librg_data_rptr(msg->data, message_buffer, strsize);
+    message_buffer[strsize] = '\0';
+
+    for (int i = 0; i < strsize; i++) message_buffer[i] = message_buffer[i] == '%' ? '\045' : message_buffer[i];
+
+    mod_log("[chat] %s\n", message_buffer);
+}
+
 void mod_connected(librg_event_t *event) {
     mod_log("[info] connected to the server\n");
     auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
-
-    ped->CPlayer->LockControls(false);
-    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
     // #if _DEBUG
     mod.state = MOD_DEBUG_STATE;
@@ -215,8 +225,7 @@ void mod_connected(librg_event_t *event) {
 
     // send our nickname
     mod_request_username_change(event->entity->id, title_state_data.username_input);
-
-    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
+    mod_player_respawn();
 }
 
 void mod_disconnected(librg_event_t *event) {

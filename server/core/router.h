@@ -96,6 +96,28 @@ void on_user_name_set(librg_message_t *msg) {
     });
 }
 
+void on_user_message(librg_message_t *msg) {
+    char message_buffer[632], input_buffer[512];
+
+    u32 strsize = librg_data_ru32(msg->data);
+    librg_data_rptr(msg->data, input_buffer, strsize);
+    input_buffer[strsize] = '\0';
+
+    for (int i = 0; i < strsize; i++) input_buffer[i] = input_buffer[i] == '%' ? '\045' : input_buffer[i];
+
+    auto entity = librg_entity_find(msg->ctx, msg->peer);
+    auto ped = get_ped(entity);
+
+    zpl_snprintf(message_buffer, 632, "%s (%d): %s", ped->name, entity->id, input_buffer);
+
+    mod_log("[chat] %s \n", message_buffer);
+
+    mod_message_send(ctx, MOD_USER_MESSAGE, [&](librg_data_t *data) {
+        librg_data_wu32(data, zpl_strlen(message_buffer));
+        librg_data_wptr(data, message_buffer, zpl_strlen(message_buffer));
+    });
+}
+
 void mod_register_routes(librg_ctx_t *ctx) {
     librg_event_add(ctx, LIBRG_CONNECTION_REQUEST,      on_connection_request);
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT,       on_connect_accepted);
@@ -114,4 +136,5 @@ void mod_register_routes(librg_ctx_t *ctx) {
     librg_network_add(ctx, MOD_CAR_EXIT_FINISH,         on_car_exit_finish);
 
     librg_network_add(ctx, MOD_USER_SET_NAME,           on_user_name_set);
+    librg_network_add(ctx, MOD_USER_MESSAGE,            on_user_message);
 }

@@ -241,3 +241,13 @@ void module_ped_callback_interpolate(librg_entity_t *entity) {
 void module_ped_init() {
 
 }
+
+void mod_player_respawn() {
+    auto ped = get_ped(mod.player);
+
+    ped->CHuman->GetScript()->SetHealth(720.0f);
+    ped->CPlayer->LockControls(false);
+    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+
+    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
+}

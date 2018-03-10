@@ -239,10 +239,15 @@ inline void graphics_input_handling() {
             } break;
         }
 
-        if (msg.uMsg == WM_CHAR && __pressed_ctrl) {
-            int down = !((msg.lParam >> 31) & 1);
-            // mod_log("%d", msg.wParam); /* dbg char */
+        /* temp chat opening */
+        if (msg.uMsg == WM_CHAR && !mod.console.enabled) {
+            if (msg.lParam == 1310721) {
+                mod.console.enabled = true;
+                mod.input_blocked   = true;
+            }
+        }
 
+        if (msg.uMsg == WM_CHAR && __pressed_ctrl) {
             switch (msg.wParam) {
                 case 1: nk_input_key(&d3d9.ctx, NK_KEY_TEXT_SELECT_ALL, true); nk_input_key(&d3d9.ctx, NK_KEY_TEXT_SELECT_ALL, false); break;
                 case 3: nk_input_key(&d3d9.ctx, NK_KEY_COPY, true); nk_input_key(&d3d9.ctx, NK_KEY_COPY, false); break;
