@@ -117,7 +117,6 @@ void module_car_callback_clientstream(librg_event_t *event) {
 // !
 // =======================================================================//
 
-
 void module_car_callback_interpolate(librg_entity_t *entity) {
     auto car = get_car(entity); mod_assert(car && car->CEntity);
 

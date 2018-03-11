@@ -38,6 +38,19 @@ void on_connect_accepted(librg_event_t *event) {
 }
 
 void on_connect_disconnect(librg_event_t *event) {
+    auto ped = get_ped(event->entity);
+
+    librg_entity_iteratex(event->ctx, LIBRG_ENTITY_ALIVE, entityid, {
+        auto entity = librg_entity_fetch(ctx, entityid);
+        if (entity->type != TYPE_CAR) continue;
+        if (!(entity->flags & LIBRG_ENTITY_CONTROLLED)) continue;
+
+        if (librg_entity_control_get(event->ctx, entity->id) == event->entity->client_peer) {
+            mod_log("[info] removing control on %d for disconnected client\n", entity->id);
+            librg_entity_control_remove(event->ctx, entity->id); // remove control from our ped
+        }
+    });
+
     delete (char *)event->entity->user_data;
 }
 
