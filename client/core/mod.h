@@ -29,16 +29,6 @@ void mod_game_init() {
 
     tools::gamehooks_install_late();
     M2::C_GameGuiModule::Get()->FaderFadeIn(1); // therotically we shouldn't call it here but because it's a sync object it's fine itll work but the local player isn't created just yet.
-    M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(0.5); /* 0.0 .. 1.0 - time of the day */
-
-    // TODO: fix crash inside ActivateStreamMapLine
-    // if (M2::C_SDSLoadingTable::Get()) {
-    //     M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
-    //     M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
-
-    //     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
-    //     mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_late_afternoon");
-    // }
 
     // setup callbacks
     librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, mod_connect_requested);
@@ -130,40 +120,6 @@ void mod_game_tick() {
         moveCMD->z = dir.z;
         reinterpret_cast<M2::C_Human2*>(ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCMD);
     }
-
-
-#if 0
-    if (GetAsyncKeyState(VK_LEFT) & 0x1) {
-        ztime -= 0.1f;
-        if (ztime < 0)
-            ztime = 0;
-        M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        mod_log("Time shift!\n");
-    }
-
-    if (GetAsyncKeyState(VK_RIGHT) & 0x1) {
-        ztime += 0.1f;
-        if (ztime > 1.0f)
-            ztime = 1.0f;
-        M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(ztime);
-        mod_log("Time shift!\n");
-    }
-
-
-    if (GetAsyncKeyState(VK_F8) & 0x1) {
-    }
-
-    if (GetAsyncKeyState(VK_F6) & 0x1) {
-        //librg_fetch_gamedata(lastcar)->object->Deactivate();
-    }
-
-    if (GetAsyncKeyState(VK_F7) & 0x1) {
-        //librg_fetch_gamedata(lastcar)->object->Activate();
-    }
-
-    if (GetAsyncKeyState(VK_F9) & 0x1) {
-    }
-#endif
 }
 
 // =======================================================================//

@@ -15,43 +15,6 @@ namespace tools {
     DWORD _callEnd = 0x99CE70;
 
     /**
-     * Game hooking methods
-     */
-
-    DWORD GameLoopHook_1_Return;
-    DWORD _call = 0x473D10;
-    void __declspec(naked) GameLoopHook_1()
-    {
-        __asm call[_call];
-        __asm pushad;
-        mod_game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_1_Return];
-    }
-
-    DWORD GameLoopHook_2_Return;
-    void __declspec(naked) GameLoopHook_2()
-    {
-        __asm fstp    dword ptr[esp + 0x10];
-        __asm fld     dword ptr[esp + 0x10];
-        __asm pushad;
-        mod_game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_2_Return];
-    }
-
-    DWORD GameInitHook_Return = 0x4ECFC0;
-    DWORD _C_PreloadSDS__FinishPendingSlots = 0x4E2690;
-    void __declspec(naked) GameInitHook()
-    {
-        __asm call[_C_PreloadSDS__FinishPendingSlots];
-        __asm pushad;
-        mod_game_init();
-        __asm popad;
-        __asm jmp[GameInitHook_Return];
-    }
-
-    /**
     * Hooking vehicle methods 
     */
     void __declspec(naked) GameStartDriveHook__1()
@@ -380,12 +343,8 @@ namespace tools {
 
     void gamehooks_install()
     {
-        // main game loops
-        GameLoopHook_1_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED614, (Address)GameLoopHook_1);
-        GameLoopHook_2_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED04D, (DWORD)GameLoopHook_2, 8);
-
-        // game init
-        GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
+        // Hooking game module registering
+        Mem::Hooks::InstallJmpPatch(0x4F2F05, (DWORD)GameModuleInstall, 5);
 
         // vehicle hooks
         GameStartDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x043B305, (Address)GameStartDriveHook__1);
@@ -406,9 +365,6 @@ namespace tools {
         // Hooking human death
         Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&CHuman2__SetupDeath_Hook);
         Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
-
-        // Hooking game module registering
-        Mem::Hooks::InstallJmpPatch(0x4F2F05, (DWORD)GameModuleInstall, 5);
 
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
         __LoadCityPart = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x4743C0, (DWORD)LoadCityPartsHook, 5);
