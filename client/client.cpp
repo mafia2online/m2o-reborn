@@ -191,7 +191,7 @@ void mod_game_tick();
 void mod_log(const char* format, ...);
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
-void mod_player_respawn();
+void mod_player_spawn();
 
 // graphics stuff, including dx callbacks
 bool graphics_init();

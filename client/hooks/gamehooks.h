@@ -221,7 +221,6 @@ namespace tools {
     {
         if (human == reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())) {
             mod_log("The player just died\n");
-            mod_player_respawn();
         }
         else {
             mod_log("An human just died\n");

@@ -242,24 +242,20 @@ void module_ped_init() {
 
 }
 
-void mod_player_spawn(bool respawn) {
+void mod_player_spawn() {
     auto ped = get_ped(mod.player);
 
+    /* Disable ambiant peds */
+    M2::Wrappers::SwitchFarAmbiants(false);
+    M2::Wrappers::SwitchGenerators(false);
+
+    /* Lock to prevent actions while respawning */
     ped->CPlayer->LockControls(true);
 
-    if (respawn) {
-        M2::C_GameGuiModule::Get()->FaderFadeIn(5);
-    }
-
+    /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
-    ped->CPlayer->LockControls(false);
     ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    /* Disable game reloading after death */
-    *(BYTE *)0x1CC397D = 1;
-}
-
-void mod_player_respawn()
-{
-    mod_player_spawn(true);
+    /* Enabling controls */
+    ped->CPlayer->LockControls(false);
 }

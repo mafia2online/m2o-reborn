@@ -224,7 +224,7 @@ void mod_connected(librg_event_t *event) {
 
     // send our nickname
     mod_request_username_change(event->entity->id, title_state_data.username_input);
-    mod_player_spawn(false);
+    mod_player_spawn();
 }
 
 void mod_disconnected(librg_event_t *event) {
