@@ -22,8 +22,13 @@
  * Version History:
  * 3.2.0
  * - Fixed minor memory client-side memory leak with empty control list
- * - Added method for allocating the librg_ctx_t for the bindings
- * - Added method for allocating the librg_data_t for the bindings
+ * - Fixed issue with client stream update and removed entity on server
+ * - Updated zpl to new major version, watch out for possible incompatibilities
+ * - Added method for alloc/dealloc the librg_ctx_t, librg_data_t, librg_event_t for the bindings
+ * - Added experimental support for update buffering, disabled by default, and not recommended to use
+ * - Added built-in timesyncer, working on top of monotonic time, syncing client clock to server one
+ * - Added helper methods: librg_time_now, librg_standard_deviation
+ * - Changed ctx->tick_delay from u16 to f64 (slightly more precision)
  *
  * Version History:
  * 3.1.0
@@ -53,8 +58,9 @@
  * 2.0.0 - Initial C version rewrite
  *
  * Things TODO:
- * v3.2.0?
- * - DEBUG packet size validation (FEATURE)
+ * v3.3.0?
+ * - Add method to check if entity is in stream of other entity
+ * - Add DEBUG packet size validation (FEATURE)
  * - refactoring librg_table_t (FEATURE)
  * - remove entity ignore for target entity that was disconnected/deleted (BUG)
  * - remove controller peer for entity, on owner disconnect (BUG)
@@ -1189,7 +1195,7 @@ extern "C" {
 
                     if (id == LIBRG_ENTITY_UPDATE) {
                         server_time = librg_data_rf64(&data);
-                        // librg_log("server_time: %f, client_predicted: %f\n", server_time, librg_time_now(ctx));
+                        // librg_log("server_time: %f, client_predicted: %f, diff: %f\n", server_time, librg_time_now(ctx), librg_time_now(ctx) - server_time);
 
                         if (librg_option_get(LIBRG_NETWORK_BUFFER_SIZE) > 1) {
                             librg__buffer_push(ctx, server_time, event.peer, data.rawptr, data.capacity);
@@ -1890,12 +1896,12 @@ extern "C" {
 
     void librg__buffer_tick(void *usrptr) {
         librg_ctx_t *ctx = (librg_ctx_t *)usrptr;
-        if (zpl_ring_librg_snapshot_empty(&ctx->buffer)) {
+        if (!zpl_ring_librg_snapshot_full(&ctx->buffer)) {
             return;
         }
 
         librg_snapshot *snap = zpl_ring_librg_snapshot_get(&ctx->buffer);
-        f64 time_diff = (ctx->buffer_size * ctx->timesync.server_delay);
+        f64 time_diff = ((ctx->buffer_size + 1) * ctx->timesync.server_delay);
 
         // if current update if too old, just skip it, and call next one
         if (snap->time < (librg_time_now(ctx) - time_diff)) {
@@ -1913,11 +1919,6 @@ extern "C" {
         // skip our message id length and timestamp lenth
         // TODO: copy not all the stuff but only needed (skiping those two)
         librg_data_set_rpos(&data, sizeof(librg_message_id) + sizeof(f64));
-
-        static f64 last_update = 0;
-        f64 diff = zpl_time_now() - last_update;
-        librg_log("diff since last update: %f\n", diff);
-        last_update = zpl_time_now();
 
         librg_message_t msg = {0}; {
             msg.ctx     = ctx;
@@ -2045,7 +2046,7 @@ extern "C" {
 
     /* Execution side: CLIENT */
     LIBRG_INTERNAL void librg__callback_connection_refuse(librg_message_t *msg) {
-        librg_dbg("librg__connection_refuse/n");
+        librg_dbg("librg__connection_refuse\n");
         LIBRG_MESSAGE_TO_EVENT(event, msg);
         librg_event_trigger(msg->ctx, LIBRG_CONNECTION_REFUSE, &event);
     }
@@ -2169,7 +2170,6 @@ extern "C" {
                     return;
                 }
 
-                // apply value, with minor averaging between our 3x median and 1x received diff
                 ctx->timesync.start_time  = zpl_time_now();
                 ctx->timesync.offset_time = server_time + ctx->timesync.median;
             }
@@ -2272,7 +2272,6 @@ extern "C" {
             if (!librg_entity_valid(msg->ctx, entity)) {
                 librg_dbg("invalid entity on client streamer update\n");
                 librg_data_set_rpos(msg->data, librg_data_get_rpos(msg->data) + size);
-                librg_assert(false);
                 continue;
             }
 
