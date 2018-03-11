@@ -61,6 +61,7 @@
 #include "CSpeedometer.hpp"
 #include "CSyncObject.hpp"
 #include "CTextDatabase.hpp"
+#include "CTickedModuleManager.hpp"
 #include "CTimer.hpp"
 #include "CTrafficLightsMgr.hpp"
 #include "CTrafficStreaming.hpp"
@@ -74,6 +75,7 @@
 /* Wrappers */
 #include "../wrappers/camera.hpp"
 #include "../wrappers/entity.hpp"
+#include "../wrappers/game.hpp"
 #include "../wrappers/lua.hpp"
 #include "../wrappers/models.hpp"
 #include "../wrappers/config.hpp"

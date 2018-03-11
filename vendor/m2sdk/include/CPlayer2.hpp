@@ -25,13 +25,10 @@ namespace M2
     class S_InputCtrl
     {
     public:
-        pad(S_InputCtrl, pad0, 0xA0);
+        pad(S_InputCtrl, pad0, 0xA0);                           // 0000 - 00A0
         E_PlayerMovementType    m_ePlayerMovementState;         // 00A0 - 00A1
-        BYTE                    m_bModifiers;                   // 00A1 - 00A2
-        BYTE                    m_bAiming;                      // 00A2 - 00A3
-        BYTE                    m_bUnk;                         // 00A3 - 00A4
-        BYTE                    m_bMouseFlags;                  // 00A4 - 00A5
-        BYTE                    m_bKeyboardFlags;               // 00A5 - 00A6
+        pad(S_InputCtrl, pad1, 0x5F);                           // 00A1 - 0100
+        bool                    m_bCrouching;                   // 0100 - 0104
 
     };
 

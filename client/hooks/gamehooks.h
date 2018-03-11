@@ -15,43 +15,6 @@ namespace tools {
     DWORD _callEnd = 0x99CE70;
 
     /**
-     * Game hooking methods
-     */
-
-    DWORD GameLoopHook_1_Return;
-    DWORD _call = 0x473D10;
-    void __declspec(naked) GameLoopHook_1()
-    {
-        __asm call[_call];
-        __asm pushad;
-        mod_game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_1_Return];
-    }
-
-    DWORD GameLoopHook_2_Return;
-    void __declspec(naked) GameLoopHook_2()
-    {
-        __asm fstp    dword ptr[esp + 0x10];
-        __asm fld     dword ptr[esp + 0x10];
-        __asm pushad;
-        mod_game_tick();
-        __asm popad;
-        __asm jmp[GameLoopHook_2_Return];
-    }
-
-    DWORD GameInitHook_Return = 0x4ECFC0;
-    DWORD _C_PreloadSDS__FinishPendingSlots = 0x4E2690;
-    void __declspec(naked) GameInitHook()
-    {
-        __asm call[_C_PreloadSDS__FinishPendingSlots];
-        __asm pushad;
-        mod_game_init();
-        __asm popad;
-        __asm jmp[GameInitHook_Return];
-    }
-
-    /**
     * Hooking vehicle methods 
     */
     void __declspec(naked) GameStartDriveHook__1()
@@ -227,7 +190,7 @@ namespace tools {
         }
     }
 
-    __declspec(naked) void MineDeathHook()
+    __declspec(naked) void CHuman2__SetupDeath_Hook()
 
     {
         __asm
@@ -245,6 +208,46 @@ namespace tools {
 
             jmp MineDeathHook_JumpBack
         }
+    }
+
+    DWORD _CHuman2__DoDamage = 0x09907D0;
+    DWORD _DoDamage__JumpBack = 0x042FC6F;
+    void OnHumanDoDamage(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)
+    {
+        //Do things here
+    }
+
+    __declspec(naked) void CHuman2__DoDamage__Hook()
+    {
+        __asm
+        {
+            pushad;
+            push esi;
+            push edi;
+            call OnHumanDoDamage;
+            add esp, 0x8;
+            popad;
+
+            push edi;
+            mov ecx, esi;
+            call _CHuman2__DoDamage;
+
+            jmp _DoDamage__JumpBack;
+        }
+    }
+
+    /* Game Module Implementation */
+    DWORD __GameModuleInstall = 0x4F2F0A;
+    void __declspec(naked) GameModuleInstall()
+    {
+        __asm {
+            mov eax, [edx + 1Ch];
+            push 0Ah;
+        }
+        __asm pushad;
+        gamemodule_install();
+        __asm popad;
+        __asm jmp[__GameModuleInstall];
     }
 
     /* Actions patching */
@@ -319,18 +322,29 @@ namespace tools {
         __asm jmp[_CHuman2__AddCommand];
     }
 
+    DWORD __LoadCityPart;
+    void __declspec(naked) LoadCityPartsHook()
+    {
+        __asm {
+            push ebx;
+            push ebp;
+            push esi;
+            push edi;
+            mov edi, [ecx + 16];
+        }
+        __asm pushad;
+        mod_log("load city part\n");
+        __asm popad;
+        __asm jmp[__LoadCityPart];
+    }
     /**
      * Game hooking calls
      */
 
     void gamehooks_install()
     {
-        // main game loops
-        GameLoopHook_1_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED614, (Address)GameLoopHook_1);
-        GameLoopHook_2_Return = Mem::Hooks::InstallNotDumbJMP(0x4ED04D, (DWORD)GameLoopHook_2, 8);
-
-        // game init
-        GameInitHook_Return = Mem::Hooks::InstallNotDumbJMP(0x4ECFBB, (DWORD)GameInitHook);
+        // Hooking game module registering
+        Mem::Hooks::InstallJmpPatch(0x4F2F05, (DWORD)GameModuleInstall, 5);
 
         // vehicle hooks
         GameStartDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x043B305, (Address)GameStartDriveHook__1);
@@ -349,9 +363,11 @@ namespace tools {
         Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
 
         // Hooking human death
-        Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&MineDeathHook);
+        Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&CHuman2__SetupDeath_Hook);
+        Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
 
         //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
+        __LoadCityPart = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x4743C0, (DWORD)LoadCityPartsHook, 5);
 
         // Entity Messages hooks
         onReceiveMessage = (CScriptEntity__RecvMessage_t) Mem::Hooks::InstallJmpPatch(0x117BCA0, (DWORD)OnReceiveMessageHook);
@@ -365,9 +381,6 @@ namespace tools {
         // Always use vec3
         *(BYTE *)0x09513EB = 0x75;
         *(BYTE *)0x0950D61 = 0x75;
-
-        // Disable game reloading after death
-        *(BYTE *)0x1CC397D = 1;
 
         // Disable game controlling engine state and radio
         Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car

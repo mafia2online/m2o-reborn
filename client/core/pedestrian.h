@@ -242,12 +242,30 @@ void module_ped_init() {
 
 }
 
-void mod_player_respawn() {
+void mod_player_spawn() {
     auto ped = get_ped(mod.player);
 
+    M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(0.5); /* 0.0 .. 1.0 - time of the day */
+
+   /* if (M2::C_SDSLoadingTable::Get()) {
+        M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
+        M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
+
+        M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
+        mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_late_afternoon");
+    }*/
+
+    /* Disable ambiant peds */
+    M2::Wrappers::SwitchFarAmbiants(false);
+    M2::Wrappers::SwitchGenerators(false);
+
+    /* Lock to prevent actions while respawning */
+    ped->CPlayer->LockControls(true);
+
+    /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
-    ped->CPlayer->LockControls(false);
     ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
 
-    mod_log("[info] local ped GUID: %lu\n", (u32)ped->CEntity->m_dwGUID);
+    /* Enabling controls */
+    ped->CPlayer->LockControls(false);
 }

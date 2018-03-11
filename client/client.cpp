@@ -191,7 +191,7 @@ void mod_game_tick();
 void mod_log(const char* format, ...);
 void mod_exit(std::string);
 bool mod_wndproc(HWND, UINT, WPARAM, LPARAM);
-void mod_player_respawn();
+void mod_player_spawn();
 
 // graphics stuff, including dx callbacks
 bool graphics_init();
@@ -213,6 +213,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // hooks
 #include "hooks/memory.h"
 #include "hooks/steamdrm.h"
+#include "hooks/gamemodule.h"
 #include "hooks/gamehooks.h"
 #include "hooks/filepatcher.h"
 #include "hooks/dx/CDirect3DDevice9Proxy.h"
