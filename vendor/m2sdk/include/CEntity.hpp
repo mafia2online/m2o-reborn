@@ -1,4 +1,4 @@
-﻿/** @file CEntity.hpp
+/** @file CEntity.hpp
 *  @brief Game's Entity class
 *
 *
