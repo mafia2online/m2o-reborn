@@ -81,44 +81,35 @@ void mod_game_tick() {
         mod.spawned = true;
     }
 
-    static quat_t test;
-    static int bite = 168;
-    if (GetAsyncKeyState(VK_F2) & 0x1) {
-        auto vehicle = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
-
-        test = vehicle->GetRot();
-        print_pos(test);
-    }
-    static std::vector<M2::C_Entity*> swag;
     static M2::C_Entity *ent;
-    static bool addCommand = false;
-    if (GetAsyncKeyState(VK_F4) & 0x1) {
-        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-        player = player + vec3(0, 1.0f, -1.5f);
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, bite);
-        ent->SetPosition(player);
-        bite++;
-
-        // TODO: add seat sync
-        M2::C_SyncObject *pSyncObject = nullptr;
-        ((M2::C_Human2 *)ent)->GetScript()->ScrAttack((M2::C_Entity*)M2::C_Game::Get()->GetLocalPed());
-    }
-
-    if (GetAsyncKeyState(VK_F6) & 0x1)
+    if (GetAsyncKeyState(VK_F3) & 0x1 && mod.spawned)
     {
-        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetScript()->SetHealth(0.0);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 0);
+
+        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+
+        ent->SetPosition(pos);
+
+        mod_log("Ped created\n");
     }
 
-    if (GetAsyncKeyState(VK_F7) & 0x1) {
-    }
 
-    if (addCommand) {
+    if (GetAsyncKeyState(VK_F4) & 0x1 && mod.spawned && ent) {
         vec3_t dir = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetDir();
         M2::S_HumanCommandMoveDir *moveCMD = new M2::S_HumanCommandMoveDir;
         moveCMD->x = dir.x;
         moveCMD->y = dir.y;
         moveCMD->z = dir.z;
         reinterpret_cast<M2::C_Human2*>(ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCMD);
+
+        mod_log("Command added\n");
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1 && mod.spawned) {
+        void *command;
+        void *command2;
+       command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
+        mod_log("0x%p\n0x%p\n", command, command2);
     }
 }
 

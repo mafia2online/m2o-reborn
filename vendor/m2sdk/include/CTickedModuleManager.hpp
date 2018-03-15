@@ -51,7 +51,7 @@ namespace M2
 
     typedef 
 
-    class C_TickedModuleManager2 : public GameClassWrapper<C_TickedModuleManager2, ICTickedModuleManager, 0x1ABE8BC>
+    class C_TickedModuleManager : public GameClassWrapper<C_TickedModuleManager, ICTickedModuleManager, 0x1ABE8BC>
     {
     public:
         void AddAction(unsigned int action, int timer, C_TickedModule *module, void (C_TickedModule::*callback)(I_TickedModuleCallEventContext&), float unk, unsigned int unk2, unsigned int unk3)

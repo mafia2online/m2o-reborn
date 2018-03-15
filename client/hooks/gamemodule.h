@@ -37,12 +37,12 @@ namespace M2
     };
 };
 
-static M2::GameModule module;
+static M2::GameModule gameModule;
 
 void gamemodule_install()
 {
-    M2::C_TickedModuleManager2::Get()->AddAction(M2::TickedModuleEvent::EVENT_GAME_INIT, 400, &module, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventGameInit), -1.0f, 0, 0);
-    M2::C_TickedModuleManager2::Get()->AddAction(M2::TickedModuleEvent::EVENT_TICK, 500, &module, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventTick), -1.0f, 0, 0);
-    M2::C_TickedModuleManager2::Get()->AddAction(M2::TickedModuleEvent::EVENT_LOADING_STARTED, 1720, &module, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventLoadingStarted), -1.0f, 0, 0);
-    M2::C_TickedModuleManager2::Get()->AddAction(M2::TickedModuleEvent::EVENT_LOADING_FINISHED, 1720, &module, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventLoadingFinished), -1.0f, 0, 0);
+    M2::C_TickedModuleManager::Get()->AddAction(M2::TickedModuleEvent::EVENT_GAME_INIT, 500, &gameModule, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventGameInit), -1.0f, 0, 0);
+    M2::C_TickedModuleManager::Get()->AddAction(M2::TickedModuleEvent::EVENT_TICK, 400, &gameModule, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventTick), -1.0f, 0, 0);
+    M2::C_TickedModuleManager::Get()->AddAction(M2::TickedModuleEvent::EVENT_LOADING_STARTED, 1720, &gameModule, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventLoadingStarted), -1.0f, 0, 0);
+    M2::C_TickedModuleManager::Get()->AddAction(M2::TickedModuleEvent::EVENT_LOADING_FINISHED, 1720, &gameModule, static_cast<void (M2::C_TickedModule::*)(M2::I_TickedModuleCallEventContext &)>(&M2::GameModule::EventLoadingFinished), -1.0f, 0, 0);
 }
