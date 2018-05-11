@@ -8,6 +8,12 @@ Usage:
   #define ZPL_IMPLEMENTATION
   #include "zpl.h"
 
+  To make use of platform layer, define ZPL_PLATFORM, like:
+
+  #define ZPL_IMPLEMENTATION
+  #define ZPL_PLATFORM
+  #include "zpl.h"
+
 Credits:
   Read AUTHORS.md
 
@@ -15,6 +21,13 @@ GitHub:
   https://github.com/zpl-c/zpl
 
 Version History:
+  6.6.0 - Several significant changes made to the repository
+  6.5.0 - Ported platform layer from https://github.com/gingerBill/gb/
+  6.4.1 - Use zpl_strlen in zpl_strdup
+  6.4.0 - Deprecated zpl_buffer_free and added zpl_array_end, zpl_buffer_end
+  6.3.0 - Added zpl_strdup
+  6.2.1 - Remove math redundancies
+  6.2.0 - Integrated zpl_math.h into zpl.h
   6.1.1 - Added direct.h include for win c++ dir methods
   6.1.0 - Added zpl_path_mkdir, zpl_path_rmdir, and few new zplFileErrors
   6.0.4 - More MSVC(++) satisfaction by fixing warnings
@@ -1375,6 +1388,7 @@ ZPL_DEF isize zpl_strnlen(char const *str, isize max_len);
 ZPL_DEF i32   zpl_strcmp (char const *s1, char const *s2);
 ZPL_DEF i32   zpl_strncmp(char const *s1, char const *s2, isize len);
 ZPL_DEF char *zpl_strcpy (char *dest, char const *source);
+ZPL_DEF char *zpl_strdup (zpl_allocator a, char *src, isize max_len);
 ZPL_DEF char *zpl_strncpy(char *dest, char const *source, isize len);
 ZPL_DEF isize zpl_strlcpy(char *dest, char const *source, isize len);
 ZPL_DEF char *zpl_strrev (char *str); // NOTE: ASCII only
@@ -1572,6 +1586,7 @@ ZPL_DEF zpl_string zpl_string_append_fmt(zpl_string str, char const *fmt, ...);
 
 #define zpl_buffer_header_t zpl_buffer_header
 typedef struct zpl_buffer_header {
+    zpl_allocator backing;
     isize count;
     isize capacity;
 } zpl_buffer_header;
@@ -1582,17 +1597,21 @@ typedef struct zpl_buffer_header {
 #define ZPL_BUFFER_HEADER(x)   (cast(zpl_buffer_header *)(x) - 1)
 #define zpl_buffer_count(x)    (ZPL_BUFFER_HEADER(x)->count)
 #define zpl_buffer_capacity(x) (ZPL_BUFFER_HEADER(x)->capacity)
+#define zpl_buffer_end(x)      (x + (zpl_buffer_count(x) - 1))
 
 #define zpl_buffer_init(x, allocator, cap) do {                         \
     void **nx = cast(void **)&(x);                                  \
     zpl_buffer_header *zpl__bh = cast(zpl_buffer_header *)zpl_alloc((allocator), sizeof(zpl_buffer_header)+(cap)*zpl_size_of(*(x))); \
+    zpl__bh->backing = allocator; \
     zpl__bh->count = 0;                                             \
     zpl__bh->capacity = cap;                                        \
     *nx = cast(void *)(zpl__bh+1);                                  \
 } while (0)
 
 
+// DEPRECATED(zpl_buffer_free): Use zpl_buffer_free2 instead
 #define zpl_buffer_free(x, allocator) (zpl_free(allocator, ZPL_BUFFER_HEADER(x)))
+#define zpl_buffer_free2(x) (zpl_free(ZPL_BUFFER_HEADER(x)->backing, ZPL_BUFFER_HEADER(x)))
 
 #define zpl_buffer_append(x, item) do { (x)[zpl_buffer_count(x)++] = (item); } while (0)
 
@@ -1746,6 +1765,7 @@ ZPL_STATIC_ASSERT(ZPL_ARRAY_GROW_FORMULA(0) > 0);
 #define zpl_array_allocator(x) (ZPL_ARRAY_HEADER(x)->allocator)
 #define zpl_array_count(x)     (ZPL_ARRAY_HEADER(x)->count)
 #define zpl_array_capacity(x)  (ZPL_ARRAY_HEADER(x)->capacity)
+#define zpl_array_end(x)       (x + (zpl_array_count(x) - 1))
 
 #define zpl_array_init_reserve(x, allocator_, cap) do {                 \
     void **zpl__array_ = cast(void **)&(x);                         \
@@ -2781,6 +2801,776 @@ ZPL_DEF void zpl_jobs_enqueue(zpl_thread_pool *pool, zpl_jobs_proc proc, void *d
 ZPL_DEF void zpl_jobs_enqueue_with_priority(zpl_thread_pool *pool, zpl_jobs_proc proc, void *data, i32 priority);
 ZPL_DEF b32  zpl_jobs_process(zpl_thread_pool *pool);
 #endif
+
+////////////////////////////////////////////////////////////////
+//
+// Math
+//
+
+#define zpl_vec2_t zpl_vec2
+typedef union zpl_vec2 {
+    struct {
+        f32 x, y;
+    };
+    f32 e[2];
+} zpl_vec2;
+
+#define zpl_vec3_t zpl_vec3
+typedef union zpl_vec3 {
+    struct {
+        f32 x, y, z;
+    };
+    struct {
+        f32 r, g, b;
+    };
+
+    zpl_vec2 xy;
+    f32 e[3];
+} zpl_vec3;
+
+#define zpl_vec4_t zpl_vec4
+typedef union zpl_vec4 {
+    struct {
+        f32 x, y, z, w;
+    };
+    struct {
+        f32 r, g, b, a;
+    };
+    struct {
+        zpl_vec2 xy, zw;
+    };
+    zpl_vec3 xyz;
+    zpl_vec3 rgb;
+    f32 e[4];
+} zpl_vec4;
+
+#define zpl_mat2_t zpl_mat2
+typedef union zpl_mat2 {
+    struct {
+        zpl_vec2 x, y;
+    };
+    zpl_vec2 col[2];
+    f32 e[4];
+} zpl_mat2;
+
+#define zpl_mat3_t zpl_mat3
+typedef union zpl_mat3 {
+    struct {
+        zpl_vec3 x, y, z;
+    };
+    zpl_vec3 col[3];
+    f32 e[9];
+} zpl_mat3;
+
+#define zpl_mat4_t zpl_mat4
+typedef union zpl_mat4 {
+    struct {
+        zpl_vec4 x, y, z, w;
+    };
+    zpl_vec4 col[4];
+    f32 e[16];
+} zpl_mat4;
+
+#define zpl_quat_t zpl_quat
+typedef union zpl_quat {
+    struct {
+        f32 x, y, z, w;
+    };
+    zpl_vec4 xyzw;
+    zpl_vec3 xyz;
+    f32 e[4];
+} zpl_quat;
+
+typedef f32 zpl_float2[2];
+typedef f32 zpl_float3[3];
+typedef f32 zpl_float4[4];
+
+typedef struct zpl_rect2 {
+    zpl_vec2 pos, dim;
+} zpl_rect2;
+typedef struct zpl_rect3 {
+    zpl_vec3 pos, dim;
+} zpl_rect3;
+
+typedef struct zpl_aabb2 {
+    zpl_vec2 centre, half_size;
+} zpl_aabb2;
+typedef struct zpl_aabb3 {
+    zpl_vec3 centre, half_size;
+} zpl_aabb3;
+
+typedef short zpl_half;
+
+#ifndef ZPL_CONSTANTS
+#define ZPL_CONSTANTS
+#define ZPL_EPSILON 1.19209290e-7f
+#define ZPL_ZERO 0.0f
+#define ZPL_ONE 1.0f
+#define ZPL_TWO_THIRDS 0.666666666666666666666666666666666666667f
+
+#define ZPL_TAU 6.28318530717958647692528676655900576f
+#define ZPL_PI 3.14159265358979323846264338327950288f
+#define ZPL_ONE_OVER_TAU 0.636619772367581343075535053490057448f
+#define ZPL_ONE_OVER_PI 0.159154943091895335768883763372514362f
+
+#define ZPL_TAU_OVER_2 3.14159265358979323846264338327950288f
+#define ZPL_TAU_OVER_4 1.570796326794896619231321691639751442f
+#define ZPL_TAU_OVER_8 0.785398163397448309615660845819875721f
+
+#define ZPL_E 2.71828182845904523536f
+#define ZPL_SQRT_TWO 1.41421356237309504880168872420969808f
+#define ZPL_SQRT_THREE 1.73205080756887729352744634150587236f
+#define ZPL_SQRT_FIVE 2.23606797749978969640917366873127623f
+
+#define ZPL_LOG_TWO 0.693147180559945309417232121458176568f
+#define ZPL_LOG_TEN 2.30258509299404568401799145468436421f
+#endif
+
+#ifndef zpl_square
+#define zpl_square(x) ((x) * (x))
+#endif
+
+#ifndef zpl_cube
+#define zpl_cube(x) ((x) * (x) * (x))
+#endif
+
+#ifndef zpl_sign
+#define zpl_sign(x) ((x) >= 0 ? 1 : -1)
+#endif
+
+ZPL_DEF f32 zpl_to_radians(f32 degrees);
+ZPL_DEF f32 zpl_to_degrees(f32 radians);
+
+/* NOTE: Because to interpolate angles */
+ZPL_DEF f32 zpl_angle_diff(f32 radians_a, f32 radians_b);
+
+ZPL_DEF f32 zpl_copy_sign(f32 x, f32 y);
+ZPL_DEF f32 zpl_remainder(f32 x, f32 y);
+ZPL_DEF f32 zpl_mod(f32 x, f32 y);
+ZPL_DEF f64 zpl_copy_sign64(f64 x, f64 y);
+ZPL_DEF f64 zpl_floor64    (f64 x);
+ZPL_DEF f64 zpl_ceil64     (f64 x);
+ZPL_DEF f64 zpl_round64    (f64 x);
+ZPL_DEF f64 zpl_remainder64(f64 x, f64 y);
+ZPL_DEF f64 zpl_abs64      (f64 x);
+ZPL_DEF f64 zpl_sign64     (f64 x);
+ZPL_DEF f64 zpl_mod64(f64 x, f64 y);
+ZPL_DEF f32 zpl_sqrt(f32 a);
+ZPL_DEF f32 zpl_rsqrt(f32 a);
+ZPL_DEF f32 zpl_quake_rsqrt(f32 a); /* NOTE: It's probably better to use 1.0f/zpl_sqrt(a)
+                                          * And for simd, there is usually isqrt functions too!
+                                          */
+ZPL_DEF f32 zpl_sin(f32 radians);
+ZPL_DEF f32 zpl_cos(f32 radians);
+ZPL_DEF f32 zpl_tan(f32 radians);
+ZPL_DEF f32 zpl_arcsin(f32 a);
+ZPL_DEF f32 zpl_arccos(f32 a);
+ZPL_DEF f32 zpl_arctan(f32 a);
+ZPL_DEF f32 zpl_arctan2(f32 y, f32 x);
+
+ZPL_DEF f32 zpl_exp(f32 x);
+ZPL_DEF f32 zpl_exp2(f32 x);
+ZPL_DEF f32 zpl_log(f32 x);
+ZPL_DEF f32 zpl_log2(f32 x);
+ZPL_DEF f32 zpl_fast_exp(f32 x);     /* NOTE: Only valid from -1 <= x <= +1 */
+ZPL_DEF f32 zpl_fast_exp2(f32 x);    /* NOTE: Only valid from -1 <= x <= +1 */
+ZPL_DEF f32 zpl_pow(f32 x, f32 y); /* x^y */
+
+ZPL_DEF f32 zpl_round(f32 x);
+ZPL_DEF f32 zpl_floor(f32 x);
+ZPL_DEF f32 zpl_ceil(f32 x);
+
+ZPL_DEF f32 zpl_half_to_float(zpl_half value);
+ZPL_DEF zpl_half zpl_float_to_half(f32 value);
+
+ZPL_DEF zpl_vec2 zpl_vec2f_zero(void);
+ZPL_DEF zpl_vec2 zpl_vec2f(f32 x, f32 y);
+ZPL_DEF zpl_vec2 zpl_vec2fv(f32 x[2]);
+
+ZPL_DEF zpl_vec3 zpl_vec3f_zero(void);
+ZPL_DEF zpl_vec3 zpl_vec3f(f32 x, f32 y, f32 z);
+ZPL_DEF zpl_vec3 zpl_vec3fv(f32 x[3]);
+
+ZPL_DEF zpl_vec4 zpl_vec4f_zero(void);
+ZPL_DEF zpl_vec4 zpl_vec4f(f32 x, f32 y, f32 z, f32 w);
+ZPL_DEF zpl_vec4 zpl_vec4fv(f32 x[4]);
+
+ZPL_DEF void zpl_vec2_add(zpl_vec2 *d, zpl_vec2 v0, zpl_vec2 v1);
+ZPL_DEF void zpl_vec2_sub(zpl_vec2 *d, zpl_vec2 v0, zpl_vec2 v1);
+ZPL_DEF void zpl_vec2_mul(zpl_vec2 *d, zpl_vec2 v, f32 s);
+ZPL_DEF void zpl_vec2_div(zpl_vec2 *d, zpl_vec2 v, f32 s);
+
+ZPL_DEF void zpl_vec3_add(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1);
+ZPL_DEF void zpl_vec3_sub(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1);
+ZPL_DEF void zpl_vec3_mul(zpl_vec3 *d, zpl_vec3 v, f32 s);
+ZPL_DEF void zpl_vec3_div(zpl_vec3 *d, zpl_vec3 v, f32 s);
+
+ZPL_DEF void zpl_vec4_add(zpl_vec4 *d, zpl_vec4 v0, zpl_vec4 v1);
+ZPL_DEF void zpl_vec4_sub(zpl_vec4 *d, zpl_vec4 v0, zpl_vec4 v1);
+ZPL_DEF void zpl_vec4_mul(zpl_vec4 *d, zpl_vec4 v, f32 s);
+ZPL_DEF void zpl_vec4_div(zpl_vec4 *d, zpl_vec4 v, f32 s);
+
+ZPL_DEF void zpl_vec2_addeq(zpl_vec2 *d, zpl_vec2 v);
+ZPL_DEF void zpl_vec2_subeq(zpl_vec2 *d, zpl_vec2 v);
+ZPL_DEF void zpl_vec2_muleq(zpl_vec2 *d, f32 s);
+ZPL_DEF void zpl_vec2_diveq(zpl_vec2 *d, f32 s);
+
+ZPL_DEF void zpl_vec3_addeq(zpl_vec3 *d, zpl_vec3 v);
+ZPL_DEF void zpl_vec3_subeq(zpl_vec3 *d, zpl_vec3 v);
+ZPL_DEF void zpl_vec3_muleq(zpl_vec3 *d, f32 s);
+ZPL_DEF void zpl_vec3_diveq(zpl_vec3 *d, f32 s);
+
+ZPL_DEF void zpl_vec4_addeq(zpl_vec4 *d, zpl_vec4 v);
+ZPL_DEF void zpl_vec4_subeq(zpl_vec4 *d, zpl_vec4 v);
+ZPL_DEF void zpl_vec4_muleq(zpl_vec4 *d, f32 s);
+ZPL_DEF void zpl_vec4_diveq(zpl_vec4 *d, f32 s);
+
+ZPL_DEF f32 zpl_vec2_dot(zpl_vec2 v0, zpl_vec2 v1);
+ZPL_DEF f32 zpl_vec3_dot(zpl_vec3 v0, zpl_vec3 v1);
+ZPL_DEF f32 zpl_vec4_dot(zpl_vec4 v0, zpl_vec4 v1);
+
+ZPL_DEF void zpl_vec2_cross(f32 *d, zpl_vec2 v0, zpl_vec2 v1);
+ZPL_DEF void zpl_vec3_cross(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1);
+
+ZPL_DEF f32 zpl_vec2_mag2(zpl_vec2 v);
+ZPL_DEF f32 zpl_vec3_mag2(zpl_vec3 v);
+ZPL_DEF f32 zpl_vec4_mag2(zpl_vec4 v);
+
+ZPL_DEF f32 zpl_vec2_mag(zpl_vec2 v);
+ZPL_DEF f32 zpl_vec3_mag(zpl_vec3 v);
+ZPL_DEF f32 zpl_vec4_mag(zpl_vec4 v);
+
+ZPL_DEF void zpl_vec2_norm(zpl_vec2 *d, zpl_vec2 v);
+ZPL_DEF void zpl_vec3_norm(zpl_vec3 *d, zpl_vec3 v);
+ZPL_DEF void zpl_vec4_norm(zpl_vec4 *d, zpl_vec4 v);
+
+ZPL_DEF void zpl_vec2_norm0(zpl_vec2 *d, zpl_vec2 v);
+ZPL_DEF void zpl_vec3_norm0(zpl_vec3 *d, zpl_vec3 v);
+ZPL_DEF void zpl_vec4_norm0(zpl_vec4 *d, zpl_vec4 v);
+
+ZPL_DEF void zpl_vec2_reflect(zpl_vec2 *d, zpl_vec2 i, zpl_vec2 n);
+ZPL_DEF void zpl_vec3_reflect(zpl_vec3 *d, zpl_vec3 i, zpl_vec3 n);
+ZPL_DEF void zpl_vec2_refract(zpl_vec2 *d, zpl_vec2 i, zpl_vec2 n, f32 eta);
+ZPL_DEF void zpl_vec3_refract(zpl_vec3 *d, zpl_vec3 i, zpl_vec3 n, f32 eta);
+
+ZPL_DEF f32 zpl_vec2_aspect_ratio(zpl_vec2 v);
+
+ZPL_DEF void zpl_mat2_identity(zpl_mat2 *m);
+ZPL_DEF void zpl_float22_identity(f32 m[2][2]);
+
+ZPL_DEF void zpl_mat2_transpose(zpl_mat2 *m);
+ZPL_DEF void zpl_mat2_mul(zpl_mat2 *out, zpl_mat2 *m1, zpl_mat2 *m2);
+ZPL_DEF void zpl_mat2_mul_vec2(zpl_vec2 *out, zpl_mat2 *m, zpl_vec2 in);
+ZPL_DEF void zpl_mat2_inverse(zpl_mat2 *out, zpl_mat2 *in);
+ZPL_DEF f32 zpl_mat2_determinate(zpl_mat2 *m);
+
+ZPL_DEF zpl_mat2 *zpl_mat2_v(zpl_vec2 m[2]);
+ZPL_DEF zpl_mat2 *zpl_mat2_f(f32 m[2][2]);
+ZPL_DEF zpl_float2 *zpl_float22_m(zpl_mat2 *m);
+ZPL_DEF zpl_float2 *zpl_float22_v(zpl_vec2 m[2]);
+ZPL_DEF zpl_float2 *zpl_float22_4(f32 m[4]);
+
+ZPL_DEF void zpl_float22_transpose(f32 (*vec)[2]);
+ZPL_DEF void zpl_float22_mul(f32 (*out)[2], f32 (*mat1)[2], f32 (*mat2)[2]);
+ZPL_DEF void zpl_float22_mul_vec2(zpl_vec2 *out, f32 m[2][2], zpl_vec2 in);
+
+ZPL_DEF void zpl_mat3_identity(zpl_mat3 *m);
+ZPL_DEF void zpl_float33_identity(f32 m[3][3]);
+
+ZPL_DEF void zpl_mat3_transpose(zpl_mat3 *m);
+ZPL_DEF void zpl_mat3_mul(zpl_mat3 *out, zpl_mat3 *m1, zpl_mat3 *m2);
+ZPL_DEF void zpl_mat3_mul_vec3(zpl_vec3 *out, zpl_mat3 *m, zpl_vec3 in);
+ZPL_DEF void zpl_mat3_inverse(zpl_mat3 *out, zpl_mat3 *in);
+ZPL_DEF f32 zpl_mat3_determinate(zpl_mat3 *m);
+
+ZPL_DEF zpl_mat3 *zpl_mat3_v(zpl_vec3 m[3]);
+ZPL_DEF zpl_mat3 *zpl_mat3_f(f32 m[3][3]);
+
+ZPL_DEF zpl_float3 *zpl_float33_m(zpl_mat3 *m);
+ZPL_DEF zpl_float3 *zpl_float33_v(zpl_vec3 m[3]);
+ZPL_DEF zpl_float3 *zpl_float33_9(f32 m[9]);
+
+ZPL_DEF void zpl_float33_transpose(f32 (*vec)[3]);
+ZPL_DEF void zpl_float33_mul(f32 (*out)[3], f32 (*mat1)[3], f32 (*mat2)[3]);
+ZPL_DEF void zpl_float33_mul_vec3(zpl_vec3 *out, f32 m[3][3], zpl_vec3 in);
+
+ZPL_DEF void zpl_mat4_identity(zpl_mat4 *m);
+ZPL_DEF void zpl_float44_identity(f32 m[4][4]);
+
+ZPL_DEF void zpl_mat4_transpose(zpl_mat4 *m);
+ZPL_DEF void zpl_mat4_mul(zpl_mat4 *out, zpl_mat4 *m1, zpl_mat4 *m2);
+ZPL_DEF void zpl_mat4_mul_vec4(zpl_vec4 *out, zpl_mat4 *m, zpl_vec4 in);
+ZPL_DEF void zpl_mat4_inverse(zpl_mat4 *out, zpl_mat4 *in);
+
+ZPL_DEF zpl_mat4 *zpl_mat4_v(zpl_vec4 m[4]);
+ZPL_DEF zpl_mat4 *zpl_mat4_f(f32 m[4][4]);
+
+ZPL_DEF zpl_float4 *zpl_float44_m(zpl_mat4 *m);
+ZPL_DEF zpl_float4 *zpl_float44_v(zpl_vec4 m[4]);
+ZPL_DEF zpl_float4 *zpl_float44_16(f32 m[16]);
+
+ZPL_DEF void zpl_float44_transpose(f32 (*vec)[4]);
+ZPL_DEF void zpl_float44_mul(f32 (*out)[4], f32 (*mat1)[4], f32 (*mat2)[4]);
+ZPL_DEF void zpl_float44_mul_vec4(zpl_vec4 *out, f32 m[4][4], zpl_vec4 in);
+
+ZPL_DEF void zpl_mat4_translate(zpl_mat4 *out, zpl_vec3 v);
+ZPL_DEF void zpl_mat4_rotate(zpl_mat4 *out, zpl_vec3 v, f32 angle_radians);
+ZPL_DEF void zpl_mat4_scale(zpl_mat4 *out, zpl_vec3 v);
+ZPL_DEF void zpl_mat4_scalef(zpl_mat4 *out, f32 s);
+ZPL_DEF void zpl_mat4_ortho2d(zpl_mat4 *out, f32 left, f32 right, f32 bottom, f32 top);
+ZPL_DEF void zpl_mat4_ortho3d(zpl_mat4 *out, f32 left, f32 right, f32 bottom, f32 top, f32 z_near,
+                               f32 z_far);
+ZPL_DEF void zpl_mat4_perspective(zpl_mat4 *out, f32 fovy, f32 aspect, f32 z_near, f32 z_far);
+ZPL_DEF void zpl_mat4_infinite_perspective(zpl_mat4 *out, f32 fovy, f32 aspect, f32 z_near);
+
+ZPL_DEF void zpl_mat4_look_at(zpl_mat4 *out, zpl_vec3 eye, zpl_vec3 centre, zpl_vec3 up);
+
+ZPL_DEF zpl_quat zpl_quatf(f32 x, f32 y, f32 z, f32 w);
+ZPL_DEF zpl_quat zpl_quatfv(f32 e[4]);
+ZPL_DEF zpl_quat zpl_quat_axis_angle(zpl_vec3 axis, f32 angle_radians);
+ZPL_DEF zpl_quat zpl_quat_euler_angles(f32 pitch, f32 yaw, f32 roll);
+ZPL_DEF zpl_quat zpl_quat_identity(void);
+
+ZPL_DEF void zpl_quat_add(zpl_quat *d, zpl_quat q0, zpl_quat q1);
+ZPL_DEF void zpl_quat_sub(zpl_quat *d, zpl_quat q0, zpl_quat q1);
+ZPL_DEF void zpl_quat_mul(zpl_quat *d, zpl_quat q0, zpl_quat q1);
+ZPL_DEF void zpl_quat_div(zpl_quat *d, zpl_quat q0, zpl_quat q1);
+
+ZPL_DEF void zpl_quat_mulf(zpl_quat *d, zpl_quat q, f32 s);
+ZPL_DEF void zpl_quat_divf(zpl_quat *d, zpl_quat q, f32 s);
+
+ZPL_DEF void zpl_quat_addeq(zpl_quat *d, zpl_quat q);
+ZPL_DEF void zpl_quat_subeq(zpl_quat *d, zpl_quat q);
+ZPL_DEF void zpl_quat_muleq(zpl_quat *d, zpl_quat q);
+ZPL_DEF void zpl_quat_diveq(zpl_quat *d, zpl_quat q);
+
+ZPL_DEF void zpl_quat_muleqf(zpl_quat *d, f32 s);
+ZPL_DEF void zpl_quat_diveqf(zpl_quat *d, f32 s);
+
+ZPL_DEF f32 zpl_quat_dot(zpl_quat q0, zpl_quat q1);
+ZPL_DEF f32 zpl_quat_mag(zpl_quat q);
+
+ZPL_DEF void zpl_quat_norm(zpl_quat *d, zpl_quat q);
+ZPL_DEF void zpl_quat_conj(zpl_quat *d, zpl_quat q);
+ZPL_DEF void zpl_quat_inverse(zpl_quat *d, zpl_quat q);
+
+ZPL_DEF void zpl_quat_axis(zpl_vec3 *axis, zpl_quat q);
+ZPL_DEF f32 zpl_quat_angle(zpl_quat q);
+
+ZPL_DEF f32 zpl_quat_pitch(zpl_quat q);
+ZPL_DEF f32 zpl_quat_yaw(zpl_quat q);
+ZPL_DEF f32 zpl_quat_roll(zpl_quat q);
+
+/* NOTE: Rotate v by q */
+ZPL_DEF void zpl_quat_rotate_vec3(zpl_vec3 *d, zpl_quat q, zpl_vec3 v);
+ZPL_DEF void zpl_mat4_from_quat(zpl_mat4 *out, zpl_quat q);
+ZPL_DEF void zpl_quat_from_mat4(zpl_quat *out, zpl_mat4 *m);
+
+/* Interpolations */
+ZPL_DEF f32 zpl_lerp(f32 a, f32 b, f32 t);
+ZPL_DEF f32 zpl_unlerp(f32 t, f32 a, f32 b);
+ZPL_DEF f32 zpl_smooth_step(f32 a, f32 b, f32 t);
+ZPL_DEF f32 zpl_smoother_step(f32 a, f32 b, f32 t);
+
+ZPL_DEF void zpl_vec2_lerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 b, f32 t);
+ZPL_DEF void zpl_vec3_lerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 b, f32 t);
+ZPL_DEF void zpl_vec4_lerp(zpl_vec4 *d, zpl_vec4 a, zpl_vec4 b, f32 t);
+
+ZPL_DEF void zpl_vec2_cslerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 v0, zpl_vec2 b, zpl_vec2 v1, f32 t);
+ZPL_DEF void zpl_vec3_cslerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 v0, zpl_vec3 b, zpl_vec3 v1, f32 t);
+ZPL_DEF void zpl_vec2_dcslerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 v0, zpl_vec2 b, zpl_vec2 v1, f32 t);
+ZPL_DEF void zpl_vec3_dcslerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 v0, zpl_vec3 b, zpl_vec3 v1, f32 t);
+
+ZPL_DEF void zpl_quat_lerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t);
+ZPL_DEF void zpl_quat_nlerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t);
+ZPL_DEF void zpl_quat_slerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t);
+ZPL_DEF void zpl_quat_nquad(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t);
+ZPL_DEF void zpl_quat_squad(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t);
+ZPL_DEF void zpl_quat_slerp_approx(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t);
+ZPL_DEF void zpl_quat_squad_approx(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t);
+
+/* Rects */
+ZPL_DEF zpl_rect2 zpl_rect2f(zpl_vec2 pos, zpl_vec2 dim);
+ZPL_DEF zpl_rect3 zpl_rect3f(zpl_vec3 pos, zpl_vec3 dim);
+
+ZPL_DEF int zpl_rect2_contains(zpl_rect2 a, f32 x, f32 y);
+ZPL_DEF int zpl_rect2_contains_vec2(zpl_rect2 a, zpl_vec2 p);
+ZPL_DEF int zpl_rect2_intersects(zpl_rect2 a, zpl_rect2 b);
+ZPL_DEF int zpl_rect2_intersection_result(zpl_rect2 a, zpl_rect2 b, zpl_rect2 *intersection);
+
+#ifndef ZPL_MURMUR64_DEFAULT_SEED
+#define ZPL_MURMUR64_DEFAULT_SEED 0x9747b28c
+#endif
+
+////////////////////////////////////////////////////////////////
+//
+// Platform Stuff
+//
+// Ported from https://github.com/gingerBill/zpl/
+//
+
+#if defined(ZPL_PLATFORM)
+
+// NOTE(bill):
+// Coordinate system - +ve x - left to right
+//                  - +ve y - bottom to top
+//                  - Relative to window
+
+// TODO(bill): Proper documentation for this with code examples
+
+// Window Support - Complete
+// OS X Support (Not ported yet) - Missing:
+//     * Software framebuffer
+//     * (show|hide) window
+//     * show_cursor
+//     * toggle (fullscreen|borderless)
+//     * set window position
+//     * Clipboard
+//     * GameControllers
+// Linux Support - None
+// Other OS Support - None
+
+#ifndef ZPL_MAX_GAME_CONTROLLER_COUNT
+#define ZPL_MAX_GAME_CONTROLLER_COUNT 4
+#endif
+
+typedef enum zplKeyType {
+    ZPL_KEY_UNKNOWN = 0, // Unhandled key
+
+    // NOTE(bill): Allow the basic printable keys to be aliased with their chars
+    ZPL_KEY_0 = '0',
+    ZPL_KEY_1,
+    ZPL_KEY_2,
+    ZPL_KEY_3,
+    ZPL_KEY_4,
+    ZPL_KEY_5,
+    ZPL_KEY_6,
+    ZPL_KEY_7,
+    ZPL_KEY_8,
+    ZPL_KEY_9,
+
+    ZPL_KEY_A = 'A',
+    ZPL_KEY_B,
+    ZPL_KEY_C,
+    ZPL_KEY_D,
+    ZPL_KEY_E,
+    ZPL_KEY_F,
+    ZPL_KEY_G,
+    ZPL_KEY_H,
+    ZPL_KEY_I,
+    ZPL_KEY_J,
+    ZPL_KEY_K,
+    ZPL_KEY_L,
+    ZPL_KEY_M,
+    ZPL_KEY_N,
+    ZPL_KEY_O,
+    ZPL_KEY_P,
+    ZPL_KEY_Q,
+    ZPL_KEY_R,
+    ZPL_KEY_S,
+    ZPL_KEY_T,
+    ZPL_KEY_U,
+    ZPL_KEY_V,
+    ZPL_KEY_W,
+    ZPL_KEY_X,
+    ZPL_KEY_Y,
+    ZPL_KEY_Z,
+
+    ZPL_KEY_LBRACKET = '[',
+    ZPL_KEY_RBRACKET = ']',
+    ZPL_KEY_SEMICOLON = ';',
+    ZPL_KEY_COMMA = ',',
+    ZPL_KEY_PERIOD = '.',
+    ZPL_KEY_QUOTE = '\'',
+    ZPL_KEY_SLASH = '/',
+    ZPL_KEY_BACKSLASH = '\\',
+    ZPL_KEY_GRAVE = '`',
+    ZPL_KEY_EQUALS = '=',
+    ZPL_KEY_MINUS = '-',
+    ZPL_KEY_SPACE = ' ',
+
+    ZPL_KEY__PAD = 128, // NOTE(BILL): MAKE SURE ASCII IS RESERVED
+
+    ZPL_KEY_ESCAPE,      // ESCAPE
+    ZPL_KEY_LCONTROL,    // LEFT CONTROL
+    ZPL_KEY_LSHIFT,      // LEFT SHIFT
+    ZPL_KEY_LALT,        // LEFT ALT
+    ZPL_KEY_LSYSTEM,     // LEFT OS SPECIFIC: WINDOW (WINDOWS AND LINUX), APPLE/CMD (MACOS X), ...
+    ZPL_KEY_RCONTROL,    // RIGHT CONTROL
+    ZPL_KEY_RSHIFT,      // RIGHT SHIFT
+    ZPL_KEY_RALT,        // RIGHT ALT
+    ZPL_KEY_RSYSTEM,     // RIGHT OS SPECIFIC: WINDOW (WINDOWS AND LINUX), APPLE/CMD (MACOS X), ...
+    ZPL_KEY_MENU,        // MENU
+    ZPL_KEY_RETURN,      // RETURN
+    ZPL_KEY_BACKSPACE,   // BACKSPACE
+    ZPL_KEY_TAB,         // TABULATION
+    ZPL_KEY_PAGEUP,      // PAGE UP
+    ZPL_KEY_PAGEDOWN,    // PAGE DOWN
+    ZPL_KEY_END,         // END
+    ZPL_KEY_HOME,        // HOME
+    ZPL_KEY_INSERT,      // INSERT
+    ZPL_KEY_DELETE,      // DELETE
+    ZPL_KEY_PLUS,        // +
+    ZPL_KEY_SUBTRACT,    // -
+    ZPL_KEY_MULTIPLY,    // *
+    ZPL_KEY_DIVIDE,      // /
+    ZPL_KEY_LEFT,        // LEFT ARROW
+    ZPL_KEY_RIGHT,       // RIGHT ARROW
+    ZPL_KEY_UP,          // UP ARROW
+    ZPL_KEY_DOWN,        // DOWN ARROW
+    ZPL_KEY_NUMPAD0,     // NUMPAD 0
+    ZPL_KEY_NUMPAD1,     // NUMPAD 1
+    ZPL_KEY_NUMPAD2,     // NUMPAD 2
+    ZPL_KEY_NUMPAD3,     // NUMPAD 3
+    ZPL_KEY_NUMPAD4,     // NUMPAD 4
+    ZPL_KEY_NUMPAD5,     // NUMPAD 5
+    ZPL_KEY_NUMPAD6,     // NUMPAD 6
+    ZPL_KEY_NUMPAD7,     // NUMPAD 7
+    ZPL_KEY_NUMPAD8,     // NUMPAD 8
+    ZPL_KEY_NUMPAD9,     // NUMPAD 9
+    ZPL_KEY_NUMPADDOT,   // NUMPAD .
+    ZPL_KEY_NUMPADENTER, // NUMPAD ENTER
+    ZPL_KEY_F1,          // F1
+    ZPL_KEY_F2,          // F2
+    ZPL_KEY_F3,          // F3
+    ZPL_KEY_F4,          // F4
+    ZPL_KEY_F5,          // F5
+    ZPL_KEY_F6,          // F6
+    ZPL_KEY_F7,          // F7
+    ZPL_KEY_F8,          // F8
+    ZPL_KEY_F9,          // F8
+    ZPL_KEY_F10,         // F10
+    ZPL_KEY_F11,         // F11
+    ZPL_KEY_F12,         // F12
+    ZPL_KEY_F13,         // F13
+    ZPL_KEY_F14,         // F14
+    ZPL_KEY_F15,         // F15
+    ZPL_KEY_PAUSE,       // PAUSE
+
+    ZPL_KEY_COUNT,
+} zplKeyType;
+
+typedef u8 zplKeyState;
+typedef enum zplKeyStateFlag {
+    ZPL_KEY_STATE_DOWN = ZPL_BIT(0),
+    ZPL_KEY_STATE_PRESSED = ZPL_BIT(1),
+    ZPL_KEY_STATE_RELEASED = ZPL_BIT(2)
+} zplKeyStateFlag;
+
+ZPL_DEF void zpl_key_state_update(zplKeyState *s, b32 is_down);
+
+typedef enum zplMouseButtonType {
+    ZPL_MOUSEBUTTON_LEFT,
+    ZPL_MOUSEBUTTON_MIDDLE,
+    ZPL_MOUSEBUTTON_RIGHT,
+    ZPL_MOUSEBUTTON_X1,
+    ZPL_MOUSEBUTTON_X2,
+
+    ZPL_MOUSEBUTTON_COUNT
+} zplMouseButtonType;
+
+typedef enum zplControllerAxisType {
+    ZPL_CONTROLLER_AXIS_LEFTX,
+    ZPL_CONTROLLER_AXIS_LEFTY,
+    ZPL_CONTROLLER_AXIS_RIGHTX,
+    ZPL_CONTROLLER_AXIS_RIGHTY,
+    ZPL_CONTROLLER_AXIS_LEFTTRIGGER,
+    ZPL_CONTROLLER_AXIS_RIGHTTRIGGER,
+
+    ZPL_CONTROLLER_AXIS_COUNT
+} zplControllerAxisType;
+
+typedef enum zplControllerButtonType {
+    ZPL_CONTROLLER_BUTTON_UP,
+    ZPL_CONTROLLER_BUTTON_DOWN,
+    ZPL_CONTROLLER_BUTTON_LEFT,
+    ZPL_CONTROLLER_BUTTON_RIGHT,
+    ZPL_CONTROLLER_BUTTON_A,
+    ZPL_CONTROLLER_BUTTON_B,
+    ZPL_CONTROLLER_BUTTON_X,
+    ZPL_CONTROLLER_BUTTON_Y,
+    ZPL_CONTROLLER_BUTTON_LEFTSHOULDER,
+    ZPL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+    ZPL_CONTROLLER_BUTTON_BACK,
+    ZPL_CONTROLLER_BUTTON_START,
+    ZPL_CONTROLLER_BUTTON_LEFTTHUMB,
+    ZPL_CONTROLLER_BUTTON_RIGHTTHUMB,
+
+    zplControllerButton_Count
+} zplControllerButtonType;
+
+typedef struct zpl_game_controller {
+    b16 is_connected, is_analog;
+
+    f32 axes[ZPL_CONTROLLER_AXIS_COUNT];
+    zplKeyState buttons[zplControllerButton_Count];
+} zpl_game_controller;
+
+#if defined(ZPL_SYSTEM_WINDOWS)
+typedef struct _XINPUT_GAMEPAD XINPUT_GAMEPAD;
+typedef struct _XINPUT_STATE XINPUT_STATE;
+typedef struct _XINPUT_VIBRATION XINPUT_VIBRATION;
+
+#define ZPL_XINPUT_GET_STATE(name) unsigned long __stdcall name(unsigned long dwUserIndex, XINPUT_STATE *pState)
+typedef ZPL_XINPUT_GET_STATE(zpl_xinput_get_state_proc);
+
+#define ZPL_XINPUT_SET_STATE(name) unsigned long __stdcall name(unsigned long dwUserIndex, XINPUT_VIBRATION *pVibration)
+typedef ZPL_XINPUT_SET_STATE(zpl_xinput_set_state_proc);
+#endif
+
+typedef enum zplWindowFlag {
+    ZPL_WINDOW_FULLSCREEN = ZPL_BIT(0),
+    ZPL_WINDOW_HIDDEN = ZPL_BIT(1),
+    ZPL_WINDOW_BORDERLESS = ZPL_BIT(2),
+    ZPL_WINDOW_RESIZABLE = ZPL_BIT(3),
+    ZPL_WINDOW_MINIMIZED = ZPL_BIT(4),
+    ZPL_WINDOW_MAXIMIZED = ZPL_BIT(5),
+    ZPL_WINDOW_FULLSCREENDESKTOP = ZPL_WINDOW_FULLSCREEN | ZPL_WINDOW_BORDERLESS,
+} zplWindowFlag;
+
+typedef enum zplRendererType {
+    ZPL_RENDERER_OPENGL,
+    ZPL_RENDERER_SOFTWARE,
+
+    ZPL_RENDERER_COUNT,
+} zplRendererType;
+
+#if defined(ZPL_SYSTEM_WINDOWS) && !defined(_WINDOWS_)
+typedef struct tagBITMAPINFOHEADER {
+    unsigned long biSize;
+    long biWidth;
+    long biHeight;
+    u16 biPlanes;
+    u16 biBitCount;
+    unsigned long biCompression;
+    unsigned long biSizeImage;
+    long biXPelsPerMeter;
+    long biYPelsPerMeter;
+    unsigned long biClrUsed;
+    unsigned long biClrImportant;
+} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
+typedef struct tagRGBQUAD {
+    u8 rgbBlue;
+    u8 rgbGreen;
+    u8 rgbRed;
+    u8 rgbReserved;
+} RGBQUAD;
+typedef struct tagBITMAPINFO {
+    BITMAPINFOHEADER bmiHeader;
+    RGBQUAD bmiColors[1];
+} BITMAPINFO, *PBITMAPINFO;
+#endif
+
+typedef struct zpl_platform {
+    b32 is_initialized;
+
+    void *window_handle;
+    i32 window_x, window_y;
+    i32 window_width, window_height;
+    i32 outline_x, outline_y;
+    i32 outline_width, outline_height;
+    u32 window_flags;
+    b16 window_is_closed, window_has_focus;
+
+#if defined(ZPL_SYSTEM_WINDOWS)
+    void *win32_dc;
+#elif defined(ZPL_SYSTEM_OSX)
+    void *osx_autorelease_pool; // TODO(bill): Is this really needed?
+#endif
+
+    zplRendererType renderer_type;
+    union {
+        struct {
+            void *context;
+            i32 major;
+            i32 minor;
+            b16 core, compatible;
+            zpl_dll_handle dll_handle;
+        } opengl;
+
+        // NOTE(bill): Software rendering
+        struct {
+#if defined(ZPL_SYSTEM_WINDOWS)
+            BITMAPINFO win32_bmi;
+#endif
+            void *memory;
+            isize memory_size;
+            i32 pitch;
+            i32 bits_per_pixel;
+        } sw_framebuffer;
+    };
+
+    zplKeyState keys[ZPL_KEY_COUNT];
+    struct {
+        zplKeyState control;
+        zplKeyState alt;
+        zplKeyState shift;
+    } key_modifiers;
+
+    Rune char_buffer[256];
+    isize char_buffer_count;
+
+    void *window_cursor;
+    b32 mouse_clip;
+    i32 mouse_x, mouse_y;
+    i32 mouse_dx, mouse_dy;         // NOTE(bill): Not raw mouse movement
+    i32 mouse_raw_dx, mouse_raw_dy; // NOTE(bill): Raw mouse movement
+    f32 mouse_wheel_delta;
+    zplKeyState mouse_buttons[ZPL_MOUSEBUTTON_COUNT];
+
+    zpl_game_controller game_controllers[ZPL_MAX_GAME_CONTROLLER_COUNT];
+
+    f64 curr_time;
+    f64 dt_for_frame;
+    b32 quit_requested;
+
+#if defined(ZPL_SYSTEM_WINDOWS)
+    struct {
+        zpl_xinput_get_state_proc *get_state;
+        zpl_xinput_set_state_proc *set_state;
+    } xinput;
+#endif
+} zpl_platform;
+
+typedef struct zpl_video_mode {
+    i32 width, height;
+    i32 bits_per_pixel;
+} zpl_video_mode;
+
+ZPL_DEF zpl_video_mode zpl_set_video_mode(i32 width, i32 height, i32 bits_per_pixel);
+ZPL_DEF b32 zpl_video_mode_is_valid(zpl_video_mode mode);
+ZPL_DEF zpl_video_mode zpl_video_mode_get_desktop(void);
+ZPL_DEF isize zpl_video_mode_get_fullscreen_modes(zpl_video_mode *modes,
+                                                isize max_mode_count); // NOTE(bill): returns mode count
+ZPL_DEF ZPL_COMPARE_PROC(zpl_video_mode_cmp);     // NOTE(bill): Sort smallest to largest (Ascending)
+ZPL_DEF ZPL_COMPARE_PROC(zpl_video_mode_dsc_cmp); // NOTE(bill): Sort largest to smallest (Descending)
+
+// NOTE(bill): Software rendering
+ZPL_DEF b32 zpl_platform_init_with_software(zpl_platform *p, char const *window_title, i32 width, i32 height,
+                                          u32 window_flags);
+// NOTE(bill): OpenGL Rendering
+ZPL_DEF b32 zpl_platform_init_with_opengl(zpl_platform *p, char const *window_title, i32 width, i32 height,
+                                        u32 window_flags, i32 major, i32 minor, b32 core, b32 compatible);
+ZPL_DEF void zpl_platform_update(zpl_platform *p);
+ZPL_DEF void zpl_platform_display(zpl_platform *p);
+ZPL_DEF void zpl_platform_destroy(zpl_platform *p);
+ZPL_DEF void zpl_platform_show_cursor(zpl_platform *p, b32 show);
+ZPL_DEF void zpl_platform_set_cursor(zpl_platform *p, void *handle);
+ZPL_DEF void zpl_platform_set_mouse_position(zpl_platform *p, i32 x, i32 y);
+ZPL_DEF void zpl_platform_set_controller_vibration(zpl_platform *p, isize index, f32 left_motor, f32 right_motor);
+ZPL_DEF b32 zpl_platform_has_clipboard_text(zpl_platform *p);
+ZPL_DEF void zpl_platform_set_clipboard_text(zpl_platform *p, char const *str);
+ZPL_DEF char *zpl_platform_get_clipboard_text(zpl_platform *p, zpl_allocator a);
+ZPL_DEF u32  zpl_platform_get_scancode(zpl_platform *p, zplKeyType key);
+ZPL_DEF void zpl_platform_set_window_position(zpl_platform *p, i32 x, i32 y);
+ZPL_DEF void zpl_platform_set_window_title(zpl_platform *p, char const *title, ...) ZPL_PRINTF_ARGS(2);
+ZPL_DEF void zpl_platform_toggle_fullscreen(zpl_platform *p, b32 fullscreen_desktop);
+ZPL_DEF void zpl_platform_toggle_borderless(zpl_platform *p);
+ZPL_DEF void zpl_platform_make_opengl_context_current(zpl_platform *p);
+ZPL_DEF void zpl_platform_show_window(zpl_platform *p);
+ZPL_DEF void zpl_platform_hide_window(zpl_platform *p);
+
+#endif // ZPL_PLATFORM
 
 #if defined(__cplusplus)
 }
@@ -5326,6 +6116,16 @@ zpl_inline char *zpl_strcpy(char *dest, char const *source) {
     return dest;
 }
 
+zpl_inline char *zpl_strdup(zpl_allocator a, char *src, isize max_len) {
+    ZPL_ASSERT_NOT_NULL(src);
+    isize len=zpl_strlen(src);
+    char *dest = cast(char *)zpl_alloc(a, max_len);
+    zpl_memset(dest + len, 0, max_len - len);
+    zpl_strncpy(dest, src, max_len);
+
+    return dest;
+}
+
 
 zpl_inline char *zpl_strncpy(char *dest, char const *source, isize len) {
     ZPL_ASSERT_NOT_NULL(dest);
@@ -7245,7 +8045,7 @@ void zpl_jobs_enqueue_with_priority(zpl_thread_pool *pool, zpl_jobs_proc proc, v
         job.priority=priority;
 
         zpl_array_append(pool->jobs, job);
-        u32 jobid=zpl_array_count(pool->jobs)-1;
+        u32 jobid=(u32)zpl_array_count(pool->jobs)-1;
         zpl_array_append(pool->queue, jobid);
     }
     else {
@@ -8739,38 +9539,11 @@ isize zpl_random_range_isize(zpl_random *r, isize lower_inc, isize higher_inc) {
     return i;
 }
 
-// NOTE: Semi-cc'ed from zpl_math to remove need for fmod and math.h
-f64 zpl__copy_sign64(f64 x, f64 y) {
-    i64 ix, iy;
-    ix = *(i64 *)&x;
-    iy = *(i64 *)&y;
-
-    ix &= 0x7fffffffffffffff;
-    ix |= iy & 0x8000000000000000;
-    return *cast(f64 *)&ix;
-}
-
-f64 zpl__floor64    (f64 x)        { return cast(f64)((x >= 0.0) ? cast(i64)x : cast(i64)(x-0.9999999999999999)); }
-f64 zpl__ceil64     (f64 x)        { return cast(f64)((x < 0) ? cast(i64)x : (cast(i64)x)+1); }
-f64 zpl__round64    (f64 x)        { return cast(f64)((x >= 0.0) ? zpl__floor64(x + 0.5) : zpl__ceil64(x - 0.5)); }
-f64 zpl__remainder64(f64 x, f64 y) { return x - (zpl__round64(x/y)*y); }
-f64 zpl__abs64      (f64 x)        { return x < 0 ? -x : x; }
-f64 zpl__sign64     (f64 x)        { return x < 0 ? -1.0 : +1.0; }
-
-f64 zpl__mod64(f64 x, f64 y) {
-    f64 result;
-    y = zpl__abs64(y);
-    result = zpl__remainder64(zpl__abs64(x), y);
-    if (zpl__sign64(result)) result += y;
-    return zpl__copy_sign64(result, x);
-}
-
-
 f64 zpl_random_range_f64(zpl_random *r, f64 lower_inc, f64 higher_inc) {
     u64 u = zpl_random_gen_u64(r);
     f64 f = *cast(f64 *)&u;
     f64 diff = higher_inc-lower_inc+1.0;
-    f = zpl__mod64(f, diff);
+    f = zpl_mod64(f, diff);
     f += lower_inc;
     return f;
 }
@@ -9842,6 +10615,3634 @@ b32 zpl_opts_compile(zpl_opts *opts, int argc, char **argv)
     return !had_errors;
 }
 
+////////////////////////////////////////////////////////////////
+//
+// Math
+//
+
+#if defined(__cplusplus)
+}
+#endif
+
+#if defined(__cplusplus)
+
+inline bool operator==(zpl_vec2 a, zpl_vec2 b) { return (a.x == b.x) && (a.y == b.y); }
+inline bool operator!=(zpl_vec2 a, zpl_vec2 b) { return !operator==(a, b); }
+
+inline zpl_vec2 operator+(zpl_vec2 a) { return a; }
+inline zpl_vec2 operator-(zpl_vec2 a) {
+    zpl_vec2 r = { -a.x, -a.y };
+    return r;
+}
+
+inline zpl_vec2 operator+(zpl_vec2 a, zpl_vec2 b) {
+    zpl_vec2 r;
+    zpl_vec2_add(&r, a, b);
+    return r;
+}
+inline zpl_vec2 operator-(zpl_vec2 a, zpl_vec2 b) {
+    zpl_vec2 r;
+    zpl_vec2_sub(&r, a, b);
+    return r;
+}
+
+inline zpl_vec2 operator*(zpl_vec2 a, f32 scalar) {
+    zpl_vec2 r;
+    zpl_vec2_mul(&r, a, scalar);
+    return r;
+}
+inline zpl_vec2 operator*(f32 scalar, zpl_vec2 a) { return operator*(a, scalar); }
+
+inline zpl_vec2 operator/(zpl_vec2 a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+/* Hadamard Product */
+inline zpl_vec2 operator*(zpl_vec2 a, zpl_vec2 b) {
+    zpl_vec2 r = { a.x * b.x, a.y * b.y };
+    return r;
+}
+inline zpl_vec2 operator/(zpl_vec2 a, zpl_vec2 b) {
+    zpl_vec2 r = { a.x / b.x, a.y / b.y };
+    return r;
+}
+
+inline zpl_vec2 &operator+=(zpl_vec2 &a, zpl_vec2 b) { return (a = a + b); }
+inline zpl_vec2 &operator-=(zpl_vec2 &a, zpl_vec2 b) { return (a = a - b); }
+inline zpl_vec2 &operator*=(zpl_vec2 &a, f32 scalar) { return (a = a * scalar); }
+inline zpl_vec2 &operator/=(zpl_vec2 &a, f32 scalar) { return (a = a / scalar); }
+
+inline bool operator==(zpl_vec3 a, zpl_vec3 b) { return (a.x == b.x) && (a.y == b.y) && (a.z == b.z); }
+inline bool operator!=(zpl_vec3 a, zpl_vec3 b) { return !operator==(a, b); }
+
+inline zpl_vec3 operator+(zpl_vec3 a) { return a; }
+inline zpl_vec3 operator-(zpl_vec3 a) {
+    zpl_vec3 r = { -a.x, -a.y, -a.z };
+    return r;
+}
+
+inline zpl_vec3 operator+(zpl_vec3 a, zpl_vec3 b) {
+    zpl_vec3 r;
+    zpl_vec3_add(&r, a, b);
+    return r;
+}
+inline zpl_vec3 operator-(zpl_vec3 a, zpl_vec3 b) {
+    zpl_vec3 r;
+    zpl_vec3_sub(&r, a, b);
+    return r;
+}
+
+inline zpl_vec3 operator*(zpl_vec3 a, f32 scalar) {
+    zpl_vec3 r;
+    zpl_vec3_mul(&r, a, scalar);
+    return r;
+}
+inline zpl_vec3 operator*(f32 scalar, zpl_vec3 a) { return operator*(a, scalar); }
+
+inline zpl_vec3 operator/(zpl_vec3 a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+/* Hadamard Product */
+inline zpl_vec3 operator*(zpl_vec3 a, zpl_vec3 b) {
+    zpl_vec3 r = { a.x * b.x, a.y * b.y, a.z * b.z };
+    return r;
+}
+inline zpl_vec3 operator/(zpl_vec3 a, zpl_vec3 b) {
+    zpl_vec3 r = { a.x / b.x, a.y / b.y, a.z / b.z };
+    return r;
+}
+
+inline zpl_vec3 &operator+=(zpl_vec3 &a, zpl_vec3 b) { return (a = a + b); }
+inline zpl_vec3 &operator-=(zpl_vec3 &a, zpl_vec3 b) { return (a = a - b); }
+inline zpl_vec3 &operator*=(zpl_vec3 &a, f32 scalar) { return (a = a * scalar); }
+inline zpl_vec3 &operator/=(zpl_vec3 &a, f32 scalar) { return (a = a / scalar); }
+
+inline bool operator==(zpl_vec4 a, zpl_vec4 b) { return (a.x == b.x) && (a.y == b.y) && (a.z == b.z) && (a.w == b.w); }
+inline bool operator!=(zpl_vec4 a, zpl_vec4 b) { return !operator==(a, b); }
+
+inline zpl_vec4 operator+(zpl_vec4 a) { return a; }
+inline zpl_vec4 operator-(zpl_vec4 a) {
+    zpl_vec4 r = { -a.x, -a.y, -a.z, -a.w };
+    return r;
+}
+
+inline zpl_vec4 operator+(zpl_vec4 a, zpl_vec4 b) {
+    zpl_vec4 r;
+    zpl_vec4_add(&r, a, b);
+    return r;
+}
+inline zpl_vec4 operator-(zpl_vec4 a, zpl_vec4 b) {
+    zpl_vec4 r;
+    zpl_vec4_sub(&r, a, b);
+    return r;
+}
+
+inline zpl_vec4 operator*(zpl_vec4 a, f32 scalar) {
+    zpl_vec4 r;
+    zpl_vec4_mul(&r, a, scalar);
+    return r;
+}
+inline zpl_vec4 operator*(f32 scalar, zpl_vec4 a) { return operator*(a, scalar); }
+
+inline zpl_vec4 operator/(zpl_vec4 a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+/* Hadamard Product */
+inline zpl_vec4 operator*(zpl_vec4 a, zpl_vec4 b) {
+    zpl_vec4 r = { a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w };
+    return r;
+}
+inline zpl_vec4 operator/(zpl_vec4 a, zpl_vec4 b) {
+    zpl_vec4 r = { a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w };
+    return r;
+}
+
+inline zpl_vec4 &operator+=(zpl_vec4 &a, zpl_vec4 b) { return (a = a + b); }
+inline zpl_vec4 &operator-=(zpl_vec4 &a, zpl_vec4 b) { return (a = a - b); }
+inline zpl_vec4 &operator*=(zpl_vec4 &a, f32 scalar) { return (a = a * scalar); }
+inline zpl_vec4 &operator/=(zpl_vec4 &a, f32 scalar) { return (a = a / scalar); }
+
+inline zpl_mat2 operator+(zpl_mat2 const &a, zpl_mat2 const &b) {
+    int i, j;
+    zpl_mat2 r = { 0 };
+    for (j = 0; j < 2; j++) {
+        for (i = 0; i < 2; i++) r.e[2 * j + i] = a.e[2 * j + i] + b.e[2 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat2 operator-(zpl_mat2 const &a, zpl_mat2 const &b) {
+    int i, j;
+    zpl_mat2 r = { 0 };
+    for (j = 0; j < 2; j++) {
+        for (i = 0; i < 2; i++) r.e[2 * j + i] = a.e[2 * j + i] - b.e[2 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat2 operator*(zpl_mat2 const &a, zpl_mat2 const &b) {
+    zpl_mat2 r;
+    zpl_mat2_mul(&r, (zpl_mat2 *)&a, (zpl_mat2 *)&b);
+    return r;
+}
+inline zpl_vec2 operator*(zpl_mat2 const &a, zpl_vec2 v) {
+    zpl_vec2 r;
+    zpl_mat2_mul_vec2(&r, (zpl_mat2 *)&a, v);
+    return r;
+}
+inline zpl_mat2 operator*(zpl_mat2 const &a, f32 scalar) {
+    zpl_mat2 r = { 0 };
+    int i;
+    for (i = 0; i < 2 * 2; i++) r.e[i] = a.e[i] * scalar;
+    return r;
+}
+inline zpl_mat2 operator*(f32 scalar, zpl_mat2 const &a) { return operator*(a, scalar); }
+inline zpl_mat2 operator/(zpl_mat2 const &a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+inline zpl_mat2 &operator+=(zpl_mat2 &a, zpl_mat2 const &b) { return (a = a + b); }
+inline zpl_mat2 &operator-=(zpl_mat2 &a, zpl_mat2 const &b) { return (a = a - b); }
+inline zpl_mat2 &operator*=(zpl_mat2 &a, zpl_mat2 const &b) { return (a = a * b); }
+
+inline zpl_mat3 operator+(zpl_mat3 const &a, zpl_mat3 const &b) {
+    int i, j;
+    zpl_mat3 r = { 0 };
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < 3; i++) r.e[3 * j + i] = a.e[3 * j + i] + b.e[3 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat3 operator-(zpl_mat3 const &a, zpl_mat3 const &b) {
+    int i, j;
+    zpl_mat3 r = { 0 };
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < 3; i++) r.e[3 * j + i] = a.e[3 * j + i] - b.e[3 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat3 operator*(zpl_mat3 const &a, zpl_mat3 const &b) {
+    zpl_mat3 r;
+    zpl_mat3_mul(&r, (zpl_mat3 *)&a, (zpl_mat3 *)&b);
+    return r;
+}
+inline zpl_vec3 operator*(zpl_mat3 const &a, zpl_vec3 v) {
+    zpl_vec3 r;
+    zpl_mat3_mul_vec3(&r, (zpl_mat3 *)&a, v);
+    return r;
+}
+inline zpl_mat3 operator*(zpl_mat3 const &a, f32 scalar) {
+    zpl_mat3 r = { 0 };
+    int i;
+    for (i = 0; i < 3 * 3; i++) r.e[i] = a.e[i] * scalar;
+    return r;
+}
+inline zpl_mat3 operator*(f32 scalar, zpl_mat3 const &a) { return operator*(a, scalar); }
+inline zpl_mat3 operator/(zpl_mat3 const &a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+inline zpl_mat3 &operator+=(zpl_mat3 &a, zpl_mat3 const &b) { return (a = a + b); }
+inline zpl_mat3 &operator-=(zpl_mat3 &a, zpl_mat3 const &b) { return (a = a - b); }
+inline zpl_mat3 &operator*=(zpl_mat3 &a, zpl_mat3 const &b) { return (a = a * b); }
+
+inline zpl_mat4 operator+(zpl_mat4 const &a, zpl_mat4 const &b) {
+    int i, j;
+    zpl_mat4 r = { 0 };
+    for (j = 0; j < 4; j++) {
+        for (i = 0; i < 4; i++) r.e[4 * j + i] = a.e[4 * j + i] + b.e[4 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat4 operator-(zpl_mat4 const &a, zpl_mat4 const &b) {
+    int i, j;
+    zpl_mat4 r = { 0 };
+    for (j = 0; j < 4; j++) {
+        for (i = 0; i < 4; i++) r.e[4 * j + i] = a.e[4 * j + i] - b.e[4 * j + i];
+    }
+    return r;
+}
+
+inline zpl_mat4 operator*(zpl_mat4 const &a, zpl_mat4 const &b) {
+    zpl_mat4 r;
+    zpl_mat4_mul(&r, (zpl_mat4 *)&a, (zpl_mat4 *)&b);
+    return r;
+}
+inline zpl_vec4 operator*(zpl_mat4 const &a, zpl_vec4 v) {
+    zpl_vec4 r;
+    zpl_mat4_mul_vec4(&r, (zpl_mat4 *)&a, v);
+    return r;
+}
+inline zpl_mat4 operator*(zpl_mat4 const &a, f32 scalar) {
+    zpl_mat4 r = { 0 };
+    int i;
+    for (i = 0; i < 4 * 4; i++) r.e[i] = a.e[i] * scalar;
+    return r;
+}
+inline zpl_mat4 operator*(f32 scalar, zpl_mat4 const &a) { return operator*(a, scalar); }
+inline zpl_mat4 operator/(zpl_mat4 const &a, f32 scalar) { return operator*(a, 1.0f / scalar); }
+
+inline zpl_mat4 &operator+=(zpl_mat4 &a, zpl_mat4 const &b) { return (a = a + b); }
+inline zpl_mat4 &operator-=(zpl_mat4 &a, zpl_mat4 const &b) { return (a = a - b); }
+inline zpl_mat4 &operator*=(zpl_mat4 &a, zpl_mat4 const &b) { return (a = a * b); }
+
+inline bool operator==(zpl_quat a, zpl_quat b) { return a.xyzw == b.xyzw; }
+inline bool operator!=(zpl_quat a, zpl_quat b) { return !operator==(a, b); }
+
+inline zpl_quat operator+(zpl_quat q) { return q; }
+inline zpl_quat operator-(zpl_quat q) { return zpl_quatf(-q.x, -q.y, -q.z, -q.w); }
+
+inline zpl_quat operator+(zpl_quat a, zpl_quat b) {
+    zpl_quat r;
+    zpl_quat_add(&r, a, b);
+    return r;
+}
+inline zpl_quat operator-(zpl_quat a, zpl_quat b) {
+    zpl_quat r;
+    zpl_quat_sub(&r, a, b);
+    return r;
+}
+
+inline zpl_quat operator*(zpl_quat a, zpl_quat b) {
+    zpl_quat r;
+    zpl_quat_mul(&r, a, b);
+    return r;
+}
+inline zpl_quat operator*(zpl_quat q, f32 s) {
+    zpl_quat r;
+    zpl_quat_mulf(&r, q, s);
+    return r;
+}
+inline zpl_quat operator*(f32 s, zpl_quat q) { return operator*(q, s); }
+inline zpl_quat operator/(zpl_quat q, f32 s) {
+    zpl_quat r;
+    zpl_quat_divf(&r, q, s);
+    return r;
+}
+
+inline zpl_quat &operator+=(zpl_quat &a, zpl_quat b) {
+    zpl_quat_addeq(&a, b);
+    return a;
+}
+inline zpl_quat &operator-=(zpl_quat &a, zpl_quat b) {
+    zpl_quat_subeq(&a, b);
+    return a;
+}
+inline zpl_quat &operator*=(zpl_quat &a, zpl_quat b) {
+    zpl_quat_muleq(&a, b);
+    return a;
+}
+inline zpl_quat &operator/=(zpl_quat &a, zpl_quat b) {
+    zpl_quat_diveq(&a, b);
+    return a;
+}
+
+inline zpl_quat &operator*=(zpl_quat &a, f32 b) {
+    zpl_quat_muleqf(&a, b);
+    return a;
+}
+inline zpl_quat &operator/=(zpl_quat &a, f32 b) {
+    zpl_quat_diveqf(&a, b);
+    return a;
+}
+
+/* Rotate v by a */
+inline zpl_vec3 operator*(zpl_quat q, zpl_vec3 v) {
+    zpl_vec3 r;
+    zpl_quat_rotate_vec3(&r, q, v);
+    return r;
+}
+
+#endif
+
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#if (defined(__GCC__) || defined(__GNUC__)) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#elif __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wattributes"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
+/* NOTE: To remove the need for memcpy */
+static void zpl__memcpy_4byte(void *dest, void const *src, size_t size) {
+    size_t i;
+    unsigned int *d, *s;
+    d = (unsigned int *)dest;
+    s = (unsigned int *)src;
+    for (i = 0; i < size / 4; i++) { *d++ = *s++; }
+}
+
+f32 zpl_to_radians(f32 degrees) { return degrees * ZPL_TAU / 360.0f; }
+f32 zpl_to_degrees(f32 radians) { return radians * 360.0f / ZPL_TAU; }
+
+f32 zpl_angle_diff(f32 radians_a, f32 radians_b) {
+    f32 delta = zpl_mod(radians_b - radians_a, ZPL_TAU);
+    delta = zpl_mod(delta + 1.5f * ZPL_TAU, ZPL_TAU);
+    delta -= 0.5f * ZPL_TAU;
+    return delta;
+}
+
+f32 zpl_copy_sign(f32 x, f32 y) {
+    int ix, iy;
+    ix = *(int *)&x;
+    iy = *(int *)&y;
+
+    ix &= 0x7fffffff;
+    ix |= iy & 0x80000000;
+    return *(f32 *)&ix;
+}
+
+f32 zpl_remainder(f32 x, f32 y) { return x - (zpl_round(x / y) * y); }
+
+f32 zpl_mod(f32 x, f32 y) {
+    f32 result;
+    y = zpl_abs(y);
+    result = zpl_remainder(zpl_abs(x), y);
+    if (zpl_sign(result)) result += y;
+    return zpl_copy_sign(result, x);
+}
+
+f64 zpl_copy_sign64(f64 x, f64 y) {
+    i64 ix, iy;
+    ix = *(i64 *)&x;
+    iy = *(i64 *)&y;
+
+    ix &= 0x7fffffffffffffff;
+    ix |= iy & 0x8000000000000000;
+    return *cast(f64 *)&ix;
+}
+
+f64 zpl_floor64    (f64 x)        { return cast(f64)((x >= 0.0) ? cast(i64)x : cast(i64)(x-0.9999999999999999)); }
+f64 zpl_ceil64     (f64 x)        { return cast(f64)((x < 0) ? cast(i64)x : (cast(i64)x)+1); }
+f64 zpl_round64    (f64 x)        { return cast(f64)((x >= 0.0) ? zpl_floor64(x + 0.5) : zpl_ceil64(x - 0.5)); }
+f64 zpl_remainder64(f64 x, f64 y) { return x - (zpl_round64(x/y)*y); }
+f64 zpl_abs64      (f64 x)        { return x < 0 ? -x : x; }
+f64 zpl_sign64     (f64 x)        { return x < 0 ? -1.0 : +1.0; }
+
+f64 zpl_mod64(f64 x, f64 y) {
+    f64 result;
+    y = zpl_abs64(y);
+    result = zpl_remainder64(zpl_abs64(x), y);
+    if (zpl_sign64(result)) result += y;
+    return zpl_copy_sign64(result, x);
+}
+
+
+f32 zpl_quake_rsqrt(f32 a) {
+    union {
+        int i;
+        f32 f;
+    } t;
+    f32 x2;
+    f32 const three_halfs = 1.5f;
+
+    x2 = a * 0.5f;
+    t.f = a;
+    t.i = 0x5f375a86 - (t.i >> 1);                /* What the fuck? */
+    t.f = t.f * (three_halfs - (x2 * t.f * t.f)); /* 1st iteration */
+    t.f = t.f * (three_halfs - (x2 * t.f * t.f)); /* 2nd iteration, this can be removed */
+
+    return t.f;
+}
+
+#if defined(ZPL_NO_MATH_H)
+#if defined(_MSC_VER)
+
+f32 zpl_rsqrt(f32 a) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(a))); }
+f32 zpl_sqrt(f32 a) { return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(a))); };
+f32 zpl_sin(f32 a) {
+    static f32 const a0 = +1.91059300966915117e-31f;
+    static f32 const a1 = +1.00086760103908896f;
+    static f32 const a2 = -1.21276126894734565e-2f;
+    static f32 const a3 = -1.38078780785773762e-1f;
+    static f32 const a4 = -2.67353392911981221e-2f;
+    static f32 const a5 = +2.08026600266304389e-2f;
+    static f32 const a6 = -3.03996055049204407e-3f;
+    static f32 const a7 = +1.38235642404333740e-4f;
+    return a0 + a * (a1 + a * (a2 + a * (a3 + a * (a4 + a * (a5 + a * (a6 + a * a7))))));
+}
+f32 zpl_cos(f32 a) {
+    static f32 const a0 = +1.00238601909309722f;
+    static f32 const a1 = -3.81919947353040024e-2f;
+    static f32 const a2 = -3.94382342128062756e-1f;
+    static f32 const a3 = -1.18134036025221444e-1f;
+    static f32 const a4 = +1.07123798512170878e-1f;
+    static f32 const a5 = -1.86637164165180873e-2f;
+    static f32 const a6 = +9.90140908664079833e-4f;
+    static f32 const a7 = -5.23022132118824778e-14f;
+    return a0 + a * (a1 + a * (a2 + a * (a3 + a * (a4 + a * (a5 + a * (a6 + a * a7))))));
+}
+
+f32 zpl_tan(f32 radians) {
+    f32 rr = radians * radians;
+    f32 a = 9.5168091e-03f;
+    a *= rr;
+    a += 2.900525e-03f;
+    a *= rr;
+    a += 2.45650893e-02f;
+    a *= rr;
+    a += 5.33740603e-02f;
+    a *= rr;
+    a += 1.333923995e-01f;
+    a *= rr;
+    a += 3.333314036e-01f;
+    a *= rr;
+    a += 1.0f;
+    a *= radians;
+    return a;
+}
+
+f32 zpl_arcsin(f32 a) { return zpl_arctan2(a, zpl_sqrt((1.0f + a) * (1.0f - a))); }
+f32 zpl_arccos(f32 a) { return zpl_arctan2(zpl_sqrt((1.0f + a) * (1.0 - a)), a); }
+
+f32 zpl_arctan(f32 a) {
+    f32 u = a * a;
+    f32 u2 = u * u;
+    f32 u3 = u2 * u;
+    f32 u4 = u3 * u;
+    f32 f = 1.0f + 0.33288950512027f * u - 0.08467922817644f * u2 + 0.03252232640125f * u3 - 0.00749305860992f * u4;
+    return a / f;
+}
+
+f32 zpl_arctan2(f32 y, f32 x) {
+    if (zpl_abs(x) > zpl_abs(y)) {
+        f32 a = zpl_arctan(y / x);
+        if (x > 0.0f)
+            return a;
+        else
+            return y > 0.0f ? a + ZPL_TAU_OVER_2 : a - ZPL_TAU_OVER_2;
+    } else {
+        f32 a = zpl_arctan(x / y);
+        if (x > 0.0f)
+            return y > 0.0f ? ZPL_TAU_OVER_4 - a : -ZPL_TAU_OVER_4 - a;
+        else
+            return y > 0.0f ? ZPL_TAU_OVER_4 + a : -ZPL_TAU_OVER_4 + a;
+    }
+}
+
+f32 zpl_exp(f32 a) {
+    union {
+        f32 f;
+        int i;
+    } u, v;
+    u.i = (int)(6051102 * a + 1056478197);
+    v.i = (int)(1056478197 - 6051102 * a);
+    return u.f / v.f;
+}
+
+f32 zpl_log(f32 a) {
+    union {
+        f32 f;
+        int i;
+    } u = { a };
+    return (u.i - 1064866805) * 8.262958405176314e-8f; /* 1 / 12102203.0; */
+}
+
+f32 zpl_pow(f32 a, f32 b) {
+    int flipped = 0, e;
+    f32 f, r = 1.0f;
+    if (b < 0) {
+        flipped = 1;
+        b = -b;
+    }
+
+    e = (int)b;
+    f = zpl_exp(b - e);
+
+    while (e) {
+        if (e & 1) r *= a;
+        a *= a;
+        e >>= 1;
+    }
+
+    r *= f;
+    return flipped ? 1.0f / r : r;
+}
+
+#else
+
+f32 zpl_rsqrt(f32 a) { return 1.0f / __builtin_sqrt(a); }
+f32 zpl_sqrt(f32 a) { return __builtin_sqrt(a); }
+f32 zpl_sin(f32 radians) { return __builtin_sinf(radians); }
+f32 zpl_cos(f32 radians) { return __builtin_cosf(radians); }
+f32 zpl_tan(f32 radians) { return __builtin_tanf(radians); }
+f32 zpl_arcsin(f32 a) { return __builtin_asinf(a); }
+f32 zpl_arccos(f32 a) { return __builtin_acosf(a); }
+f32 zpl_arctan(f32 a) { return __builtin_atanf(a); }
+f32 zpl_arctan2(f32 y, f32 x) { return __builtin_atan2f(y, x); }
+
+f32 zpl_exp(f32 x) { return __builtin_expf(x); }
+f32 zpl_log(f32 x) { return __builtin_logf(x); }
+
+// TODO: Should this be zpl_exp(y * zpl_log(x)) ???
+f32 zpl_pow(f32 x, f32 y) { return __builtin_powf(x, y); }
+
+#endif
+
+#else
+f32 zpl_rsqrt(f32 a) { return 1.0f / sqrtf(a); }
+f32 zpl_sqrt(f32 a) { return sqrtf(a); };
+f32 zpl_sin(f32 radians) { return sinf(radians); };
+f32 zpl_cos(f32 radians) { return cosf(radians); };
+f32 zpl_tan(f32 radians) { return tanf(radians); };
+f32 zpl_arcsin(f32 a) { return asinf(a); };
+f32 zpl_arccos(f32 a) { return acosf(a); };
+f32 zpl_arctan(f32 a) { return atanf(a); };
+f32 zpl_arctan2(f32 y, f32 x) { return atan2f(y, x); };
+
+f32 zpl_exp(f32 x) { return expf(x); }
+f32 zpl_log(f32 x) { return logf(x); }
+f32 zpl_pow(f32 x, f32 y) { return powf(x, y); }
+#endif
+
+f32 zpl_exp2(f32 x) { return zpl_exp(ZPL_LOG_TWO * x); }
+f32 zpl_log2(f32 x) { return zpl_log(x) / ZPL_LOG_TWO; }
+
+f32 zpl_fast_exp(f32 x) {
+    /* NOTE: Only works in the range -1 <= x <= +1 */
+    f32 e = 1.0f + x * (1.0f + x * 0.5f * (1.0f + x * 0.3333333333f * (1.0f + x * 0.25f * (1.0f + x * 0.2f))));
+    return e;
+}
+
+f32 zpl_fast_exp2(f32 x) { return zpl_fast_exp(ZPL_LOG_TWO * x); }
+
+f32 zpl_round(f32 x) { return (float)((x >= 0.0f) ? zpl_floor(x + 0.5f) : zpl_ceil(x - 0.5f)); }
+f32 zpl_floor(f32 x) { return (float)((x >= 0.0f) ? (int)x : (int)(x - 0.9999999999999999f)); }
+f32 zpl_ceil(f32 x) { return (float)((x < 0) ? (int)x : ((int)x) + 1); }
+
+f32 zpl_half_to_float(zpl_half value) {
+    union {
+        unsigned int i;
+        f32 f;
+    } result;
+    int s = (value >> 15) & 0x001;
+    int e = (value >> 10) & 0x01f;
+    int m = value & 0x3ff;
+
+    if (e == 0) {
+        if (m == 0) {
+            /* Plus or minus zero */
+            result.i = (unsigned int)(s << 31);
+            return result.f;
+        } else {
+            /* Denormalized number */
+            while (!(m & 0x00000400)) {
+                m <<= 1;
+                e -= 1;
+            }
+
+            e += 1;
+            m &= ~0x00000400;
+        }
+    } else if (e == 31) {
+        if (m == 0) {
+            /* Positive or negative infinity */
+            result.i = (unsigned int)((s << 31) | 0x7f800000);
+            return result.f;
+        } else {
+            /* Nan */
+            result.i = (unsigned int)((s << 31) | 0x7f800000 | (m << 13));
+            return result.f;
+        }
+    }
+
+    e = e + (127 - 15);
+    m = m << 13;
+
+    result.i = (unsigned int)((s << 31) | (e << 23) | m);
+    return result.f;
+}
+
+zpl_half zpl_float_to_half(f32 value) {
+    union {
+        unsigned int i;
+        f32 f;
+    } v;
+    int i, s, e, m;
+
+    v.f = value;
+    i = (int)v.i;
+
+    s = (i >> 16) & 0x00008000;
+    e = ((i >> 23) & 0x000000ff) - (127 - 15);
+    m = i & 0x007fffff;
+
+    if (e <= 0) {
+        if (e < -10) return (zpl_half)s;
+        m = (m | 0x00800000) >> (1 - e);
+
+        if (m & 0x00001000) m += 0x00002000;
+
+        return (zpl_half)(s | (m >> 13));
+    } else if (e == 0xff - (127 - 15)) {
+        if (m == 0) {
+            return (zpl_half)(s | 0x7c00); /* NOTE: infinity */
+        } else {
+            /* NOTE: NAN */
+            m >>= 13;
+            return (zpl_half)(s | 0x7c00 | m | (m == 0));
+        }
+    } else {
+        if (m & 0x00001000) {
+            m += 0x00002000;
+            if (m & 0x00800000) {
+                m = 0;
+                e += 1;
+            }
+        }
+
+        if (e > 30) {
+            f32 volatile f = 1e12f;
+            int j;
+            for (j = 0; j < 10; j++) f *= f; /* NOTE: Cause overflow */
+
+            return (zpl_half)(s | 0x7c00);
+        }
+
+        return (zpl_half)(s | (e << 10) | (m >> 13));
+    }
+}
+
+#define ZPL_VEC2_2OP(a, c, post)                                                                                      \
+    \
+a->x = c.x post;                                                                                                       \
+    \
+a->y = c.y post;
+
+#define ZPL_VEC2_3OP(a, b, op, c, post)                                                                               \
+    \
+a->x = b.x op c.x post;                                                                                                \
+    \
+a->y = b.y op c.y post;
+
+#define ZPL_VEC3_2OP(a, c, post)                                                                                      \
+    \
+a->x = c.x post;                                                                                                       \
+    \
+a->y = c.y post;                                                                                                       \
+    \
+a->z = c.z post;
+
+#define ZPL_VEC3_3OP(a, b, op, c, post)                                                                               \
+    \
+a->x = b.x op c.x post;                                                                                                \
+    \
+a->y = b.y op c.y post;                                                                                                \
+    \
+a->z = b.z op c.z post;
+
+#define ZPL_VEC4_2OP(a, c, post)                                                                                      \
+    \
+a->x = c.x post;                                                                                                       \
+    \
+a->y = c.y post;                                                                                                       \
+    \
+a->z = c.z post;                                                                                                       \
+    \
+a->w = c.w post;
+
+#define ZPL_VEC4_3OP(a, b, op, c, post)                                                                               \
+    \
+a->x = b.x op c.x post;                                                                                                \
+    \
+a->y = b.y op c.y post;                                                                                                \
+    \
+a->z = b.z op c.z post;                                                                                                \
+    \
+a->w = b.w op c.w post;
+
+zpl_vec2 zpl_vec2f_zero(void) {
+    zpl_vec2 v = { 0, 0 };
+    return v;
+}
+zpl_vec2 zpl_vec2f(f32 x, f32 y) {
+    zpl_vec2 v;
+    v.x = x;
+    v.y = y;
+    return v;
+}
+zpl_vec2 zpl_vec2fv(f32 x[2]) {
+    zpl_vec2 v;
+    v.x = x[0];
+    v.y = x[1];
+    return v;
+}
+
+zpl_vec3 zpl_vec3f_zero(void) {
+    zpl_vec3 v = { 0, 0, 0 };
+    return v;
+}
+zpl_vec3 zpl_vec3f(f32 x, f32 y, f32 z) {
+    zpl_vec3 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+zpl_vec3 zpl_vec3fv(f32 x[3]) {
+    zpl_vec3 v;
+    v.x = x[0];
+    v.y = x[1];
+    v.z = x[2];
+    return v;
+}
+
+zpl_vec4 zpl_vec4f_zero(void) {
+    zpl_vec4 v = { 0, 0, 0, 0 };
+    return v;
+}
+zpl_vec4 zpl_vec4f(f32 x, f32 y, f32 z, f32 w) {
+    zpl_vec4 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    v.w = w;
+    return v;
+}
+zpl_vec4 zpl_vec4fv(f32 x[4]) {
+    zpl_vec4 v;
+    v.x = x[0];
+    v.y = x[1];
+    v.z = x[2];
+    v.w = x[3];
+    return v;
+}
+
+void zpl_vec2_add(zpl_vec2 *d, zpl_vec2 v0, zpl_vec2 v1) { ZPL_VEC2_3OP(d, v0, +, v1, +0); }
+void zpl_vec2_sub(zpl_vec2 *d, zpl_vec2 v0, zpl_vec2 v1) { ZPL_VEC2_3OP(d, v0, -, v1, +0); }
+void zpl_vec2_mul(zpl_vec2 *d, zpl_vec2 v, f32 s) { ZPL_VEC2_2OP(d, v, *s); }
+void zpl_vec2_div(zpl_vec2 *d, zpl_vec2 v, f32 s) { ZPL_VEC2_2OP(d, v, / s); }
+
+void zpl_vec3_add(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1) { ZPL_VEC3_3OP(d, v0, +, v1, +0); }
+void zpl_vec3_sub(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1) { ZPL_VEC3_3OP(d, v0, -, v1, +0); }
+void zpl_vec3_mul(zpl_vec3 *d, zpl_vec3 v, f32 s) { ZPL_VEC3_2OP(d, v, *s); }
+void zpl_vec3_div(zpl_vec3 *d, zpl_vec3 v, f32 s) { ZPL_VEC3_2OP(d, v, / s); }
+
+void zpl_vec4_add(zpl_vec4 *d, zpl_vec4 v0, zpl_vec4 v1) { ZPL_VEC4_3OP(d, v0, +, v1, +0); }
+void zpl_vec4_sub(zpl_vec4 *d, zpl_vec4 v0, zpl_vec4 v1) { ZPL_VEC4_3OP(d, v0, -, v1, +0); }
+void zpl_vec4_mul(zpl_vec4 *d, zpl_vec4 v, f32 s) { ZPL_VEC4_2OP(d, v, *s); }
+void zpl_vec4_div(zpl_vec4 *d, zpl_vec4 v, f32 s) { ZPL_VEC4_2OP(d, v, / s); }
+
+void zpl_vec2_addeq(zpl_vec2 *d, zpl_vec2 v) { ZPL_VEC2_3OP(d, (*d), +, v, +0); }
+void zpl_vec2_subeq(zpl_vec2 *d, zpl_vec2 v) { ZPL_VEC2_3OP(d, (*d), -, v, +0); }
+void zpl_vec2_muleq(zpl_vec2 *d, f32 s) { ZPL_VEC2_2OP(d, (*d), *s); }
+void zpl_vec2_diveq(zpl_vec2 *d, f32 s) { ZPL_VEC2_2OP(d, (*d), / s); }
+
+void zpl_vec3_addeq(zpl_vec3 *d, zpl_vec3 v) { ZPL_VEC3_3OP(d, (*d), +, v, +0); }
+void zpl_vec3_subeq(zpl_vec3 *d, zpl_vec3 v) { ZPL_VEC3_3OP(d, (*d), -, v, +0); }
+void zpl_vec3_muleq(zpl_vec3 *d, f32 s) { ZPL_VEC3_2OP(d, (*d), *s); }
+void zpl_vec3_diveq(zpl_vec3 *d, f32 s) { ZPL_VEC3_2OP(d, (*d), / s); }
+
+void zpl_vec4_addeq(zpl_vec4 *d, zpl_vec4 v) { ZPL_VEC4_3OP(d, (*d), +, v, +0); }
+void zpl_vec4_subeq(zpl_vec4 *d, zpl_vec4 v) { ZPL_VEC4_3OP(d, (*d), -, v, +0); }
+void zpl_vec4_muleq(zpl_vec4 *d, f32 s) { ZPL_VEC4_2OP(d, (*d), *s); }
+void zpl_vec4_diveq(zpl_vec4 *d, f32 s) { ZPL_VEC4_2OP(d, (*d), / s); }
+
+#undef ZPL_VEC2_2OP
+#undef ZPL_VEC2_3OP
+#undef ZPL_VEC3_3OP
+#undef ZPL_VEC3_2OP
+#undef ZPL_VEC4_2OP
+#undef ZPL_VEC4_3OP
+
+f32 zpl_vec2_dot(zpl_vec2 v0, zpl_vec2 v1) { return v0.x * v1.x + v0.y * v1.y; }
+f32 zpl_vec3_dot(zpl_vec3 v0, zpl_vec3 v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z; }
+f32 zpl_vec4_dot(zpl_vec4 v0, zpl_vec4 v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w; }
+
+void zpl_vec2_cross(f32 *d, zpl_vec2 v0, zpl_vec2 v1) { *d = v0.x * v1.y - v1.x * v0.y; }
+void zpl_vec3_cross(zpl_vec3 *d, zpl_vec3 v0, zpl_vec3 v1) {
+    d->x = v0.y * v1.z - v0.z * v1.y;
+    d->y = v0.z * v1.x - v0.x * v1.z;
+    d->z = v0.x * v1.y - v0.y * v1.x;
+}
+
+f32 zpl_vec2_mag2(zpl_vec2 v) { return zpl_vec2_dot(v, v); }
+f32 zpl_vec3_mag2(zpl_vec3 v) { return zpl_vec3_dot(v, v); }
+f32 zpl_vec4_mag2(zpl_vec4 v) { return zpl_vec4_dot(v, v); }
+
+/* TODO: Create custom sqrt function */
+f32 zpl_vec2_mag(zpl_vec2 v) { return zpl_sqrt(zpl_vec2_dot(v, v)); }
+f32 zpl_vec3_mag(zpl_vec3 v) { return zpl_sqrt(zpl_vec3_dot(v, v)); }
+f32 zpl_vec4_mag(zpl_vec4 v) { return zpl_sqrt(zpl_vec4_dot(v, v)); }
+
+void zpl_vec2_norm(zpl_vec2 *d, zpl_vec2 v) {
+    f32 inv_mag = zpl_rsqrt(zpl_vec2_dot(v, v));
+    zpl_vec2_mul(d, v, inv_mag);
+}
+void zpl_vec3_norm(zpl_vec3 *d, zpl_vec3 v) {
+    f32 mag = zpl_vec3_mag(v);
+    zpl_vec3_div(d, v, mag);
+}
+void zpl_vec4_norm(zpl_vec4 *d, zpl_vec4 v) {
+    f32 mag = zpl_vec4_mag(v);
+    zpl_vec4_div(d, v, mag);
+}
+
+void zpl_vec2_norm0(zpl_vec2 *d, zpl_vec2 v) {
+    f32 mag = zpl_vec2_mag(v);
+    if (mag > 0)
+        zpl_vec2_div(d, v, mag);
+    else
+        *d = zpl_vec2f_zero( );
+}
+void zpl_vec3_norm0(zpl_vec3 *d, zpl_vec3 v) {
+    f32 mag = zpl_vec3_mag(v);
+    if (mag > 0)
+        zpl_vec3_div(d, v, mag);
+    else
+        *d = zpl_vec3f_zero( );
+}
+void zpl_vec4_norm0(zpl_vec4 *d, zpl_vec4 v) {
+    f32 mag = zpl_vec4_mag(v);
+    if (mag > 0)
+        zpl_vec4_div(d, v, mag);
+    else
+        *d = zpl_vec4f_zero( );
+}
+
+void zpl_vec2_reflect(zpl_vec2 *d, zpl_vec2 i, zpl_vec2 n) {
+    zpl_vec2 b = n;
+    zpl_vec2_muleq(&b, 2.0f * zpl_vec2_dot(n, i));
+    zpl_vec2_sub(d, i, b);
+}
+
+void zpl_vec3_reflect(zpl_vec3 *d, zpl_vec3 i, zpl_vec3 n) {
+    zpl_vec3 b = n;
+    zpl_vec3_muleq(&b, 2.0f * zpl_vec3_dot(n, i));
+    zpl_vec3_sub(d, i, b);
+}
+
+void zpl_vec2_refract(zpl_vec2 *d, zpl_vec2 i, zpl_vec2 n, f32 eta) {
+    zpl_vec2 a, b;
+    f32 dv, k;
+
+    dv = zpl_vec2_dot(n, i);
+    k = 1.0f - eta * eta * (1.0f - dv * dv);
+    zpl_vec2_mul(&a, i, eta);
+    zpl_vec2_mul(&b, n, eta * dv * zpl_sqrt(k));
+    zpl_vec2_sub(d, a, b);
+    zpl_vec2_muleq(d, (float)(k >= 0.0f));
+}
+
+void zpl_vec3_refract(zpl_vec3 *d, zpl_vec3 i, zpl_vec3 n, f32 eta) {
+    zpl_vec3 a, b;
+    f32 dv, k;
+
+    dv = zpl_vec3_dot(n, i);
+    k = 1.0f - eta * eta * (1.0f - dv * dv);
+    zpl_vec3_mul(&a, i, eta);
+    zpl_vec3_mul(&b, n, eta * dv * zpl_sqrt(k));
+    zpl_vec3_sub(d, a, b);
+    zpl_vec3_muleq(d, (float)(k >= 0.0f));
+}
+
+f32 zpl_vec2_aspect_ratio(zpl_vec2 v) { return (v.y < 0.0001f) ? 0.0f : v.x / v.y; }
+
+void zpl_mat2_transpose(zpl_mat2 *m) { zpl_float22_transpose(zpl_float22_m(m)); }
+void zpl_mat2_identity(zpl_mat2 *m) { zpl_float22_identity(zpl_float22_m(m)); }
+void zpl_mat2_mul(zpl_mat2 *out, zpl_mat2 *m1, zpl_mat2 *m2) {
+    zpl_float22_mul(zpl_float22_m(out), zpl_float22_m(m1), zpl_float22_m(m2));
+}
+
+void zpl_float22_identity(f32 m[2][2]) {
+    m[0][0] = 1;
+    m[0][1] = 0;
+    m[1][0] = 0;
+    m[1][1] = 1;
+}
+
+void zpl_mat2_mul_vec2(zpl_vec2 *out, zpl_mat2 *m, zpl_vec2 in) { zpl_float22_mul_vec2(out, zpl_float22_m(m), in); }
+
+zpl_mat2 *zpl_mat2_v(zpl_vec2 m[2]) { return (zpl_mat2 *)m; }
+zpl_mat2 *zpl_mat2_f(f32 m[2][2]) { return (zpl_mat2 *)m; }
+
+zpl_float2 *zpl_float22_m(zpl_mat2 *m) { return (zpl_float2 *)m; }
+zpl_float2 *zpl_float22_v(zpl_vec2 m[2]) { return (zpl_float2 *)m; }
+zpl_float2 *zpl_float22_4(f32 m[4]) { return (zpl_float2 *)m; }
+
+void zpl_float22_transpose(f32 (*vec)[2]) {
+    int i, j;
+    for (j = 0; j < 2; j++) {
+        for (i = j + 1; i < 2; i++) {
+            f32 t = vec[i][j];
+            vec[i][j] = vec[j][i];
+            vec[j][i] = t;
+        }
+    }
+}
+
+void zpl_float22_mul(f32 (*out)[2], f32 (*mat1)[2], f32 (*mat2)[2]) {
+    int i, j;
+    f32 temp1[2][2], temp2[2][2];
+    if (mat1 == out) {
+        zpl__memcpy_4byte(temp1, mat1, sizeof(temp1));
+        mat1 = temp1;
+    }
+    if (mat2 == out) {
+        zpl__memcpy_4byte(temp2, mat2, sizeof(temp2));
+        mat2 = temp2;
+    }
+    for (j = 0; j < 2; j++) {
+        for (i = 0; i < 2; i++) { out[j][i] = mat1[0][i] * mat2[j][0] + mat1[1][i] * mat2[j][1]; }
+    }
+}
+
+void zpl_float22_mul_vec2(zpl_vec2 *out, f32 m[2][2], zpl_vec2 v) {
+    out->x = m[0][0] * v.x + m[0][1] * v.y;
+    out->y = m[1][0] * v.x + m[1][1] * v.y;
+}
+
+f32 zpl_mat2_determinate(zpl_mat2 *m) {
+    zpl_float2 *e = zpl_float22_m(m);
+    return e[0][0] * e[1][1] - e[1][0] * e[0][1];
+}
+
+void zpl_mat2_inverse(zpl_mat2 *out, zpl_mat2 *in) {
+    zpl_float2 *o = zpl_float22_m(out);
+    zpl_float2 *i = zpl_float22_m(in);
+
+    f32 ood = 1.0f / zpl_mat2_determinate(in);
+
+    o[0][0] = +i[1][1] * ood;
+    o[0][1] = -i[0][1] * ood;
+    o[1][0] = -i[1][0] * ood;
+    o[1][1] = +i[0][0] * ood;
+}
+
+void zpl_mat3_transpose(zpl_mat3 *m) { zpl_float33_transpose(zpl_float33_m(m)); }
+void zpl_mat3_identity(zpl_mat3 *m) { zpl_float33_identity(zpl_float33_m(m)); }
+void zpl_mat3_mul(zpl_mat3 *out, zpl_mat3 *m1, zpl_mat3 *m2) {
+    zpl_float33_mul(zpl_float33_m(out), zpl_float33_m(m1), zpl_float33_m(m2));
+}
+
+void zpl_float33_identity(f32 m[3][3]) {
+    m[0][0] = 1;
+    m[0][1] = 0;
+    m[0][2] = 0;
+    m[1][0] = 0;
+    m[1][1] = 1;
+    m[1][2] = 0;
+    m[2][0] = 0;
+    m[2][1] = 0;
+    m[2][2] = 1;
+}
+
+void zpl_mat3_mul_vec3(zpl_vec3 *out, zpl_mat3 *m, zpl_vec3 in) { zpl_float33_mul_vec3(out, zpl_float33_m(m), in); }
+
+zpl_mat3 *zpl_mat3_v(zpl_vec3 m[3]) { return (zpl_mat3 *)m; }
+zpl_mat3 *zpl_mat3_f(f32 m[3][3]) { return (zpl_mat3 *)m; }
+
+zpl_float3 *zpl_float33_m(zpl_mat3 *m) { return (zpl_float3 *)m; }
+zpl_float3 *zpl_float33_v(zpl_vec3 m[3]) { return (zpl_float3 *)m; }
+zpl_float3 *zpl_float33_16(f32 m[9]) { return (zpl_float3 *)m; }
+
+void zpl_float33_transpose(f32 (*vec)[3]) {
+    int i, j;
+    for (j = 0; j < 3; j++) {
+        for (i = j + 1; i < 3; i++) {
+            f32 t = vec[i][j];
+            vec[i][j] = vec[j][i];
+            vec[j][i] = t;
+        }
+    }
+}
+
+void zpl_float33_mul(f32 (*out)[3], f32 (*mat1)[3], f32 (*mat2)[3]) {
+    int i, j;
+    f32 temp1[3][3], temp2[3][3];
+    if (mat1 == out) {
+        zpl__memcpy_4byte(temp1, mat1, sizeof(temp1));
+        mat1 = temp1;
+    }
+    if (mat2 == out) {
+        zpl__memcpy_4byte(temp2, mat2, sizeof(temp2));
+        mat2 = temp2;
+    }
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < 3; i++) {
+            out[j][i] = mat1[0][i] * mat2[j][0] + mat1[1][i] * mat2[j][1] + mat1[2][i] * mat2[j][2];
+        }
+    }
+}
+
+void zpl_float33_mul_vec3(zpl_vec3 *out, f32 m[3][3], zpl_vec3 v) {
+    out->x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z;
+    out->y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z;
+    out->z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z;
+}
+
+f32 zpl_mat3_determinate(zpl_mat3 *m) {
+    zpl_float3 *e = zpl_float33_m(m);
+    f32 d = +e[0][0] * (e[1][1] * e[2][2] - e[1][2] * e[2][1]) - e[0][1] * (e[1][0] * e[2][2] - e[1][2] * e[2][0]) +
+              e[0][2] * (e[1][0] * e[2][1] - e[1][1] * e[2][0]);
+    return d;
+}
+
+void zpl_mat3_inverse(zpl_mat3 *out, zpl_mat3 *in) {
+    zpl_float3 *o = zpl_float33_m(out);
+    zpl_float3 *i = zpl_float33_m(in);
+
+    f32 ood = 1.0f / zpl_mat3_determinate(in);
+
+    o[0][0] = +(i[1][1] * i[2][2] - i[2][1] * i[1][2]) * ood;
+    o[0][1] = -(i[1][0] * i[2][2] - i[2][0] * i[1][2]) * ood;
+    o[0][2] = +(i[1][0] * i[2][1] - i[2][0] * i[1][1]) * ood;
+    o[1][0] = -(i[0][1] * i[2][2] - i[2][1] * i[0][2]) * ood;
+    o[1][1] = +(i[0][0] * i[2][2] - i[2][0] * i[0][2]) * ood;
+    o[1][2] = -(i[0][0] * i[2][1] - i[2][0] * i[0][1]) * ood;
+    o[2][0] = +(i[0][1] * i[1][2] - i[1][1] * i[0][2]) * ood;
+    o[2][1] = -(i[0][0] * i[1][2] - i[1][0] * i[0][2]) * ood;
+    o[2][2] = +(i[0][0] * i[1][1] - i[1][0] * i[0][1]) * ood;
+}
+
+void zpl_mat4_transpose(zpl_mat4 *m) { zpl_float44_transpose(zpl_float44_m(m)); }
+void zpl_mat4_identity(zpl_mat4 *m) { zpl_float44_identity(zpl_float44_m(m)); }
+void zpl_mat4_mul(zpl_mat4 *out, zpl_mat4 *m1, zpl_mat4 *m2) {
+    zpl_float44_mul(zpl_float44_m(out), zpl_float44_m(m1), zpl_float44_m(m2));
+}
+
+void zpl_float44_identity(f32 m[4][4]) {
+    m[0][0] = 1;
+    m[0][1] = 0;
+    m[0][2] = 0;
+    m[0][3] = 0;
+    m[1][0] = 0;
+    m[1][1] = 1;
+    m[1][2] = 0;
+    m[1][3] = 0;
+    m[2][0] = 0;
+    m[2][1] = 0;
+    m[2][2] = 1;
+    m[2][3] = 0;
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = 0;
+    m[3][3] = 1;
+}
+
+void zpl_mat4_mul_vec4(zpl_vec4 *out, zpl_mat4 *m, zpl_vec4 in) { zpl_float44_mul_vec4(out, zpl_float44_m(m), in); }
+
+zpl_mat4 *zpl_mat4_v(zpl_vec4 m[4]) { return (zpl_mat4 *)m; }
+zpl_mat4 *zpl_mat4_f(f32 m[4][4]) { return (zpl_mat4 *)m; }
+
+zpl_float4 *zpl_float44_m(zpl_mat4 *m) { return (zpl_float4 *)m; }
+zpl_float4 *zpl_float44_v(zpl_vec4 m[4]) { return (zpl_float4 *)m; }
+zpl_float4 *zpl_float44_16(f32 m[16]) { return (zpl_float4 *)m; }
+
+void zpl_float44_transpose(f32 (*vec)[4]) {
+    f32 tmp;
+    tmp = vec[1][0];
+    vec[1][0] = vec[0][1];
+    vec[0][1] = tmp;
+    tmp = vec[2][0];
+    vec[2][0] = vec[0][2];
+    vec[0][2] = tmp;
+    tmp = vec[3][0];
+    vec[3][0] = vec[0][3];
+    vec[0][3] = tmp;
+    tmp = vec[2][1];
+    vec[2][1] = vec[1][2];
+    vec[1][2] = tmp;
+    tmp = vec[3][1];
+    vec[3][1] = vec[1][3];
+    vec[1][3] = tmp;
+    tmp = vec[3][2];
+    vec[3][2] = vec[2][3];
+    vec[2][3] = tmp;
+}
+
+void zpl_float44_mul(f32 (*out)[4], f32 (*mat1)[4], f32 (*mat2)[4]) {
+    int i, j;
+    f32 temp1[4][4], temp2[4][4];
+    if (mat1 == out) {
+        zpl__memcpy_4byte(temp1, mat1, sizeof(temp1));
+        mat1 = temp1;
+    }
+    if (mat2 == out) {
+        zpl__memcpy_4byte(temp2, mat2, sizeof(temp2));
+        mat2 = temp2;
+    }
+    for (j = 0; j < 4; j++) {
+        for (i = 0; i < 4; i++) {
+            out[j][i] =
+                mat1[0][i] * mat2[j][0] + mat1[1][i] * mat2[j][1] + mat1[2][i] * mat2[j][2] + mat1[3][i] * mat2[j][3];
+        }
+    }
+}
+
+void zpl_float44_mul_vec4(zpl_vec4 *out, f32 m[4][4], zpl_vec4 v) {
+    out->x = m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z + m[3][0] * v.w;
+    out->y = m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z + m[3][1] * v.w;
+    out->z = m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z + m[3][2] * v.w;
+    out->w = m[0][3] * v.x + m[1][3] * v.y + m[2][3] * v.z + m[3][3] * v.w;
+}
+
+void zpl_mat4_inverse(zpl_mat4 *out, zpl_mat4 *in) {
+    zpl_float4 *o = zpl_float44_m(out);
+    zpl_float4 *m = zpl_float44_m(in);
+
+    f32 ood;
+    // f32 tmp;
+
+    f32 sf00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+    f32 sf01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+    f32 sf02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+    f32 sf03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+    f32 sf04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+    f32 sf05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+    f32 sf06 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+    f32 sf07 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+    f32 sf08 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+    f32 sf09 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+    f32 sf10 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+    f32 sf11 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+    f32 sf12 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+    f32 sf13 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+    f32 sf14 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+    f32 sf15 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+    f32 sf16 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+    f32 sf17 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+    f32 sf18 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+    o[0][0] = +(m[1][1] * sf00 - m[1][2] * sf01 + m[1][3] * sf02);
+    o[1][0] = -(m[1][0] * sf00 - m[1][2] * sf03 + m[1][3] * sf04);
+    o[2][0] = +(m[1][0] * sf01 - m[1][1] * sf03 + m[1][3] * sf05);
+    o[3][0] = -(m[1][0] * sf02 - m[1][1] * sf04 + m[1][2] * sf05);
+
+    o[0][1] = -(m[0][1] * sf00 - m[0][2] * sf01 + m[0][3] * sf02);
+    o[1][1] = +(m[0][0] * sf00 - m[0][2] * sf03 + m[0][3] * sf04);
+    o[2][1] = -(m[0][0] * sf01 - m[0][1] * sf03 + m[0][3] * sf05);
+    o[3][1] = +(m[0][0] * sf02 - m[0][1] * sf04 + m[0][2] * sf05);
+
+    o[0][2] = +(m[0][1] * sf06 - m[0][2] * sf07 + m[0][3] * sf08);
+    o[1][2] = -(m[0][0] * sf06 - m[0][2] * sf09 + m[0][3] * sf10);
+    o[2][2] = +(m[0][0] * sf11 - m[0][1] * sf09 + m[0][3] * sf12);
+    o[3][2] = -(m[0][0] * sf08 - m[0][1] * sf10 + m[0][2] * sf12);
+
+    o[0][3] = -(m[0][1] * sf13 - m[0][2] * sf14 + m[0][3] * sf15);
+    o[1][3] = +(m[0][0] * sf13 - m[0][2] * sf16 + m[0][3] * sf17);
+    o[2][3] = -(m[0][0] * sf14 - m[0][1] * sf16 + m[0][3] * sf18);
+    o[3][3] = +(m[0][0] * sf15 - m[0][1] * sf17 + m[0][2] * sf18);
+
+    ood = 1.0f / (m[0][0] * o[0][0] + m[0][1] * o[1][0] + m[0][2] * o[2][0] + m[0][3] * o[3][0]);
+
+    o[0][0] *= ood;
+    o[0][1] *= ood;
+    o[0][2] *= ood;
+    o[0][3] *= ood;
+    o[1][0] *= ood;
+    o[1][1] *= ood;
+    o[1][2] *= ood;
+    o[1][3] *= ood;
+    o[2][0] *= ood;
+    o[2][1] *= ood;
+    o[2][2] *= ood;
+    o[2][3] *= ood;
+    o[3][0] *= ood;
+    o[3][1] *= ood;
+    o[3][2] *= ood;
+    o[3][3] *= ood;
+}
+
+void zpl_mat4_translate(zpl_mat4 *out, zpl_vec3 v) {
+    zpl_mat4_identity(out);
+    out->col[3].xyz = v;
+    out->col[3].w = 1;
+}
+
+void zpl_mat4_rotate(zpl_mat4 *out, zpl_vec3 v, f32 angle_radians) {
+    f32 c, s;
+    zpl_vec3 axis, t;
+    zpl_float4 *rot;
+
+    c = zpl_cos(angle_radians);
+    s = zpl_sin(angle_radians);
+
+    zpl_vec3_norm(&axis, v);
+    zpl_vec3_mul(&t, axis, 1.0f - c);
+
+    zpl_mat4_identity(out);
+    rot = zpl_float44_m(out);
+
+    rot[0][0] = c + t.x * axis.x;
+    rot[0][1] = 0 + t.x * axis.y + s * axis.z;
+    rot[0][2] = 0 + t.x * axis.z - s * axis.y;
+    rot[0][3] = 0;
+
+    rot[1][0] = 0 + t.y * axis.x - s * axis.z;
+    rot[1][1] = c + t.y * axis.y;
+    rot[1][2] = 0 + t.y * axis.z + s * axis.x;
+    rot[1][3] = 0;
+
+    rot[2][0] = 0 + t.z * axis.x + s * axis.y;
+    rot[2][1] = 0 + t.z * axis.y - s * axis.x;
+    rot[2][2] = c + t.z * axis.z;
+    rot[2][3] = 0;
+}
+
+void zpl_mat4_scale(zpl_mat4 *out, zpl_vec3 v) {
+    zpl_mat4_identity(out);
+    out->e[0] = v.x;
+    out->e[5] = v.y;
+    out->e[10] = v.z;
+}
+
+void zpl_mat4_scalef(zpl_mat4 *out, f32 s) {
+    zpl_mat4_identity(out);
+    out->e[0] = s;
+    out->e[5] = s;
+    out->e[10] = s;
+}
+
+void zpl_mat4_ortho2d(zpl_mat4 *out, f32 left, f32 right, f32 bottom, f32 top) {
+    zpl_float4 *m;
+    zpl_mat4_identity(out);
+    m = zpl_float44_m(out);
+
+    m[0][0] = 2.0f / (right - left);
+    m[1][1] = 2.0f / (top - bottom);
+    m[2][2] = -1.0f;
+    m[3][0] = -(right + left) / (right - left);
+    m[3][1] = -(top + bottom) / (top - bottom);
+}
+
+void zpl_mat4_ortho3d(zpl_mat4 *out, f32 left, f32 right, f32 bottom, f32 top, f32 z_near, f32 z_far) {
+    zpl_float4 *m;
+    zpl_mat4_identity(out);
+    m = zpl_float44_m(out);
+
+    m[0][0] = +2.0f / (right - left);
+    m[1][1] = +2.0f / (top - bottom);
+    m[2][2] = -2.0f / (z_far - z_near);
+    m[3][0] = -(right + left) / (right - left);
+    m[3][1] = -(top + bottom) / (top - bottom);
+    m[3][2] = -(z_far + z_near) / (z_far - z_near);
+}
+
+void zpl_mat4_perspective(zpl_mat4 *out, f32 fovy, f32 aspect, f32 z_near, f32 z_far) {
+    f32 tan_half_fovy = zpl_tan(0.5f * fovy);
+    zpl_mat4 zero_mat = { 0 };
+    zpl_float4 *m = zpl_float44_m(out);
+    *out = zero_mat;
+
+    m[0][0] = 1.0f / (aspect * tan_half_fovy);
+    m[1][1] = 1.0f / (tan_half_fovy);
+    m[2][2] = -(z_far + z_near) / (z_far - z_near);
+    m[2][3] = -1.0f;
+    m[3][2] = -2.0f * z_far * z_near / (z_far - z_near);
+}
+
+void zpl_mat4_infinite_perspective(zpl_mat4 *out, f32 fovy, f32 aspect, f32 z_near) {
+    f32 range = zpl_tan(0.5f * fovy) * z_near;
+    f32 left = -range * aspect;
+    f32 right = range * aspect;
+    f32 bottom = -range;
+    f32 top = range;
+    zpl_mat4 zero_mat = { 0 };
+    zpl_float4 *m = zpl_float44_m(out);
+    *out = zero_mat;
+
+    m[0][0] = (2.0f * z_near) / (right - left);
+    m[1][1] = (2.0f * z_near) / (top - bottom);
+    m[2][2] = -1.0f;
+    m[2][3] = -1.0f;
+    m[3][2] = -2.0f * z_near;
+}
+
+void zpl_mat4_look_at(zpl_mat4 *out, zpl_vec3 eye, zpl_vec3 centre, zpl_vec3 up) {
+    zpl_vec3 f, s, u;
+    zpl_float4 *m;
+
+    zpl_vec3_sub(&f, centre, eye);
+    zpl_vec3_norm(&f, f);
+
+    zpl_vec3_cross(&s, f, up);
+    zpl_vec3_norm(&s, s);
+
+    zpl_vec3_cross(&u, s, f);
+
+    zpl_mat4_identity(out);
+    m = zpl_float44_m(out);
+
+    m[0][0] = +s.x;
+    m[1][0] = +s.y;
+    m[2][0] = +s.z;
+
+    m[0][1] = +u.x;
+    m[1][1] = +u.y;
+    m[2][1] = +u.z;
+
+    m[0][2] = -f.x;
+    m[1][2] = -f.y;
+    m[2][2] = -f.z;
+
+    m[3][0] = zpl_vec3_dot(s, eye);
+    m[3][1] = zpl_vec3_dot(u, eye);
+    m[3][2] = zpl_vec3_dot(f, eye);
+}
+
+zpl_quat zpl_quatf(f32 x, f32 y, f32 z, f32 w) {
+    zpl_quat q;
+    q.x = x;
+    q.y = y;
+    q.z = z;
+    q.w = w;
+    return q;
+}
+zpl_quat zpl_quatfv(f32 e[4]) {
+    zpl_quat q;
+    q.x = e[0];
+    q.y = e[1];
+    q.z = e[2];
+    q.w = e[3];
+    return q;
+}
+
+zpl_quat zpl_quat_axis_angle(zpl_vec3 axis, f32 angle_radians) {
+    zpl_quat q;
+    zpl_vec3_norm(&q.xyz, axis);
+    zpl_vec3_muleq(&q.xyz, zpl_sin(0.5f * angle_radians));
+    q.w = zpl_cos(0.5f * angle_radians);
+    return q;
+}
+
+zpl_quat zpl_quat_euler_angles(f32 pitch, f32 yaw, f32 roll) {
+    /* TODO: Do without multiplication, i.e. make it faster */
+    zpl_quat q, p, y, r;
+    p = zpl_quat_axis_angle(zpl_vec3f(1, 0, 0), pitch);
+    y = zpl_quat_axis_angle(zpl_vec3f(0, 1, 0), yaw);
+    r = zpl_quat_axis_angle(zpl_vec3f(0, 0, 1), roll);
+
+    zpl_quat_mul(&q, y, p);
+    zpl_quat_muleq(&q, r);
+
+    return q;
+}
+
+zpl_quat zpl_quat_identity(void) {
+    zpl_quat q = { 0, 0, 0, 1 };
+    return q;
+}
+
+void zpl_quat_add(zpl_quat *d, zpl_quat q0, zpl_quat q1) { zpl_vec4_add(&d->xyzw, q0.xyzw, q1.xyzw); }
+void zpl_quat_sub(zpl_quat *d, zpl_quat q0, zpl_quat q1) { zpl_vec4_sub(&d->xyzw, q0.xyzw, q1.xyzw); }
+
+void zpl_quat_mul(zpl_quat *d, zpl_quat q0, zpl_quat q1) {
+    d->x = q0.w * q1.x + q0.x * q1.w + q0.y * q1.z - q0.z * q1.y;
+    d->y = q0.w * q1.y - q0.x * q1.z + q0.y * q1.w + q0.z * q1.x;
+    d->z = q0.w * q1.z + q0.x * q1.y - q0.y * q1.x + q0.z * q1.w;
+    d->w = q0.w * q1.w - q0.x * q1.x - q0.y * q1.y - q0.z * q1.z;
+}
+
+void zpl_quat_div(zpl_quat *d, zpl_quat q0, zpl_quat q1) {
+    zpl_quat iq1;
+    zpl_quat_inverse(&iq1, q1);
+    zpl_quat_mul(d, q0, iq1);
+}
+
+void zpl_quat_mulf(zpl_quat *d, zpl_quat q0, f32 s) { zpl_vec4_mul(&d->xyzw, q0.xyzw, s); }
+void zpl_quat_divf(zpl_quat *d, zpl_quat q0, f32 s) { zpl_vec4_div(&d->xyzw, q0.xyzw, s); }
+
+void zpl_quat_addeq(zpl_quat *d, zpl_quat q) { zpl_vec4_addeq(&d->xyzw, q.xyzw); }
+void zpl_quat_subeq(zpl_quat *d, zpl_quat q) { zpl_vec4_subeq(&d->xyzw, q.xyzw); }
+void zpl_quat_muleq(zpl_quat *d, zpl_quat q) { zpl_quat_mul(d, *d, q); }
+void zpl_quat_diveq(zpl_quat *d, zpl_quat q) { zpl_quat_div(d, *d, q); }
+
+void zpl_quat_muleqf(zpl_quat *d, f32 s) { zpl_vec4_muleq(&d->xyzw, s); }
+void zpl_quat_diveqf(zpl_quat *d, f32 s) { zpl_vec4_diveq(&d->xyzw, s); }
+
+f32 zpl_quat_dot(zpl_quat q0, zpl_quat q1) {
+    f32 r = zpl_vec3_dot(q0.xyz, q1.xyz) + q0.w * q1.w;
+    return r;
+}
+f32 zpl_quat_mag(zpl_quat q) {
+    f32 r = zpl_sqrt(zpl_quat_dot(q, q));
+    return r;
+}
+
+void zpl_quat_norm(zpl_quat *d, zpl_quat q) { zpl_quat_divf(d, q, zpl_quat_mag(q)); }
+void zpl_quat_conj(zpl_quat *d, zpl_quat q) {
+    d->xyz = zpl_vec3f(-q.x, -q.y, -q.z);
+    d->w = q.w;
+}
+void zpl_quat_inverse(zpl_quat *d, zpl_quat q) {
+    zpl_quat_conj(d, q);
+    zpl_quat_diveqf(d, zpl_quat_dot(q, q));
+}
+
+void zpl_quat_axis(zpl_vec3 *axis, zpl_quat q) {
+    zpl_quat n;
+    zpl_quat_norm(&n, q);
+    zpl_vec3_div(axis, n.xyz, zpl_sin(zpl_arccos(q.w)));
+}
+
+f32 zpl_quat_angle(zpl_quat q) {
+    f32 mag = zpl_quat_mag(q);
+    f32 c = q.w * (1.0f / mag);
+    f32 angle = 2.0f * zpl_arccos(c);
+    return angle;
+}
+
+f32 zpl_quat_roll(zpl_quat q) {
+    return zpl_arctan2(2.0f * q.x * q.y + q.z * q.w, q.x * q.x + q.w * q.w - q.y * q.y - q.z * q.z);
+}
+f32 zpl_quat_pitch(zpl_quat q) {
+    return zpl_arctan2(2.0f * q.y * q.z + q.w * q.x, q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
+}
+f32 zpl_quat_yaw(zpl_quat q) { return zpl_arcsin(-2.0f * (q.x * q.z - q.w * q.y)); }
+
+void zpl_quat_rotate_vec3(zpl_vec3 *d, zpl_quat q, zpl_vec3 v) {
+    /* zpl_vec3 t = 2.0f * cross(q.xyz, v);
+     * *d = q.w*t + v + cross(q.xyz, t);
+     */
+    zpl_vec3 t, p;
+    zpl_vec3_cross(&t, q.xyz, v);
+    zpl_vec3_muleq(&t, 2.0f);
+
+    zpl_vec3_cross(&p, q.xyz, t);
+
+    zpl_vec3_mul(d, t, q.w);
+    zpl_vec3_addeq(d, v);
+    zpl_vec3_addeq(d, p);
+}
+
+void zpl_mat4_from_quat(zpl_mat4 *out, zpl_quat q) {
+    zpl_float4 *m;
+    zpl_quat a;
+    f32 xx, yy, zz, xy, xz, yz, wx, wy, wz;
+
+    zpl_quat_norm(&a, q);
+    xx = a.x * a.x;
+    yy = a.y * a.y;
+    zz = a.z * a.z;
+    xy = a.x * a.y;
+    xz = a.x * a.z;
+    yz = a.y * a.z;
+    wx = a.w * a.x;
+    wy = a.w * a.y;
+    wz = a.w * a.z;
+
+    zpl_mat4_identity(out);
+    m = zpl_float44_m(out);
+
+    m[0][0] = 1.0f - 2.0f * (yy + zz);
+    m[0][1] = 2.0f * (xy + wz);
+    m[0][2] = 2.0f * (xz - wy);
+
+    m[1][0] = 2.0f * (xy - wz);
+    m[1][1] = 1.0f - 2.0f * (xx + zz);
+    m[1][2] = 2.0f * (yz + wx);
+
+    m[2][0] = 2.0f * (xz + wy);
+    m[2][1] = 2.0f * (yz - wx);
+    m[2][2] = 1.0f - 2.0f * (xx + yy);
+}
+
+void zpl_quat_from_mat4(zpl_quat *out, zpl_mat4 *mat) {
+    zpl_float4 *m;
+    f32 four_x_squared_minus_1, four_y_squared_minus_1, four_z_squared_minus_1, four_w_squared_minus_1,
+        four_biggest_squared_minus_1;
+    int biggest_index = 0;
+    f32 biggest_value, mult;
+
+    m = zpl_float44_m(mat);
+
+    four_x_squared_minus_1 = m[0][0] - m[1][1] - m[2][2];
+    four_y_squared_minus_1 = m[1][1] - m[0][0] - m[2][2];
+    four_z_squared_minus_1 = m[2][2] - m[0][0] - m[1][1];
+    four_w_squared_minus_1 = m[0][0] + m[1][1] + m[2][2];
+
+    four_biggest_squared_minus_1 = four_w_squared_minus_1;
+    if (four_x_squared_minus_1 > four_biggest_squared_minus_1) {
+        four_biggest_squared_minus_1 = four_x_squared_minus_1;
+        biggest_index = 1;
+    }
+    if (four_y_squared_minus_1 > four_biggest_squared_minus_1) {
+        four_biggest_squared_minus_1 = four_y_squared_minus_1;
+        biggest_index = 2;
+    }
+    if (four_z_squared_minus_1 > four_biggest_squared_minus_1) {
+        four_biggest_squared_minus_1 = four_z_squared_minus_1;
+        biggest_index = 3;
+    }
+
+    biggest_value = zpl_sqrt(four_biggest_squared_minus_1 + 1.0f) * 0.5f;
+    mult = 0.25f / biggest_value;
+
+    switch (biggest_index) {
+    case 0:
+        out->w = biggest_value;
+        out->x = (m[1][2] - m[2][1]) * mult;
+        out->y = (m[2][0] - m[0][2]) * mult;
+        out->z = (m[0][1] - m[1][0]) * mult;
+        break;
+    case 1:
+        out->w = (m[1][2] - m[2][1]) * mult;
+        out->x = biggest_value;
+        out->y = (m[0][1] + m[1][0]) * mult;
+        out->z = (m[2][0] + m[0][2]) * mult;
+        break;
+    case 2:
+        out->w = (m[2][0] - m[0][2]) * mult;
+        out->x = (m[0][1] + m[1][0]) * mult;
+        out->y = biggest_value;
+        out->z = (m[1][2] + m[2][1]) * mult;
+        break;
+    case 3:
+        out->w = (m[0][1] - m[1][0]) * mult;
+        out->x = (m[2][0] + m[0][2]) * mult;
+        out->y = (m[1][2] + m[2][1]) * mult;
+        out->z = biggest_value;
+        break;
+    default:
+        /* NOTE: This shouldn't fucking happen!!! */
+        break;
+    }
+}
+
+f32 zpl_lerp(f32 a, f32 b, f32 t) { return a * (1.0f - t) + b * t; }
+f32 zpl_unlerp(f32 t, f32 a, f32 b) { return (t - a) / (b - a); }
+f32 zpl_smooth_step(f32 a, f32 b, f32 t) {
+    f32 x = (t - a) / (b - a);
+    return x * x * (3.0f - 2.0f * x);
+}
+f32 zpl_smoother_step(f32 a, f32 b, f32 t) {
+    f32 x = (t - a) / (b - a);
+    return x * x * x * (x * (6.0f * x - 15.0f) + 10.0f);
+}
+
+#define ZPL_VEC_LERPN(N, d, a, b, t)                                                                                  \
+    \
+zpl_vec##N##_t db;                                                                                                     \
+    \
+zpl_vec##N##_sub(&db, b, a);                                                                                           \
+    \
+zpl_vec##N##_muleq(&db, t);                                                                                            \
+    \
+zpl_vec##N##_add(d, a, db)
+void zpl_vec2_lerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 b, f32 t) { ZPL_VEC_LERPN(2, d, a, b, t); }
+void zpl_vec3_lerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 b, f32 t) { ZPL_VEC_LERPN(3, d, a, b, t); }
+void zpl_vec4_lerp(zpl_vec4 *d, zpl_vec4 a, zpl_vec4 b, f32 t) { ZPL_VEC_LERPN(4, d, a, b, t); }
+
+#undef ZPL_VEC_LERPN
+
+void zpl_vec2_cslerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 v0, zpl_vec2 b, zpl_vec2 v1, f32 t) {
+    f32 t2 = t * t;
+    f32 ti = (t - 1);
+    f32 ti2 = ti * ti;
+
+    f32 h00 = (1 + 2 * t) * ti2;
+    f32 h10 = t * ti2;
+    f32 h01 = t2 * (3 - 2 * t);
+    f32 h11 = t2 * ti;
+
+    d->x = h00 * a.x + h10 * v0.x + h01 * b.x + h11 * v1.x;
+    d->y = h00 * a.y + h10 * v0.y + h01 * b.y + h11 * v1.y;
+}
+
+void zpl_vec3_cslerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 v0, zpl_vec3 b, zpl_vec3 v1, f32 t) {
+    f32 t2 = t * t;
+    f32 ti = (t - 1);
+    f32 ti2 = ti * ti;
+
+    f32 h00 = (1 + 2 * t) * ti2;
+    f32 h10 = t * ti2;
+    f32 h01 = t2 * (3 - 2 * t);
+    f32 h11 = t2 * ti;
+
+    d->x = h00 * a.x + h10 * v0.x + h01 * b.x + h11 * v1.x;
+    d->y = h00 * a.y + h10 * v0.y + h01 * b.y + h11 * v1.y;
+    d->z = h00 * a.z + h10 * v0.z + h01 * b.z + h11 * v1.z;
+}
+
+void zpl_vec2_dcslerp(zpl_vec2 *d, zpl_vec2 a, zpl_vec2 v0, zpl_vec2 b, zpl_vec2 v1, f32 t) {
+    f32 t2 = t * t;
+
+    f32 dh00 = 6 * t2 - 6 * t;
+    f32 dh10 = 3 * t2 - 4 * t + 1;
+    f32 dh01 = -6 * t2 + 6 * t;
+    f32 dh11 = 3 * t2 - 2 * t;
+
+    d->x = dh00 * a.x + dh10 * v0.x + dh01 * b.x + dh11 * v1.x;
+    d->y = dh00 * a.y + dh10 * v0.y + dh01 * b.y + dh11 * v1.y;
+}
+
+void zpl_vec3_dcslerp(zpl_vec3 *d, zpl_vec3 a, zpl_vec3 v0, zpl_vec3 b, zpl_vec3 v1, f32 t) {
+    f32 t2 = t * t;
+
+    f32 dh00 = 6 * t2 - 6 * t;
+    f32 dh10 = 3 * t2 - 4 * t + 1;
+    f32 dh01 = -6 * t2 + 6 * t;
+    f32 dh11 = 3 * t2 - 2 * t;
+
+    d->x = dh00 * a.x + dh10 * v0.x + dh01 * b.x + dh11 * v1.x;
+    d->y = dh00 * a.y + dh10 * v0.y + dh01 * b.y + dh11 * v1.y;
+    d->z = dh00 * a.z + dh10 * v0.z + dh01 * b.z + dh11 * v1.z;
+}
+
+void zpl_quat_lerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t) { zpl_vec4_lerp(&d->xyzw, a.xyzw, b.xyzw, t); }
+void zpl_quat_nlerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t) {
+    zpl_quat_lerp(d, a, b, t);
+    zpl_quat_norm(d, *d);
+}
+
+void zpl_quat_slerp(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t) {
+    zpl_quat x, y, z;
+    f32 cos_theta, angle;
+    f32 s1, s0, is;
+
+    z = b;
+    cos_theta = zpl_quat_dot(a, b);
+
+    if (cos_theta < 0.0f) {
+        z = zpl_quatf(-b.x, -b.y, -b.z, -b.w);
+        cos_theta = -cos_theta;
+    }
+
+    if (cos_theta > 1.0f) {
+        /* NOTE: Use lerp not nlerp as it's not a real angle or they are not normalized */
+        zpl_quat_lerp(d, a, b, t);
+    }
+
+    angle = zpl_arccos(cos_theta);
+
+    s1 = zpl_sin(1.0f - t * angle);
+    s0 = zpl_sin(t * angle);
+    is = 1.0f / zpl_sin(angle);
+    zpl_quat_mulf(&x, z, s1);
+    zpl_quat_mulf(&y, z, s0);
+    zpl_quat_add(d, x, y);
+    zpl_quat_muleqf(d, is);
+}
+
+void zpl_quat_slerp_approx(zpl_quat *d, zpl_quat a, zpl_quat b, f32 t) {
+    /* NOTE: Derived by taylor expanding the geometric interpolation equation
+     *             Even works okay for nearly anti-parallel versors!!!
+     */
+    /* NOTE: Extra interations cannot be used as they require angle^4 which is not worth it to approximate */
+    f32 tp = t + (1.0f - zpl_quat_dot(a, b)) / 3.0f * t * (-2.0f * t * t + 3.0f * t - 1.0f);
+    zpl_quat_nlerp(d, a, b, tp);
+}
+
+void zpl_quat_nquad(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t) {
+    zpl_quat x, y;
+    zpl_quat_nlerp(&x, p, q, t);
+    zpl_quat_nlerp(&y, a, b, t);
+    zpl_quat_nlerp(d, x, y, 2.0f * t * (1.0f - t));
+}
+
+void zpl_quat_squad(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t) {
+    zpl_quat x, y;
+    zpl_quat_slerp(&x, p, q, t);
+    zpl_quat_slerp(&y, a, b, t);
+    zpl_quat_slerp(d, x, y, 2.0f * t * (1.0f - t));
+}
+
+void zpl_quat_squad_approx(zpl_quat *d, zpl_quat p, zpl_quat a, zpl_quat b, zpl_quat q, f32 t) {
+    zpl_quat x, y;
+    zpl_quat_slerp_approx(&x, p, q, t);
+    zpl_quat_slerp_approx(&y, a, b, t);
+    zpl_quat_slerp_approx(d, x, y, 2.0f * t * (1.0f - t));
+}
+
+zpl_rect2 zpl_rect2f(zpl_vec2 pos, zpl_vec2 dim) {
+    zpl_rect2 r;
+    r.pos = pos;
+    r.dim = dim;
+    return r;
+}
+
+zpl_rect3 zpl_rect3f(zpl_vec3 pos, zpl_vec3 dim) {
+    zpl_rect3 r;
+    r.pos = pos;
+    r.dim = dim;
+    return r;
+}
+
+int zpl_rect2_contains(zpl_rect2 a, f32 x, f32 y) {
+    f32 min_x = zpl_min(a.pos.x, a.pos.x + a.dim.x);
+    f32 max_x = zpl_max(a.pos.x, a.pos.x + a.dim.x);
+    f32 min_y = zpl_min(a.pos.y, a.pos.y + a.dim.y);
+    f32 max_y = zpl_max(a.pos.y, a.pos.y + a.dim.y);
+    int result = (x >= min_x) & (x < max_x) & (y >= min_y) & (y < max_y);
+    return result;
+}
+
+int zpl_rect2_contains_vec2(zpl_rect2 a, zpl_vec2 p) { return zpl_rect2_contains(a, p.x, p.y); }
+
+int zpl_rect2_intersects(zpl_rect2 a, zpl_rect2 b) {
+    zpl_rect2 r = { 0 };
+    return zpl_rect2_intersection_result(a, b, &r);
+}
+
+int zpl_rect2_intersection_result(zpl_rect2 a, zpl_rect2 b, zpl_rect2 *intersection) {
+    f32 a_min_x = zpl_min(a.pos.x, a.pos.x + a.dim.x);
+    f32 a_max_x = zpl_max(a.pos.x, a.pos.x + a.dim.x);
+    f32 a_min_y = zpl_min(a.pos.y, a.pos.y + a.dim.y);
+    f32 a_max_y = zpl_max(a.pos.y, a.pos.y + a.dim.y);
+
+    f32 b_min_x = zpl_min(b.pos.x, b.pos.x + b.dim.x);
+    f32 b_max_x = zpl_max(b.pos.x, b.pos.x + b.dim.x);
+    f32 b_min_y = zpl_min(b.pos.y, b.pos.y + b.dim.y);
+    f32 b_max_y = zpl_max(b.pos.y, b.pos.y + b.dim.y);
+
+    f32 x0 = zpl_max(a_min_x, b_min_x);
+    f32 y0 = zpl_max(a_min_y, b_min_y);
+    f32 x1 = zpl_min(a_max_x, b_max_x);
+    f32 y1 = zpl_min(a_max_y, b_max_y);
+
+    if ((x0 < x1) && (y0 < y1)) {
+        zpl_rect2 r = zpl_rect2f(zpl_vec2f(x0, y0), zpl_vec2f(x1 - x0, y1 - y0));
+        *intersection = r;
+        return 1;
+    } else {
+        zpl_rect2 r = { 0 };
+        *intersection = r;
+        return 0;
+    }
+}
+
+////////////////////////////////////////////////////////////////
+//
+// Platform
+//
+//
+
+#if defined(ZPL_PLATFORM)
+
+zpl_inline void zpl_key_state_update(zplKeyState *s, b32 is_down) {
+    b32 was_down = (*s & ZPL_KEY_STATE_DOWN) != 0;
+    is_down = is_down != 0; // NOTE(bill): Make sure it's a boolean
+    ZPL_MASK_SET(*s, is_down, ZPL_KEY_STATE_DOWN);
+    ZPL_MASK_SET(*s, !was_down && is_down, ZPL_KEY_STATE_PRESSED);
+    ZPL_MASK_SET(*s, was_down && !is_down, ZPL_KEY_STATE_RELEASED);
+}
+
+#if defined(ZPL_SYSTEM_WINDOWS)
+
+#ifndef ERROR_DEVICE_NOT_CONNECTED
+#define ERROR_DEVICE_NOT_CONNECTED 1167
+#endif
+
+ZPL_XINPUT_GET_STATE(zplXInputGetState_Stub) {
+    zpl_unused(dwUserIndex);
+    zpl_unused(pState);
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+ZPL_XINPUT_SET_STATE(zplXInputSetState_Stub) {
+    zpl_unused(dwUserIndex);
+    zpl_unused(pVibration);
+    return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+zpl_internal zpl_inline f32 zpl__process_xinput_stick_value(i16 value, i16 dead_zone_threshold) {
+    f32 result = 0;
+
+    if (value < -dead_zone_threshold) {
+        result = cast(f32)(value + dead_zone_threshold) / (32768.0f - dead_zone_threshold);
+    } else if (value > dead_zone_threshold) {
+        result = cast(f32)(value - dead_zone_threshold) / (32767.0f - dead_zone_threshold);
+    }
+
+    return result;
+}
+
+zpl_internal void zpl__platform_resize_dib_section(zpl_platform *p, i32 width, i32 height) {
+    if ((p->renderer_type == ZPL_RENDERER_SOFTWARE) && !(p->window_width == width && p->window_height == height)) {
+        BITMAPINFO bmi = { 0 };
+
+        if (width == 0 || height == 0) { return; }
+
+        p->window_width = width;
+        p->window_height = height;
+
+        // TODO(bill): Is this slow to get the desktop mode everytime?
+        p->sw_framebuffer.bits_per_pixel = zpl_video_mode_get_desktop( ).bits_per_pixel;
+        p->sw_framebuffer.pitch = (p->sw_framebuffer.bits_per_pixel * width / 8);
+
+        bmi.bmiHeader.biSize = zpl_size_of(bmi.bmiHeader);
+        bmi.bmiHeader.biWidth = width;
+        bmi.bmiHeader.biHeight = height; // NOTE(bill): -ve is top-down, +ve is bottom-up
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biBitCount = cast(u16) p->sw_framebuffer.bits_per_pixel;
+        bmi.bmiHeader.biCompression = 0 /*BI_RGB*/;
+
+        p->sw_framebuffer.win32_bmi = bmi;
+
+        if (p->sw_framebuffer.memory) {
+            zpl_vm_free(zpl_vm(p->sw_framebuffer.memory, p->sw_framebuffer.memory_size));
+        }
+
+        {
+            isize memory_size = p->sw_framebuffer.pitch * height;
+            zpl_virtual_memory vm = zpl_vm_alloc(0, memory_size);
+            p->sw_framebuffer.memory = vm.data;
+            p->sw_framebuffer.memory_size = vm.size;
+        }
+    }
+}
+
+zpl_internal zplKeyType zpl__win32_from_vk(unsigned int key) {
+    // NOTE(bill): Letters and numbers are defined the same for VK_* and ZPL_*
+    if (key >= 'A' && key < 'Z') return cast(zplKeyType) key;
+    if (key >= '0' && key < '9') return cast(zplKeyType) key;
+    switch (key) {
+    case VK_ESCAPE: return ZPL_KEY_ESCAPE;
+
+    case VK_LCONTROL: return ZPL_KEY_LCONTROL;
+    case VK_LSHIFT: return ZPL_KEY_LSHIFT;
+    case VK_LMENU: return ZPL_KEY_LALT;
+    case VK_LWIN: return ZPL_KEY_LSYSTEM;
+    case VK_RCONTROL: return ZPL_KEY_RCONTROL;
+    case VK_RSHIFT: return ZPL_KEY_RSHIFT;
+    case VK_RMENU: return ZPL_KEY_RALT;
+    case VK_RWIN: return ZPL_KEY_RSYSTEM;
+    case VK_MENU: return ZPL_KEY_MENU;
+
+    case VK_OEM_4: return ZPL_KEY_LBRACKET;
+    case VK_OEM_6: return ZPL_KEY_RBRACKET;
+    case VK_OEM_1: return ZPL_KEY_SEMICOLON;
+    case VK_OEM_COMMA: return ZPL_KEY_COMMA;
+    case VK_OEM_PERIOD: return ZPL_KEY_PERIOD;
+    case VK_OEM_7: return ZPL_KEY_QUOTE;
+    case VK_OEM_2: return ZPL_KEY_SLASH;
+    case VK_OEM_5: return ZPL_KEY_BACKSLASH;
+    case VK_OEM_3: return ZPL_KEY_GRAVE;
+    case VK_OEM_PLUS: return ZPL_KEY_EQUALS;
+    case VK_OEM_MINUS: return ZPL_KEY_MINUS;
+
+    case VK_SPACE: return ZPL_KEY_SPACE;
+    case VK_RETURN: return ZPL_KEY_RETURN;
+    case VK_BACK: return ZPL_KEY_BACKSPACE;
+    case VK_TAB: return ZPL_KEY_TAB;
+
+    case VK_PRIOR: return ZPL_KEY_PAGEUP;
+    case VK_NEXT: return ZPL_KEY_PAGEDOWN;
+    case VK_END: return ZPL_KEY_END;
+    case VK_HOME: return ZPL_KEY_HOME;
+    case VK_INSERT: return ZPL_KEY_INSERT;
+    case VK_DELETE: return ZPL_KEY_DELETE;
+
+    case VK_ADD: return ZPL_KEY_PLUS;
+    case VK_SUBTRACT: return ZPL_KEY_SUBTRACT;
+    case VK_MULTIPLY: return ZPL_KEY_MULTIPLY;
+    case VK_DIVIDE: return ZPL_KEY_DIVIDE;
+
+    case VK_LEFT: return ZPL_KEY_LEFT;
+    case VK_RIGHT: return ZPL_KEY_RIGHT;
+    case VK_UP: return ZPL_KEY_UP;
+    case VK_DOWN: return ZPL_KEY_DOWN;
+
+    case VK_NUMPAD0: return ZPL_KEY_NUMPAD0;
+    case VK_NUMPAD1: return ZPL_KEY_NUMPAD1;
+    case VK_NUMPAD2: return ZPL_KEY_NUMPAD2;
+    case VK_NUMPAD3: return ZPL_KEY_NUMPAD3;
+    case VK_NUMPAD4: return ZPL_KEY_NUMPAD4;
+    case VK_NUMPAD5: return ZPL_KEY_NUMPAD5;
+    case VK_NUMPAD6: return ZPL_KEY_NUMPAD6;
+    case VK_NUMPAD7: return ZPL_KEY_NUMPAD7;
+    case VK_NUMPAD8: return ZPL_KEY_NUMPAD8;
+    case VK_NUMPAD9: return ZPL_KEY_NUMPAD9;
+    case VK_SEPARATOR: return ZPL_KEY_NUMPADENTER;
+    case VK_DECIMAL: return ZPL_KEY_NUMPADDOT;
+
+    case VK_F1: return ZPL_KEY_F1;
+    case VK_F2: return ZPL_KEY_F2;
+    case VK_F3: return ZPL_KEY_F3;
+    case VK_F4: return ZPL_KEY_F4;
+    case VK_F5: return ZPL_KEY_F5;
+    case VK_F6: return ZPL_KEY_F6;
+    case VK_F7: return ZPL_KEY_F7;
+    case VK_F8: return ZPL_KEY_F8;
+    case VK_F9: return ZPL_KEY_F9;
+    case VK_F10: return ZPL_KEY_F10;
+    case VK_F11: return ZPL_KEY_F11;
+    case VK_F12: return ZPL_KEY_F12;
+    case VK_F13: return ZPL_KEY_F13;
+    case VK_F14: return ZPL_KEY_F14;
+    case VK_F15: return ZPL_KEY_F15;
+
+    case VK_PAUSE: return ZPL_KEY_PAUSE;
+    }
+    return ZPL_KEY_UNKNOWN;
+}
+LRESULT CALLBACK zpl__win32_window_callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    // NOTE(bill): Silly callbacks
+    zpl_platform *platform = cast(zpl_platform *) GetWindowLongPtrW(hWnd, GWLP_USERDATA);
+    b32 window_has_focus = (platform != NULL) && platform->window_has_focus;
+
+    if (msg == WM_CREATE) { // NOTE(bill): Doesn't need the platform
+        // NOTE(bill): https://msdn.microsoft.com/en-us/library/windows/desktop/ms645536(v=vs.85).aspx
+        RAWINPUTDEVICE rid[2] = { 0 };
+
+        // NOTE(bill): Keyboard
+        rid[0].usUsagePage = 0x01;
+        rid[0].usUsage = 0x06;
+        rid[0].dwFlags =
+            0x00002000; /*RIDEV_DEVNOTIFY*/
+            //0x00000030 /*RIDEV_NOLEGACY*/; // NOTE(bill): Do not generate legacy messages such as WM_KEYDOWN
+        rid[0].hwndTarget = hWnd;
+
+        // NOTE(bill): Mouse
+        rid[1].usUsagePage = 0x01;
+        rid[1].usUsage = 0x02;
+        rid[1].dwFlags =
+            0; // NOTE(bill): adds HID mouse and also allows legacy mouse messages to allow for window movement etc.
+        rid[1].hwndTarget = hWnd;
+
+        if (RegisterRawInputDevices(rid, zpl_count_of(rid), zpl_size_of(rid[0])) == false) {
+            DWORD err = GetLastError( );
+            ZPL_PANIC("Failed to initialize raw input device for win32."
+                     "Err: %u",
+                     err);
+        }
+    }
+
+    if (!platform) { return DefWindowProcW(hWnd, msg, wParam, lParam); }
+
+    switch (msg) {
+    case WM_CLOSE:
+    case WM_DESTROY: platform->window_is_closed = true; return 0;
+
+    case WM_QUIT: {
+        platform->quit_requested = true;
+    } break;
+
+    // TODO Improve to handle different keyboard layouts
+    case WM_CHAR:
+    case WM_UNICHAR: {
+        if (window_has_focus) {
+            if (wParam == '\r') { wParam = '\n'; }
+            
+            platform->char_buffer[platform->char_buffer_count++] = cast(Rune) wParam;
+        }
+    } break;
+
+
+    case WM_INPUT: {
+        RAWINPUT raw = { 0 };
+        unsigned int size = zpl_size_of(RAWINPUT);
+
+        if (!GetRawInputData(cast(HRAWINPUT) lParam, RID_INPUT, &raw, &size, zpl_size_of(RAWINPUTHEADER))) { return 0; }
+        switch (raw.header.dwType) {
+        case RIM_TYPEKEYBOARD: {
+            // NOTE(bill): Many thanks to
+            // https://blog.molecular-matters.com/2011/09/05/properly-handling-keyboard-input/ for the
+            RAWKEYBOARD *raw_kb = &raw.data.keyboard;
+            unsigned int vk = raw_kb->VKey;
+            unsigned int scan_code = raw_kb->MakeCode;
+            unsigned int flags = raw_kb->Flags;
+            // NOTE(bill): e0 and e1 are escape sequences used for certain special keys, such as PRINT and PAUSE/BREAK.
+            // NOTE(bill): http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+            b32 is_e0 = (flags & RI_KEY_E0) != 0;
+            b32 is_e1 = (flags & RI_KEY_E1) != 0;
+            b32 is_up = (flags & RI_KEY_BREAK) != 0;
+            b32 is_down = !is_up;
+
+            // TODO(bill): Should I handle scan codes?
+
+            if (vk == 255) {
+                // NOTE(bill): Discard "fake keys"
+                return 0;
+            } else if (vk == VK_SHIFT) {
+                // NOTE(bill): Correct left/right shift
+                vk = MapVirtualKeyW(scan_code, MAPVK_VSC_TO_VK_EX);
+            } else if (vk == VK_NUMLOCK) {
+                // NOTE(bill): Correct PAUSE/BREAK and NUM LOCK and set the extended bit
+                scan_code = MapVirtualKeyW(vk, MAPVK_VK_TO_VSC) | 0x100;
+            }
+
+            if (is_e1) {
+                // NOTE(bill): Escaped sequences, turn vk into the correct scan code
+                // except for VK_PAUSE (it's a bug)
+                if (vk == VK_PAUSE) {
+                    scan_code = 0x45;
+                } else {
+                    scan_code = MapVirtualKeyW(vk, MAPVK_VK_TO_VSC);
+                }
+            }
+
+            switch (vk) {
+            case VK_CONTROL: vk = (is_e0) ? VK_RCONTROL : VK_LCONTROL; break;
+            case VK_MENU: vk = (is_e0) ? VK_RMENU : VK_LMENU; break;
+
+            case VK_RETURN:
+                if (is_e0) vk = VK_SEPARATOR;
+                break; // NOTE(bill): Numpad return
+            case VK_DELETE:
+                if (!is_e0) vk = VK_DECIMAL;
+                break; // NOTE(bill): Numpad dot
+            case VK_INSERT:
+                if (!is_e0) vk = VK_NUMPAD0;
+                break;
+            case VK_HOME:
+                if (!is_e0) vk = VK_NUMPAD7;
+                break;
+            case VK_END:
+                if (!is_e0) vk = VK_NUMPAD1;
+                break;
+            case VK_PRIOR:
+                if (!is_e0) vk = VK_NUMPAD9;
+                break;
+            case VK_NEXT:
+                if (!is_e0) vk = VK_NUMPAD3;
+                break;
+
+            // NOTE(bill): The standard arrow keys will always have their e0 bit set, but the
+            // corresponding keys on the NUMPAD will not.
+            case VK_LEFT:
+                if (!is_e0) vk = VK_NUMPAD4;
+                break;
+            case VK_RIGHT:
+                if (!is_e0) vk = VK_NUMPAD6;
+                break;
+            case VK_UP:
+                if (!is_e0) vk = VK_NUMPAD8;
+                break;
+            case VK_DOWN:
+                if (!is_e0) vk = VK_NUMPAD2;
+                break;
+
+            // NUMPAD 5 doesn't have its e0 bit set
+            case VK_CLEAR:
+                if (!is_e0) vk = VK_NUMPAD5;
+                break;
+            }
+
+            // NOTE(bill): Set appropriate key state flags
+            zpl_key_state_update(&platform->keys[zpl__win32_from_vk(vk)], is_down);
+
+        } break;
+        case RIM_TYPEMOUSE: {
+            RAWMOUSE *raw_mouse = &raw.data.mouse;
+            u16 flags = raw_mouse->usButtonFlags;
+            long dx = +raw_mouse->lLastX;
+            long dy = -raw_mouse->lLastY;
+
+            if (flags & RI_MOUSE_WHEEL) { platform->mouse_wheel_delta = cast(i16) raw_mouse->usButtonData; }
+
+            platform->mouse_raw_dx = dx;
+            platform->mouse_raw_dy = dy;
+        } break;
+        }
+    } break;
+
+    default: break;
+    }
+
+    return DefWindowProcW(hWnd, msg, wParam, lParam);
+}
+
+typedef void *wglCreateContextAttribsARB_Proc(void *hDC, void *hshareContext, int const *attribList);
+
+b32 zpl__platform_init(zpl_platform *p, char const *window_title, zpl_video_mode mode, zplRendererType type,
+                      u32 window_flags) {
+    WNDCLASSEXW wc = { zpl_size_of(WNDCLASSEXW) };
+    DWORD ex_style = 0, style = 0;
+    RECT wr;
+    u16 title_buffer[256] = { 0 }; // TODO(bill): zpl_local_persist this?
+
+    wc.style = CS_HREDRAW | CS_VREDRAW; // | CS_OWNDC
+    wc.lpfnWndProc = zpl__win32_window_callback;
+    wc.hbrBackground = cast(HBRUSH) GetStockObject(0 /*WHITE_BRUSH*/);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = L"zpl-win32-wndclass"; // TODO(bill): Is this enough?
+    wc.hInstance = GetModuleHandleW(NULL);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    p->window_cursor = (void*)wc.hCursor;
+
+    if (RegisterClassExW(&wc) == 0) {
+        MessageBoxW(NULL, L"Failed to register the window class", L"ERROR", MB_OK | MB_ICONEXCLAMATION);
+        return false;
+    }
+
+    if ((window_flags & ZPL_WINDOW_FULLSCREEN) && !(window_flags & ZPL_WINDOW_BORDERLESS)) {
+        DEVMODEW screen_settings = { zpl_size_of(DEVMODEW) };
+        screen_settings.dmPelsWidth = mode.width;
+        screen_settings.dmPelsHeight = mode.height;
+        screen_settings.dmBitsPerPel = mode.bits_per_pixel;
+        screen_settings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+        if (ChangeDisplaySettingsW(&screen_settings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
+            if (MessageBoxW(NULL,
+                            L"The requested fullscreen mode is not supported by\n"
+                            L"your video card. Use windowed mode instead?",
+                            L"", MB_YESNO | MB_ICONEXCLAMATION) == IDYES) {
+                window_flags &= ~ZPL_WINDOW_FULLSCREEN;
+            } else {
+                mode = zpl_video_mode_get_desktop( );
+                screen_settings.dmPelsWidth = mode.width;
+                screen_settings.dmPelsHeight = mode.height;
+                screen_settings.dmBitsPerPel = mode.bits_per_pixel;
+                ChangeDisplaySettingsW(&screen_settings, CDS_FULLSCREEN);
+            }
+        }
+    }
+
+    // ex_style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+    // style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE | WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX |
+    // WS_MINIMIZEBOX;
+
+    style |= WS_VISIBLE;
+
+    if (window_flags & ZPL_WINDOW_HIDDEN) style &= ~WS_VISIBLE;
+    if (window_flags & ZPL_WINDOW_RESIZABLE) style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
+    if (window_flags & ZPL_WINDOW_MAXIMIZED) style |= WS_MAXIMIZE;
+    if (window_flags & ZPL_WINDOW_MINIMIZED) style |= WS_MINIMIZE;
+
+    // NOTE(bill): Completely ignore the given mode and just change it
+    if (window_flags & ZPL_WINDOW_FULLSCREENDESKTOP) { mode = zpl_video_mode_get_desktop( ); }
+
+    if ((window_flags & ZPL_WINDOW_FULLSCREEN) || (window_flags & ZPL_WINDOW_BORDERLESS)) {
+        style |= WS_POPUP;
+    } else {
+        style |= WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+    }
+
+    wr.left = 0;
+    wr.top = 0;
+    wr.right = mode.width;
+    wr.bottom = mode.height;
+    AdjustWindowRect(&wr, style, false);
+
+    p->window_flags = window_flags;
+    p->window_handle = CreateWindowExW(
+        ex_style, wc.lpszClassName,
+        cast(wchar_t const *) zpl_utf8_to_ucs2(title_buffer, zpl_size_of(title_buffer), (u8 *)window_title), style,
+        CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, 0, 0, GetModuleHandleW(NULL), NULL);
+
+    if (!p->window_handle) {
+        MessageBoxW(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONEXCLAMATION);
+        return false;
+    }
+
+    p->win32_dc = GetDC(cast(HWND) p->window_handle);
+
+    p->renderer_type = type;
+    switch (p->renderer_type) {
+    case ZPL_RENDERER_OPENGL: {
+        wglCreateContextAttribsARB_Proc *wglCreateContextAttribsARB;
+        i32 attribs[8] = { 0 };
+        isize c = 0;
+
+        PIXELFORMATDESCRIPTOR pfd = { zpl_size_of(PIXELFORMATDESCRIPTOR) };
+        pfd.nVersion = 1;
+        pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        pfd.iPixelType = PFD_TYPE_RGBA;
+        pfd.cColorBits = 32;
+        pfd.cAlphaBits = 8;
+        pfd.cDepthBits = 24;
+        pfd.cStencilBits = 8;
+        pfd.iLayerType = PFD_MAIN_PLANE;
+
+        SetPixelFormat(cast(HDC) p->win32_dc, ChoosePixelFormat(cast(HDC) p->win32_dc, &pfd), NULL);
+        p->opengl.context = cast(void *) wglCreateContext(cast(HDC) p->win32_dc);
+        wglMakeCurrent(cast(HDC) p->win32_dc, cast(HGLRC) p->opengl.context);
+
+        if (p->opengl.major > 0) {
+            attribs[c++] = 0x2091; // WGL_CONTEXT_MAJOR_VERSION_ARB
+            attribs[c++] = zpl_max(p->opengl.major, 1);
+        }
+        if (p->opengl.major > 0 && p->opengl.minor >= 0) {
+            attribs[c++] = 0x2092; // WGL_CONTEXT_MINOR_VERSION_ARB
+            attribs[c++] = zpl_max(p->opengl.minor, 0);
+        }
+
+        if (p->opengl.core) {
+            attribs[c++] = 0x9126; // WGL_CONTEXT_PROFILE_MASK_ARB
+            attribs[c++] = 0x0001; // WGL_CONTEXT_CORE_PROFILE_BIT_ARB
+        } else if (p->opengl.compatible) {
+            attribs[c++] = 0x9126; // WGL_CONTEXT_PROFILE_MASK_ARB
+            attribs[c++] = 0x0002; // WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+        }
+        attribs[c++] = 0; // NOTE(bill): tells the proc that this is the end of attribs
+
+        wglCreateContextAttribsARB =
+            cast(wglCreateContextAttribsARB_Proc *) wglGetProcAddress("wglCreateContextAttribsARB");
+        if (wglCreateContextAttribsARB) {
+            HGLRC rc = cast(HGLRC) wglCreateContextAttribsARB(p->win32_dc, 0, attribs);
+            if (rc && wglMakeCurrent(cast(HDC) p->win32_dc, rc)) {
+                p->opengl.context = rc;
+            } else {
+                // TODO(bill): Handle errors from GetLastError
+                // ERROR_INVALID_VERSION_ARB 0x2095
+                // ERROR_INVALID_PROFILE_ARB 0x2096
+            }
+        }
+
+    } break;
+
+    case ZPL_RENDERER_SOFTWARE: zpl__platform_resize_dib_section(p, mode.width, mode.height); break;
+
+    default: ZPL_PANIC("Unknown window type"); break;
+    }
+
+    SetForegroundWindow(cast(HWND) p->window_handle);
+    SetFocus(cast(HWND) p->window_handle);
+    SetWindowLongPtrW(cast(HWND) p->window_handle, GWLP_USERDATA, cast(LONG_PTR) p);
+
+    p->window_width = mode.width;
+    p->window_height = mode.height;
+
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) { p->opengl.dll_handle = zpl_dll_load("opengl32.dll"); }
+
+    { // Load XInput
+        // TODO(bill): What other dlls should I look for?
+        zpl_dll_handle xinput_library = zpl_dll_load("xinput1_4.dll");
+        p->xinput.get_state = zplXInputGetState_Stub;
+        p->xinput.set_state = zplXInputSetState_Stub;
+
+        if (!xinput_library) xinput_library = zpl_dll_load("xinput9_1_0.dll");
+        if (!xinput_library) xinput_library = zpl_dll_load("xinput1_3.dll");
+        if (!xinput_library) {
+            // TODO(bill): Proper Diagnostic
+            zpl_printf_err("XInput could not be loaded. Controllers will not work!\n");
+        } else {
+            p->xinput.get_state = cast(zpl_xinput_get_state_proc *) zpl_dll_proc_address(xinput_library, "XInputGetState");
+            p->xinput.set_state = cast(zpl_xinput_set_state_proc *) zpl_dll_proc_address(xinput_library, "XInputSetState");
+        }
+    }
+
+    // Init keys
+    zpl_zero_array(p->keys, zpl_count_of(p->keys));
+
+    p->is_initialized = true;
+    return true;
+}
+
+zpl_inline b32 zpl_platform_init_with_software(zpl_platform *p, char const *window_title, i32 width, i32 height,
+                                             u32 window_flags) {
+    zpl_video_mode mode;
+    mode.width = width;
+    mode.height = height;
+    mode.bits_per_pixel = 32;
+    return zpl__platform_init(p, window_title, mode, ZPL_RENDERER_SOFTWARE, window_flags);
+}
+
+zpl_inline b32 zpl_platform_init_with_opengl(zpl_platform *p, char const *window_title, i32 width, i32 height,
+                                           u32 window_flags, i32 major, i32 minor, b32 core, b32 compatible) {
+    zpl_video_mode mode;
+    mode.width = width;
+    mode.height = height;
+    mode.bits_per_pixel = 32;
+    p->opengl.major = major;
+    p->opengl.minor = minor;
+    p->opengl.core = cast(b16) core;
+    p->opengl.compatible = cast(b16) compatible;
+    return zpl__platform_init(p, window_title, mode, ZPL_RENDERER_OPENGL, window_flags);
+}
+
+#ifndef _XINPUT_H_
+typedef struct _XINPUT_GAMEPAD {
+    u16 wButtons;
+    u8 bLeftTrigger;
+    u8 bRightTrigger;
+    u16 sThumbLX;
+    u16 sThumbLY;
+    u16 sThumbRX;
+    u16 sThumbRY;
+} XINPUT_GAMEPAD;
+
+typedef struct _XINPUT_STATE {
+    DWORD dwPacketNumber;
+    XINPUT_GAMEPAD Gamepad;
+} XINPUT_STATE;
+
+typedef struct _XINPUT_VIBRATION {
+    u16 wLeftMotorSpeed;
+    u16 wRightMotorSpeed;
+} XINPUT_VIBRATION;
+
+#define XINPUT_GAMEPAD_DPAD_UP 0x00000001
+#define XINPUT_GAMEPAD_DPAD_DOWN 0x00000002
+#define XINPUT_GAMEPAD_DPAD_LEFT 0x00000004
+#define XINPUT_GAMEPAD_DPAD_RIGHT 0x00000008
+#define XINPUT_GAMEPAD_START 0x00000010
+#define XINPUT_GAMEPAD_BACK 0x00000020
+#define XINPUT_GAMEPAD_LEFT_THUMB 0x00000040
+#define XINPUT_GAMEPAD_RIGHT_THUMB 0x00000080
+#define XINPUT_GAMEPAD_LEFT_SHOULDER 0x0100
+#define XINPUT_GAMEPAD_RIGHT_SHOULDER 0x0200
+#define XINPUT_GAMEPAD_A 0x1000
+#define XINPUT_GAMEPAD_B 0x2000
+#define XINPUT_GAMEPAD_X 0x4000
+#define XINPUT_GAMEPAD_Y 0x8000
+#define XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE 7849
+#define XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE 8689
+#define XINPUT_GAMEPAD_TRIGGER_THRESHOLD 30
+#endif
+
+#ifndef XUSER_MAX_COUNT
+#define XUSER_MAX_COUNT 4
+#endif
+
+void zpl_platform_update(zpl_platform *p) {
+    isize i;
+
+    { // NOTE(bill): Set window state
+        // TODO(bill): Should this be moved to zpl__win32_window_callback ?
+        RECT window_rect;
+        i32 x, y, w, h;
+
+        GetClientRect(cast(HWND) p->window_handle, &window_rect);
+        x = window_rect.left;
+        y = window_rect.top;
+        w = window_rect.right - window_rect.left;
+        h = window_rect.bottom - window_rect.top;
+
+        if ((p->window_width != w) || (p->window_height != h)) {
+            if (p->renderer_type == ZPL_RENDERER_SOFTWARE) { zpl__platform_resize_dib_section(p, w, h); }
+        }
+
+        p->window_x = x;
+        p->window_y = y;
+        p->window_width = w;
+        p->window_height = h;
+        ZPL_MASK_SET(p->window_flags, IsIconic(cast(HWND) p->window_handle) != 0, ZPL_WINDOW_MINIMIZED);
+
+        p->window_has_focus = GetFocus( ) == cast(HWND) p->window_handle;
+
+        RECT outline_rect;
+        GetWindowRect(cast(HWND) p->window_handle, &outline_rect);
+        x = window_rect.left;
+        y = window_rect.top;
+        w = window_rect.right - window_rect.left;
+        h = window_rect.bottom - window_rect.top;
+
+        p->outline_x = x;
+        p->outline_y = y;
+        p->outline_width = w;
+        p->outline_height = h;
+    }
+
+    { // NOTE(bill): Set mouse position
+        POINT mouse_pos;
+        DWORD win_button_id[ZPL_MOUSEBUTTON_COUNT] = {
+            VK_LBUTTON, VK_MBUTTON, VK_RBUTTON, VK_XBUTTON1, VK_XBUTTON2,
+        };
+
+        // NOTE(bill): This needs to be GetAsyncKeyState as RAWMOUSE doesn't aways work for some odd reason
+        // TODO(bill): Try and get RAWMOUSE to work for key presses
+        for (i = 0; i < ZPL_MOUSEBUTTON_COUNT; i++) {
+            zpl_key_state_update(p->mouse_buttons + i, GetAsyncKeyState(win_button_id[i]) < 0);
+        }
+
+        GetCursorPos(&mouse_pos);
+        ScreenToClient(cast(HWND) p->window_handle, &mouse_pos);
+        {
+            i32 x = mouse_pos.x;
+            i32 y = p->window_height - 1 - mouse_pos.y;
+            p->mouse_dx = x - p->mouse_x;
+            p->mouse_dy = y - p->mouse_y;
+            p->mouse_x = x;
+            p->mouse_y = y;
+        }
+
+        if (p->mouse_clip) {
+            b32 update = false;
+            i32 x = p->mouse_x;
+            i32 y = p->mouse_y;
+            if (p->mouse_x < 0) {
+                x = 0;
+                update = true;
+            } else if (p->mouse_y > p->window_height - 1) {
+                y = p->window_height - 1;
+                update = true;
+            }
+
+            if (p->mouse_y < 0) {
+                y = 0;
+                update = true;
+            } else if (p->mouse_x > p->window_width - 1) {
+                x = p->window_width - 1;
+                update = true;
+            }
+
+            if (update) { zpl_platform_set_mouse_position(p, x, y); }
+        }
+    }
+
+    // NOTE(bill): Set Key/Button states
+    if (p->window_has_focus) {
+        p->char_buffer[0] = '\0';
+        p->char_buffer_count = 0; // TODO(bill): Reset buffer count here or else where?
+        p->mouse_wheel_delta = 0.0f;
+
+        // NOTE(bill): Need to update as the keys only get updates on events
+        for (i = 0; i < ZPL_KEY_COUNT; i++) {
+            b32 is_down = (p->keys[i] & ZPL_KEY_STATE_DOWN) != 0;
+            zpl_key_state_update(&p->keys[i], is_down);
+        }
+
+        p->key_modifiers.control = p->keys[ZPL_KEY_LCONTROL] | p->keys[ZPL_KEY_RCONTROL];
+        p->key_modifiers.alt = p->keys[ZPL_KEY_LALT] | p->keys[ZPL_KEY_RALT];
+        p->key_modifiers.shift = p->keys[ZPL_KEY_LSHIFT] | p->keys[ZPL_KEY_RSHIFT];
+    }
+
+    { // NOTE(bill): Set Controller states
+        isize max_controller_count = XUSER_MAX_COUNT;
+        if (max_controller_count > zpl_count_of(p->game_controllers)) {
+            max_controller_count = zpl_count_of(p->game_controllers);
+        }
+
+        for (i = 0; i < max_controller_count; i++) {
+            zpl_game_controller *controller = &p->game_controllers[i];
+            XINPUT_STATE controller_state = { 0 };
+            if (p->xinput.get_state(cast(DWORD) i, &controller_state) != 0) {
+                // NOTE(bill): The controller is not available
+                controller->is_connected = false;
+            } else {
+                // NOTE(bill): This controller is plugged in
+                // TODO(bill): See if ControllerState.dwPacketNumber increments too rapidly
+                XINPUT_GAMEPAD *pad = &controller_state.Gamepad;
+
+                controller->is_connected = true;
+
+                // TODO(bill): This is a square deadzone, check XInput to verify that the deadzone is "round" and do
+                // round deadzone processing.
+                controller->axes[ZPL_CONTROLLER_AXIS_LEFTX] =
+                    zpl__process_xinput_stick_value(pad->sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+                controller->axes[ZPL_CONTROLLER_AXIS_LEFTY] =
+                    zpl__process_xinput_stick_value(pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+                controller->axes[ZPL_CONTROLLER_AXIS_RIGHTX] =
+                    zpl__process_xinput_stick_value(pad->sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+                controller->axes[ZPL_CONTROLLER_AXIS_RIGHTY] =
+                    zpl__process_xinput_stick_value(pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+
+                controller->axes[ZPL_CONTROLLER_AXIS_LEFTTRIGGER] = cast(f32) pad->bLeftTrigger / 255.0f;
+                controller->axes[ZPL_CONTROLLER_AXIS_RIGHTTRIGGER] = cast(f32) pad->bRightTrigger / 255.0f;
+
+                if ((controller->axes[ZPL_CONTROLLER_AXIS_LEFTX] != 0.0f) ||
+                    (controller->axes[ZPL_CONTROLLER_AXIS_LEFTY] != 0.0f)) {
+                    controller->is_analog = true;
+                }
+
+#define ZPL__PROCESS_DIGITAL_BUTTON(button_type, xinput_button)                                                         \
+    zpl_key_state_update(&controller->buttons[button_type], (pad->wButtons & xinput_button) == xinput_button)
+
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_A, XINPUT_GAMEPAD_A);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_B, XINPUT_GAMEPAD_B);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_X, XINPUT_GAMEPAD_X);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_Y, XINPUT_GAMEPAD_Y);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_LEFTSHOULDER, XINPUT_GAMEPAD_LEFT_SHOULDER);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_RIGHTSHOULDER, XINPUT_GAMEPAD_RIGHT_SHOULDER);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_START, XINPUT_GAMEPAD_START);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_BACK, XINPUT_GAMEPAD_BACK);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_LEFT, XINPUT_GAMEPAD_DPAD_LEFT);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_RIGHT, XINPUT_GAMEPAD_DPAD_RIGHT);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_DOWN, XINPUT_GAMEPAD_DPAD_DOWN);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_UP, XINPUT_GAMEPAD_DPAD_UP);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_LEFTTHUMB, XINPUT_GAMEPAD_LEFT_THUMB);
+                ZPL__PROCESS_DIGITAL_BUTTON(ZPL_CONTROLLER_BUTTON_RIGHTTHUMB, XINPUT_GAMEPAD_RIGHT_THUMB);
+#undef ZPL__PROCESS_DIGITAL_BUTTON
+            }
+        }
+    }
+
+    { // NOTE(bill): Process pending messages
+        MSG message;
+        for (;;) {
+            BOOL is_okay = PeekMessageW(&message, 0, 0, 0, PM_REMOVE);
+            if (!is_okay) break;
+
+            switch (message.message) {
+            case WM_QUIT: p->quit_requested = true; break;
+
+            case WM_SETCURSOR: {
+                SetCursor((HCURSOR)p->window_cursor);
+            } break;
+
+            default:
+                TranslateMessage(&message);
+                DispatchMessageW(&message);
+                break;
+            }
+        }
+    }
+}
+
+void zpl_platform_display(zpl_platform *p) {
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) {
+        SwapBuffers(cast(HDC) p->win32_dc);
+    } else if (p->renderer_type == ZPL_RENDERER_SOFTWARE) {
+        StretchDIBits(cast(HDC) p->win32_dc, 0, 0, p->window_width, p->window_height, 0, 0, p->window_width,
+                      p->window_height, p->sw_framebuffer.memory, &p->sw_framebuffer.win32_bmi, DIB_RGB_COLORS,
+                      SRCCOPY);
+    } else {
+        ZPL_PANIC("Invalid window rendering type");
+    }
+
+    {
+        f64 prev_time = p->curr_time;
+        f64 curr_time = zpl_time_now( );
+        p->dt_for_frame = curr_time - prev_time;
+        p->curr_time = curr_time;
+    }
+}
+
+void zpl_platform_destroy(zpl_platform *p) {
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) {
+        wglDeleteContext(cast(HGLRC) p->opengl.context);
+    } else if (p->renderer_type == ZPL_RENDERER_SOFTWARE) {
+        zpl_vm_free(zpl_vm(p->sw_framebuffer.memory, p->sw_framebuffer.memory_size));
+    }
+
+    DestroyWindow(cast(HWND) p->window_handle);
+}
+
+void zpl_platform_show_cursor(zpl_platform *p, b32 show) {
+    zpl_unused(p);
+    ShowCursor(show);
+}
+
+void zpl_platform_set_cursor(zpl_platform *p, void *handle) {
+    ZPL_ASSERT_NOT_NULL(p);
+    p->window_cursor = handle;
+    SetCursor((HCURSOR)handle);
+}
+
+void zpl_platform_set_mouse_position(zpl_platform *p, i32 x, i32 y) {
+    POINT point;
+    point.x = cast(LONG) x;
+    point.y = cast(LONG)(p->window_height - 1 - y);
+    ClientToScreen(cast(HWND) p->window_handle, &point);
+    SetCursorPos(point.x, point.y);
+
+    p->mouse_x = point.x;
+    p->mouse_y = p->window_height - 1 - point.y;
+}
+
+void zpl_platform_set_controller_vibration(zpl_platform *p, isize index, f32 left_motor, f32 right_motor) {
+    if (zpl_is_between(index, 0, ZPL_MAX_GAME_CONTROLLER_COUNT - 1)) {
+        XINPUT_VIBRATION vibration = { 0 };
+        left_motor = zpl_clamp01(left_motor);
+        right_motor = zpl_clamp01(right_motor);
+        vibration.wLeftMotorSpeed = cast(WORD)(65535 * left_motor);
+        vibration.wRightMotorSpeed = cast(WORD)(65535 * right_motor);
+
+        p->xinput.set_state(cast(DWORD) index, &vibration);
+    }
+}
+
+void zpl_platform_set_window_position(zpl_platform *p, i32 x, i32 y) {
+    RECT rect;
+    i32 width, height;
+
+    GetClientRect(cast(HWND) p->window_handle, &rect);
+    width = rect.right - rect.left;
+    height = rect.bottom - rect.top;
+    MoveWindow(cast(HWND) p->window_handle, x, y, width, height, false);
+}
+
+void zpl_platform_set_window_title(zpl_platform *p, char const *title, ...) {
+    u16 buffer[256] = { 0 };
+    char str[512] = { 0 };
+    va_list va;
+    va_start(va, title);
+    zpl_snprintf_va(str, zpl_size_of(str), title, va);
+    va_end(va);
+
+    if (str[0] != '\0') {
+        SetWindowTextW(cast(HWND) p->window_handle,
+                       cast(wchar_t const *) zpl_utf8_to_ucs2(buffer, zpl_size_of(buffer), (u8 *)str));
+    }
+}
+
+void zpl_platform_toggle_fullscreen(zpl_platform *p, b32 fullscreen_desktop) {
+    // NOTE(bill): From the man himself, Raymond Chen! (Modified for my need.)
+    HWND handle = cast(HWND) p->window_handle;
+    DWORD style = cast(DWORD) GetWindowLongW(handle, GWL_STYLE);
+    WINDOWPLACEMENT placement;
+
+    if (style & WS_OVERLAPPEDWINDOW) {
+        MONITORINFO monitor_info = { zpl_size_of(monitor_info) };
+        if (GetWindowPlacement(handle, &placement) && GetMonitorInfoW(MonitorFromWindow(handle, 1), &monitor_info)) {
+            style &= ~WS_OVERLAPPEDWINDOW;
+            if (fullscreen_desktop) {
+                style &= ~WS_CAPTION;
+                style |= WS_POPUP;
+            }
+            SetWindowLongW(handle, GWL_STYLE, style);
+            SetWindowPos(handle, HWND_TOP, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
+                         monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
+                         monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top,
+                         SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+
+            if (fullscreen_desktop) {
+                p->window_flags |= ZPL_WINDOW_FULLSCREENDESKTOP;
+            } else {
+                p->window_flags |= ZPL_WINDOW_FULLSCREEN;
+            }
+        }
+    } else {
+        style &= ~WS_POPUP;
+        style |= WS_OVERLAPPEDWINDOW | WS_CAPTION;
+        SetWindowLongW(handle, GWL_STYLE, style);
+        SetWindowPlacement(handle, &placement);
+        SetWindowPos(handle, 0, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+
+        p->window_flags &= ~ZPL_WINDOW_FULLSCREEN;
+    }
+}
+
+void zpl_platform_toggle_borderless(zpl_platform *p) {
+    HWND handle = cast(HWND) p->window_handle;
+    DWORD style = GetWindowLongW(handle, GWL_STYLE);
+    b32 is_borderless = (style & WS_POPUP) != 0;
+
+    ZPL_MASK_SET(style, is_borderless, WS_OVERLAPPEDWINDOW | WS_CAPTION);
+    ZPL_MASK_SET(style, !is_borderless, WS_POPUP);
+
+    SetWindowLongW(handle, GWL_STYLE, style);
+
+    ZPL_MASK_SET(p->window_flags, !is_borderless, ZPL_WINDOW_BORDERLESS);
+}
+
+zpl_inline void zpl_platform_make_opengl_context_current(zpl_platform *p) {
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) { wglMakeCurrent(cast(HDC) p->win32_dc, cast(HGLRC) p->opengl.context); }
+}
+
+zpl_inline void zpl_platform_show_window(zpl_platform *p) {
+    ShowWindow(cast(HWND) p->window_handle, SW_SHOW);
+    p->window_flags &= ~ZPL_WINDOW_HIDDEN;
+}
+
+zpl_inline void zpl_platform_hide_window(zpl_platform *p) {
+    ShowWindow(cast(HWND) p->window_handle, SW_HIDE);
+    p->window_flags |= ZPL_WINDOW_HIDDEN;
+}
+
+zpl_inline zpl_video_mode zpl_video_mode_get_desktop(void) {
+    DEVMODEW win32_mode = { zpl_size_of(win32_mode) };
+    EnumDisplaySettingsW(NULL, ENUM_CURRENT_SETTINGS, &win32_mode);
+    return zpl_set_video_mode(win32_mode.dmPelsWidth, win32_mode.dmPelsHeight, win32_mode.dmBitsPerPel);
+}
+
+isize zpl_video_mode_get_fullscreen_modes(zpl_video_mode *modes, isize max_mode_count) {
+    DEVMODEW win32_mode = { zpl_size_of(win32_mode) };
+    i32 count;
+    for (count = 0; count < max_mode_count && EnumDisplaySettingsW(NULL, count, &win32_mode); count++) {
+        modes[count] = zpl_set_video_mode(win32_mode.dmPelsWidth, win32_mode.dmPelsHeight, win32_mode.dmBitsPerPel);
+    }
+
+    zpl_sort_array(modes, count, zpl_video_mode_dsc_cmp);
+    return count;
+}
+
+b32 zpl_platform_has_clipboard_text(zpl_platform *p) {
+    b32 result = false;
+
+    if (IsClipboardFormatAvailable(1 /*CF_TEXT*/) && OpenClipboard(cast(HWND) p->window_handle)) {
+        HANDLE mem = GetClipboardData(1 /*CF_TEXT*/);
+        if (mem) {
+            char *str = cast(char *) GlobalLock(mem);
+            if (str && str[0] != '\0') { result = true; }
+            GlobalUnlock(mem);
+        } else {
+            return false;
+        }
+
+        CloseClipboard( );
+    }
+
+    return result;
+}
+
+// TODO(bill): Handle UTF-8
+void zpl_platform_set_clipboard_text(zpl_platform *p, char const *str) {
+    if (OpenClipboard(cast(HWND) p->window_handle)) {
+        isize i, len = zpl_strlen(str) + 1;
+
+        HANDLE mem = cast(HANDLE) GlobalAlloc(0x0002 /*GMEM_MOVEABLE*/, len);
+        if (mem) {
+            char *dst = cast(char *) GlobalLock(mem);
+            if (dst) {
+                for (i = 0; str[i]; i++) {
+                    // TODO(bill): Does this cause a buffer overflow?
+                    // NOTE(bill): Change \n to \r\n 'cause windows
+                    if (str[i] == '\n' && (i == 0 || str[i - 1] != '\r')) { *dst++ = '\r'; }
+                    *dst++ = str[i];
+                }
+                *dst = 0;
+            }
+            GlobalUnlock(mem);
+        }
+
+        EmptyClipboard( );
+        if (!SetClipboardData(1 /*CF_TEXT*/, mem)) { return; }
+        CloseClipboard( );
+    }
+}
+
+// TODO(bill): Handle UTF-8
+char *zpl_platform_get_clipboard_text(zpl_platform *p, zpl_allocator a) {
+    char *text = NULL;
+
+    if (IsClipboardFormatAvailable(1 /*CF_TEXT*/) && OpenClipboard(cast(HWND) p->window_handle)) {
+        HANDLE mem = GetClipboardData(1 /*CF_TEXT*/);
+        if (mem) {
+            char *str = cast(char *) GlobalLock(mem);
+            text = zpl_alloc_str(a, str);
+            GlobalUnlock(mem);
+        } else {
+            return NULL;
+        }
+
+        CloseClipboard( );
+    }
+
+    return text;
+}
+
+u32  zpl_platform_get_scancode(zpl_platform *p, zplKeyType key) {
+    u32 vk = p->keys[key];
+
+    u32 scancode = MapVirtualKey(vk, MAPVK_VK_TO_CHAR);
+    return scancode;
+}
+
+// TODO: Refactor OS X part
+#if 0
+#elif defined(ZPL_SYSTEM_OSX)
+
+#include <CoreGraphics/CoreGraphics.h>
+#include <objc/NSObjCRuntime.h>
+#include <objc/message.h>
+#include <objc/objc.h>
+
+#if __LP64__ || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || NS_BUILD_32_LIKE_64
+#define NSIntegerEncoding "q"
+#define NSUIntegerEncoding "L"
+#else
+#define NSIntegerEncoding "i"
+#define NSUIntegerEncoding "I"
+#endif
+
+#ifdef __OBJC__
+#import <Cocoa/Cocoa.h>
+#else
+typedef CGPoint NSPoint;
+typedef CGSize NSSize;
+typedef CGRect NSRect;
+
+extern id NSApp;
+extern id const NSDefaultRunLoopMode;
+#endif
+
+#if defined(__OBJC__) && __has_feature(objc_arc)
+#error TODO(bill): Cannot compile as objective-c code just yet!
+#endif
+
+// ABI is a bit different between platforms
+#ifdef __arm64__
+#define abi_objc_msgSend_stret objc_msgSend
+#else
+#define abi_objc_msgSend_stret objc_msgSend_stret
+#endif
+#ifdef __i386__
+#define abi_objc_msgSend_fpret objc_msgSend_fpret
+#else
+#define abi_objc_msgSend_fpret objc_msgSend
+#endif
+
+#define objc_msgSend_id ((id(*)(id, SEL))objc_msgSend)
+#define objc_msgSend_void ((void (*)(id, SEL))objc_msgSend)
+#define objc_msgSend_void_id ((void (*)(id, SEL, id))objc_msgSend)
+#define objc_msgSend_void_bool ((void (*)(id, SEL, BOOL))objc_msgSend)
+#define objc_msgSend_id_char_const ((id(*)(id, SEL, char const *))objc_msgSend)
+
+zpl_internal NSUInteger zpl__osx_application_should_terminate(id self, SEL _sel, id sender) {
+    // NOTE(bill): Do nothing
+    return 0;
+}
+
+zpl_internal void zpl__osx_window_will_close(id self, SEL _sel, id notification) {
+    NSUInteger value = true;
+    object_setInstanceVariable(self, "closed", cast(void *) value);
+}
+
+zpl_internal void zpl__osx_window_did_become_key(id self, SEL _sel, id notification) {
+    zpl_platform *p = NULL;
+    object_getInstanceVariable(self, "zpl_platform", cast(void **) & p);
+    if (p) {
+        // TODO(bill):
+    }
+}
+
+b32 zpl__platform_init(zpl_platform *p, char const *window_title, zpl_video_mode mode, zplRendererType type,
+                      u32 window_flags) {
+    if (p->is_initialized) { return true; }
+    // Init Platform
+    { // Initial OSX State
+        Class appDelegateClass;
+        b32 resultAddProtoc, resultAddMethod;
+        id dgAlloc, dg, menubarAlloc, menubar;
+        id appMenuItemAlloc, appMenuItem;
+        id appMenuAlloc, appMenu;
+
+#if defined(ARC_AVAILABLE)
+#error TODO(bill): This code should be compiled as C for now
+#else
+        id poolAlloc = objc_msgSend_id(cast(id) objc_getClass("NSAutoreleasePool"), sel_registerName("alloc"));
+        p->osx_autorelease_pool = objc_msgSend_id(poolAlloc, sel_registerName("init"));
+#endif
+
+        objc_msgSend_id(cast(id) objc_getClass("NSApplication"), sel_registerName("sharedApplication"));
+        ((void (*)(id, SEL, NSInteger))objc_msgSend)(NSApp, sel_registerName("setActivationPolicy:"), 0);
+
+        appDelegateClass = objc_allocateClassPair((Class)objc_getClass("NSObject"), "AppDelegate", 0);
+        resultAddProtoc = class_addProtocol(appDelegateClass, objc_getProtocol("NSApplicationDelegate"));
+        assert(resultAddProtoc);
+        resultAddMethod = class_addMethod(appDelegateClass, sel_registerName("applicationShouldTerminate:"),
+                                          cast(IMP) zpl__osx_application_should_terminate, NSUIntegerEncoding "@:@");
+        assert(resultAddMethod);
+        dgAlloc = objc_msgSend_id(cast(id) appDelegateClass, sel_registerName("alloc"));
+        dg = objc_msgSend_id(dgAlloc, sel_registerName("init"));
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(dg, sel_registerName("autorelease"));
+#endif
+
+        objc_msgSend_void_id(NSApp, sel_registerName("setDelegate:"), dg);
+        objc_msgSend_void(NSApp, sel_registerName("finishLaunching"));
+
+        menubarAlloc = objc_msgSend_id(cast(id) objc_getClass("NSMenu"), sel_registerName("alloc"));
+        menubar = objc_msgSend_id(menubarAlloc, sel_registerName("init"));
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(menubar, sel_registerName("autorelease"));
+#endif
+
+        appMenuItemAlloc = objc_msgSend_id(cast(id) objc_getClass("NSMenuItem"), sel_registerName("alloc"));
+        appMenuItem = objc_msgSend_id(appMenuItemAlloc, sel_registerName("init"));
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(appMenuItem, sel_registerName("autorelease"));
+#endif
+
+        objc_msgSend_void_id(menubar, sel_registerName("addItem:"), appMenuItem);
+        ((id(*)(id, SEL, id))objc_msgSend)(NSApp, sel_registerName("setMainMenu:"), menubar);
+
+        appMenuAlloc = objc_msgSend_id(cast(id) objc_getClass("NSMenu"), sel_registerName("alloc"));
+        appMenu = objc_msgSend_id(appMenuAlloc, sel_registerName("init"));
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(appMenu, sel_registerName("autorelease"));
+#endif
+
+        {
+            id processInfo = objc_msgSend_id(cast(id) objc_getClass("NSProcessInfo"), sel_registerName("processInfo"));
+            id appName = objc_msgSend_id(processInfo, sel_registerName("processName"));
+
+            id quitTitlePrefixString = objc_msgSend_id_char_const(cast(id) objc_getClass("NSString"),
+                                                                  sel_registerName("stringWithUTF8String:"), "Quit ");
+            id quitTitle = ((id(*)(id, SEL, id))objc_msgSend)(quitTitlePrefixString,
+                                                              sel_registerName("stringByAppendingString:"), appName);
+
+            id quitMenuItemKey = objc_msgSend_id_char_const(cast(id) objc_getClass("NSString"),
+                                                            sel_registerName("stringWithUTF8String:"), "q");
+            id quitMenuItemAlloc = objc_msgSend_id(cast(id) objc_getClass("NSMenuItem"), sel_registerName("alloc"));
+            id quitMenuItem = ((id(*)(id, SEL, id, SEL, id))objc_msgSend)(
+                quitMenuItemAlloc, sel_registerName("initWithTitle:action:keyEquivalent:"), quitTitle,
+                sel_registerName("terminate:"), quitMenuItemKey);
+#ifndef ARC_AVAILABLE
+            objc_msgSend_void(quitMenuItem, sel_registerName("autorelease"));
+#endif
+
+            objc_msgSend_void_id(appMenu, sel_registerName("addItem:"), quitMenuItem);
+            objc_msgSend_void_id(appMenuItem, sel_registerName("setSubmenu:"), appMenu);
+        }
+    }
+
+    { // Init Window
+        NSRect rect = { { 0, 0 }, { cast(CGFloat) mode.width, cast(CGFloat) mode.height } };
+        id windowAlloc, window, wdgAlloc, wdg, contentView, titleString;
+        Class WindowDelegateClass;
+        b32 resultAddProtoc, resultAddIvar, resultAddMethod;
+
+        windowAlloc = objc_msgSend_id(cast(id) objc_getClass("NSWindow"), sel_registerName("alloc"));
+        window = ((id(*)(id, SEL, NSRect, NSUInteger, NSUInteger, BOOL))objc_msgSend)(
+            windowAlloc, sel_registerName("initWithContentRect:styleMask:backing:defer:"), rect, 15, 2, NO);
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(window, sel_registerName("autorelease"));
+#endif
+
+        // when we are not using ARC, than window will be added to autorelease pool
+        // so if we close it by hand (pressing red button), we don't want it to be released for us
+        // so it will be released by autorelease pool later
+        objc_msgSend_void_bool(window, sel_registerName("setReleasedWhenClosed:"), NO);
+
+        WindowDelegateClass = objc_allocateClassPair((Class)objc_getClass("NSObject"), "WindowDelegate", 0);
+        resultAddProtoc = class_addProtocol(WindowDelegateClass, objc_getProtocol("NSWindowDelegate"));
+        ZPL_ASSERT(resultAddProtoc);
+        resultAddIvar = class_addIvar(WindowDelegateClass, "closed", zpl_size_of(NSUInteger),
+                                      rint(log2(zpl_size_of(NSUInteger))), NSUIntegerEncoding);
+        ZPL_ASSERT(resultAddIvar);
+        resultAddIvar =
+            class_addIvar(WindowDelegateClass, "zpl_platform", zpl_size_of(void *), rint(log2(zpl_size_of(void *))), "ˆv");
+        ZPL_ASSERT(resultAddIvar);
+        resultAddMethod = class_addMethod(WindowDelegateClass, sel_registerName("windowWillClose:"),
+                                          cast(IMP) zpl__osx_window_will_close, "v@:@");
+        ZPL_ASSERT(resultAddMethod);
+        resultAddMethod = class_addMethod(WindowDelegateClass, sel_registerName("windowDidBecomeKey:"),
+                                          cast(IMP) zpl__osx_window_did_become_key, "v@:@");
+        ZPL_ASSERT(resultAddMethod);
+        wdgAlloc = objc_msgSend_id(cast(id) WindowDelegateClass, sel_registerName("alloc"));
+        wdg = objc_msgSend_id(wdgAlloc, sel_registerName("init"));
+#ifndef ARC_AVAILABLE
+        objc_msgSend_void(wdg, sel_registerName("autorelease"));
+#endif
+
+        objc_msgSend_void_id(window, sel_registerName("setDelegate:"), wdg);
+
+        contentView = objc_msgSend_id(window, sel_registerName("contentView"));
+
+        {
+            NSPoint point = { 20, 20 };
+            ((void (*)(id, SEL, NSPoint))objc_msgSend)(window, sel_registerName("cascadeTopLeftFromPoint:"), point);
+        }
+
+        titleString = objc_msgSend_id_char_const(cast(id) objc_getClass("NSString"),
+                                                 sel_registerName("stringWithUTF8String:"), window_title);
+        objc_msgSend_void_id(window, sel_registerName("setTitle:"), titleString);
+
+        if (type == ZPL_RENDERER_OPENGL) {
+            // TODO(bill): Make sure this works correctly
+            u32 opengl_hex_version = (p->opengl.major << 12) | (p->opengl.minor << 8);
+            u32 gl_attribs[] = { 8, 24, // NSOpenGLPFAColorSize, 24,
+                                 11, 8, // NSOpenGLPFAAlphaSize, 8,
+                                 5,     // NSOpenGLPFADoubleBuffer,
+                                 73,    // NSOpenGLPFAAccelerated,
+                                 // 72,                   // NSOpenGLPFANoRecovery,
+                                 // 55, 1,                // NSOpenGLPFASampleBuffers, 1,
+                                 // 56, 4,                // NSOpenGLPFASamples, 4,
+                                 99, opengl_hex_version, // NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+                                 0 };
+
+            id pixel_format_alloc, pixel_format;
+            id opengl_context_alloc, opengl_context;
+
+            pixel_format_alloc =
+                objc_msgSend_id(cast(id) objc_getClass("NSOpenGLPixelFormat"), sel_registerName("alloc"));
+            pixel_format = ((id(*)(id, SEL, const uint32_t *))objc_msgSend)(
+                pixel_format_alloc, sel_registerName("initWithAttributes:"), gl_attribs);
+#ifndef ARC_AVAILABLE
+            objc_msgSend_void(pixel_format, sel_registerName("autorelease"));
+#endif
+
+            opengl_context_alloc =
+                objc_msgSend_id(cast(id) objc_getClass("NSOpenGLContext"), sel_registerName("alloc"));
+            opengl_context = ((id(*)(id, SEL, id, id))objc_msgSend)(
+                opengl_context_alloc, sel_registerName("initWithFormat:shareContext:"), pixel_format, nil);
+#ifndef ARC_AVAILABLE
+            objc_msgSend_void(opengl_context, sel_registerName("autorelease"));
+#endif
+
+            objc_msgSend_void_id(opengl_context, sel_registerName("setView:"), contentView);
+            objc_msgSend_void_id(window, sel_registerName("makeKeyAndOrderFront:"), window);
+            objc_msgSend_void_bool(window, sel_registerName("setAcceptsMouseMovedEvents:"), YES);
+
+            p->window_handle = cast(void *) window;
+            p->opengl.context = cast(void *) opengl_context;
+        } else {
+            ZPL_PANIC("TODO(bill): Software rendering");
+        }
+
+        {
+            id blackColor = objc_msgSend_id(cast(id) objc_getClass("NSColor"), sel_registerName("blackColor"));
+            objc_msgSend_void_id(window, sel_registerName("setBackgroundColor:"), blackColor);
+            objc_msgSend_void_bool(NSApp, sel_registerName("activateIgnoringOtherApps:"), YES);
+        }
+        object_setInstanceVariable(wdg, "zpl_platform", cast(void *) p);
+
+        p->is_initialized = true;
+    }
+
+    return true;
+}
+
+// NOTE(bill): Software rendering
+b32 zpl_platform_init_with_software(zpl_platform *p, char const *window_title, i32 width, i32 height, u32 window_flags) {
+    ZPL_PANIC("TODO(bill): Software rendering in not yet implemented on OS X\n");
+    return zpl__platform_init(p, window_title, zpl_set_video_mode(width, height, 32), ZPL_RENDERER_SOFTWARE, window_flags);
+}
+// NOTE(bill): OpenGL Rendering
+b32 zpl_platform_init_with_opengl(zpl_platform *p, char const *window_title, i32 width, i32 height, u32 window_flags,
+                                 i32 major, i32 minor, b32 core, b32 compatible) {
+
+    p->opengl.major = major;
+    p->opengl.minor = minor;
+    p->opengl.core = core;
+    p->opengl.compatible = compatible;
+    return zpl__platform_init(p, window_title, zpl_set_video_mode(width, height, 32), ZPL_RENDERER_OPENGL, window_flags);
+}
+
+// NOTE(bill): Reverse engineering can be fun!!!
+zpl_internal zplKeyType zpl__osx_from_key_code(u16 key_code) {
+    switch (key_code) {
+    default:
+        return zplKey_Unknown;
+    // NOTE(bill): WHO THE FUCK DESIGNED THIS VIRTUAL KEY CODE SYSTEM?!
+    // THEY ARE FUCKING IDIOTS!
+    case 0x1d: return zplKey_0;
+    case 0x12: return zplKey_1;
+    case 0x13: return zplKey_2;
+    case 0x14: return zplKey_3;
+    case 0x15: return zplKey_4;
+    case 0x17: return zplKey_5;
+    case 0x16: return zplKey_6;
+    case 0x1a: return zplKey_7;
+    case 0x1c: return zplKey_8;
+    case 0x19: return zplKey_9;
+
+    case 0x00: return zplKey_A;
+    case 0x0b: return zplKey_B;
+    case 0x08: return zplKey_C;
+    case 0x02: return zplKey_D;
+    case 0x0e: return zplKey_E;
+    case 0x03: return zplKey_F;
+    case 0x05: return zplKey_G;
+    case 0x04: return zplKey_H;
+    case 0x22: return zplKey_I;
+    case 0x26: return zplKey_J;
+    case 0x28: return zplKey_K;
+    case 0x25: return zplKey_L;
+    case 0x2e: return zplKey_M;
+    case 0x2d: return zplKey_N;
+    case 0x1f: return zplKey_O;
+    case 0x23: return zplKey_P;
+    case 0x0c: return zplKey_Q;
+    case 0x0f: return zplKey_R;
+    case 0x01: return zplKey_S;
+    case 0x11: return zplKey_T;
+    case 0x20: return zplKey_U;
+    case 0x09: return zplKey_V;
+    case 0x0d: return zplKey_W;
+    case 0x07: return zplKey_X;
+    case 0x10: return zplKey_Y;
+    case 0x06: return zplKey_Z;
+
+    case 0x21: return zplKey_Lbracket;
+    case 0x1e: return zplKey_Rbracket;
+    case 0x29: return zplKey_Semicolon;
+    case 0x2b: return zplKey_Comma;
+    case 0x2f: return zplKey_Period;
+    case 0x27: return zplKey_Quote;
+    case 0x2c: return zplKey_Slash;
+    case 0x2a: return zplKey_Backslash;
+    case 0x32: return zplKey_Grave;
+    case 0x18: return zplKey_Equals;
+    case 0x1b: return zplKey_Minus;
+    case 0x31: return zplKey_Space;
+
+    case 0x35:
+        return zplKey_Escape; // Escape
+    case 0x3b:
+        return ZPL_KEY_LCONTROL; // Left Control
+    case 0x38:
+        return ZPL_KEY_LSHIFT; // Left Shift
+    case 0x3a:
+        return ZPL_KEY_LALT; // Left Alt
+    case 0x37:
+        return zplKey_Lsystem; // Left OS specific: window (Windows and Linux), apple/cmd (MacOS X), ...
+    case 0x3e:
+        return ZPL_KEY_RCONTROL; // Right Control
+    case 0x3c:
+        return ZPL_KEY_RSHIFT; // Right Shift
+    case 0x3d:
+        return ZPL_KEY_RALT; // Right Alt
+    // case 0x37: return zplKey_Rsystem;      // Right OS specific: window (Windows and Linux), apple/cmd (MacOS X), ...
+    case 0x6e:
+        return zplKey_Menu; // Menu
+    case 0x24:
+        return zplKey_Return; // Return
+    case 0x33:
+        return zplKey_Backspace; // Backspace
+    case 0x30:
+        return zplKey_Tab; // Tabulation
+    case 0x74:
+        return zplKey_Pageup; // Page up
+    case 0x79:
+        return zplKey_Pagedown; // Page down
+    case 0x77:
+        return zplKey_End; // End
+    case 0x73:
+        return zplKey_Home; // Home
+    case 0x72:
+        return zplKey_Insert; // Insert
+    case 0x75:
+        return zplKey_Delete; // Delete
+    case 0x45:
+        return zplKey_Plus; // +
+    case 0x4e:
+        return zplKey_Subtract; // -
+    case 0x43:
+        return zplKey_Multiply; // *
+    case 0x4b:
+        return zplKey_Divide; // /
+    case 0x7b:
+        return zplKey_Left; // Left arrow
+    case 0x7c:
+        return zplKey_Right; // Right arrow
+    case 0x7e:
+        return zplKey_Up; // Up arrow
+    case 0x7d:
+        return zplKey_Down; // Down arrow
+    case 0x52:
+        return zplKey_Numpad0; // Numpad 0
+    case 0x53:
+        return zplKey_Numpad1; // Numpad 1
+    case 0x54:
+        return zplKey_Numpad2; // Numpad 2
+    case 0x55:
+        return zplKey_Numpad3; // Numpad 3
+    case 0x56:
+        return zplKey_Numpad4; // Numpad 4
+    case 0x57:
+        return zplKey_Numpad5; // Numpad 5
+    case 0x58:
+        return zplKey_Numpad6; // Numpad 6
+    case 0x59:
+        return zplKey_Numpad7; // Numpad 7
+    case 0x5b:
+        return zplKey_Numpad8; // Numpad 8
+    case 0x5c:
+        return zplKey_Numpad9; // Numpad 9
+    case 0x41:
+        return zplKey_NumpadDot; // Numpad .
+    case 0x4c:
+        return zplKey_NumpadEnter; // Numpad Enter
+    case 0x7a:
+        return zplKey_F1; // F1
+    case 0x78:
+        return zplKey_F2; // F2
+    case 0x63:
+        return zplKey_F3; // F3
+    case 0x76:
+        return zplKey_F4; // F4
+    case 0x60:
+        return zplKey_F5; // F5
+    case 0x61:
+        return zplKey_F6; // F6
+    case 0x62:
+        return zplKey_F7; // F7
+    case 0x64:
+        return zplKey_F8; // F8
+    case 0x65:
+        return zplKey_F9; // F8
+    case 0x6d:
+        return zplKey_F10; // F10
+    case 0x67:
+        return zplKey_F11; // F11
+    case 0x6f:
+        return zplKey_F12; // F12
+    case 0x69:
+        return zplKey_F13; // F13
+    case 0x6b:
+        return zplKey_F14; // F14
+    case 0x71:
+        return zplKey_F15; // F15
+        // case : return zplKey_Pause;        // Pause // NOTE(bill): Not possible on OS X
+    }
+}
+
+zpl_internal void zpl__osx_on_cocoa_event(zpl_platform *p, id event, id window) {
+    if (!event) {
+        return;
+    } else if (objc_msgSend_id(window, sel_registerName("delegate"))) {
+        NSUInteger event_type = ((NSUInteger(*)(id, SEL))objc_msgSend)(event, sel_registerName("type"));
+        switch (event_type) {
+        case 1:
+            zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Left], true);
+            break; // NSLeftMouseDown
+        case 2:
+            zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Left], false);
+            break; // NSLeftMouseUp
+        case 3:
+            zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Right], true);
+            break; // NSRightMouseDown
+        case 4:
+            zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Right], false);
+            break; // NSRightMouseUp
+        case 25: { // NSOtherMouseDown
+            // TODO(bill): Test thoroughly
+            NSInteger number = ((NSInteger(*)(id, SEL))objc_msgSend)(event, sel_registerName("buttonNumber"));
+            if (number == 2) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Middle], true);
+            if (number == 3) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_X1], true);
+            if (number == 4) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_X2], true);
+        } break;
+        case 26: { // NSOtherMouseUp
+            NSInteger number = ((NSInteger(*)(id, SEL))objc_msgSend)(event, sel_registerName("buttonNumber"));
+            if (number == 2) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_Middle], false);
+            if (number == 3) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_X1], false);
+            if (number == 4) zpl_key_state_update(&p->mouse_buttons[zplMouseButton_X2], false);
+
+        } break;
+
+        // TODO(bill): Scroll wheel
+        case 22: { // NSScrollWheel
+            CGFloat dx = ((CGFloat(*)(id, SEL))abi_objc_msgSend_fpret)(event, sel_registerName("scrollingDeltaX"));
+            CGFloat dy = ((CGFloat(*)(id, SEL))abi_objc_msgSend_fpret)(event, sel_registerName("scrollingDeltaY"));
+            BOOL precision_scrolling =
+                ((BOOL(*)(id, SEL))objc_msgSend)(event, sel_registerName("hasPreciseScrollingDeltas"));
+            if (precision_scrolling) {
+                dx *= 0.1f;
+                dy *= 0.1f;
+            }
+            // TODO(bill): Handle sideways
+            p->mouse_wheel_delta = dy;
+            // p->mouse_wheel_dy = dy;
+            // zpl_printf("%f %f\n", dx, dy);
+        } break;
+
+        case 12: { // NSFlagsChanged
+#if 0
+			// TODO(bill): Reverse engineer this properly
+			NSUInteger modifiers = ((NSUInteger (*)(id, SEL))objc_msgSend)(event, sel_registerName("modifierFlags"));
+			u32 upper_mask = (modifiers & 0xffff0000ul) >> 16;
+			b32 shift   = (upper_mask & 0x02) != 0;
+			b32 control = (upper_mask & 0x04) != 0;
+			b32 alt     = (upper_mask & 0x08) != 0;
+			b32 command = (upper_mask & 0x10) != 0;
+#endif
+
+            // zpl_printf("%u\n", keys.mask);
+            // zpl_printf("%x\n", cast(u32)modifiers);
+        } break;
+
+        case 10: { // NSKeyDown
+            u16 key_code;
+
+            id input_text = objc_msgSend_id(event, sel_registerName("characters"));
+            char const *input_text_utf8 =
+                ((char const *(*)(id, SEL))objc_msgSend)(input_text, sel_registerName("UTF8String"));
+            p->char_buffer_count = zpl_strnlen(input_text_utf8, zpl_size_of(p->char_buffer));
+            zpl_memcopy(p->char_buffer, input_text_utf8, p->char_buffer_count);
+
+            key_code = ((unsigned short (*)(id, SEL))objc_msgSend)(event, sel_registerName("keyCode"));
+            zpl_key_state_update(&p->keys[zpl__osx_from_key_code(key_code)], true);
+        } break;
+
+        case 11: { // NSKeyUp
+            u16 key_code = ((unsigned short (*)(id, SEL))objc_msgSend)(event, sel_registerName("keyCode"));
+            zpl_key_state_update(&p->keys[zpl__osx_from_key_code(key_code)], false);
+        } break;
+
+        default: break;
+        }
+
+        objc_msgSend_void_id(NSApp, sel_registerName("sendEvent:"), event);
+    }
+}
+
+void zpl_platform_update(zpl_platform *p) {
+    id window, key_window, content_view;
+    NSRect original_frame;
+
+    window = cast(id) p->window_handle;
+    key_window = objc_msgSend_id(NSApp, sel_registerName("keyWindow"));
+    p->window_has_focus = key_window == window; // TODO(bill): Is this right
+
+    if (p->window_has_focus) {
+        isize i;
+        p->char_buffer_count = 0; // TODO(bill): Reset buffer count here or else where?
+
+        // NOTE(bill): Need to update as the keys only get updates on events
+        for (i = 0; i < ZPL_KEY_COUNT; i++) {
+            b32 is_down = (p->keys[i] & ZPL_KEY_STATE_DOWN) != 0;
+            zpl_key_state_update(&p->keys[i], is_down);
+        }
+
+        for (i = 0; i < ZPL_MOUSEBUTTON_COUNT; i++) {
+            b32 is_down = (p->mouse_buttons[i] & ZPL_KEY_STATE_DOWN) != 0;
+            zpl_key_state_update(&p->mouse_buttons[i], is_down);
+        }
+    }
+
+    { // Handle Events
+        id distant_past = objc_msgSend_id(cast(id) objc_getClass("NSDate"), sel_registerName("distantPast"));
+        id event = ((id(*)(id, SEL, NSUInteger, id, id, BOOL))objc_msgSend)(
+            NSApp, sel_registerName("nextEventMatchingMask:untilDate:inMode:dequeue:"), NSUIntegerMax, distant_past,
+            NSDefaultRunLoopMode, YES);
+        zpl__osx_on_cocoa_event(p, event, window);
+    }
+
+    if (p->window_has_focus) {
+        p->key_modifiers.control = p->keys[ZPL_KEY_LCONTROL] | p->keys[ZPL_KEY_RCONTROL];
+        p->key_modifiers.alt = p->keys[ZPL_KEY_LALT] | p->keys[ZPL_KEY_RALT];
+        p->key_modifiers.shift = p->keys[ZPL_KEY_LSHIFT] | p->keys[ZPL_KEY_RSHIFT];
+    }
+
+    { // Check if window is closed
+        id wdg = objc_msgSend_id(window, sel_registerName("delegate"));
+        if (!wdg) {
+            p->window_is_closed = false;
+        } else {
+            NSUInteger value = 0;
+            object_getInstanceVariable(wdg, "closed", cast(void **) & value);
+            p->window_is_closed = (value != 0);
+        }
+    }
+
+    content_view = objc_msgSend_id(window, sel_registerName("contentView"));
+    original_frame = ((NSRect(*)(id, SEL))abi_objc_msgSend_stret)(content_view, sel_registerName("frame"));
+
+    { // Window
+        NSRect frame = original_frame;
+        frame = ((NSRect(*)(id, SEL, NSRect))abi_objc_msgSend_stret)(content_view,
+                                                                     sel_registerName("convertRectToBacking:"), frame);
+        p->window_width = frame.size.width;
+        p->window_height = frame.size.height;
+        frame = ((NSRect(*)(id, SEL, NSRect))abi_objc_msgSend_stret)(window, sel_registerName("convertRectToScreen:"),
+                                                                     frame);
+        p->window_x = frame.origin.x;
+        p->window_y = frame.origin.y;
+    }
+
+    { // Mouse
+        NSRect frame = original_frame;
+        NSPoint mouse_pos =
+            ((NSPoint(*)(id, SEL))objc_msgSend)(window, sel_registerName("mouseLocationOutsideOfEventStream"));
+        mouse_pos.x = zpl_clamp(mouse_pos.x, 0, frame.size.width - 1);
+        mouse_pos.y = zpl_clamp(mouse_pos.y, 0, frame.size.height - 1);
+
+        {
+            i32 x = mouse_pos.x;
+            i32 y = mouse_pos.y;
+            p->mouse_dx = x - p->mouse_x;
+            p->mouse_dy = y - p->mouse_y;
+            p->mouse_x = x;
+            p->mouse_y = y;
+        }
+
+        if (p->mouse_clip) {
+            b32 update = false;
+            i32 x = p->mouse_x;
+            i32 y = p->mouse_y;
+            if (p->mouse_x < 0) {
+                x = 0;
+                update = true;
+            } else if (p->mouse_y > p->window_height - 1) {
+                y = p->window_height - 1;
+                update = true;
+            }
+
+            if (p->mouse_y < 0) {
+                y = 0;
+                update = true;
+            } else if (p->mouse_x > p->window_width - 1) {
+                x = p->window_width - 1;
+                update = true;
+            }
+
+            if (update) { zpl_platform_set_mouse_position(p, x, y); }
+        }
+    }
+
+    { // TODO(bill): Controllers
+    }
+
+    // TODO(bill): Is this in the correct place?
+    objc_msgSend_void(NSApp, sel_registerName("updateWindows"));
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) {
+        objc_msgSend_void(cast(id) p->opengl.context, sel_registerName("update"));
+        zpl_platform_make_opengl_context_current(p);
+    }
+}
+
+void zpl_platform_display(zpl_platform *p) {
+    // TODO(bill): Do more
+    if (p->renderer_type == ZPL_RENDERER_OPENGL) {
+        zpl_platform_make_opengl_context_current(p);
+        objc_msgSend_void(cast(id) p->opengl.context, sel_registerName("flushBuffer"));
+    } else if (p->renderer_type == ZPL_RENDERER_SOFTWARE) {
+        // TODO(bill):
+    } else {
+        ZPL_PANIC("Invalid window rendering type");
+    }
+
+    {
+        f64 prev_time = p->curr_time;
+        f64 curr_time = zpl_time_now( );
+        p->dt_for_frame = curr_time - prev_time;
+        p->curr_time = curr_time;
+    }
+}
+
+void zpl_platform_destroy(zpl_platform *p) {
+    zpl_platform_make_opengl_context_current(p);
+
+    objc_msgSend_void(cast(id) p->window_handle, sel_registerName("close"));
+
+#if defined(ARC_AVAILABLE)
+// TODO(bill): autorelease pool
+#else
+    objc_msgSend_void(cast(id) p->osx_autorelease_pool, sel_registerName("drain"));
+#endif
+}
+
+void zpl_platform_show_cursor(zpl_platform *p, b32 show) {
+    if (show) {
+        // objc_msgSend_void(class_registerName("NSCursor"), sel_registerName("unhide"));
+    } else {
+        // objc_msgSend_void(class_registerName("NSCursor"), sel_registerName("hide"));
+    }
+}
+
+void zpl_platform_set_mouse_position(zpl_platform *p, i32 x, i32 y) {
+    // TODO(bill):
+    CGPoint pos = { cast(CGFloat) x, cast(CGFloat) y };
+    pos.x += p->window_x;
+    pos.y += p->window_y;
+    CGWarpMouseCursorPosition(pos);
+}
+
+void zpl_platform_set_controller_vibration(zpl_platform *p, isize index, f32 left_motor, f32 right_motor) {
+    // TODO(bill):
+}
+
+b32 zpl_platform_has_clipboard_text(zpl_platform *p) {
+    // TODO(bill):
+    return false;
+}
+
+void zpl_platform_set_clipboard_text(zpl_platform *p, char const *str) {
+    // TODO(bill):
+}
+
+char *zpl_platform_get_clipboard_text(zpl_platform *p, zplAllocator a) {
+    // TODO(bill):
+    return NULL;
+}
+
+void zpl_platform_set_window_position(zpl_platform *p, i32 x, i32 y) {
+    // TODO(bill):
+}
+
+void zpl_platform_set_window_title(zpl_platform *p, char const *title, ...) {
+    id title_string;
+    char buf[256] = { 0 };
+    va_list va;
+    va_start(va, title);
+    zpl_snprintf_va(buf, zpl_count_of(buf), title, va);
+    va_end(va);
+
+    title_string =
+        objc_msgSend_id_char_const(cast(id) objc_getClass("NSString"), sel_registerName("stringWithUTF8String:"), buf);
+    objc_msgSend_void_id(cast(id) p->window_handle, sel_registerName("setTitle:"), title_string);
+}
+
+void zpl_platform_toggle_fullscreen(zpl_platform *p, b32 fullscreen_desktop) {
+    // TODO(bill):
+}
+
+void zpl_platform_toggle_borderless(zpl_platform *p) {
+    // TODO(bill):
+}
+
+void zpl_platform_make_opengl_context_current(zpl_platform *p) {
+    objc_msgSend_void(cast(id) p->opengl.context, sel_registerName("makeCurrentContext"));
+}
+
+void zpl_platform_show_window(zpl_platform *p) {
+    // TODO(bill):
+}
+
+void zpl_platform_hide_window(zpl_platform *p) {
+    // TODO(bill):
+}
+
+i32 zpl__osx_mode_bits_per_pixel(CGDisplayModeRef mode) {
+    i32 bits_per_pixel = 0;
+    CFStringRef pixel_encoding = CGDisplayModeCopyPixelEncoding(mode);
+    if (CFStringCompare(pixel_encoding, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+        bits_per_pixel = 32;
+    } else if (CFStringCompare(pixel_encoding, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) ==
+               kCFCompareEqualTo) {
+        bits_per_pixel = 16;
+    } else if (CFStringCompare(pixel_encoding, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) ==
+               kCFCompareEqualTo) {
+        bits_per_pixel = 8;
+    }
+    CFRelease(pixel_encoding);
+
+    return bits_per_pixel;
+}
+
+i32 zpl__osx_display_bits_per_pixel(CGDirectDisplayID display) {
+    CGDisplayModeRef mode = CGDisplayCopyDisplayMode(display);
+    i32 bits_per_pixel = zpl__osx_mode_bits_per_pixel(mode);
+    CGDisplayModeRelease(mode);
+    return bits_per_pixel;
+}
+
+zpl_video_mode zpl_video_mode_get_desktop(void) {
+    CGDirectDisplayID display = CGMainDisplayID( );
+    return zpl_set_video_mode(CGDisplayPixelsWide(display), CGDisplayPixelsHigh(display),
+                         zpl__osx_display_bits_per_pixel(display));
+}
+
+isize zpl_video_mode_get_fullscreen_modes(zpl_video_mode *modes, isize max_mode_count) {
+    CFArrayRef cg_modes = CGDisplayCopyAllDisplayModes(CGMainDisplayID( ), NULL);
+    CFIndex i, count;
+    if (cg_modes == NULL) { return 0; }
+
+    count = zpl_min(CFArrayGetCount(cg_modes), max_mode_count);
+    for (i = 0; i < count; i++) {
+        CGDisplayModeRef cg_mode = cast(CGDisplayModeRef) CFArrayGetValueAtIndex(cg_modes, i);
+        modes[i] = zpl_set_video_mode(CGDisplayModeGetWidth(cg_mode), CGDisplayModeGetHeight(cg_mode),
+                                 zpl__osx_mode_bits_per_pixel(cg_mode));
+    }
+
+    CFRelease(cg_modes);
+
+    zpl_sort_array(modes, count, zpl_video_mode_dsc_cmp);
+    return cast(isize) count;
+}
+
+#endif
+#endif // #if 0
+
+// TODO(bill): OSX Platform Layer
+// NOTE(bill): Use this as a guide so there is no need for Obj-C https://github.com/jimon/osx_app_in_plain_c
+
+zpl_inline zpl_video_mode zpl_set_video_mode(i32 width, i32 height, i32 bits_per_pixel) {
+    zpl_video_mode m;
+    m.width = width;
+    m.height = height;
+    m.bits_per_pixel = bits_per_pixel;
+    return m;
+}
+
+zpl_inline b32 zpl_video_mode_is_valid(zpl_video_mode mode) {
+    zpl_local_persist zpl_video_mode modes[256] = { 0 };
+    zpl_local_persist isize mode_count = 0;
+    zpl_local_persist b32 is_set = false;
+    isize i;
+
+    if (!is_set) {
+        mode_count = zpl_video_mode_get_fullscreen_modes(modes, zpl_count_of(modes));
+        is_set = true;
+    }
+
+    for (i = 0; i < mode_count; i++) { zpl_printf("%d %d\n", modes[i].width, modes[i].height); }
+
+    return zpl_binary_search_array(modes, mode_count, &mode, zpl_video_mode_cmp) >= 0;
+}
+
+ZPL_COMPARE_PROC(zpl_video_mode_cmp) {
+    zpl_video_mode const *x = cast(zpl_video_mode const *) a;
+    zpl_video_mode const *y = cast(zpl_video_mode const *) b;
+
+    if (x->bits_per_pixel == y->bits_per_pixel) {
+        if (x->width == y->width) { return x->height < y->height ? -1 : x->height > y->height; }
+        return x->width < y->width ? -1 : x->width > y->width;
+    }
+    return x->bits_per_pixel < y->bits_per_pixel ? -1 : +1;
+}
+
+ZPL_COMPARE_PROC(zpl_video_mode_dsc_cmp) { return zpl_video_mode_cmp(b, a); }
+
+#endif // defined(ZPL_PLATFORM)
 
 //
 // BOTTOM
