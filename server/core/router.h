@@ -35,10 +35,22 @@ void on_connect_accepted(librg_event_t *event) {
 
     entity->user_data = new ped_t();
     librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
+
+    m2o_args args = {0};
+    m2o_args_init(&args);
+    m2o_args_push_integer(&args, event->entity->id);
+    m2o_event_trigger("player_connect", &args);
+    m2o_args_free(&args);
 }
 
 void on_connect_disconnect(librg_event_t *event) {
     auto ped = get_ped(event->entity);
+
+    m2o_args args = {0};
+    m2o_args_init(&args);
+    m2o_args_push_integer(&args, event->entity->id);
+    m2o_event_trigger("player_disconnect", &args);
+    m2o_args_free(&args);
 
     librg_entity_iteratex(event->ctx, LIBRG_ENTITY_ALIVE, entityid, {
         auto entity = librg_entity_fetch(ctx, entityid);

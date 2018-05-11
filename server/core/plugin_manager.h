@@ -76,3 +76,11 @@ void m2o_plugins_stop(librg_ctx_t *ctx, mod_t *mod) {
     m2o_args_free(&args);
     zpl_array_free(m2o_plugins);
 }
+
+void m2o_event_trigger(const char* name, const m2o_args* args) {
+    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
+        if (m2o_plugins[i].callbacks.plugin_tick) {
+            m2o_plugins[i].callbacks.plugin_event(name, args);
+        }
+    }
+}

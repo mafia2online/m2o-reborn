@@ -12,7 +12,7 @@ void m2o_args_push_integer(m2o_args *arg, i64 integer);
 void m2o_args_push_real(m2o_args *arg, f64 real);
 void m2o_args_push_pointer(m2o_args *arg, void *pointer);
 
-void m2o_event_trigger(char* name, m2o_args* args);
+void m2o_event_trigger(const char* name, const m2o_args* args);;
 
 u32 m2o_vehicle_create();
 bool m2o_vehicle_destroy(u32 vehicleid);
@@ -34,7 +34,7 @@ typedef void (m2o_api_args_push_string)(m2o_args *arg, const char *string);
 typedef void (m2o_api_args_push_integer)(m2o_args *arg, i64 integer);
 typedef void (m2o_api_args_push_real)(m2o_args *arg, f64 real);
 typedef void (m2o_api_args_push_pointer)(m2o_args *arg, void *pointer);
-typedef void (m2o_api_event_trigger)(char* name, m2o_args* args);
+typedef void (m2o_api_event_trigger)(const char* name, const m2o_args* args);;
 typedef u32 (m2o_api_vehicle_create)();
 typedef bool (m2o_api_vehicle_destroy)(u32 vehicleid);
 typedef bool (m2o_api_vehicle_position_set)(u32 vehicleid, vec3_t position);
