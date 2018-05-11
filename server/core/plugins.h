@@ -1,7 +1,11 @@
 #define M2O_PLUGIN_DIRECTORY "plugins"
-typedef void (m2o_plugin_init)(m2o_api_vtable *);
+typedef void (m2o_plugin_init)(const m2o_api_vtable *, m2o_plugin *);
 
-void m2o_plugins_init(m2o_api_vtable *api) {
+static zpl_array(m2o_plugin) m2o_plugins;
+
+void m2o_plugins_init(librg_ctx_t *ctx, mod_t *mod) {
+    zpl_array_init(m2o_plugins, zpl_heap());
+
     /* create folder if doesnt exist */
     zpl_path_mkdir(M2O_PLUGIN_DIRECTORY, 0744);
 
@@ -14,20 +18,56 @@ void m2o_plugins_init(m2o_api_vtable *api) {
         zpl_dll_handle dll = zpl_dll_load(files[i]);
 
         if (!dll) {
-            mod_log("[error] could not load a plugin: %s\n", files[i]);
-        } else {
-            auto plugin_main = (m2o_plugin_init *)zpl_dll_proc_address(dll, "m2o_plugin_main");
-
-            if (!plugin_main) {
-                mod_log("[error] could not load a plugin: %s\n", files[i]);
-            } else {
-                mod_log("[info] successfully loaded plugin: %s\n", files[i]);
-                plugin_main(api);
-            }
+            mod_log("[error] (%s) is not a valid dynamic library, skipping...\n", files[i]);
+            continue;
         }
 
+        auto plugin_main = (m2o_plugin_init *)zpl_dll_proc_address(dll, "m2o_plugin_main");
+
+        if (!plugin_main) {
+            mod_log("[error] (%s) doesnt contain m2o_plugin_main, skipping...\n", files[i]);
+            continue;
+        }
+
+        m2o_plugin plugin = {0};
+        plugin_main((const m2o_api_vtable *)mod->api, &plugin);
+
+        mod_log("[info] successfully loaded plugin: %s\n", plugin.name);
+
+        if (plugin.callbacks.plugin_init) {
+            // m2o_args args = {0};
+            // m2o_args_init(&args);
+            // plugin.callbacks.plugin_init(&args);
+            // m2o_args_free(&args);
+            plugin.callbacks.plugin_init(NULL);
+        }
+
+        zpl_array_append(m2o_plugins, plugin);
     }
 
     zpl_string_free(filelst);
     zpl_array_free(files);
+}
+
+void m2o_plugins_tick(librg_ctx_t *ctx, mod_t *mod) {
+    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
+        if (m2o_plugins[i].callbacks.plugin_tick) {
+            m2o_plugins[i].callbacks.plugin_tick(NULL);
+        }
+    }
+}
+
+void m2o_plugins_stop(librg_ctx_t *ctx, mod_t *mod) {
+    m2o_args args = {0};
+    m2o_args_init(&args);
+
+    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
+        if (m2o_plugins[i].callbacks.plugin_stop) {
+            m2o_plugins[i].callbacks.plugin_stop(&args);
+        }
+    }
+
+    m2o_args_free(&args);
+
+    zpl_array_free(m2o_plugins);
 }

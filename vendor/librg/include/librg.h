@@ -1681,7 +1681,7 @@ extern "C" {
             ENetAddress address = {0};
 
             if (zpl_strcmp(addr.host, "localhost") == 0) {
-                addr.host = "::1";
+                addr.host = (char *)"::1";
             }
 
             address.port = addr.port;

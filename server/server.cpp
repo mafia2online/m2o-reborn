@@ -8,10 +8,10 @@
 // shared
 #include "components.h"
 #include "extensions.h"
-#include "api/api.h"
 
+struct m2o_api_vtable;
 struct mod_t {
-    m2o_api_vtable api;
+    m2o_api_vtable *api;
 
     struct {
         std::string hostname;
@@ -22,16 +22,20 @@ struct mod_t {
 static mod_t mod;
 librg_ctx_t *ctx;
 
+#include "api/general.h"
+#include "api/errors.h"
+#include "api/arguments.h"
+#include "api/plugin.h"
+#include "api/vehicle.h"
+#include "api/pedestrian.h"
+#include "api/api.h"
+
 // server modules
 #include "core/settings.h"
 #include "core/vehicle.h"
 #include "core/pedestrian.h"
 #include "core/plugins.h"
 #include "core/router.h"
-
-#include "api/errors.h"
-#include "api/vehicle.h"
-#include "api/pedestrian.h"
 
 /* simple bandwidth measurer */
 void mod_measure(void *user_data) {
@@ -107,17 +111,21 @@ int main() {
 
     librg_network_start(ctx, address);
 
-    m2o_api_init(&mod.api);
-    m2o_plugins_init(&mod.api);
+    mod.api = new m2o_api_vtable;
+    m2o_api_init(mod.api);
+    m2o_plugins_init(ctx, &mod);
 
     while (true) {
         librg_tick(ctx);
+        m2o_plugins_tick(ctx, &mod);
         zpl_sleep_ms(5);
     }
 
+    m2o_plugins_stop(ctx, &mod);
     librg_network_stop(ctx);
     librg_free(ctx);
     delete ctx;
+    delete mod.api;
 
     return 0;
 }

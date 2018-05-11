@@ -82,7 +82,7 @@ void on_entity_remove(librg_event_t *event) {
     mod_log("[info] sending a remove packet for entity: %d\n", event->entity->id);
 
     if (librg_entity_control_get(event->ctx, event->entity->id) == event->peer) {
-        mod_log("removing control of entity: %d for peer: %x\n", event->entity->id, event->peer);
+        mod_log("removing control of entity: %d for peer: %llx\n", event->entity->id, (u64)event->peer);
         librg_entity_control_remove(event->ctx, event->entity->id);
     }
 
