@@ -3,12 +3,8 @@ typedef void (m2o_callback)(m2o_args *);
 typedef void (m2o_event_callback)(const char *, m2o_args *);
 
 typedef struct {
-    char *name;
-    usize name_len;
-
-    char *author;
-    usize author_len;
-
+    const char *name;
+    const char *author;
     u32 version;
 
     struct {

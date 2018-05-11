@@ -34,7 +34,7 @@ librg_ctx_t *ctx;
 #include "core/settings.h"
 #include "core/vehicle.h"
 #include "core/pedestrian.h"
-#include "core/plugins.h"
+#include "core/plugin_manager.h"
 #include "core/router.h"
 
 /* simple bandwidth measurer */
