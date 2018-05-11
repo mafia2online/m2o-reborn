@@ -56,7 +56,7 @@ namespace M2
 
         void Open(const vec3_t & position, bool unk1, unsigned int unk2)
         {
-            Mem::InvokeFunction<Mem::call_this, int>(0x4EAC80, this, position, unk1, unk2);
+            Mem::InvokeFunction<Mem::call_this, int>(0x4EAC80, this, &position, unk1, unk2);
         }
 
         void StartLockpick()

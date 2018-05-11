@@ -20,14 +20,11 @@ namespace M2
 	{
 	public:
 
-		void ActivateStreamMapLine(char * szName)
+        uint32_t ProcessLine(char * szName)
 		{
-			static uint32_t dwReturn;
-			// method addr, class pointer | return name
-			Mem::InvokeFunction<Mem::call_this, void>(0x5CFCD0, &GetInterface()->m_pEnumerator, &dwReturn, szName);
+            static uint32_t dwReturn;
+            Mem::InvokeFunction<Mem::call_this, int *>(0x5CFCD0, &GetInterface()->m_pEnumerator, &dwReturn, szName);
+            return dwReturn;
 		}
-
-
-
 	};
 };
