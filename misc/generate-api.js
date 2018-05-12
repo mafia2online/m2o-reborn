@@ -10,6 +10,7 @@ const targets = [
     'server/api/arguments.h',
     'server/api/plugin.h',
     'server/api/vehicle.h',
+    'server/api/player.h',
     'server/api/pedestrian.h',
 ];
 

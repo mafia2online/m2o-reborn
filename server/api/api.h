@@ -19,6 +19,8 @@ bool m2o_vehicle_destroy(u32 vehicleid);
 bool m2o_vehicle_position_set(u32 vehicleid, vec3_t position);
 vec3_t m2o_vehicle_position_get(u32 vehicleid);
 
+bool m2o_player_kick(u32 playerid);
+
 u32 m2o_ped_create();
 bool m2o_ped_destroy(u32 pedid);
 bool m2o_ped_position_set(u32 pedid, vec3_t position);
@@ -39,6 +41,7 @@ typedef u32 (m2o_api_vehicle_create)();
 typedef bool (m2o_api_vehicle_destroy)(u32 vehicleid);
 typedef bool (m2o_api_vehicle_position_set)(u32 vehicleid, vec3_t position);
 typedef vec3_t (m2o_api_vehicle_position_get)(u32 vehicleid);
+typedef bool (m2o_api_player_kick)(u32 playerid);
 typedef u32 (m2o_api_ped_create)();
 typedef bool (m2o_api_ped_destroy)(u32 pedid);
 typedef bool (m2o_api_ped_position_set)(u32 pedid, vec3_t position);
@@ -60,6 +63,7 @@ typedef struct m2o_api_vtable {
     m2o_api_vehicle_destroy *vehicle_destroy;
     m2o_api_vehicle_position_set *vehicle_position_set;
     m2o_api_vehicle_position_get *vehicle_position_get;
+    m2o_api_player_kick *player_kick;
     m2o_api_ped_create *ped_create;
     m2o_api_ped_destroy *ped_destroy;
     m2o_api_ped_position_set *ped_position_set;
@@ -82,6 +86,7 @@ void m2o_api_init(m2o_api_vtable *api) {
     api->vehicle_destroy = m2o_vehicle_destroy;
     api->vehicle_position_set = m2o_vehicle_position_set;
     api->vehicle_position_get = m2o_vehicle_position_get;
+    api->player_kick = m2o_player_kick;
     api->ped_create = m2o_ped_create;
     api->ped_destroy = m2o_ped_destroy;
     api->ped_position_set = m2o_ped_position_set;

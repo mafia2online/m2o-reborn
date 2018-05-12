@@ -59,6 +59,14 @@ void on_car_enter_start(librg_message_t *msg) {
         librg_data_wu32(data, vehicle->id);
         librg_data_wu8(data, seat);
     });
+
+    m2o_args args = {0};
+    m2o_args_init(&args);
+    m2o_args_push_integer(&args, player->id);
+    m2o_args_push_integer(&args, vehicle->id);
+    m2o_args_push_integer(&args, seat);
+    m2o_event_trigger("player_vehicle_enter", &args);
+    m2o_args_free(&args);
 }
 
 void on_car_enter_finish(librg_message_t *msg) {
@@ -71,6 +79,7 @@ void on_car_enter_finish(librg_message_t *msg) {
 
 void on_car_exit_start(librg_message_t *msg) {
     auto player = librg_entity_find(msg->ctx, msg->peer);
+    auto ped = get_ped(player);
     mod_log("player: %d is trying to leave his current car\n", player->id);
 
     // TODO: does he still need to control and stream that car? most probably yea
@@ -79,6 +88,14 @@ void on_car_exit_start(librg_message_t *msg) {
     mod_message_send_instream_except(msg->ctx, MOD_CAR_EXIT_START, player->id, player->client_peer, [&](librg_data_t *data) {
         librg_data_wu32(data, player->id);
     });
+
+    m2o_args args = {0};
+    m2o_args_init(&args);
+    m2o_args_push_integer(&args, player->id);
+    m2o_args_push_integer(&args, ped->vehicle->id);
+    m2o_args_push_integer(&args, ped->seat);
+    m2o_event_trigger("player_vehicle_exit", &args);
+    m2o_args_free(&args);
 }
 
 void on_car_exit_finish(librg_message_t *msg) {

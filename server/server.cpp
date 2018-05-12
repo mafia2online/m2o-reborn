@@ -28,6 +28,7 @@ librg_ctx_t *ctx;
 #include "api/plugin.h"
 #include "api/vehicle.h"
 #include "api/pedestrian.h"
+#include "api/player.h"
 #include "api/api.h"
 
 // server modules
