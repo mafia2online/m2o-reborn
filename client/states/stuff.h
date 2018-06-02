@@ -1,5 +1,5 @@
 IDirect3DVertexBuffer9*	m_vb;
-IDirect3DTexture9 *g_texture;
+IDirect3DTexture9 *g_texture = NULL;
 DWORD				m_dwRenderTextureBlock;
 
 #define OURVERTEX (D3DFVF_XYZRHW | D3DFVF_TEX1 | D3DFVF_DIFFUSE)
@@ -198,32 +198,50 @@ void init_stuff() {
         &g_texture);    //Texture handle
     */
 
+    hr = D3DXCreateTexture(mod.graphics.device, 1024, 1024, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&g_texture);
 
-        hr = D3DXCreateTextureFromFile(mod.graphics.device,   //Direct3D Device
 
-            "DH.png",       //File Name
+        // hr = D3DXCreateTextureFromFile(mod.graphics.device,   //Direct3D Device
 
-            &g_texture);    //Texture handle
+        //     "DH.png",       //File Name
+
+        //     &g_texture);    //Texture handle
 
     if (FAILED(hr)) {
         mod_log("Error loading texture\n");
     }
 }
 
+static bool a_initialized = false;
+
 void foobar() {
+    if (!a_initialized) {
+        a_initialized = true;
+        init_stuff();
+    }
+
     vec3_t screen;
-    graphics_world_to_screen(&screen, vec3(-421.75f, 479.31f, 0.1f));
-    mod_assert(g_texture);
+    vec3_t swin = vec3(-421.75f, 479.31f, 0.1f);
+    graphics_world_to_screen(&screen, swin);
+    // mod_assert(g_texture);
     //foobar_FillARGB(screen.x, screen.y, screen.z, 100, 100, 0xffffffff);
 
     vec3_t screen2;
-    graphics_world_to_screen(&screen2, vec3(-421.75f, 485.31f, 0.05f));
-    foobar_FillARGB(screen2.x, screen2.y, 0.5f, 100, 100, 0xffccffcc);
+    graphics_world_to_screen(&screen2, swin);
+    //foobar_FillARGB(screen2.x, screen2.y, 0.5f, 100, 100, 0xffccffcc);
 
-    mod_log("drawing a texture %x at: %f\n", g_texture, screen.z);
+    // foobar_RenderTexture(screen2.x, screen2.y, screen2.z, 100, 100, g_texture, 100);
 
-    gfont->RestoreDeviceObjects();
-    gfont->DrawTextScaled(screen.x, screen.y, 0.0, 2.0, 2.0, 0xccffffcc, "hgello weolsd");
+    zpl_mutex_lock(&mod.mutexes.cef);
+    if (g_texture) {
+        foobar_RenderTexture(0, 0, 0, 1024, 1024, g_texture, 255);
+    }
+    zpl_mutex_unlock(&mod.mutexes.cef);
+
+    // mod_log("drawing a texture %x at: %f\n", g_texture, screen.z);
+
+    //gfont->RestoreDeviceObjects();
+    //gfont->DrawTextScaled(screen.x, screen.y, 0.0, 2.0, 2.0, 0xccffffcc, "hgello weolsd");
 }
 
 #define MOD_STUFF_STATE { nullptr, nullptr, nullptr, foobar }

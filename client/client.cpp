@@ -165,6 +165,7 @@ struct mod_t {
     // collection of mutexes
     struct {
         zpl_mutex_t log;
+        zpl_mutex_t cef;
         zpl_mutex_t wnd_msg;
     } mutexes;
 
@@ -203,6 +204,7 @@ void graphics_device_prerender();
 void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+void graphics_page_render(const unsigned char* pixels, int x, int y, const int width, const int height);
 
 // =======================================================================//
 // !
@@ -244,6 +246,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 // actual client stuff
 #include "states/title.h"
 #include "states/debug.h"
+#include "states/stuff.h"
 // #include "states/connected.h"
 
 // core stuff
@@ -251,6 +254,7 @@ void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #include "core/pedestrian.h"
 #include "core/vehicle.h"
 #include "core/discord.h"
+#include "core/cef.h"
 #include "core/mod.h"
 
 // NOTE(zaklaus): Tell the OS to prefer dedicated video card.
@@ -295,6 +299,7 @@ void mod_exit(std::string reason) {
     zpl_file_close(&mod.debug_log);
 
     zpl_mutex_destroy(&mod.mutexes.log);
+    zpl_mutex_destroy(&mod.mutexes.cef);
     zpl_mutex_destroy(&mod.mutexes.wnd_msg);
 
     // MessageBoxA(nullptr, reason.c_str(), "Well.. Something went wrong!", MB_OK);
@@ -344,6 +349,7 @@ void mod_log(const char* format, ...) {
  * @param module
  */
 void mod_main(HMODULE module) {
+    zpl_mutex_init(&mod.mutexes.cef);
     zpl_mutex_init(&mod.mutexes.log);
     zpl_mutex_init(&mod.mutexes.wnd_msg);
 

@@ -40,8 +40,8 @@ if (WIN32)
         #message(FATAL_ERROR "Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
     endif()
 
-    find_path (D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
-    find_path (D3DX9_LIBRARY d3dx9.lib HINTS ${DirectX_LIB_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
+    find_path(D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
+    find_path(D3DX9_LIBRARY d3dx9.lib HINTS ${DirectX_LIB_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
 endif()
 
 
@@ -57,6 +57,8 @@ include_directories(
     vendor/m2sdk/wrappers
     vendor/nuklear/include
     vendor/discord_rpc/include
+    vendor/cef/include
+    vendor/cef
     server/
     shared/
     launcher/
@@ -64,9 +66,10 @@ include_directories(
 )
 
 link_directories(
-    ${PROJECT_SOURCE_DIR}/vendor/discord_rpc/lib
+    ${PROJECT_SOURCE_DIR}/vendor/discord_rpc/${CMAKE_BUILD_TYPE}/
     ${PROJECT_SOURCE_DIR}/vendor/steam_api/lib
     ${PROJECT_SOURCE_DIR}/vendor/detours/lib
+    ${PROJECT_SOURCE_DIR}/vendor/cef/${CMAKE_BUILD_TYPE}/
     ${D3DX9_LIBRARY}
 )
 
@@ -89,23 +92,32 @@ file(GLOB_RECURSE CLIENT_FILES
     "${PROJECT_SOURCE_DIR}/vendor/m2sdk/wrappers/*.h*"
     "${PROJECT_SOURCE_DIR}/vendor/nuklear/include/*.h"
     "${PROJECT_SOURCE_DIR}/vendor/discord_rpc/include/*.h"
+    "${PROJECT_SOURCE_DIR}/vendor/cef/include/*.h"
 )
 
 
-set(DISCORD debug discord-rpcd optimized discord-rpc)
-
 set(SERVER_LIBRARIES)
-set(CLIENT_LIBRARIES d3d9 d3dx9 dxgi dinput8 dxguid detours ${DISCORD})
-set(LAUNCHER_LIBRARIES Psapi steam_api)
+set(LAUNCHER_LIBRARIES psapi steam_api)
+set(CLIENT_LIBRARIES
+    ws2_32
+    winmm
+    d3d9
+    d3dx9
+    dxgi
+    dinput8
+    dxguid
+    detours
+    discord-rpc
+    libcef
+    libcef_dll_wrapper
+)
 
 if (WIN32)
     # windows libraries for enet
-    set(SERVER_LIBRARIES ${SERVER_LIBRARIES} Ws2_32 Winmm)
-    set(CLIENT_LIBRARIES ${CLIENT_LIBRARIES} Ws2_32 Winmm)
+    set(SERVER_LIBRARIES ${SERVER_LIBRARIES} ws2_32 winmm)
 elseif (UNIX)
     # unix math library for us
     set(SERVER_LIBRARIES ${SERVER_LIBRARIES} m pthread dl)
-    set(CLIENT_LIBRARIES ${CLIENT_LIBRARIES} m pthread dl)
 endif()
 
 ###
@@ -121,11 +133,20 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(client PROPERTIES LINK_FLAGS_DEBUG "/SAFESEH:NO")
     set_target_properties(client PROPERTIES LINK_FLAGS_RELEASE "/SAFESEH:NO")
 
+    # ADD_WINDOWS_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}" "${CEF_TARGET}" "exe")
+
     ## tha lancunha
     add_executable(launcher "${PROJECT_SOURCE_DIR}/launcher/launcher.cpp")
     target_link_libraries(launcher ${LAUNCHER_LIBRARIES})
     set_target_properties(launcher PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
     set_target_properties(launcher PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+
+    add_executable(cef_worker "${PROJECT_SOURCE_DIR}/client/cef_worker.cpp")
+    target_link_libraries(cef_worker libcef libcef_dll_wrapper)
+
+    set_target_properties(cef_worker PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+    set_target_properties(cef_worker PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+    set_target_properties(cef_worker PROPERTIES LINK_FLAGS "/ignore:4099")
 endif()
 
 ## tha servera
@@ -133,13 +154,36 @@ add_executable(server ${SERVER_FILES})
 target_link_libraries(server ${SERVER_LIBRARIES})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    # if (WIN32)
+    #     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /MANIFEST:NO")
+    # endif()
+
     add_custom_command(TARGET client POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
+    )
+
+    add_custom_command(TARGET cef_worker POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/cef_worker.exe" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
     )
 
     add_custom_command(TARGET launcher POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/launcher.exe" "${CMAKE_CURRENT_SOURCE_DIR}/binary/"
     )
+
+    add_custom_command(
+        TARGET client
+        POST_BUILD
+        COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}\\client\\manifest.xml\" -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/binary/client.dll"\;\#2
+        COMMENT "Adding manifest..."
+    )
+
+    add_custom_command(
+        TARGET cef_worker
+        POST_BUILD
+        COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}\\client\\manifest.xml\" -outputresource:"${CMAKE_CURRENT_SOURCE_DIR}/binary/cef_worker.exe"\;\#1
+        COMMENT "Adding manifest..."
+    )
+
 endif()
 
 add_custom_command(TARGET server POST_BUILD
@@ -168,6 +212,7 @@ if(MSVC)
     GroupSources(vendor/m2sdk)
     GroupSources(vendor/nuklear)
     GroupSources(vendor/discord_rpc)
+    GroupSources(vendor/cef)
     GroupSources(launcher)
 endif()
 

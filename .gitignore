@@ -28,6 +28,8 @@ binary/*
 !binary/steam_api.dll
 !binary/m2o-2clients.exe
 
+vendor/dullahan/Debug/libcef.dll.pdb
+
 # os stuff
 .DS_Store
 Thumbs.db

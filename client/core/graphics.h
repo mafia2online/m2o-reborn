@@ -56,7 +56,9 @@ void graphics_world_to_screen(vec3_t *screen, vec3_t world) {
 
     screen->x = viewport.X + (1.0f + vec.x) * viewport.Width / 2.0f;
     screen->y = viewport.Y + (1.0f - vec.y) * viewport.Height / 2.0f;
-    screen->z = viewport.MinZ + vec.z * (viewport.MaxZ - viewport.MinZ);
+    // screen->z = viewport.MinZ + vec.z * (viewport.MaxZ - viewport.MinZ);
+    screen->z = world.z * mat._33 + world.y * mat._23 + world.x * mat._13 + mat._43;
+
 }
 
 // =======================================================================//
@@ -133,7 +135,7 @@ void graphics_device_lost(IDirect3DDevice9 * pDevice) {
  * @param pDevice
  * @param pPresentationParameters
  */
-void graphics_device_reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
+void graphics_device_reset(IDirect3DDevice9 *pDevice, D3DPRESENT_PARAMETERS *pPresentationParameters) {
     mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
 
     mod.graphics.device = pDevice;
@@ -287,4 +289,14 @@ inline void graphics_device_render(void) {
 
     pStateBlock->Apply();
     pStateBlock->Release();
+
+}
+
+
+void graphics_page_render(const unsigned char* pixels, int x, int y, const int width, const int height) {
+    if (!mod.window || !nk_ctx) {
+        return;
+    }
+
+
 }

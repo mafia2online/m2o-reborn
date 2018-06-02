@@ -20,6 +20,8 @@ void mod_entity_interpolate(librg_ctx_t *, librg_entity_t *);
 void mod_user_name_set(librg_message_t *);
 void mod_on_user_message(librg_message_t *);
 
+CefRefPtr<CefMinimal> cm;
+
 /**
  * Game initialization event
  * World loaded, and we are ready to be telerpoted
@@ -50,10 +52,20 @@ void mod_game_init() {
     module_car_init();
 
     discord_init();
+
+    int x, y;
+    graphics_dimensions(&x, &y);
+
+    cm = new CefMinimal();
+    cm->init(0, nullptr);
+    // cm->navigate("about:blank");
+    cm->navigate("https://www.youtube.com/embed/1MGNw-Y2QPk?autoplay=1");
+
 }
 
 void mod_game_stop() {
     discord_free();
+    cm->shutdown();
 }
 
 static std::vector<M2::C_Entity*> swag;
@@ -63,6 +75,10 @@ static std::vector<M2::C_Entity*> swag;
  * takes about ~16 ms per tick
  */
 void mod_game_tick() {
+    if (cm) {
+        cm->update();
+    }
+
     mod.last_delta  = (zpl_time_now() - mod.last_update);
     mod.last_update = zpl_time_now();
 
@@ -75,6 +91,17 @@ void mod_game_tick() {
     if (GetAsyncKeyState(VK_F1) & 0x1) {
         mod.input_blocked = !mod.input_blocked;
     }
+
+    if (GetAsyncKeyState(VK_F2) & 0x1) {
+        cm->clickCenter();
+        return;
+    }
+
+    if (GetAsyncKeyState(VK_F12) & 0x1) {
+        mod_exit("pressed f12");
+        return;
+    }
+
     /* connect to the server */
     if (GetAsyncKeyState(VK_F5) & 0x1 && !mod.spawned) {
         librg_network_start(ctx, { 27010, "localhost" });
@@ -161,7 +188,7 @@ void mod_connected(librg_event_t *event) {
     auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
 
     // #if _DEBUG
-    mod.state = MOD_DEBUG_STATE;
+    mod.state = MOD_STUFF_STATE;
     // #else
     // mod.state = MOD_CONNECTED_STATE;
     // #endif
