@@ -15,7 +15,7 @@
 class m2o_module : public M2::C_TickedModule {
 public:
     void init(M2::I_TickedModuleCallEventContext &);
-    void tick(M2::I_TickedModuleCallEventContext&);
+    void tick(M2::I_TickedModuleCallEventContext &);
     void load_start(M2::I_TickedModuleCallEventContext &);
     void load_finish(M2::I_TickedModuleCallEventContext &);
 };
@@ -70,7 +70,6 @@ bool mod_connected() {
 }
 
 void mod_respawn() {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(0.5); /* 0.0 .. 1.0 - time of the day */
 
     auto ped = get_ped(mod.player);
@@ -148,9 +147,9 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         mod.player = event->entity;
         mod.player->user_data = ped;
 
-        // // send our nickname
+        // send our nickname
         // mod_request_username_change(event->entity->id, title_state_data.username_input);
-        // mod_player_spawn();
+        mod_respawn();
     });
 
     librg_event_add(ctx, LIBRG_CONNECTION_REFUSE, [](librg_event_t *event) {
@@ -206,18 +205,17 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_ADD, [](librg_event_t *event) {
         mod_log("[info] adding an entity %d to clientstream\n", event->entity->id);
         mod.stats.streamed_entities++;
+
         event->entity->flags &= ~MOD_ENTITY_INTERPOLATED;
     });
 
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, [](librg_event_t *event) {
         mod_log("[info] removing an entity %d from clientstream\n", event->entity->id);
-
         mod.stats.streamed_entities--;
+
         switch (event->entity->type) {
             case TYPE_PED:
-            case TYPE_CAR:
-                event->entity->flags |= MOD_ENTITY_INTERPOLATED;
-                break;
+            case TYPE_CAR: event->entity->flags |= MOD_ENTITY_INTERPOLATED; break;
         }
     });
 
@@ -237,7 +235,7 @@ void m2o_module::load_start(M2::I_TickedModuleCallEventContext &) {
 
 void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
     mod_log("[GameModule]: EventLoadingFinished\n");
-    std::thread(mod_respawn).detach();
+    std::thread([](){ std::this_thread::sleep_for(std::chrono::milliseconds(1500)); }).detach();
 }
 
 void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
@@ -257,7 +255,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 static int foo = 0;
     if (x != 0 && !mod_connected() && !foo) {
         foo = 1;
-        mod_connect("127.0.0.1", 27010);
+        mod_connect("localhost", 27010);
     }
 
     // discord_update_presence();
