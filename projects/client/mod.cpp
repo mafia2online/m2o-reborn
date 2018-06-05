@@ -74,13 +74,13 @@ void mod_respawn() {
 
     auto ped = get_ped(mod.player);
 
-   /* if (M2::C_SDSLoadingTable::Get()) {
-        M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_joe_load");
-        M2::C_SDSLoadingTable::Get()->ActivateStreamMapLine("free_summer_load");
+    if (M2::C_SDSLoadingTable::Get()) {
+        M2::C_SDSLoadingTable::Get()->ProcessLine("free_joe_load");
+        M2::C_SDSLoadingTable::Get()->ProcessLine("free_summer_load");
 
         M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
         mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_late_afternoon");
-    }*/
+    }
 
     /* Disable ambiant peds */
     M2::Wrappers::SwitchFarAmbiants(false);
