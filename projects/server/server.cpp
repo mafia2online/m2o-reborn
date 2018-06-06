@@ -1,13 +1,19 @@
-#define MOD_SERVER
-#include "includes.h"
+#define M2O_SERVER
+#include "m2o_config.h"
+
+#include <string>
+#include <functional>
+
+#define LIBRG_IMPLEMENTATION
+#include "librg.h"
+#include "librg_ext.h"
 
 #if defined(ZPL_SYSTEM_WINDOWS)
 #include <clocale>
 #endif
 
 // shared
-#include "components.h"
-#include "extensions.h"
+#include "m2o_types.h"
 
 struct m2o_api_vtable;
 struct mod_t {
@@ -70,11 +76,11 @@ int main() {
         "==                                              ==\n" \
         "==================================================\n";
     mod_log("%s", test);
-    mod_log("[info] server version: %s\n", MOD_VERSION_STRING);
+    mod_log("[info] server version: %s\n", M2O_VERSION_STRING);
 
     librg_option_set(LIBRG_PLATFORM_ID, 218);
-    librg_option_set(LIBRG_PLATFORM_BUILD, MOD_VERSION_NUMBER);
-    librg_option_set(LIBRG_PLATFORM_PROTOCOL, MOD_VERSION_PROTOCOL);
+    librg_option_set(LIBRG_PLATFORM_BUILD, M2O_VERSION_NUMBER);
+    librg_option_set(LIBRG_PLATFORM_PROTOCOL, M2O_VERSION_PROTOCOL);
 
     // allocate ctx
     ctx = new librg_ctx_t;
@@ -84,7 +90,7 @@ int main() {
     ctx->mode            = LIBRG_MODE_SERVER;
     ctx->tick_delay      = 64.0f;
     ctx->world_size      = zplm_vec3f(5000.0f, 5000.0f, 0.0f);
-    ctx->max_entities    = MOD_ENTITY_LIMIT;
+    ctx->max_entities    = M2O_ENTITY_LIMIT;
     ctx->max_connections = 1000;
 
     librg_address_t address = { 27010, NULL };
