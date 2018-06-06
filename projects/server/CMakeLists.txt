@@ -5,6 +5,7 @@ file(GLOB_RECURSE SERVER_FILES
     "${PROJECT_SOURCE_DIR}/*.cpp"
     "${PROJECT_SOURCE_DIR}/*.h"
     "${PROJECT_SOURCE_DIR}/../shared/*.h"
+    "${PROJECT_SOURCE_DIR}/../../vendor/librg/include/*.h"
 )
 
 add_executable(server ${SERVER_FILES})
@@ -28,4 +29,8 @@ if (MSVC)
     add_custom_command(TARGET server POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server.exe" "${CMAKE_SOURCE_DIR}/binary/"
     )
+
+    GroupSourcesNamed(server ../server)
+    GroupSourcesNamed(shared ../shared)
+    GroupSourcesNamed(vendor ../../vendor)
 endif()

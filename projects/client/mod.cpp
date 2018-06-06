@@ -5,6 +5,7 @@
 #include <future>
 #include <functional>
 
+#define LIBRG_IMPLEMENTATION
 #include "librg.h"
 #include "librg_ext.h"
 #include "m2sdk.h"
