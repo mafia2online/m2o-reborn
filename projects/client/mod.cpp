@@ -75,7 +75,7 @@ void mod_install() {
         data->arg5 = (void *)true;
         // data->arg5 = (void *)false; // to block entering the car
 
-        mod_log("[game-event] ped request vehicle enter (%s)\n" ((bool)data->arg5) ? "granted" : "denied");
+        mod_log("[game-event] ped request vehicle enter (%s)\n", ((bool)data->arg5) ? "granted" : "denied");
     });
 
     M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event *data) {
@@ -107,6 +107,14 @@ void mod_disconnect() {
 
 bool mod_connected() {
     return librg_is_connected(ctx);
+}
+
+void mod_nickname_set(const char *username) {
+    mod_assert(username);
+    mod_message_send(ctx, MOD_USER_SET_NAME, [&](librg_data_t *data) {
+        librg_data_wu8(data, zpl_strlen(username));
+        librg_data_wptr(data, (void *)username, zpl_strlen(username));
+    });
 }
 
 void mod_respawn() {
@@ -187,8 +195,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         mod.player = event->entity;
         mod.player->user_data = ped;
 
-        // send our nickname
-        // mod_request_username_change(event->entity->id, title_state_data.username_input);
+        mod_nickname_set("the playah");
         mod_respawn();
     });
 
@@ -259,7 +266,20 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         }
     });
 
-    // librg_network_add(ctx, MOD_USER_SET_NAME, mod_user_name_set);
+    librg_network_add(ctx, MOD_USER_SET_NAME, [](librg_message_t *msg) {
+        auto entity = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
+        mod_assert(entity);
+
+        u8 strsize = librg_data_ru8(msg->data);
+        auto ped   = get_ped(entity);
+        librg_data_rptr(msg->data, ped->name, strsize);
+
+        // client-specific
+        zpl_utf8_to_ucs2((u16 *)ped->cached_name, strsize, (const u8 *)ped->name);
+
+        mod_log("set new name for client %u: %s\n", entity->id, ped->name);
+    });
+
     // librg_network_add(ctx, MOD_USER_MESSAGE, mod_on_user_message);
 
     // call inits for modules

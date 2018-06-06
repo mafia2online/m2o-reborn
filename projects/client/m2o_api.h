@@ -29,6 +29,7 @@ void mod_log(const char* format, ...);
 void mod_connect(const char *host, int port);
 void mod_disconnect();
 bool mod_connected();
+void mod_nickname_set(const char *name);
 // mod_message_send()
 
 void input_init();
