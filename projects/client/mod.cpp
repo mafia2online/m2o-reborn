@@ -12,29 +12,7 @@
 #include "m2o_api.h"
 #include "m2o_types.h"
 
-class m2o_module : public M2::C_TickedModule {
-public:
-    void init(M2::I_TickedModuleCallEventContext &);
-    void tick(M2::I_TickedModuleCallEventContext &);
-    void load_start(M2::I_TickedModuleCallEventContext &);
-    void load_finish(M2::I_TickedModuleCallEventContext &);
-};
-
-static m2o_module m2o;
-static librg_ctx_t *ctx;
-
-struct {
-    librg_entity_t *player;
-
-    // game tick props
-    f64 last_update;
-    f64 last_delta;
-
-    struct {
-        i32 streamed_entities;
-    } stats;
-} mod;
-
+#include "core/mod.h"
 #include "core/vehicle.h"
 #include "core/pedestrian.h"
 
@@ -54,6 +32,68 @@ void mod_install() {
     tmm->AddAction(M2::TickedModuleEvent::EVENT_TICK,             400,  &m2o, (tc)(&m2o_module::tick), -1.0f, 0, 0);
     tmm->AddAction(M2::TickedModuleEvent::EVENT_LOADING_STARTED,  1720, &m2o, (tc)(&m2o_module::load_start), -1.0f, 0, 0);
     tmm->AddAction(M2::TickedModuleEvent::EVENT_LOADING_FINISHED, 1720, &m2o, (tc)(&m2o_module::load_finish), -1.0f, 0, 0);
+
+    M2::AttachHandler(M2_EVENT_MOD_MESSAGE, [](m2sdk_event *data) {
+        auto message = (int)data->arg1;
+
+        switch (message) {
+            case M2::E_PlayerMessage::MESSAGE_MOD_ENTER_CAR: {
+                mod_log("[game-event] ped start to enter vehicle\n");
+            } break;
+
+            case M2::E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR: {
+                mod_log("[game-event] Start to breakin vehicle\n");
+            } break;
+
+            case M2::E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR: {
+                mod_log("[game-event] Start to leave car\n");
+
+                librg_event_t event = { 0 }; event.entity = mod.player;
+                librg_event_trigger(ctx, MOD_CAR_EXIT_START, &event);
+            } break;
+        }
+    });
+
+    M2::AttachHandler(M2_EVENT_GAME_MESSAGE, [](m2sdk_event *data) {
+        auto message = (M2::C_EntityMessage *)data->arg1;
+
+        switch (message->m_dwMessage) {
+            case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE: {
+                mod_log("[game-event] Enter/Exit Vehicle done\n");
+
+                librg_event_t event = { 0 }; event.entity = mod.player;
+                librg_event_trigger(ctx, MOD_CAR_INTERACTION_FINISH, &event);
+            } break;
+
+            default: {
+                mod_log("[game-event] unknown event %d\n", (int)message->m_dwMessage);
+            } break;
+        }
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_ENTER_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+        // data->arg5 = (void *)false; // to block entering the car
+
+        mod_log("[game-event] ped request vehicle enter (%s)\n" ((bool)data->arg5) ? "granted" : "denied");
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event *data) {
+        auto player = (M2::C_Player2 *)data->arg1;
+        auto car    = (M2::C_Car *)data->arg2;
+        auto seat   = (int)data->arg3;
+
+        mod_log("[game-event] ped entering the car on seat: %d\n", seat);
+
+        librg_event_t event = { 0 };
+        u8 iseat = seat + 1;
+
+        event.entity = mod.player;
+        event.user_data = (void *)car;
+        event.data = (librg_data_t*)&iseat;
+
+        librg_event_trigger(ctx, MOD_CAR_ENTER_START, &event);
+    });
 }
 
 void mod_connect(const char *host, int port) {
@@ -257,6 +297,12 @@ static int foo = 0;
         foo = 1;
         mod_connect("localhost", 27010);
     }
+
+// static int bar = 0;
+//     if (x == 800 && bar == 0) {
+//         bar = 1;
+//         librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
+//     }
 
     // discord_update_presence();
 
