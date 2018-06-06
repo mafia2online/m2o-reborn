@@ -4,12 +4,14 @@
 #include "m2sdk.h"
 
 #define mod_assert ZPL_ASSERT
+m2sdk_callback g_gamemodule_callback = nullptr;
 
 // include source code parts
 #include "temp.hpp"
 #include "memory.hpp"
 #include "entity.hpp"
 #include "steamdrm.hpp"
+#include "gamehooks.hpp"
 
 // =======================================================================//
 // !
@@ -17,21 +19,22 @@
 // !
 // =======================================================================//
 
-m2sdk_callback g_gamemodule_callback = nullptr;
 std::unordered_map<m2sdk_event_id, m2sdk_callback_event> g_events;
 
 void M2::AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback) {
     g_events[id] = callback;
 }
 
-void m2sdk_event_trigger(m2sdk_event_id id, m2sdk_event *data) {
+void M2::DetachHandler(m2sdk_event_id id) {
+    g_events[id] = nullptr;
+}
+
+void M2::TriggerHandler(m2sdk_event_id id, m2sdk_event *data) {
     auto pair = g_events.find(id);
-    if (pair != g_events.end()) {
+    if (pair != g_events.end() && pair->second) {
         pair->second(data);
     }
 }
-
-#include "gamehooks.hpp"
 
 void M2::Initialize(m2sdk_callback callback) {
     g_gamemodule_callback = callback;

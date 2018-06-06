@@ -13,7 +13,7 @@ void __declspec(naked) GameStartDriveHook__1() {
     __asm pushad;
     {
         m2sdk_event event = { 0 }; event.arg1 = (void *)M2::E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR;
-        m2sdk_event_trigger(M2_EVENT_MOD_MESSAGE, &event);
+        M2::TriggerHandler(M2_EVENT_MOD_MESSAGE, &event);
     }
     __asm popad;
     __asm jmp[GameStartDrive__Return];
@@ -24,7 +24,7 @@ void __declspec(naked) GameStartDriveHook__2() {
     __asm pushad;
     {
         m2sdk_event event = { 0 }; event.arg1 = (void *)M2::E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR;
-        m2sdk_event_trigger(M2_EVENT_MOD_MESSAGE, &event);
+        M2::TriggerHandler(M2_EVENT_MOD_MESSAGE, &event);
     }
     __asm popad;
     __asm jmp[GameStartDrive_2__Return];
@@ -36,7 +36,7 @@ void __declspec(naked) GameStartDriveHook__3() {
     __asm pushad
     {
         m2sdk_event event = { 0 }; event.arg1 = (void *)M2::E_PlayerMessage::MESSAGE_MOD_ENTER_CAR;
-        m2sdk_event_trigger(M2_EVENT_MOD_MESSAGE, &event);
+        M2::TriggerHandler(M2_EVENT_MOD_MESSAGE, &event);
     }
     __asm popad;
     __asm jmp[GameStartDrive_3__Return];
@@ -47,7 +47,7 @@ void __declspec(naked) GameEndDriveHook() {
     __asm pushad;
     {
         m2sdk_event event = { 0 }; event.arg1 = (void *)M2::E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR;
-        m2sdk_event_trigger(M2_EVENT_MOD_MESSAGE, &event);
+        M2::TriggerHandler(M2_EVENT_MOD_MESSAGE, &event);
     }
     __asm popad;
     __asm jmp[GameEndDrive__Return];
@@ -60,7 +60,7 @@ void game_player_enter_car(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
         event.arg3 = (void *)seat;
     }
 
-    m2sdk_event_trigger(M2_EVENT_CAR_ENTER, &event);
+    M2::TriggerHandler(M2_EVENT_CAR_ENTER, &event);
 }
 
 DWORD CPlayer__EnterCar__Call = 0x42CAC0;
@@ -92,7 +92,7 @@ bool player_request_vehicle_enter(M2::C_Car *car) {
         event.arg1 = (void *)car;
     }
 
-    m2sdk_event_trigger(M2_EVENT_CAR_ENTER_REQUEST, &event);
+    M2::TriggerHandler(M2_EVENT_CAR_ENTER_REQUEST, &event);
     return (bool)event.arg5;
 }
 
@@ -169,7 +169,7 @@ int OnReceiveMessageHook(void *lua, void *a2, const char *function, M2::C_Entity
                 if (entity) {
                     if (pMessage->m_dwReceiveGUID == entity->m_dwGUID) {
                         m2sdk_event event = { 0 }; event.arg1 = (void *)pMessage;
-                        m2sdk_event_trigger(M2_EVENT_GAME_MESSAGE, &event);
+                        M2::TriggerHandler(M2_EVENT_GAME_MESSAGE, &event);
                     }
                 }
             }

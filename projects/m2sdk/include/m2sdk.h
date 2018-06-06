@@ -53,6 +53,7 @@ namespace M2 {
 
     void AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback);
     void DetachHandler(m2sdk_event_id id);
+    void TriggerHandler(m2sdk_event_id id, m2sdk_event *data);
 
     template < typename T, typename I, M2_Address A > class GameClassWrapperStatic {
     public:
