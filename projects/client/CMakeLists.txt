@@ -10,7 +10,6 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/../../vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/nuklear/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/discord/include/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/cef/include/*.h"
 )
 
 set(LIBRARY_FOLDERS
@@ -29,10 +28,6 @@ set(LIBRARIES m2sdk discord-rpc)
 
 if (WIN32)
     include(../../misc/cmake/FindDirectX.cmake)
-
-    if (NOT DirectX_D3DX9_INCLUDE_FOUND)
-        message("Cannot find D3DX9 (DirectX 9 extenions). Make sure you installed DirectX SDK August 2010.")
-    endif()
 
     find_path(D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
     find_path(D3DX9_LIBRARY d3dx9.lib HINTS ${DirectX_LIB_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
@@ -57,6 +52,8 @@ elseif (UNIX)
 endif()
 
 if (M2O_CEF)
+    message("-- M2O_CEF enabled, linking with CEF ...")
+
     set(LIBRARY_FOLDERS ${LIBRARY_FOLDERS} ${PROJECT_SOURCE_DIR}/../../vendor/cef/${CMAKE_BUILD_TYPE}/)
     set(INCLUDE_FOLDERS ${INCLUDE_FOLDERS}
         ${PROJECT_SOURCE_DIR}/../../vendor/cef

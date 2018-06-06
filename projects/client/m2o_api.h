@@ -1,3 +1,6 @@
+#ifndef M2O_API_H
+#define M2O_API_H
+
 void gfx_init();
 void gfx_free();
 // gfx_text_draw()
@@ -47,3 +50,5 @@ bool input_key_up();
 
 void platform_init();
 void platform_free();
+
+#endif // M2O_API_H
