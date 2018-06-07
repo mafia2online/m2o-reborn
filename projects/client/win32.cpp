@@ -38,7 +38,7 @@ LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 void platform_free() {}
 void platform_init() {
     HWND hWnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
-    SetWindowText(hWnd, "m2o-reborn");
+    SetWindowText(hWnd, M2O_VERSION_PRETTY);
 
     // hook the wind proc
     mod_wndproc_original = (wnd_wndproc_cb)SetWindowLongPtr(hWnd, GWL_WNDPROC, (LONG_PTR)mod_wndproc_hook);
@@ -126,7 +126,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserv
             zpl_file_seek(&debug_log, 0);
 
             mod_log("[info] attaching to thread (%x) ...\n", GetCurrentThreadId());
-            mod_log("[info] starting m2o-reborn v1.0.0 ...\n");
+            mod_log("[info] starting %s ...\n", M2O_VERSION_PRETTY);
 
             gfx_init(); /* attach gfx rendering hooks */
             vfs_init(); /* init vfs for file overrides */

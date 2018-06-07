@@ -186,13 +186,13 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
             }
         }
 
-        // if (nk_ctx && m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
-        //     if (_input_state.blocked && nk_ctx->active && nk_ctx->active->edit.active) {
-        //         for (usize i = 0; i < 256; i++) {
-        //             ((mod_di_keys_t*)lpvData)->state[i] = 0;
-        //         }
-        //     }
-        // }
+        if (m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
+            if (_input_state.blocked /*&& nk_ctx->active && nk_ctx->active->edit.active*/) {
+                for (usize i = 0; i < 256; i++) {
+                    ((mod_di_keys_t*)lpvData)->state[i] = 0;
+                }
+            }
+        }
     }
 
     return hResult;
