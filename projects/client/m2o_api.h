@@ -38,8 +38,10 @@ void mod_nickname_set(const char *name);
 void input_init();
 void input_free();
 void input_mouse_position(int *x, int *y);
+void input_block_set(bool value);
+bool input_block_get();
 // input_mouse_button()
-bool input_key_down();
+bool input_key_down(unsigned int key);
 bool input_key_up();
 // input_joy()
 

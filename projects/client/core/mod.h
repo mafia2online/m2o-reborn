@@ -16,6 +16,8 @@ struct {
     f64 last_update;
     f64 last_delta;
 
+    bool spawned;
+
     struct {
         i32 streamed_entities;
     } stats;

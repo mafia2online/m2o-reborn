@@ -87,4 +87,18 @@ void input_mouse_position(int *x, int *y) {
     *y = _input_state.mouse.y;
 }
 
-// void input_key_up()
+void input_block_set(bool value) {
+    _input_state.blocked = value;
+}
+
+bool input_block_get() {
+    return _input_state.blocked;
+}
+
+bool input_key_up(u32 key) {
+    return !input_key_down(key);
+}
+
+bool input_key_down(u32 key) {
+    return GetAsyncKeyState(key) & 0x1;
+}

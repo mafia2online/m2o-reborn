@@ -311,24 +311,41 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         }
     });
 
-    int x, y; input_mouse_position(&x, &y);
-    // mod_log("mouse pos: [%d, %d]\n", x, y);
-static int foo = 0;
-    if (x != 0 && !mod_connected() && !foo) {
-        foo = 1;
-        mod_connect("localhost", 27010);
+    /* show/hide mouse */
+    if (input_key_down(VK_F1)) {
+        input_block_set(!input_block_get());
     }
 
-// static int bar = 0;
-//     if (x == 800 && bar == 0) {
-//         bar = 1;
-//         librg_message_send(ctx, MOD_CAR_CREATE, nullptr, 0);
-//     }
+    /* connect to the server */
+    if (input_key_down(VK_F5) && !mod.spawned) {
+        mod_connect("localhost", 27010);
+        mod.spawned = true;
+    }
 
-    // discord_update_presence();
+    static M2::C_Entity *ent;
+    if (input_key_down(VK_F3) && mod.spawned) {
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 0);
+        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+        ent->SetPosition(pos);
+        mod_log("Ped created\n");
+    }
 
-    /* show/hide mouse */
-    // if (input_key_down(VK_F1)) {
-    //     mod.input_blocked = !mod.input_blocked;
-    // }
+
+    if (input_key_down(VK_F4) && mod.spawned && ent) {
+        vec3_t dir = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetDir();
+        M2::S_HumanCommandMoveDir *moveCMD = new M2::S_HumanCommandMoveDir;
+        moveCMD->x = dir.x;
+        moveCMD->y = dir.y;
+        moveCMD->z = dir.z;
+        reinterpret_cast<M2::C_Human2*>(ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCMD);
+
+        mod_log("Command added\n");
+    }
+
+    if (input_key_down(VK_F6) && mod.spawned) {
+        void *command;
+        void *command2;
+        command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
+        mod_log("0x%p\n0x%p\n", command, command2);
+    }
 }

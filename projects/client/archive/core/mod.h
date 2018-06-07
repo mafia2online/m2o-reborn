@@ -89,7 +89,7 @@ void mod_game_tick() {
 
     /* show/hide mouse */
     if (GetAsyncKeyState(VK_F1) & 0x1) {
-        mod.input_blocked = !mod.input_blocked;
+        input_block_set(!input_block_get());
     }
 
     if (GetAsyncKeyState(VK_F2) & 0x1) {
