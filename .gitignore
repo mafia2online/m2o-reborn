@@ -18,7 +18,6 @@ client.dir/*
 server.dir/*
 launcher.dir/*
 .vs/*
-Win32/
 
 binary/*
 !binary/files/
