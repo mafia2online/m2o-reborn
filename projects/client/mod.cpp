@@ -296,7 +296,13 @@ void m2o_module::load_start(M2::I_TickedModuleCallEventContext &) {
 
 void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
     mod_log("[GameModule]: EventLoadingFinished\n");
-    std::thread([](){ std::this_thread::sleep_for(std::chrono::milliseconds(1500)); }).detach();
+    std::thread([]() {
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(1500)
+        );
+
+        mod_respawn();
+    }).detach();
 }
 
 void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
