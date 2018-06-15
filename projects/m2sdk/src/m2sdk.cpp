@@ -112,6 +112,7 @@ void M2::Initialize(m2sdk_callback callback) {
 
     // Disable DLC loadings (NONO, WE NEED DLCs !)
     //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
+    //
 }
 
 void M2::Free() {}
