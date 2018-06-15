@@ -1,1 +1,3 @@
+src/*
+CMakeLists.txt
 .DS_store
