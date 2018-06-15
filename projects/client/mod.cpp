@@ -334,13 +334,12 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     static M2::C_Entity *ent;
-    if (input_key_down(VK_F3) && mod.spawned) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 0);
+    if (input_key_down(VK_F3)) {
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 10);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
     }
-
 
     if (input_key_down(VK_F4) && mod.spawned && ent) {
         vec3_t dir = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetDir();
@@ -353,10 +352,25 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         mod_log("Command added\n");
     }
 
-    if (input_key_down(VK_F6) && mod.spawned) {
-        void *command;
-        void *command2;
-        command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
-        mod_log("0x%p\n0x%p\n", command, command2);
+    // if (input_key_down(VK_F6) && mod.spawned) {
+    //     void *command;
+    //     void *command2;
+    //     command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
+    //     mod_log("0x%p\n0x%p\n", command, command2);
+    // }
+
+    if (input_key_down(VK_F7)) {
+        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar->SetVehicleDirty(100.0);
+    }
+
+    if (input_key_down(VK_F6)) {
+        M2::C_Car *car = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
+        if (!car) {
+            mod_log("null ptr\n");
+            return;
+        }
+
+        float level = *(float*)(car + 0xE8C);
+        mod_log("level : %d\n", level);
     }
 }
