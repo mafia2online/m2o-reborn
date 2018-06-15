@@ -322,6 +322,11 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         input_block_set(!input_block_get());
     }
 
+    /* show/hide mouse */
+    if (input_key_down(VK_F2)) {
+        mod_message_send(ctx, MOD_CAR_CREATE, nullptr);
+    }
+
     /* connect to the server */
     if (input_key_down(VK_F5) && !mod.spawned) {
         mod_connect("localhost", 27010);
