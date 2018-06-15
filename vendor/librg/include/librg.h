@@ -347,7 +347,7 @@ LIBRG_API void librg_entity_iterate(struct librg_ctx_t *ctx, u64 flags, librg_en
  * C based entity iteration macro
  */
 #define librg_entity_iteratex(ctx, cflags, cname, code) do { \
-    for (int _ent = 0, _valid = 0; _ent < ctx->max_entities && _valid < ctx->entity.count; ++_ent) { \
+    for (u32 _ent = 0, _valid = 0; _ent < ctx->max_entities && _valid < ctx->entity.count; ++_ent) { \
         if ((ctx->entity.list[_ent].flags & (LIBRG_ENTITY_ALIVE | cflags)) == (LIBRG_ENTITY_ALIVE | cflags)) { \
             _valid++; librg_entity_id cname = _ent; code; \
         } \
