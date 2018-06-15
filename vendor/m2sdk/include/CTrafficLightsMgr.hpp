@@ -70,5 +70,10 @@ namespace M2
         {
             return Mem::InvokeFunction<Mem::call_this, int>(0xA18EA0, this);
         }
+
+        void Update(unsigned long unk, float unk2)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0xA1CBF0, this, unk, unk2);
+        }
     };
 };

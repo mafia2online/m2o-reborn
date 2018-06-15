@@ -309,6 +309,16 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D040, this);
 		}
 
+        void ScriptModelToHands(int model, int hand, int unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0xD6D8A0, this, model, hand, unk);
+        }
+
+        void ScriptModelToMouth(int model)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0xD6DAE0, this, model);
+        }
+
         void ScriptSetControlStyleStr(const char *style)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x91DE50, this, style);

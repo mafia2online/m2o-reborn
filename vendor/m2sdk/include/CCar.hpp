@@ -244,6 +244,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x0A151F0, this);
         }
 
+        void SetVehicleDirty(float level)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9CCB80, this, level);
+        }
+
         void SetWipersOn(bool toggle)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x447650, this, toggle);

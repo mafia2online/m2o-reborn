@@ -39,6 +39,7 @@ namespace M2
 
     struct S_HumanCommandMoveDir
     {
+        pad(S_HumanCommandMoveDir, pad0, 0x50);
         float x;
         float y;
         float z;
@@ -88,7 +89,7 @@ namespace M2
 
         void *GetCurrentMoveCommand(void *unk)
         {
-            return Mem::InvokeFunction<Mem::call_this, void *>(0x94D540, this, unk);
+            return Mem::InvokeFunction<Mem::call_this, void *>(0x94D540, this, &unk);
         }
 
         vec3_t GetDir()

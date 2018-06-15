@@ -221,6 +221,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x11F7820, this, &primary, &secondary);
         }
 
+        void SetVehicleDirty(float level)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x9BBE40, this, level);
+        }
+
 		void SetVehicleFlags(int unk, int unk2)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x1263620, this, unk, unk2);

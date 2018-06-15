@@ -82,9 +82,9 @@ void mod_game_tick() {
     }
 
     static M2::C_Entity *ent;
-    if (GetAsyncKeyState(VK_F3) & 0x1 && mod.spawned)
+    if (GetAsyncKeyState(VK_F3) & 0x1)
     {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 0);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 10);
 
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
 
@@ -105,11 +105,20 @@ void mod_game_tick() {
         mod_log("Command added\n");
     }
 
-    if (GetAsyncKeyState(VK_F6) & 0x1 && mod.spawned) {
-        void *command;
-        void *command2;
-       command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
-        mod_log("0x%p\n0x%p\n", command, command2);
+    if (GetAsyncKeyState(VK_F7) & 0x1)
+    {
+        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar->SetVehicleDirty(100.0);
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        M2::C_Car *car = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
+        if (!car) {
+            mod_log("null ptr\n");
+            return;
+        }
+
+        float level = *(float*)(car + 0xE8C);
+        mod_log("level : %d\n", level);
     }
 }
 
