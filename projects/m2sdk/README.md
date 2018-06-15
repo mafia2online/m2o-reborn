@@ -27,7 +27,7 @@ And add lib/m2sdk.lib to your linker.
 #include <m2sdk/m2sdk.h>
 
 void pluginRegisterCallback() {
-    printf("game pre init!\n");
+    printf("game pre init !\n");
 
     M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event *data) {
         auto player = (M2::C_Player2 *)data->arg1;

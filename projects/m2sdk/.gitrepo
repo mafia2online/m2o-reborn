@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:inlife/m2sdk.git
 	branch = master
-	commit = b6717bf1f2afd7c500241217b89d4649a12c6c04
-	parent = 28fa3e55412d579c648d2197ec9f68ca3fc25f4d
+	commit = f9e9550417f25f94e2c18b0d2c3728b90d405dff
+	parent = ea4169845aedfdc6347fa8dd57287f1e43c8f225
 	cmdver = 0.3.1
