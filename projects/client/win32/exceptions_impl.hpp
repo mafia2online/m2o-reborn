@@ -59,110 +59,110 @@ long WINAPI exception_callback(_EXCEPTION_POINTERS *pExceptionInfo) {
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
-    exception_writeln(&file, "Exception at address: 0x%p\n", pExceptionInfo->ExceptionRecord->ExceptionAddress);
+    exception_writeln(&file, "Exception at address: 0x%p\r\n", pExceptionInfo->ExceptionRecord->ExceptionAddress);
 
     if (bFoundModule) {
-        exception_writeln(&file, "Exception in module: %s (+0x%p)\n", szModuleName, dwAddressOfExceptionInModule);
+        exception_writeln(&file, "Exception in module: %s (+0x%p)\r\n", szModuleName, dwAddressOfExceptionInModule);
     }
 
     switch(pExceptionInfo->ExceptionRecord->ExceptionCode) {
         case EXCEPTION_ACCESS_VIOLATION: {
-            exception_writeln(&file, "Exception code: EXCEPTION_ACCESS_VIOLATION\n");
+            exception_writeln(&file, "Exception code: EXCEPTION_ACCESS_VIOLATION\r\n");
 
             switch(pExceptionInfo->ExceptionRecord->ExceptionInformation[0])
             {
                 case 0:
-                    exception_writeln(&file, "Attempted to read from: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Attempted to read from: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 case 1:
-                    exception_writeln(&file, "Attempted to write to: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Attempted to write to: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 case 8:
-                    exception_writeln(&file, "Data Execution Prevention (DEP) at: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Data Execution Prevention (DEP) at: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 default:
-                    exception_writeln(&file, "Unknown access violation at: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Unknown access violation at: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
             }
             break;
         }
 
-        case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: exception_writeln(&file, "Exception code: EXCEPTION_ARRAY_BOUNDS_EXCEEDED\n");break;
-        case EXCEPTION_BREAKPOINT: exception_writeln(&file, "Exception code: EXCEPTION_BREAKPOINT\n");break;
-        case EXCEPTION_DATATYPE_MISALIGNMENT: exception_writeln(&file, "Exception code: EXCEPTION_DATATYPE_MISALIGNMENT\n");break;
-        case EXCEPTION_FLT_DENORMAL_OPERAND: exception_writeln(&file, "Exception code: EXCEPTION_FLT_DENORMAL_OPERAND\n");break;
-        case EXCEPTION_FLT_DIVIDE_BY_ZERO: exception_writeln(&file, "Exception code: EXCEPTION_FLT_DIVIDE_BY_ZERO\n");break;
-        case EXCEPTION_FLT_INEXACT_RESULT: exception_writeln(&file, "Exception code: EXCEPTION_FLT_INEXACT_RESULT\n");break;
-        case EXCEPTION_FLT_INVALID_OPERATION: exception_writeln(&file, "Exception code: EXCEPTION_FLT_INVALID_OPERATION\n");break;
-        case EXCEPTION_FLT_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_FLT_OVERFLOW\n");break;
-        case EXCEPTION_FLT_STACK_CHECK: exception_writeln(&file, "Exception code: EXCEPTION_FLT_STACK_CHECK\n");break;
-        case EXCEPTION_FLT_UNDERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_FLT_UNDERFLOW\n");break;
-        case EXCEPTION_ILLEGAL_INSTRUCTION: exception_writeln(&file, "Exception code: EXCEPTION_ILLEGAL_INSTRUCTION\n");break;
+        case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: exception_writeln(&file, "Exception code: EXCEPTION_ARRAY_BOUNDS_EXCEEDED\r\n");break;
+        case EXCEPTION_BREAKPOINT: exception_writeln(&file, "Exception code: EXCEPTION_BREAKPOINT\r\n");break;
+        case EXCEPTION_DATATYPE_MISALIGNMENT: exception_writeln(&file, "Exception code: EXCEPTION_DATATYPE_MISALIGNMENT\r\n");break;
+        case EXCEPTION_FLT_DENORMAL_OPERAND: exception_writeln(&file, "Exception code: EXCEPTION_FLT_DENORMAL_OPERAND\r\n");break;
+        case EXCEPTION_FLT_DIVIDE_BY_ZERO: exception_writeln(&file, "Exception code: EXCEPTION_FLT_DIVIDE_BY_ZERO\r\n");break;
+        case EXCEPTION_FLT_INEXACT_RESULT: exception_writeln(&file, "Exception code: EXCEPTION_FLT_INEXACT_RESULT\r\n");break;
+        case EXCEPTION_FLT_INVALID_OPERATION: exception_writeln(&file, "Exception code: EXCEPTION_FLT_INVALID_OPERATION\r\n");break;
+        case EXCEPTION_FLT_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_FLT_OVERFLOW\r\n");break;
+        case EXCEPTION_FLT_STACK_CHECK: exception_writeln(&file, "Exception code: EXCEPTION_FLT_STACK_CHECK\r\n");break;
+        case EXCEPTION_FLT_UNDERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_FLT_UNDERFLOW\r\n");break;
+        case EXCEPTION_ILLEGAL_INSTRUCTION: exception_writeln(&file, "Exception code: EXCEPTION_ILLEGAL_INSTRUCTION\r\n");break;
         case EXCEPTION_IN_PAGE_ERROR: {
-            exception_writeln(&file, "Exception code: EXCEPTION_IN_PAGE_ERROR\n");
+            exception_writeln(&file, "Exception code: EXCEPTION_IN_PAGE_ERROR\r\n");
 
             switch(pExceptionInfo->ExceptionRecord->ExceptionInformation[0])
             {
                 case 0:
-                    exception_writeln(&file, "Attempted to read from: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Attempted to read from: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 case 1:
-                    exception_writeln(&file, "Attempted to write to: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Attempted to write to: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 case 8:
-                    exception_writeln(&file, "Data Execution Prevention (DEP) at: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Data Execution Prevention (DEP) at: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
 
                 default:
-                    exception_writeln(&file, "Unknown access violation at: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+                    exception_writeln(&file, "Unknown access violation at: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
                     break;
             }
 
-            exception_writeln(&file, "NTSTATUS: 0x%08X\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[2]);
+            exception_writeln(&file, "NTSTATUS: 0x%08X\r\n", pExceptionInfo->ExceptionRecord->ExceptionInformation[2]);
             break;
         }
 
-        case EXCEPTION_INT_DIVIDE_BY_ZERO: exception_writeln(&file, "Exception code: EXCEPTION_INT_DIVIDE_BY_ZERO\n");break;
-        case EXCEPTION_INT_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_INT_OVERFLOW\n");break;
-        case EXCEPTION_INVALID_DISPOSITION: exception_writeln(&file, "Exception code: EXCEPTION_INVALID_DISPOSITION\n");break;
-        case EXCEPTION_NONCONTINUABLE_EXCEPTION: exception_writeln(&file, "Exception code: EXCEPTION_NONCONTINUABLE_EXCEPTION\n");break;
-        case EXCEPTION_PRIV_INSTRUCTION: exception_writeln(&file, "Exception code: EXCEPTION_PRIV_INSTRUCTION\n");break;
-        case EXCEPTION_SINGLE_STEP: exception_writeln(&file, "Exception code: EXCEPTION_SINGLE_STEP\n");break;
-        case EXCEPTION_STACK_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_STACK_OVERFLOW\n");break;
-        case DBG_CONTROL_C: exception_writeln(&file, "Exception code: DBG_CONTROL_C (WTF?!)\n");break;
-        default: exception_writeln(&file, "Exception code: %08x\n", pExceptionInfo->ExceptionRecord->ExceptionCode);
+        case EXCEPTION_INT_DIVIDE_BY_ZERO: exception_writeln(&file, "Exception code: EXCEPTION_INT_DIVIDE_BY_ZERO\r\n");break;
+        case EXCEPTION_INT_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_INT_OVERFLOW\r\n");break;
+        case EXCEPTION_INVALID_DISPOSITION: exception_writeln(&file, "Exception code: EXCEPTION_INVALID_DISPOSITION\r\n");break;
+        case EXCEPTION_NONCONTINUABLE_EXCEPTION: exception_writeln(&file, "Exception code: EXCEPTION_NONCONTINUABLE_EXCEPTION\r\n");break;
+        case EXCEPTION_PRIV_INSTRUCTION: exception_writeln(&file, "Exception code: EXCEPTION_PRIV_INSTRUCTION\r\n");break;
+        case EXCEPTION_SINGLE_STEP: exception_writeln(&file, "Exception code: EXCEPTION_SINGLE_STEP\r\n");break;
+        case EXCEPTION_STACK_OVERFLOW: exception_writeln(&file, "Exception code: EXCEPTION_STACK_OVERFLOW\r\n");break;
+        case DBG_CONTROL_C: exception_writeln(&file, "Exception code: DBG_CONTROL_C (WTF?!)\r\n");break;
+        default: exception_writeln(&file, "Exception code: %08x\r\n", pExceptionInfo->ExceptionRecord->ExceptionCode);
     }
 
-    exception_writeln(&file, "\nRegisters:\n");
+    exception_writeln(&file, "\nRegisters:\r\n");
 
     if (pExceptionInfo->ContextRecord->ContextFlags & CONTEXT_SEGMENTS) {
-        exception_writeln(&file, "GS = 0x%p, FS = 0x%p, ES = 0x%p, DS = 0x%p\n", pExceptionInfo->ContextRecord->SegGs, pExceptionInfo->ContextRecord->SegFs, pExceptionInfo->ContextRecord->SegEs, pExceptionInfo->ContextRecord->SegDs);
+        exception_writeln(&file, "GS = 0x%p, FS = 0x%p, ES = 0x%p, DS = 0x%p\r\n", pExceptionInfo->ContextRecord->SegGs, pExceptionInfo->ContextRecord->SegFs, pExceptionInfo->ContextRecord->SegEs, pExceptionInfo->ContextRecord->SegDs);
     }
 
     if (pExceptionInfo->ContextRecord->ContextFlags & CONTEXT_INTEGER) {
-        exception_writeln(&file, "EDI = 0x%p, ESI = 0x%p, EBX = 0x%p\n", pExceptionInfo->ContextRecord->Edi, pExceptionInfo->ContextRecord->Esi, pExceptionInfo->ContextRecord->Ebx);
-        exception_writeln(&file, "EDX = 0x%p, ECX = 0x%p, EAX = 0x%p\n", pExceptionInfo->ContextRecord->Edx, pExceptionInfo->ContextRecord->Ecx, pExceptionInfo->ContextRecord->Eax);
+        exception_writeln(&file, "EDI = 0x%p, ESI = 0x%p, EBX = 0x%p\r\n", pExceptionInfo->ContextRecord->Edi, pExceptionInfo->ContextRecord->Esi, pExceptionInfo->ContextRecord->Ebx);
+        exception_writeln(&file, "EDX = 0x%p, ECX = 0x%p, EAX = 0x%p\r\n", pExceptionInfo->ContextRecord->Edx, pExceptionInfo->ContextRecord->Ecx, pExceptionInfo->ContextRecord->Eax);
     }
 
     if (pExceptionInfo->ContextRecord->ContextFlags & CONTEXT_CONTROL) {
-        exception_writeln(&file, "EBP = 0x%p, EIP = 0x%p, CS = 0x%p\n", pExceptionInfo->ContextRecord->Ebp, pExceptionInfo->ContextRecord->Eip, pExceptionInfo->ContextRecord->SegCs);
-        exception_writeln(&file, "EFLAGS = 0x%p, ESP = 0x%p, SS = 0x%p\n", pExceptionInfo->ContextRecord->EFlags, pExceptionInfo->ContextRecord->Esp, pExceptionInfo->ContextRecord->SegSs);
+        exception_writeln(&file, "EBP = 0x%p, EIP = 0x%p, CS = 0x%p\r\n", pExceptionInfo->ContextRecord->Ebp, pExceptionInfo->ContextRecord->Eip, pExceptionInfo->ContextRecord->SegCs);
+        exception_writeln(&file, "EFLAGS = 0x%p, ESP = 0x%p, SS = 0x%p\r\n", pExceptionInfo->ContextRecord->EFlags, pExceptionInfo->ContextRecord->Esp, pExceptionInfo->ContextRecord->SegSs);
     }
 
     DWORD dwEsp = pExceptionInfo->ContextRecord->Esp;
 
-    exception_writeln(&file, "\nStack:\n");
+    exception_writeln(&file, "\nStack:\r\n");
 
     for(int i = 0; i < 320; i += 16) {
-        exception_writeln(&file, "+%04X: 0x%08X 0x%08X 0x%08X 0x%08X\n", i, *(DWORD*)(dwEsp+i+0), *(DWORD*)(dwEsp+i+4), *(DWORD*)(dwEsp+i+8), *(DWORD*)(dwEsp+i+12));
+        exception_writeln(&file, "+%04X: 0x%08X 0x%08X 0x%08X 0x%08X\r\n", i, *(DWORD*)(dwEsp+i+0), *(DWORD*)(dwEsp+i+4), *(DWORD*)(dwEsp+i+8), *(DWORD*)(dwEsp+i+12));
     }
 
-    exception_writeln(&file, "\nModules:\n");
+    exception_writeln(&file, "\nModules:\r\n");
 
     if (hModuleSnapShot) {
         MODULEENTRY32 ModuleEntry;
@@ -171,7 +171,7 @@ long WINAPI exception_callback(_EXCEPTION_POINTERS *pExceptionInfo) {
         if (Module32First(hModuleSnapShot, &ModuleEntry)) {
             do {
                 if (ModuleEntry.szModule[0] != 'f' && ModuleEntry.szModule[1] != 'l' && ModuleEntry.szModule[2] != 'a')
-                    exception_writeln(&file, "%s [B: 0x%08X, S: 0x%08X] (%s)\n", ModuleEntry.szModule, ModuleEntry.modBaseAddr, ModuleEntry.modBaseSize, ModuleEntry.szExePath);
+                    exception_writeln(&file, "%s [B: 0x%08X, S: 0x%08X] (%s)\r\n", ModuleEntry.szModule, ModuleEntry.modBaseAddr, ModuleEntry.modBaseSize, ModuleEntry.szExePath);
             } while(Module32Next(hModuleSnapShot, &ModuleEntry));
         }
 
