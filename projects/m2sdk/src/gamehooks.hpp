@@ -53,7 +53,7 @@ void __declspec(naked) GameEndDriveHook() {
     __asm jmp[GameEndDrive__Return];
 }
 
-void game_player_enter_car(M2::C_Player2 *player, M2::C_Actor *car, u8 seat) {
+void game_player_enter_car(M2::C_Player2 *player, M2::C_Actor *car, char seat) {
     m2sdk_event event = { 0 }; {
         event.arg1 = (void *)player;
         event.arg2 = (void *)car;

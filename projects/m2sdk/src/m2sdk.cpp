@@ -1,9 +1,12 @@
-#include <unordered_map>
+#define _SCL_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
-#include "zpl.h"
+#include <unordered_map>
+#include <assert.h>
+
 #include "m2sdk.h"
 
-#define mod_assert ZPL_ASSERT
+#define m2sdk_assert assert
 m2sdk_callback g_gamemodule_callback = nullptr;
 
 // include source code parts

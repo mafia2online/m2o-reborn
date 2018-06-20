@@ -13,7 +13,7 @@ M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
         return nullptr;
     }
     M2::Wrappers::GameModelManager *pPedModelManager = nullptr;
-    mod_assert(pModelManager);
+    m2sdk_assert(pModelManager);
 
     M2::C_Entity *entity = nullptr;
     std::string dir;
@@ -25,10 +25,10 @@ M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
             M2::Models::GetPlayerModelFromID(modelID, &dir, &model);
 
             pPedModelManager = pModelManager->Load(dir.c_str(), model.c_str());
-            mod_assert(pPedModelManager);
+            m2sdk_assert(pPedModelManager);
 
             entity = reinterpret_cast<M2::C_Entity*>(M2::C_EntityFactory::Get()->CreateEntity<M2::C_Human2>(M2::EntityTypes::Entity_Human));
-            mod_assert(entity);
+            m2sdk_assert(entity);
         }
         break;
 
@@ -37,16 +37,16 @@ M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
             M2::Models::GetVehicleModelFromID(modelID, &dir, &model);
 
             pPedModelManager = pModelManager->Load(dir.c_str(), model.c_str());
-            mod_assert(pPedModelManager);
+            m2sdk_assert(pPedModelManager);
 
             entity = reinterpret_cast<M2::C_Entity*>(M2::C_EntityFactory::Get()->CreateEntity<M2::C_Car>(M2::EntityTypes::Entity_Car));
-            mod_assert(entity);
+            m2sdk_assert(entity);
         }
         break;
     }
 
     M2::C_Model *pModel = M2::C_Core::Get()->AllocateModel(2);
-    mod_assert(pModel);
+    m2sdk_assert(pModel);
 
     pModel->CloneHierarchy(pPedModelManager->GetModelManager()->m_pModel);
     pModel->SetName("m2o_entity");
