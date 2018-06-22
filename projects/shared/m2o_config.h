@@ -23,6 +23,9 @@
 #define M2O_ENTITY_LIMIT 16000
 #define M2O_INVALID_ENTITY M2O_ENTITY_LIMIT
 
+#define M2O_DEBUG 1
+#define LIBRG_DEBUG 1
+
 // =======================================================================//
 // !
 // ! Other sutff used everywhere
@@ -32,8 +35,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _SCL_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-#define LIBRG_DEBUG
 
 #define Vector2 zplm_vec2
 #define Vector3 zplm_vec3

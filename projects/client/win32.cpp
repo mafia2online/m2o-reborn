@@ -1,3 +1,4 @@
+#define M2O_CLIENT
 #include "m2o_config.h"
 
 #include <stdint.h>
@@ -7,7 +8,7 @@
 #include "zpl.h"
 #include "nuklear.h"
 
-// instead of including m2sdk.h, we can just use dis:
+// instead of including whole m2sdk.h, we can just use thisd:
 namespace M2 { void Initialize(void (*)(void)); }
 #include "../m2sdk/include/utils/Memory.hpp"
 
@@ -17,9 +18,11 @@ namespace M2 { void Initialize(void (*)(void)); }
 #include "win32/input_impl.hpp"
 #include "win32/exceptions_impl.hpp"
 
-// NOTE: Tell the OS to prefer dedicated video card.
-DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
-int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
+extern "C" {
+    // NOTE: Tell the OS to prefer dedicated video card.
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
+}
 
 // =======================================================================//
 // !
@@ -52,6 +55,8 @@ void platform_init() {
 // =======================================================================//
 
 zpl_file_t debug_log;
+zpl_mutex_t debug_log_mutex;
+
 void mod_log(const char* format, ...) {
     va_list ap;
     char message[2048] = { 0 };
@@ -67,7 +72,7 @@ void mod_log(const char* format, ...) {
         len++;
     }
 
-    // zpl_mutex_lock(&mod.mutexes.log); {
+    zpl_mutex_lock(&debug_log_mutex); {
         zpl_printf(message);
         zpl_file_write(&debug_log, message, zpl_strlen(message));
 
@@ -78,8 +83,8 @@ void mod_log(const char* format, ...) {
         //     mod.console.queue.pop();
         // }
 
-    // }
-    // zpl_mutex_unlock(&mod.mutexes.log);
+    }
+    zpl_mutex_unlock(&debug_log_mutex);
 }
 
 // =======================================================================//
@@ -88,9 +93,10 @@ void mod_log(const char* format, ...) {
 // !
 // =======================================================================//
 
-BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call) {
+BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
+    switch (reason) {
         case DLL_PROCESS_ATTACH: {
+            #ifdef M2O_DEBUG
             AllocConsole();
             AttachConsole(GetCurrentProcessId());
             DisableThreadLibraryCalls(module);
@@ -112,6 +118,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserv
             RECT rect;
             GetWindowRect(hConsole, &rect);
             SetWindowPos(hConsole, NULL, 20, 20, 800, 600, 0);
+            #endif
 
             char temp_path_raw[MAX_PATH] = { '\0' };
             GetModuleFileName(module, temp_path_raw, MAX_PATH);
@@ -121,6 +128,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD  ul_reason_for_call, LPVOID lpReserv
 
             auto modpath = temp_path.erase(temp_pos, std::string::npos);
 
+            zpl_mutex_init(&debug_log_mutex);
             zpl_file_remove((modpath + "\\debug.log").c_str());
             zpl_file_create(&debug_log, (modpath + "\\debug.log").c_str());
             zpl_file_seek(&debug_log, 0);
