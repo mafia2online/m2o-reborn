@@ -118,5 +118,9 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
         *ppReturnedDeviceInterface = new CDirect3DDevice9Proxy( this, *ppReturnedDeviceInterface );
     }
 
+    mod_log("wrapping the renderer %d %d\n", pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
+    renderer = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
+    mod_log("sdlerror: %s\n", SDL_GetError());
+
     return hr;
 }

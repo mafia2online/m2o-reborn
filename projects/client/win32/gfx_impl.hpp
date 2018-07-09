@@ -7,6 +7,9 @@ void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
+#include "SDL_render.h"
+SDL_Renderer* renderer = NULL;
+
 #include "gfx/CDirect3DDevice9Proxy.h"
 #include "gfx/CDirect3D9Proxy.h"
 

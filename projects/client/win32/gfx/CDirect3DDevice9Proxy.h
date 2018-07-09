@@ -330,6 +330,69 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetDepthStencilSurface(IDirect3
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene( ) {
+    // static int firsttime = 1;
+    // if (firsttime) {
+    //     firsttime = 0;
+
+    //     D3DMATRIX matrix;
+
+    //     IDirect3DDevice9 *device = m_pD3DDevice;
+
+    //     IDirect3DDevice9_SetVertexShader(device, NULL);
+    //     IDirect3DDevice9_SetFVF(device, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+    //     IDirect3DDevice9_SetRenderState(device, D3DRS_ZENABLE, D3DZB_FALSE);
+    //     IDirect3DDevice9_SetRenderState(device, D3DRS_CULLMODE, D3DCULL_NONE);
+    //     IDirect3DDevice9_SetRenderState(device, D3DRS_LIGHTING, FALSE);
+
+    //     /* Enable color modulation by diffuse color */
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_COLOROP,
+    //                                           D3DTOP_MODULATE);
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_COLORARG1,
+    //                                           D3DTA_TEXTURE);
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_COLORARG2,
+    //                                           D3DTA_DIFFUSE);
+
+    //     /* Enable alpha modulation by diffuse alpha */
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_ALPHAOP,
+    //                                           D3DTOP_MODULATE);
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_ALPHAARG1,
+    //                                           D3DTA_TEXTURE);
+    //     IDirect3DDevice9_SetTextureStageState(device, 0, D3DTSS_ALPHAARG2,
+    //                                           D3DTA_DIFFUSE);
+
+    //     /* Enable separate alpha blend function, if possible */
+    //     // if (data->enableSeparateAlphaBlend) {
+    //         IDirect3DDevice9_SetRenderState(device, D3DRS_SEPARATEALPHABLENDENABLE, TRUE);
+    //     // }
+
+    //     /* Disable second texture stage, since we're done */
+    //     IDirect3DDevice9_SetTextureStageState(device, 1, D3DTSS_COLOROP,
+    //                                           D3DTOP_DISABLE);
+    //     IDirect3DDevice9_SetTextureStageState(device, 1, D3DTSS_ALPHAOP,
+    //                                           D3DTOP_DISABLE);
+
+    //     /* Set an identity world and view matrix */
+    //     matrix.m[0][0] = 1.0f;
+    //     matrix.m[0][1] = 0.0f;
+    //     matrix.m[0][2] = 0.0f;
+    //     matrix.m[0][3] = 0.0f;
+    //     matrix.m[1][0] = 0.0f;
+    //     matrix.m[1][1] = 1.0f;
+    //     matrix.m[1][2] = 0.0f;
+    //     matrix.m[1][3] = 0.0f;
+    //     matrix.m[2][0] = 0.0f;
+    //     matrix.m[2][1] = 0.0f;
+    //     matrix.m[2][2] = 1.0f;
+    //     matrix.m[2][3] = 0.0f;
+    //     matrix.m[3][0] = 0.0f;
+    //     matrix.m[3][1] = 0.0f;
+    //     matrix.m[3][2] = 0.0f;
+    //     matrix.m[3][3] = 1.0f;
+    //     IDirect3DDevice9_SetTransform(device, D3DTS_WORLD, &matrix);
+    //     IDirect3DDevice9_SetTransform(device, D3DTS_VIEW, &matrix);
+    // }
+
+
     // Call our real handler
     HRESULT hr = m_pD3DDevice->BeginScene();
 
@@ -350,6 +413,25 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene( ) {
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::EndScene( ) {
     graphics_device_render();
+
+    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    // SDL_RenderClear(renderer);
+
+    IDirect3DStateBlock9* pStateBlock = NULL;
+    m_pD3DDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
+
+    SDL_SetRenderDrawColor(renderer, 255, 100, 100, 100);
+    SDL_RenderDrawLine(renderer, 0, 0, 300, 240);
+    SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
+    SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
+    // SDL_RenderPresent(renderer);
+
+    SDL_Rect position = {0, 0, 100, 100};
+    SDL_RenderFillRect(renderer, &position);
+
+    pStateBlock->Apply();
+    pStateBlock->Release();
+
     return m_pD3DDevice->EndScene();
 }
 
