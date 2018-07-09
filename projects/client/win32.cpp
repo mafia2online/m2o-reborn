@@ -12,6 +12,8 @@
 namespace M2 { void Initialize(void (*)(void)); }
 #include "../m2sdk/include/utils/Memory.hpp"
 
+static std::string mod_path;
+
 #include "m2o_api.h"
 #include "win32/gfx_impl.hpp"
 #include "win32/vfs_impl.hpp"
@@ -127,6 +129,8 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
             auto temp_pos  = temp_path.rfind("\\");
 
             auto modpath = temp_path.erase(temp_pos, std::string::npos);
+
+            mod_path = modpath;
 
             zpl_mutex_init(&debug_log_mutex);
             zpl_file_remove((modpath + "\\debug.log").c_str());
