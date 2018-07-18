@@ -1,5 +1,5 @@
-#ifndef M2O_API_H
-#define M2O_API_H
+#ifndef M2O_CLIENT_H
+#define M2O_CLIENT_H
 
 void gfx_init();
 void gfx_free();
@@ -53,4 +53,4 @@ bool input_key_up();
 void platform_init();
 void platform_free();
 
-#endif // M2O_API_H
+#endif // M2O_CLIENT_H

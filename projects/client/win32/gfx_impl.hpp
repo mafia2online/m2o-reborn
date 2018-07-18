@@ -7,7 +7,7 @@ void graphics_device_render();
 void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
-#include "SDL_render.h"
+#include "SDL.h"
 #include "SDL_ttf.h"
 
 SDL_Renderer* renderer = NULL;
@@ -27,7 +27,7 @@ void get_text_and_rect(SDL_Renderer *renderer, int x, int y, char *text,
     SDL_Surface *surface;
     SDL_Color textColor = {255, 255, 255, 0};
 
-    surface = TTF_RenderText_Blended(font, text, textColor);
+    surface = TTF_RenderUTF8_Blended(font, text, textColor);
     *texture = SDL_CreateTextureFromSurface(renderer, surface);
     text_width = surface->w;
     text_height = surface->h;
@@ -91,6 +91,8 @@ void gfx_init() {
         _gfx_state.installed = true;
         _gfx_state.method = (gfx_d3dcreate9_cb)(Mem::Hooks::InstallDetourPatch("d3d9.dll", "Direct3DCreate9", (DWORD)gfx_d3dcreate9_hook));
     }
+
+    TTF_Init();
 }
 
 void gfx_free() {
@@ -98,6 +100,8 @@ void gfx_free() {
         _gfx_state.installed = false;
         Mem::Hooks::UninstallDetourPatch(_gfx_state.method, (DWORD)gfx_d3dcreate9_hook);
     }
+
+
 }
 
 void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
@@ -116,6 +120,11 @@ inline void graphics_device_prerender(void) {}
 inline void graphics_device_render(void) {
     // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     // SDL_RenderClear(renderer);
+    SDL_Event e;
+
+    while(SDL_PollEvent(&e) != 0) {
+        mod_log("e.type: %d\n", e.type);
+    }
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 

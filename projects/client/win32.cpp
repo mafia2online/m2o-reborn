@@ -14,7 +14,7 @@ namespace M2 { void Initialize(void (*)(void)); }
 
 static std::string mod_path;
 
-#include "m2o_api.h"
+#include "m2o_client.h"
 #include "win32/gfx_impl.hpp"
 #include "win32/vfs_impl.hpp"
 #include "win32/input_impl.hpp"

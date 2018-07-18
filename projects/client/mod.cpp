@@ -10,7 +10,7 @@
 #include "librg_ext.h"
 #include "m2sdk.h"
 
-#include "m2o_api.h"
+#include "m2o_client.h"
 #include "m2o_types.h"
 
 #include "core/mod.h"

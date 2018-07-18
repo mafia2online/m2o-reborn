@@ -119,8 +119,6 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
     }
 
     renderer = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
-
-    TTF_Init();
     font = TTF_OpenFont((mod_path + "\\files\\Roboto-Regular.ttf").c_str(), 14);
 
     bmp = SDL_LoadBMP((mod_path + "\\pug.bmp").c_str());
