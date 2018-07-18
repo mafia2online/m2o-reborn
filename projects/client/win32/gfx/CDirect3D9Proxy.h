@@ -120,6 +120,9 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 
     renderer = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
 
+    TTF_Init();
+    font = TTF_OpenFont((mod_path + "\\files\\Roboto-Regular.ttf").c_str(), 14);
+
     bmp = SDL_LoadBMP((mod_path + "\\pug.bmp").c_str());
     if (bmp == NULL) {
         mod_log("SDL_LoadBMP Error: %s\n", SDL_GetError());
@@ -130,6 +133,9 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
     if (tex == NULL) {
         mod_log("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
     }
+
+    get_text_and_rect(renderer, 300, 300, "hello", font, &texture1, &rect1);
+    get_text_and_rect(renderer, 300, rect1.y + rect1.h, "world", font, &texture2, &rect2);
 
 
     return hr;

@@ -8,9 +8,37 @@ void graphics_device_lost(IDirect3DDevice9*);
 void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 #include "SDL_render.h"
+#include "SDL_ttf.h"
+
 SDL_Renderer* renderer = NULL;
 SDL_Texture *tex;
 SDL_Surface *bmp;
+TTF_Font *font;
+SDL_Rect rect1, rect2;
+
+/*
+- x, y: upper left corner.
+- texture, rect: outputs.
+*/
+void get_text_and_rect(SDL_Renderer *renderer, int x, int y, char *text,
+        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+    int text_width;
+    int text_height;
+    SDL_Surface *surface;
+    SDL_Color textColor = {255, 255, 255, 0};
+
+    surface = TTF_RenderText_Blended(font, text, textColor);
+    *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    text_width = surface->w;
+    text_height = surface->h;
+    SDL_FreeSurface(surface);
+    rect->x = x;
+    rect->y = y;
+    rect->w = text_width;
+    rect->h = text_height;
+}
+
+SDL_Texture *texture1, *texture2;
 
 #include "gfx/CDirect3DDevice9Proxy.h"
 #include "gfx/CDirect3D9Proxy.h"
@@ -35,7 +63,6 @@ struct gfx_state {
 };
 
 static gfx_state _gfx_state;
-
 
 
 IDirect3D9 *WINAPI gfx_d3dcreate9_hook(UINT SDKVersion) {
@@ -92,18 +119,22 @@ inline void graphics_device_render(void) {
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 15);
-    SDL_RenderDrawLine(renderer, 0, 0, 300, 240);
-    SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
-    SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
-    // SDL_RenderPresent(renderer);
+    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 15);
+    // SDL_RenderDrawLine(renderer, 0, 0, 300, 240);
+    // SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
+    // SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
+    // // SDL_RenderPresent(renderer);
 
-    if (tex) {
-        SDL_RenderCopy(renderer, tex, NULL, NULL);
+    // if (tex) {
+    //     SDL_RenderCopy(renderer, tex, NULL, NULL);
+    // }
+    // SDL_Rect position = {0, 0, 300, 300};
+    // SDL_RenderFillRect(renderer, &position);
+
+    if (texture1 && texture2) {
+        SDL_RenderCopy(renderer, texture1, NULL, &rect1);
+        SDL_RenderCopy(renderer, texture2, NULL, &rect2);
     }
-
-    SDL_Rect position = {0, 0, 300, 300};
-    SDL_RenderFillRect(renderer, &position);
 }
 
 void gfx_screen_size(int *x, int *y) {

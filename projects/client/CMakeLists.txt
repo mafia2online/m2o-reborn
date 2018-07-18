@@ -6,6 +6,7 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/*.h*"
     "${PROJECT_SOURCE_DIR}/../shared/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/sdl/include/*.h"
+    "${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/librg/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/detours/include/*.h"
@@ -13,16 +14,18 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/../../vendor/discord/include/*.h"
 )
 
-set(LIBRARIES m2sdk discord-rpc SDL2)
+set(LIBRARIES m2sdk discord-rpc SDL2 SDL2_ttf libfreetype-6)
 set(LIBRARY_FOLDERS
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/${CMAKE_BUILD_TYPE}/
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/${CMAKE_BUILD_TYPE}/
+    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/lib/
 )
 set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/../shared
     ${PROJECT_SOURCE_DIR}/../m2sdk/include
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/include
+    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include
     ${PROJECT_SOURCE_DIR}/../../vendor/librg/include
     ${PROJECT_SOURCE_DIR}/../../vendor/nuklear/include
     ${PROJECT_SOURCE_DIR}/../../vendor/detours/include
