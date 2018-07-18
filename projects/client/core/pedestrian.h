@@ -264,7 +264,7 @@ void mod_player_spawn() {
 
     /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
-    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+    ped->CEntity->SetPosition(vec3f(-421.75f, 479.31f, 0.05f));
 
     /* Enabling controls */
     ped->CPlayer->LockControls(false);

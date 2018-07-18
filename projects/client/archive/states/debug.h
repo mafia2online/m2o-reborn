@@ -38,7 +38,7 @@ void mod_debug_console_execute() {
     }
 
     if (command.compare("/spawn") == 0) {
-        ((ped_t *)mod.player->user_data)->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+        ((ped_t *)mod.player->user_data)->CEntity->SetPosition(vec3f(-421.75f, 479.31f, 0.05f));
     }
 
 #if _DEBUG

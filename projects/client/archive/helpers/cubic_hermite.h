@@ -31,7 +31,7 @@ inline void cubic_hermite_v3_value(interpolate3_hermite_t *src, vec3_t value) {
 }
 
 inline vec3_t cubic_hermite_v3(vec3_t A, vec3_t B, vec3_t C, vec3_t D, f32 t) {
-    return vec3(
+    return vec3f(
         cubic_hermite_f32(A.x, B.x, C.x, D.x, t),
         cubic_hermite_f32(A.y, B.y, C.y, D.y, t),
         cubic_hermite_f32(A.z, B.z, C.z, D.z, t)

@@ -3,7 +3,7 @@ void on_ped_create_command(librg_message_t *msg) {
     mod_assert(player);
 
     auto ped = m2o_ped_create();
-    m2o_ped_position_set(ped, vec3(
+    m2o_ped_position_set(ped, vec3f(
         player->position.x + 1.0f,
         player->position.y,
         player->position.z + 0.05f

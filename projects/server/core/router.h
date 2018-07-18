@@ -24,7 +24,7 @@ void on_connection_request(librg_event_t *event) {
  */
 void on_connect_accepted(librg_event_t *event) {
     auto entity = event->entity;
-    // entity->position = vec3(-421.75f, 479.31f, 0.05f);
+    // entity->position = vec3f(-421.75f, 479.31f, 0.05f);
 
     mod_log("spawning player %u at: %f %f %f\n",
         entity->id,

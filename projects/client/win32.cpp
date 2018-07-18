@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "zpl.h"
+#include "zpl_math.h"
 #include "nuklear.h"
 
 // instead of including whole m2sdk.h, we can just use thisd:

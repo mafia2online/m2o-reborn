@@ -221,7 +221,7 @@ void foobar() {
     }
 
     vec3_t screen;
-    vec3_t swin = vec3(-421.75f, 479.31f, 0.1f);
+    vec3_t swin = vec3f(-421.75f, 479.31f, 0.1f);
     graphics_world_to_screen(&screen, swin);
     // mod_assert(g_texture);
     //foobar_FillARGB(screen.x, screen.y, screen.z, 100, 100, 0xffffffff);
