@@ -1,4 +1,10 @@
 namespace M2 {
+    void *GetCameraWorldViewProjection()
+    {
+        auto camera = M2::C_GameCamera::Get()->GetCamera(1);
+        return camera ? (void *)&camera->m_pGameCamera->m_worldViewProjection : NULL;
+    }
+
     /* TODO: Fix previous natives and delete those ones */
     DWORD dwAddress = 0x0993B00;
     C_SyncObject _declspec(naked) *C_HumanScript::ScrAimAt(C_SyncObject **syncObject, M2::C_Entity *ent, Vector3 const &pos, const bool smooth)

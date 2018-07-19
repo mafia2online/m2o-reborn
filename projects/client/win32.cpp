@@ -9,8 +9,11 @@
 #include "zpl_math.h"
 #include "nuklear.h"
 
-// instead of including whole m2sdk.h, we can just use thisd:
-namespace M2 { void Initialize(void (*)(void)); }
+// instead of including whole m2sdk.h, we can just use this:
+namespace M2 {
+    void Initialize(void (*)(void));
+    void *GetCameraWorldViewProjection();
+};
 #include "../m2sdk/include/utils/Memory.hpp"
 
 static std::string mod_path;
@@ -143,6 +146,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
 
             /* attach custom exception handler */
             exceptions_init((modpath + "\\exceptions").c_str());
+
 
             /* attach gfx rendering hooks */
             gfx_init();

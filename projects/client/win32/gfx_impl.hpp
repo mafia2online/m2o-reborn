@@ -10,7 +10,10 @@ struct gfx_object {
     u8 type;
 
     u8 valid : 1;
-    u8 metadata : 7;
+    u8 queued : 1;
+    u8 metadata : 6;
+
+    i32 zindex;
 
     union {
         SDL_Texture *texture;
@@ -35,10 +38,12 @@ struct gfx_object {
 
 struct gfx_t {
     bool installed;
-    char fontregistry[8][MAX_PATH];
+    char fontpaths[8][MAX_PATH];
+    int  object_cursor;
 
+    zpl_array(TTF_Font *) fonts;
     zpl_array(gfx_object) objects;
-    int object_cursor;
+    zpl_array(gfx_handle) queue;
 
     SDL_Renderer *rnd;
 
@@ -53,202 +58,349 @@ static gfx_t gfx_state;
 
 // =======================================================================//
 // !
-// ! Implementation
+// ! Fonts
 // !
 // =======================================================================//
 
-int gfx_font_add(int fontid, const char *filename) {
-    if (gfx_font_exists(fontid)) {
-        return -1;
-    }
+    int gfx_font_add(int fontid, const char *filename) {
+        if (gfx_font_exists(fontid)) {
+            return -1;
+        }
 
-    if (!zpl_file_exists(filename)) {
-        return -2;
-    }
+        if (!zpl_file_exists(filename)) {
+            return -2;
+        }
 
-    zpl_memcopy(&gfx_state.fontregistry[fontid], filename, zpl_strlen(filename));
-    return 0;
-}
-
-int gfx_font_exists(int fontid) {
-    if (gfx_state.fontregistry[fontid][0] == 0) {
+        zpl_memcopy(&gfx_state.fontpaths[fontid], filename, zpl_strlen(filename));
         return 0;
     }
 
-    return 1;
-}
-
-int gfx_font_remove(int fontid) {
-    if (!gfx_font_exists(fontid)) {
-        return -1;
-    }
-
-    zpl_zero_item(gfx_state.fontregistry[fontid]);
-    return 1;
-}
-
-TTF_Font *gfx_font_request(int fontid, int size) {
-    return NULL;
-}
-
-i32 gfx_handle_next() {
-    int capacity = (int)zpl_array_capacity(gfx_state.objects);
-
-    if (zpl_array_count(gfx_state.objects) + 1 >= capacity) {
-        zpl_array_set_capacity(gfx_state.objects, capacity * 2);
-        capacity = (int)zpl_array_capacity(gfx_state.objects);
-    }
-
-    for (; gfx_state.object_cursor <= capacity; ++gfx_state.object_cursor) {
-        if (gfx_state.object_cursor == capacity) { gfx_state.object_cursor = 0; }
-
-        if (!gfx_state.objects[gfx_state.object_cursor].valid) {
-            zpl_zero_item(&gfx_state.objects[gfx_state.object_cursor]);
-            gfx_state.objects[gfx_state.object_cursor].valid = 1;
-
-            zpl_array_count(gfx_state.objects)++;
-            return gfx_state.object_cursor;
+    int gfx_font_exists(int fontid) {
+        if (gfx_state.fontpaths[fontid][0] == 0) {
+            return 0;
         }
+
+        return 1;
     }
 
-    return -1;
-}
+    int gfx_font_remove(int fontid) {
+        if (!gfx_font_exists(fontid)) {
+            return -1;
+        }
 
-gfx_handle gfx_create_texture(int w, int h) {
-    ZPL_ASSERT(gfx_state.rnd);
+        zpl_zero_item(gfx_state.fontpaths[fontid]);
+        return 1;
+    }
 
-    int handle      = gfx_handle_next();
-    gfx_object *obj = &gfx_state.objects[handle];
+    TTF_Font *gfx_font_request(int fontid, int size) {
+        if (!gfx_font_exists(fontid)) {
+            return NULL;
+        }
 
-    obj->type    = GFX_TEXTURE;
-    obj->texture = SDL_CreateTexture(gfx_state.rnd, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_STREAMING, w, h);
-    obj->scalex  = 1.0f;
-    obj->scaley  = 1.0f;
-    obj->data.x  = 0;
-    obj->data.y  = 0;
-    obj->data.w  = w;
-    obj->data.h  = h;
+        if (fontid > zpl_array_capacity(gfx_state.fonts)) {
+            zpl_array_set_capacity(gfx_state.fonts, fontid + 1);
+        }
 
-    if (!obj->texture) {
+        if (fontid + 1 > zpl_array_count(gfx_state.fonts)) {
+            zpl_array_count(gfx_state.fonts) = fontid + 1;
+        }
+
+        if (gfx_state.fonts[fontid] == NULL) {
+            gfx_state.fonts[fontid] = TTF_OpenFont(gfx_state.fontpaths[fontid], size);
+        }
+
+        return gfx_state.fonts[fontid];
+    }
+
+// =======================================================================//
+// !
+// ! Resource creation/destruction
+// !
+// =======================================================================//
+
+    i32 gfx_handle_next() {
+        int capacity = (int)zpl_array_capacity(gfx_state.objects);
+
+        if (zpl_array_count(gfx_state.objects) + 1 >= capacity) {
+            zpl_array_set_capacity(gfx_state.objects, capacity * 2);
+            capacity = (int)zpl_array_capacity(gfx_state.objects);
+        }
+
+        for (; gfx_state.object_cursor <= capacity; ++gfx_state.object_cursor) {
+            if (gfx_state.object_cursor == capacity) { gfx_state.object_cursor = 0; }
+
+            if (!gfx_state.objects[gfx_state.object_cursor].valid) {
+                zpl_zero_item(&gfx_state.objects[gfx_state.object_cursor]);
+                gfx_state.objects[gfx_state.object_cursor].valid = 1;
+
+                zpl_array_count(gfx_state.objects)++;
+                return gfx_state.object_cursor;
+            }
+        }
+
         return -1;
     }
 
-    return handle;
-}
+    gfx_handle gfx_create_texture(int w, int h) {
+        ZPL_ASSERT(gfx_state.rnd);
 
-gfx_handle gfx_create_texture_file(const char *path) {
-    ZPL_ASSERT(gfx_state.rnd);
+        int handle      = gfx_handle_next();
+        gfx_object *obj = &gfx_state.objects[handle];
 
-    int handle      = gfx_handle_next();
-    gfx_object *obj = &gfx_state.objects[handle];
+        obj->type    = GFX_TEXTURE;
+        obj->texture = SDL_CreateTexture(gfx_state.rnd, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_STREAMING, w, h);
+        obj->scalex  = 1.0f;
+        obj->scaley  = 1.0f;
+        obj->data.x  = 0;
+        obj->data.y  = 0;
+        obj->data.w  = w;
+        obj->data.h  = h;
 
-    SDL_Surface *surface = SDL_LoadBMP(path); if (surface == NULL) {
-        return -1;
+        if (!obj->texture) {
+            return -1;
+        }
+
+        return handle;
     }
 
-    obj->type    = GFX_TEXTURE;
-    obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
-    obj->scalex  = 1.0f;
-    obj->scaley  = 1.0f;
-    obj->data.x  = 0;
-    obj->data.y  = 0;
-    obj->data.w  = surface->w;
-    obj->data.h  = surface->h;
+    gfx_handle gfx_create_texture_file(const char *path) {
+        ZPL_ASSERT(gfx_state.rnd);
 
-    SDL_FreeSurface(surface);
+        int handle      = gfx_handle_next();
+        gfx_object *obj = &gfx_state.objects[handle];
 
-    if (!obj->texture) {
-        return -1;
+        SDL_Surface *surface = SDL_LoadBMP(path); if (surface == NULL) {
+            return -1;
+        }
+
+        obj->type    = GFX_TEXTURE;
+        obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
+        obj->scalex  = 1.0f;
+        obj->scaley  = 1.0f;
+        obj->data.x  = 0;
+        obj->data.y  = 0;
+        obj->data.w  = surface->w;
+        obj->data.h  = surface->h;
+
+        SDL_FreeSurface(surface);
+
+        if (!obj->texture) {
+            return -1;
+        }
+
+        return handle;
     }
 
-    return handle;
-}
+    gfx_handle gfx_create_text(int font, int size, const char *text, vec4 color) {
+        ZPL_ASSERT(gfx_state.rnd);
 
-gfx_handle gfx_create_text(int font, int size, const char *text, vec4 color) {
-    ZPL_ASSERT(gfx_state.rnd);
+        int handle      = gfx_handle_next();
+        gfx_object *obj = &gfx_state.objects[handle];
 
-    int handle      = gfx_handle_next();
-    gfx_object *obj = &gfx_state.objects[handle];
+        TTF_Font *fontptr    = gfx_font_request(font, size);
+        SDL_Color textcolor  = {(int)color.r, (int)color.g, (int)color.b, (int)color.a};
+        SDL_Surface *surface = TTF_RenderUTF8_Blended(fontptr, text, textcolor);if (surface == NULL) {
+            return -1;
+        }
 
-    TTF_Font *fontptr    = gfx_font_request(font, size);
-    SDL_Color textcolor  = {(int)color.r, (int)color.g, (int)color.b, (int)color.a};
-    SDL_Surface *surface = TTF_RenderUTF8_Blended(fontptr, text, textcolor);if (surface == NULL) {
-        return -1;
+        obj->type    = GFX_TEXTURE;
+        obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
+        obj->scalex  = 1.0f;
+        obj->scaley  = 1.0f;
+        obj->data.x  = 0;
+        obj->data.y  = 0;
+        obj->data.w  = surface->w;
+        obj->data.h  = surface->h;
+        obj->color   = color;
+
+        SDL_FreeSurface(surface);
+
+        if (!obj->texture) {
+            return -1;
+        }
+
+        return handle;
     }
 
-    obj->type    = GFX_TEXTURE;
-    obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
-    obj->scalex  = 1.0f;
-    obj->scaley  = 1.0f;
-    obj->data.x  = 0;
-    obj->data.y  = 0;
-    obj->data.w  = surface->w;
-    obj->data.h  = surface->h;
-    obj->color   = color;
+    gfx_handle gfx_create_line(int x1, int y1, int x2, int y2, vec4 color) {
+        int handle      = gfx_handle_next();
+        gfx_object *obj = &gfx_state.objects[handle];
 
-    SDL_FreeSurface(surface);
+        obj->type    = GFX_LINE;
+        obj->data.x1 = x1;
+        obj->data.y1 = y1;
+        obj->data.x2 = x2;
+        obj->data.y2 = y2;
+        obj->color   = color;
 
-    if (!obj->texture) {
-        return -1;
+        return handle;
     }
 
-    return handle;
-}
+    gfx_handle gfx_create_rect(int x, int y, int w, int h, vec4 color) {
+        int handle      = gfx_handle_next();
+        gfx_object *obj = &gfx_state.objects[handle];
 
-gfx_handle gfx_create_line(int x1, int y1, int x2, int y2, vec4 color) {
-    ZPL_ASSERT(gfx_state.rnd);
+        obj->type    = GFX_RECTANGLE;
+        obj->data.x  = x;
+        obj->data.y  = y;
+        obj->data.w  = w;
+        obj->data.h  = h;
+        obj->color   = color;
 
-    int handle      = gfx_handle_next();
-    gfx_object *obj = &gfx_state.objects[handle];
-
-    obj->type    = GFX_LINE;
-    obj->data.x1 = x1;
-    obj->data.y1 = y1;
-    obj->data.x2 = x2;
-    obj->data.y2 = y2;
-    obj->color   = color;
-
-    return handle;
-}
-
-gfx_handle gfx_create_rect(int x, int y, int w, int h, vec4 color) {
-    ZPL_ASSERT(gfx_state.rnd);
-
-    int handle      = gfx_handle_next();
-    gfx_object *obj = &gfx_state.objects[handle];
-
-    obj->type    = GFX_RECTANGLE;
-    obj->data.x  = x;
-    obj->data.y  = y;
-    obj->data.w  = w;
-    obj->data.h  = h;
-    obj->color   = color;
-
-    return handle;
-}
-
-int gfx_destroy(gfx_handle handle) {
-    if (!gfx_state.objects[handle].valid) {
-        return -1;
+        return handle;
     }
 
-    gfx_object *obj = &gfx_state.objects[handle];
+    int gfx_exists(gfx_handle handle) {
+        if (handle >= 0 && handle > zpl_array_capacity(gfx_state.objects)) {
+            return 0;
+        }
 
-    switch (obj->type) {
-        case GFX_LINE:
-        case GFX_RECTANGLE:
-            break;
-
-        case GFX_TEXTURE:
-            SDL_DestroyTexture(obj->texture);
-            break;
+        return gfx_state.objects[handle].valid;
     }
 
-    zpl_array_count(gfx_state.objects)--;
-    gfx_state.objects[handle].valid = 0;
+    int gfx_destroy(gfx_handle handle) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
 
-    return 0;
-}
+        gfx_object *obj = &gfx_state.objects[handle];
+
+        switch (obj->type) {
+            case GFX_LINE:
+            case GFX_RECTANGLE:
+                break;
+
+            case GFX_TEXTURE:
+                SDL_DestroyTexture(obj->texture);
+                break;
+        }
+
+        zpl_array_count(gfx_state.objects)--;
+        gfx_state.objects[handle].valid = 0;
+
+        return 0;
+    }
+
+// =======================================================================//
+// !
+// ! Rendering
+// !
+// =======================================================================//
+
+    void gfx_dump() {
+        zpl_printf("oi\n");
+        //ZPL_ASSERT(false);
+    }
+
+    ZPL_COMPARE_PROC(gfx_render_sort_cmp) {
+        int *ax = (int *)a;
+        int *bx = (int *)b;
+
+        if (*ax == -1) { return 1; }
+        if (*bx == -1) { return 1; }
+
+        int az = gfx_state.objects[*ax].zindex;
+        int bz = gfx_state.objects[*bx].zindex;
+
+        return az > bz ? 1 : bz < az ? 1 : 0;
+    }
+
+    int gfx_render_resort() {
+        zpl_sort_array(gfx_state.queue, zpl_array_count(gfx_state.queue), gfx_render_sort_cmp);
+
+        if (zpl_array_back(gfx_state.queue) == -1) {
+            zpl_array_pop(gfx_state.queue);
+        }
+
+        return 0;
+    }
+
+    int gfx_render_add(gfx_handle handle, int zindex) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        gfx_object *obj = &gfx_state.objects[handle];
+
+        obj->queued = true;
+        obj->zindex = zindex;
+
+        zpl_array_append(gfx_state.queue, handle);
+        return gfx_render_resort();
+    }
+
+    int gfx_render_exists(gfx_handle handle) {
+        return gfx_exists(handle) && gfx_state.objects[handle].queued;
+    }
+
+    int gfx_render_remove(gfx_handle handle) {
+        if (!gfx_render_exists(handle)) {
+            return -1;
+        }
+
+        gfx_object *obj = &gfx_state.objects[handle];
+
+        obj->queued = false;
+        obj->zindex = 0;
+
+        for (int i = 0; i < zpl_array_count(gfx_state.queue); ++i) {
+            if (handle == gfx_state.queue[i]) {
+                gfx_state.queue[i] = -1;
+            }
+        }
+
+        return gfx_render_resort();
+    }
+
+    int gfx_render_dump() {
+        zpl_printf("[ ");
+
+        for (int i = 0; i < zpl_array_count(gfx_state.queue); ++i) {
+            zpl_printf("%d, ", gfx_state.queue[i]);
+        }
+
+        zpl_printf(" ]\n");
+        return 0;
+    }
+
+// =======================================================================//
+// !
+// ! Utils
+// !
+// =======================================================================//
+
+    void gfx_util_screensize(int *w, int *h) {
+        *w = static_cast<int>(gfx_state.present_params.BackBufferWidth);
+        *h = static_cast<int>(gfx_state.present_params.BackBufferHeight);
+    }
+
+    void gfx_util_screen2world(const vec3 *screen, vec3 *world) {
+        ZPL_ASSERT_MSG(false, "TODO: implement gfx_util_screen2world");
+    }
+
+    void gfx_util_world2screen(const vec3 *world, vec3 *screen) {
+        // Get the world view projection matrix
+        D3DXMATRIX mat = *(D3DXMATRIX *)M2::GetCameraWorldViewProjection();
+        D3DXMatrixTranspose(&mat, &mat);
+
+        // Get the viewport
+        D3DVIEWPORT9 viewport;
+        gfx_state.device->GetViewport(&viewport);
+
+        // Transform the world coordinate by the worldViewProjection matrix
+        D3DXVECTOR3 vec;
+        D3DXVec3TransformCoord(&vec, &D3DXVECTOR3(world->x, world->y, world->z), &mat);
+
+        screen->x = viewport.X + (1.0f + vec.x) * viewport.Width / 2.0f;
+        screen->y = viewport.Y + (1.0f - vec.y) * viewport.Height / 2.0f;
+        // screen->z = viewport.MinZ + vec.z * (viewport.MaxZ - viewport.MinZ);
+        screen->z = world->z * mat._33 + world->y * mat._23 + world->x * mat._13 + mat._43;
+    }
+
+
+
+
+
 
 
 
@@ -320,7 +472,9 @@ int gfx_init() {
     gfx_state.method = (gfx_d3dcreate9_cb)(Mem::Hooks::InstallDetourPatch("d3d9.dll", "Direct3DCreate9", (DWORD)gfx_d3dcreate9_hook));
 
     TTF_Init();
+    zpl_array_init_reserve(gfx_state.fonts, zpl_heap(), 32);
     zpl_array_init_reserve(gfx_state.objects, zpl_heap(), 4);
+    zpl_array_init(gfx_state.queue, zpl_heap());
 
     return 0;
 }
@@ -333,6 +487,14 @@ int gfx_free() {
     gfx_state.installed = false;
     Mem::Hooks::UninstallDetourPatch(gfx_state.method, (DWORD)gfx_d3dcreate9_hook);
 
+    for (i32 i = 0; i < 0; i++) {
+        if (gfx_state.fonts[i] != NULL) {
+            TTF_CloseFont(gfx_state.fonts[i]);
+        }
+    }
+
+    zpl_array_free(gfx_state.queue);
+    zpl_array_free(gfx_state.fonts);
     zpl_array_free(gfx_state.objects);
     TTF_Quit();
 
@@ -342,21 +504,21 @@ int gfx_free() {
 void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
     mod_log("[info] creating dx9 device [%x, %x] ...\n", pDevice, pPresentationParameters);
 
-    font = TTF_OpenFont((mod_path + "\\files\\Roboto-Regular.ttf").c_str(), 44);
+    // font = TTF_OpenFont((mod_path + "\\files\\Roboto-Regular.ttf").c_str(), 44);
 
-    bmp = SDL_LoadBMP((mod_path + "\\pug.bmp").c_str());
-    if (bmp == NULL) {
-        mod_log("SDL_LoadBMP Error: %s\n", SDL_GetError());
-    }
+    // bmp = SDL_LoadBMP((mod_path + "\\pug.bmp").c_str());
+    // if (bmp == NULL) {
+    //     mod_log("SDL_LoadBMP Error: %s\n", SDL_GetError());
+    // }
 
-    tex = SDL_CreateTextureFromSurface(renderer, bmp);
-    SDL_FreeSurface(bmp);
-    if (tex == NULL) {
-        mod_log("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
-    }
+    // tex = SDL_CreateTextureFromSurface(renderer, bmp);
+    // SDL_FreeSurface(bmp);
+    // if (tex == NULL) {
+    //     mod_log("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
+    // }
 
-    get_text_and_rect(renderer, 300, 300, "hello", font, &texture1, &rect1);
-    get_text_and_rect(renderer, 300, rect1.y + rect1.h, "world", font, &texture2, &rect2);
+    // get_text_and_rect(renderer, 300, 300, "hello", font, &texture1, &rect1);
+    // get_text_and_rect(renderer, 300, rect1.y + rect1.h, "world", font, &texture2, &rect2);
 }
 
 void graphics_device_lost(IDirect3DDevice9 * pDevice) {
@@ -389,23 +551,8 @@ void graphics_device_render(void) {
     // SDL_Rect position = {0, 0, 300, 300};
     // SDL_RenderFillRect(renderer, &position);
 
-    if (texture1 && texture2) {
-        SDL_RenderCopy(renderer, texture1, NULL, &rect1);
-        SDL_RenderCopy(renderer, texture2, NULL, &rect2);
-    }
-}
-
-void gfx_util_screensize(int *w, int *h) {
-    // *w = static_cast<int>(mod.graphics.present_params.BackBufferWidth);
-    // *h = static_cast<int>(mod.graphics.present_params.BackBufferHeight);
-    *w = 800;
-    *h = 600;
-}
-
-void gfx_util_screen2world(vec3 *screen, vec3 **world) {
-
-}
-
-void gfx_util_world2screen(vec3 *world, vec3 **screen) {
-
+    // if (texture1 && texture2) {
+    //     SDL_RenderCopy(renderer, texture1, NULL, &rect1);
+    //     SDL_RenderCopy(renderer, texture2, NULL, &rect2);
+    // }
 }

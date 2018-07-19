@@ -41,27 +41,31 @@ extern "C" {
     int gfx_init();
     int gfx_free();
 
+    void gfx_dump();
+
     gfx_handle gfx_create_texture(int w, int h);
     gfx_handle gfx_create_texture_file(const char *path);
     gfx_handle gfx_create_text(int font, int size, const char *text, vec4 color);
     gfx_handle gfx_create_line(int x1, int y1, int x2, int y2, vec4 color);
     gfx_handle gfx_create_rect(int x, int y, int w, int h, vec4 color);
 
-    int gfx_destroy(gfx_handle res);
+    int gfx_exists(gfx_handle handle);
+    int gfx_destroy(gfx_handle handle);
 
     int gfx_font_add(int fontid, const char *filename);
     int gfx_font_exists(int fontid);
     int gfx_font_remove(int fontid);
 
-    int gfx_render_add(gfx_handle res, int zindex);
-    int gfx_render_exists(gfx_handle res);
-    int gfx_render_remove(gfx_handle res);
+    int gfx_render_add(gfx_handle handle, int zindex);
+    int gfx_render_exists(gfx_handle handle);
+    int gfx_render_remove(gfx_handle handle);
+    int gfx_render_dump();
 
-    int gfx_zindex_get(gfx_handle res);
-    int gfx_zindex_set(gfx_handle res, int zindex);
+    int gfx_zindex_get(gfx_handle handle);
+    int gfx_zindex_set(gfx_handle handle, int zindex);
 
-    int gfx_position_set(gfx_handle res, int x, int y);
-    int gfx_position_get(gfx_handle res, int *x, int *y);
+    int gfx_position_set(gfx_handle handle, int x, int y);
+    int gfx_position_get(gfx_handle handle, int *x, int *y);
 
     void gfx_util_screensize(int *w, int *h);
     void gfx_util_screen2world(vec3 *screen, vec3 **world);
