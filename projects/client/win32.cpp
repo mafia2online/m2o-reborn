@@ -141,16 +141,23 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
             mod_log("[info] attaching to thread (%x) ...\n", GetCurrentThreadId());
             mod_log("[info] starting %s ...\n", M2O_VERSION_PRETTY);
 
-            gfx_init(); /* attach gfx rendering hooks */
-            vfs_init(); /* init vfs for file overrides */
-            input_init(); /* attach input manager hooks */
+            /* attach custom exception handler */
             exceptions_init((modpath + "\\exceptions").c_str());
 
+            /* attach gfx rendering hooks */
+            gfx_init();
+            gfx_font_add(0, (modpath + "\\files\\Roboto-Regular.ttf").c_str());
+
+            /* init vfs for file overrides */
+            vfs_init();
             vfs_override_set("gui.sds",         (modpath + "\\files\\gui.sds").c_str());
             vfs_override_set("gui-main.sds",    (modpath + "\\files\\gui-main.sds").c_str());
             vfs_override_set("tables.sds",      (modpath + "\\files\\tables.sds").c_str());
             vfs_override_set("sdsconfig.bin",   (modpath + "\\files\\sdsconfig.bin").c_str());
             vfs_override_set("StreamMapa.bin",  (modpath + "\\files\\StreamMapa.bin").c_str());
+
+            /* attach input manager hooks */
+            input_init();
 
             M2::Initialize(mod_install);
         }

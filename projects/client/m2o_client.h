@@ -1,6 +1,10 @@
 #ifndef M2O_CLIENT_H
 #define M2O_CLIENT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // =======================================================================//
 // !
 // ! General
@@ -28,6 +32,10 @@
 // !
 // =======================================================================//
 
+    /**
+     * Valid handle is an int value equal or bigger than 0
+     * If value returned from a method is smaller than 0, it means it's an error code
+     */
     typedef int gfx_handle;
 
     int gfx_init();
@@ -35,11 +43,15 @@
 
     gfx_handle gfx_create_texture(int w, int h);
     gfx_handle gfx_create_texture_file(const char *path);
-    gfx_handle gfx_create_text(int font, int size, const char *text);
-    gfx_handle gfx_create_line(int x1, int y1, int x2, int y2);
-    gfx_handle gfx_create_rect(int x, int y, int w, int h, bool filled);
+    gfx_handle gfx_create_text(int font, int size, const char *text, vec4 color);
+    gfx_handle gfx_create_line(int x1, int y1, int x2, int y2, vec4 color);
+    gfx_handle gfx_create_rect(int x, int y, int w, int h, vec4 color);
 
     int gfx_destroy(gfx_handle res);
+
+    int gfx_font_add(int fontid, const char *filename);
+    int gfx_font_exists(int fontid);
+    int gfx_font_remove(int fontid);
 
     int gfx_render_add(gfx_handle res, int zindex);
     int gfx_render_exists(gfx_handle res);
@@ -101,5 +113,9 @@
     // game_vehicle_destroy()
     // game_ped_create()
     // game_ped_destroy()
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // M2O_CLIENT_H

@@ -46,7 +46,9 @@
 #define vec3_t zplm_vec3
 #define quat_t zplm_quat
 #define vec3f zplm_vec3f
+#define vec2 zplm_vec2
 #define vec3 zplm_vec3
+#define vec4 zplm_vec4
 
 // helpers
 #define when(init, name) auto name = init; if (name)

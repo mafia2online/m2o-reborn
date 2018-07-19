@@ -115,6 +115,7 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 
     if (SUCCEEDED(hr)) {
         graphics_device_create(*ppReturnedDeviceInterface, pPresentationParameters);
+        renderer = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
         *ppReturnedDeviceInterface = new CDirect3DDevice9Proxy( this, *ppReturnedDeviceInterface );
     }
 

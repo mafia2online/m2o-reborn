@@ -153,7 +153,7 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
             _input_state.mouse.z = _input_state.mouse.state.lZ;
 
             int screenWidth, screenHeight;
-            gfx_screen_size(&screenWidth, &screenHeight);
+            gfx_util_screensize(&screenWidth, &screenHeight);
 
             if (_input_state.mouse.x <= 0)
                 _input_state.mouse.x = 0;
