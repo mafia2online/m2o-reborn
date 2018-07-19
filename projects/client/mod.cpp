@@ -375,35 +375,35 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (input_key_down(VK_F8)) {
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        // gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
 
-        // gfx_render_add(0, 15);
-        // gfx_render_add(5, 20);
-        // gfx_render_add(8, 3);
-        // gfx_render_add(2, -5);
-        // gfx_render_add(3, -10);
-        // gfx_render_remove(3);
-        // gfx_render_add(9, -11);
+        gfx_render_add(0, 15);
+        gfx_render_add(5, 20);
+        gfx_render_add(8, 3);
+        gfx_render_add(2, -5);
+        gfx_render_add(3, -10);
+        gfx_render_remove(3);
+        gfx_render_add(9, -11);
 
-        // gfx_render_dump();
+        gfx_render_dump();
     }
 }

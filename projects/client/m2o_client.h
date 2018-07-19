@@ -41,8 +41,6 @@ extern "C" {
     int gfx_init();
     int gfx_free();
 
-    void gfx_dump();
-
     gfx_handle gfx_create_texture(int w, int h);
     gfx_handle gfx_create_texture_file(const char *path);
     gfx_handle gfx_create_text(int font, int size, const char *text, vec4 color);
