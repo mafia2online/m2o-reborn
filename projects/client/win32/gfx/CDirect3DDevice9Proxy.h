@@ -222,13 +222,16 @@ UINT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetNumberOfSwapChains() {
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pPresentationParameters) {
-    graphics_device_lost(m_pD3DDevice);
+    // HRESULT hResult = 0;
+
+
+    // graphics_device_lost(m_pD3DDevice);
 
     HRESULT hResult = m_pD3DDevice->Reset(pPresentationParameters);
 
-    if (SUCCEEDED(hResult)) {
-        graphics_device_reset(m_pD3DDevice, pPresentationParameters);
-    }
+    // if (SUCCEEDED(hResult)) {
+    //     // graphics_device_reset(m_pD3DDevice, pPresentationParameters);
+    // }
 
     return hResult;
 }
@@ -343,7 +346,7 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene( ) {
     m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);*/
 
-    graphics_device_prerender();
+    // graphics_device_prerender();
 
     return hr;
 }
@@ -381,7 +384,7 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::EndScene() {
 
     IDirect3DDevice9_SetPixelShader(device, NULL);
 
-    graphics_device_render();
+    gfx_render_draw();
 
     pStateBlock->Apply();
     pStateBlock->Release();

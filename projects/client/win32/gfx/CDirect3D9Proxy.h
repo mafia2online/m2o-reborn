@@ -114,9 +114,11 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
     HRESULT hr = m_pD3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     if (SUCCEEDED(hr)) {
-        graphics_device_create(*ppReturnedDeviceInterface, pPresentationParameters);
-        renderer = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
-        *ppReturnedDeviceInterface = new CDirect3DDevice9Proxy( this, *ppReturnedDeviceInterface );
+        gfx_state.rnd = SDL_CreateWrapperForRenderer(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, *ppReturnedDeviceInterface);
+        gfx_state.device = *ppReturnedDeviceInterface;
+        gfx_state.present_params = *pPresentationParameters;
+
+        *ppReturnedDeviceInterface = new CDirect3DDevice9Proxy(this, *ppReturnedDeviceInterface);
     }
 
     return hr;

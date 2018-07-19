@@ -65,6 +65,9 @@ extern "C" {
     int gfx_position_set(gfx_handle handle, int x, int y);
     int gfx_position_get(gfx_handle handle, int *x, int *y);
 
+    int gfx_scale_set(gfx_handle handle, float x, float y);
+    int gfx_scale_get(gfx_handle handle, float *x, float *y);
+
     void gfx_util_screensize(int *w, int *h);
     void gfx_util_screen2world(vec3 *screen, vec3 **world);
     void gfx_util_world2screen(vec3 *world, vec3 **screen);

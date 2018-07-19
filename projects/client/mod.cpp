@@ -375,34 +375,23 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (input_key_down(VK_F8)) {
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
-        gfx_create_line(0, 0, 100, 100, vec4f(255, 255, 255, 255));
+        // int handle = gfx_create_rect(0, 0, 500, 500, vec4f(255, 255, 255, 255));
+        // int handle = gfx_create_line(0, 0, 500, 500, vec4f(255, 255, 255, 255));
+        // int handle = gfx_create_text(0, 24, "Hello world!", vec4f(0, 0, 255, 255));
+        int handle = gfx_create_texture_file("D:\\Projects\\m2o\\m2o-reborn\\binary\\pug.bmp");
 
-        gfx_render_add(0, 15);
-        gfx_render_add(5, 20);
-        gfx_render_add(8, 3);
-        gfx_render_add(2, -5);
-        gfx_render_add(3, -10);
-        gfx_render_remove(3);
-        gfx_render_add(9, -11);
+        gfx_position_set(handle, 200, 200);
+        gfx_scale_set(handle, 0.5f, 1.0f);
+        gfx_render_add(handle, 15);
+        mod_log("attaching handle %d at layer 15\n", handle);
+
+        gfx_render_dump();
+    }
+
+    if (input_key_down(VK_F9)) {
+        int handle = gfx_create_rect(200, 200, 500, 500, vec4f(255, 0, 0, 255));
+        gfx_render_add(handle, -10);
+        mod_log("attaching handle %d at layer -10\n", handle);
 
         gfx_render_dump();
     }

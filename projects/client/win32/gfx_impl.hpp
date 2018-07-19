@@ -159,6 +159,8 @@ static zpl_mutex gfx_lock;
         obj->data.h  = h;
 
         if (!obj->texture) {
+            zpl_array_count(gfx_state.objects)--;
+            obj->valid = 0;
             return -1;
         }
 
@@ -189,6 +191,8 @@ static zpl_mutex gfx_lock;
         SDL_FreeSurface(surface);
 
         if (!obj->texture) {
+            zpl_array_count(gfx_state.objects)--;
+            obj->valid = 0;
             return -1;
         }
 
@@ -204,7 +208,7 @@ static zpl_mutex gfx_lock;
         gfx_object *obj = &gfx_state.objects[handle];
 
         TTF_Font *fontptr    = gfx_font_request(font, size);
-        SDL_Color textcolor  = {(int)color.r, (int)color.g, (int)color.b, (int)color.a};
+        SDL_Color textcolor  = {(u8)color.r, (u8)color.g, (u8)color.b, (u8)color.a};
         SDL_Surface *surface = TTF_RenderUTF8_Blended(fontptr, text, textcolor);if (surface == NULL) {
             return -1;
         }
@@ -222,6 +226,8 @@ static zpl_mutex gfx_lock;
         SDL_FreeSurface(surface);
 
         if (!obj->texture) {
+            zpl_array_count(gfx_state.objects)--;
+            obj->valid = 0;
             return -1;
         }
 
@@ -402,6 +408,133 @@ static zpl_mutex gfx_lock;
         return 0;
     }
 
+    int gfx_render_draw() {
+        if (!gfx_state.rnd) {
+            return -1;
+        }
+
+        SDL_SetRenderDrawBlendMode(gfx_state.rnd, SDL_BLENDMODE_BLEND);
+
+        zpl_mutex_lock(&gfx_lock);
+        for (int i = 0; i < zpl_array_count(gfx_state.queue); ++i) {
+            gfx_object *obj = &gfx_state.objects[gfx_state.queue[i]];
+
+            SDL_SetRenderDrawColor(
+                gfx_state.rnd,
+                (u8)obj->color.r,
+                (u8)obj->color.g,
+                (u8)obj->color.b,
+                (u8)obj->color.a
+            );
+
+            switch (obj->type) {
+                case GFX_LINE: {
+                    SDL_RenderDrawLine(gfx_state.rnd, obj->data.x1, obj->data.y1, obj->data.x2, obj->data.y2);
+                } break;
+                case GFX_RECTANGLE: {
+                    SDL_Rect desc = {obj->data.x, obj->data.y, obj->data.w, obj->data.h};
+                    SDL_RenderFillRect(gfx_state.rnd, &desc);
+                } break;
+
+                case GFX_TEXTURE: {
+                    SDL_Rect desc = {obj->data.x, obj->data.y, (int)(obj->data.w * obj->scalex), (int)(obj->data.h * obj->scaley)};
+                    SDL_RenderCopy(gfx_state.rnd, obj->texture, NULL, &desc);
+                } break;
+            }
+
+        }
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+// =======================================================================//
+// !
+// ! Attributes
+// !
+// =======================================================================//
+
+    int gfx_zindex_get(gfx_handle handle) {
+        if (!gfx_exists(handle)) {
+            return 0;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        int zindex = gfx_state.objects[handle].zindex;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return zindex;
+    }
+
+    int gfx_zindex_set(gfx_handle handle, int zindex) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        int queued = gfx_render_exists(handle);
+
+        zpl_mutex_lock(&gfx_lock);
+        gfx_state.objects[handle].zindex = zindex;
+        if (queued) { gfx_render_resort(); }
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+
+    int gfx_position_set(gfx_handle handle, int x, int y) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        gfx_state.objects[handle].data.x = x;
+        gfx_state.objects[handle].data.y = y;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+    int gfx_position_get(gfx_handle handle, int *x, int *y) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        *x = gfx_state.objects[handle].data.x;
+        *y = gfx_state.objects[handle].data.y;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+    int gfx_scale_set(gfx_handle handle, float x, float y) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        gfx_state.objects[handle].scalex = x;
+        gfx_state.objects[handle].scaley = y;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+    int gfx_scale_get(gfx_handle handle, float *x, float *y) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        *x = gfx_state.objects[handle].scaley;
+        *y = gfx_state.objects[handle].scaley;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+
 // =======================================================================//
 // !
 // ! Utils
@@ -436,164 +569,66 @@ static zpl_mutex gfx_lock;
         screen->z = world->z * mat._33 + world->y * mat._23 + world->x * mat._13 + mat._43;
     }
 
-
-
-
-
-
-
-
-void graphics_device_create(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-void graphics_device_prerender();
-void graphics_device_render();
-void graphics_device_lost(IDirect3DDevice9*);
-void graphics_device_reset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-
-SDL_Renderer* renderer = NULL;
-SDL_Texture *tex;
-SDL_Surface *bmp;
-TTF_Font *font;
-SDL_Rect rect1, rect2;
-
-/*
-- x, y: upper left corner.
-- texture, rect: outputs.
-*/
-void get_text_and_rect(SDL_Renderer *renderer, int x, int y, char *text, TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
-    int text_width;
-    int text_height;
-    SDL_Surface *surface;
-    SDL_Color textColor = {255, 255, 255, 0};
-
-    surface = TTF_RenderUTF8_Blended(font, text, textColor);
-    *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    text_width = surface->w;
-    text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = text_width;
-    rect->h = text_height;
-}
-
-SDL_Texture *texture1, *texture2;
-
-#include "gfx/CDirect3DDevice9Proxy.h"
-#include "gfx/CDirect3D9Proxy.h"
-
 // =======================================================================//
 // !
 // ! Hooking
 // !
 // =======================================================================//
 
-IDirect3D9 *WINAPI gfx_d3dcreate9_hook(UINT SDKVersion) {
-    IDirect3D9 *pD3D = gfx_state.method(SDKVersion);
+    #include "gfx/CDirect3DDevice9Proxy.h"
+    #include "gfx/CDirect3D9Proxy.h"
 
-    if (pD3D) {
-        return new CDirect3D9Proxy(pD3D);
-    }
+    IDirect3D9 *WINAPI gfx_d3dcreate9_hook(UINT SDKVersion) {
+        IDirect3D9 *pD3D = gfx_state.method(SDKVersion);
 
-    MessageBox(NULL, "Unable to create Direct3D9 interface.", "Fatal error", MB_ICONERROR);
-    TerminateProcess(GetCurrentProcess(), 0);
-
-    return NULL;
-}
-
-int gfx_init() {
-    gfx_state = {0};
-
-    if (gfx_state.installed) {
-        return 1;
-    }
-
-    gfx_state.installed = true;
-    gfx_state.method = (gfx_d3dcreate9_cb)(Mem::Hooks::InstallDetourPatch("d3d9.dll", "Direct3DCreate9", (DWORD)gfx_d3dcreate9_hook));
-
-    TTF_Init();
-    zpl_array_init_reserve(gfx_state.fonts, zpl_heap(), 32);
-    zpl_array_init_reserve(gfx_state.objects, zpl_heap(), 4);
-    zpl_array_init(gfx_state.queue, zpl_heap());
-    zpl_mutex_init(&gfx_lock);
-
-    return 0;
-}
-
-int gfx_free() {
-    if (!gfx_state.installed) {
-        return 1;
-    }
-
-    gfx_state.installed = false;
-    Mem::Hooks::UninstallDetourPatch(gfx_state.method, (DWORD)gfx_d3dcreate9_hook);
-
-    for (i32 i = 0; i < 0; i++) {
-        if (gfx_state.fonts[i] != NULL) {
-            TTF_CloseFont(gfx_state.fonts[i]);
+        if (pD3D) {
+            return new CDirect3D9Proxy(pD3D);
         }
+
+        MessageBox(NULL, "Unable to create Direct3D9 interface.", "Fatal error", MB_ICONERROR);
+        TerminateProcess(GetCurrentProcess(), 0);
+
+        return NULL;
     }
 
-    zpl_mutex_destroy(&gfx_lock);
-    zpl_array_free(gfx_state.queue);
-    zpl_array_free(gfx_state.fonts);
-    zpl_array_free(gfx_state.objects);
-    TTF_Quit();
+    int gfx_init() {
+        gfx_state = {0};
 
-    return 0;
-}
+        if (gfx_state.installed) {
+            return 1;
+        }
 
-void graphics_device_create(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters) {
-    mod_log("[info] creating dx9 device [%x, %x] ...\n", pDevice, pPresentationParameters);
+        gfx_state.installed = true;
+        gfx_state.method = (gfx_d3dcreate9_cb)(Mem::Hooks::InstallDetourPatch("d3d9.dll", "Direct3DCreate9", (DWORD)gfx_d3dcreate9_hook));
 
-    // font = TTF_OpenFont((mod_path + "\\files\\Roboto-Regular.ttf").c_str(), 44);
+        TTF_Init();
+        zpl_array_init_reserve(gfx_state.fonts, zpl_heap(), 32);
+        zpl_array_init_reserve(gfx_state.objects, zpl_heap(), 4);
+        zpl_array_init(gfx_state.queue, zpl_heap());
+        zpl_mutex_init(&gfx_lock);
 
-    // bmp = SDL_LoadBMP((mod_path + "\\pug.bmp").c_str());
-    // if (bmp == NULL) {
-    //     mod_log("SDL_LoadBMP Error: %s\n", SDL_GetError());
-    // }
+        return 0;
+    }
 
-    // tex = SDL_CreateTextureFromSurface(renderer, bmp);
-    // SDL_FreeSurface(bmp);
-    // if (tex == NULL) {
-    //     mod_log("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
-    // }
+    int gfx_free() {
+        if (!gfx_state.installed) {
+            return 1;
+        }
 
-    // get_text_and_rect(renderer, 300, 300, "hello", font, &texture1, &rect1);
-    // get_text_and_rect(renderer, 300, rect1.y + rect1.h, "world", font, &texture2, &rect2);
-}
+        gfx_state.installed = false;
+        Mem::Hooks::UninstallDetourPatch(gfx_state.method, (DWORD)gfx_d3dcreate9_hook);
 
-void graphics_device_lost(IDirect3DDevice9 * pDevice) {
-    mod_log("CGraphicsManager::OnDeviceLost(%x)", pDevice);
-}
+        for (i32 i = 0; i < 0; i++) {
+            if (gfx_state.fonts[i] != NULL) {
+                TTF_CloseFont(gfx_state.fonts[i]);
+            }
+        }
 
-void graphics_device_reset(IDirect3DDevice9 *pDevice, D3DPRESENT_PARAMETERS *pPresentationParameters) {
-    mod_log("CGraphicsManager::OnDeviceReset(%x, %x)", pDevice, pPresentationParameters);
-}
+        zpl_mutex_destroy(&gfx_lock);
+        zpl_array_free(gfx_state.queue);
+        zpl_array_free(gfx_state.fonts);
+        zpl_array_free(gfx_state.objects);
+        TTF_Quit();
 
-void graphics_device_prerender(void) {
-
-}
-
-void graphics_device_render(void) {
-    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    // SDL_RenderClear(renderer);
-
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-
-    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 15);
-    // SDL_RenderDrawLine(renderer, 0, 0, 300, 240);
-    // SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
-    // SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
-    // // SDL_RenderPresent(renderer);
-
-    // if (tex) {
-    //     SDL_RenderCopy(renderer, tex, NULL, NULL);
-    // }
-    // SDL_Rect position = {0, 0, 300, 300};
-    // SDL_RenderFillRect(renderer, &position);
-
-    // if (texture1 && texture2) {
-    //     SDL_RenderCopy(renderer, texture1, NULL, &rect1);
-    //     SDL_RenderCopy(renderer, texture2, NULL, &rect2);
-    // }
-}
+        return 0;
+    }
