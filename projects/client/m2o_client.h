@@ -47,6 +47,8 @@ extern "C" {
     gfx_handle gfx_create_line(int x1, int y1, int x2, int y2, vec4 color);
     gfx_handle gfx_create_rect(int x, int y, int w, int h, vec4 color);
 
+    int gfx_update_texture(gfx_handle handle, const void *pixels, int w, int h);
+
     int gfx_exists(gfx_handle handle);
     int gfx_destroy(gfx_handle handle);
 
@@ -69,8 +71,8 @@ extern "C" {
     int gfx_scale_get(gfx_handle handle, float *x, float *y);
 
     void gfx_util_screensize(int *w, int *h);
-    void gfx_util_screen2world(vec3 *screen, vec3 **world);
-    void gfx_util_world2screen(vec3 *world, vec3 **screen);
+    void gfx_util_screen2world(vec3 *screen, vec3 *world);
+    void gfx_util_world2screen(vec3 *world, vec3 *screen);
 
 // =======================================================================//
 // !

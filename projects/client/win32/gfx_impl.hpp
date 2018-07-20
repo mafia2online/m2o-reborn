@@ -159,8 +159,9 @@ static zpl_mutex gfx_lock;
         obj->data.h  = h;
 
         if (!obj->texture) {
-            zpl_array_count(gfx_state.objects)--;
             obj->valid = 0;
+            zpl_array_count(gfx_state.objects)--;
+            zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
 
@@ -176,6 +177,7 @@ static zpl_mutex gfx_lock;
         gfx_object *obj = &gfx_state.objects[handle];
 
         SDL_Surface *surface = SDL_LoadBMP(path); if (surface == NULL) {
+            zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
 
@@ -191,8 +193,9 @@ static zpl_mutex gfx_lock;
         SDL_FreeSurface(surface);
 
         if (!obj->texture) {
-            zpl_array_count(gfx_state.objects)--;
             obj->valid = 0;
+            zpl_array_count(gfx_state.objects)--;
+            zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
 
@@ -210,6 +213,7 @@ static zpl_mutex gfx_lock;
         TTF_Font *fontptr    = gfx_font_request(font, size);
         SDL_Color textcolor  = {(u8)color.r, (u8)color.g, (u8)color.b, (u8)color.a};
         SDL_Surface *surface = TTF_RenderUTF8_Blended(fontptr, text, textcolor);if (surface == NULL) {
+            zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
 
@@ -226,8 +230,9 @@ static zpl_mutex gfx_lock;
         SDL_FreeSurface(surface);
 
         if (!obj->texture) {
-            zpl_array_count(gfx_state.objects)--;
             obj->valid = 0;
+            zpl_array_count(gfx_state.objects)--;
+            zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
 
@@ -269,10 +274,36 @@ static zpl_mutex gfx_lock;
         return handle;
     }
 
+    int gfx_update_texture(gfx_handle handle, const void *pixels, int w, int h) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        u8 *texture_data  = NULL;
+        int texture_pitch = 0;
+
+        zpl_mutex_lock(&gfx_lock);
+        gfx_object *obj = &gfx_state.objects[handle];
+
+        if (obj->type != GFX_TEXTURE) {
+            zpl_mutex_unlock(&gfx_lock);
+            return -2;
+        }
+
+        SDL_LockTexture(obj->texture, 0, (void **)&texture_data, &texture_pitch);
+        memcpy(texture_data, pixels, w * h * 4);
+        SDL_UnlockTexture(obj->texture);
+
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
     int gfx_exists(gfx_handle handle) {
         zpl_mutex_lock(&gfx_lock);
 
         if (handle >= 0 && handle > zpl_array_capacity(gfx_state.objects)) {
+            zpl_mutex_unlock(&gfx_lock);
             return 0;
         }
 
@@ -289,11 +320,14 @@ static zpl_mutex gfx_lock;
 
         zpl_mutex_lock(&gfx_lock);
         gfx_object *obj = &gfx_state.objects[handle];
+        int queued = obj->queued;
+        zpl_mutex_unlock(&gfx_lock);
 
-        if (obj->queued) {
+        if (queued) {
             gfx_render_remove(handle);
         }
 
+        zpl_mutex_lock(&gfx_lock);
         switch (obj->type) {
             case GFX_LINE:
             case GFX_RECTANGLE:
@@ -533,7 +567,6 @@ static zpl_mutex gfx_lock;
 
         return 0;
     }
-
 
 // =======================================================================//
 // !
