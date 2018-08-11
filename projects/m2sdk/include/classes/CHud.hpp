@@ -12,6 +12,7 @@
 #include "CHints.hpp"
 #include "CResources.hpp"
 #include "CReticle.hpp"
+#include "CLockpick.hpp"
 
 namespace M2
 {
@@ -23,7 +24,9 @@ namespace M2
 		pad(ICHud, pad1, 0x20);         //0030 - 0050
 		C_Speedometer *m_pSpeedo;		//0050 - 0054
 		C_Hints *m_pHints;				//0054 - 0058
-		pad(ICHud, pad2, 0x14);			//0058 - 006C
+        pad(ICHud, pad5, 0x8);          //0058 - 0060
+        C_Lockpick *m_pLockpick;        //0060 - 0064
+		pad(ICHud, pad2, 0x8);			//0064 - 006C
 		C_Timer *m_pTimer;				//006C - 0070
 		pad(ICHud, pad3, 0x4);			//0070 - 0074
         C_Reticle *m_pReticle;          //0074 - 0078
@@ -39,5 +42,6 @@ namespace M2
 		C_Speedometer	*GetSpeedometer() { return reinterpret_cast<ICHud *>(this)->m_pSpeedo; }
 		C_Hints			*GetHints() { return reinterpret_cast<ICHud *>(this)->m_pHints; }
         C_Resources     *GetResources() { return reinterpret_cast<ICHud *>(this)->m_pResources; }
+        C_Lockpick      *GetLockpick() { return reinterpret_cast<ICHud *>(this)->m_pLockpick; }
 	};
 };

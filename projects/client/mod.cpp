@@ -161,6 +161,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     // therotically we shouldn't call it here but because it's a
     // sync object it's fine itll work but the local player isn't created just yet.
+    M2::C_GuiGame::Get()->StartGame(M2::E_iLoadType::TYPE_NEW_GAME, 0, 1, "freeride", false);
     M2::C_GameGuiModule::Get()->FaderFadeIn(1);
 
     ctx = new librg_ctx_t;
@@ -360,7 +361,13 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     // }
 
     if (input_key_down(VK_F7)) {
-        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar->SetVehicleDirty(100.0);
+        /*auto player = M2::C_Game::Get()->GetLocalPed();
+        auto humanScript = reinterpret_cast<M2::C_Human2*>(player);
+        
+        humanScript->GetInventory()->AddWeapon(12, 120);
+
+        mod_log("pointer : 0x%p\n0x%p\n", player, player->m_pPlayerControls);*/
+        M2::C_Hud::Get()->GetLockpick()->Start();
     }
 
     if (input_key_down(VK_F6)) {
@@ -370,7 +377,9 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
             return;
         }
 
-        float level = *(float*)(car + 0xE8C);
-        mod_log("level : %d\n", level);
+        mod_log("0x%p\n", car);
+
+        car->m_pVehicle.SetSPZText("CACA");
+        mod_log("%s\n", car->m_pVehicle.m_sPainting);
     }
 }

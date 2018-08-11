@@ -127,6 +127,7 @@ namespace M2 {
 #include "classes/CHumanInventory.hpp"
 #include "classes/CHumanScript.hpp"
 #include "classes/CHumanWeaponController.hpp"
+#include "classes/CLockpick.hpp"
 #include "classes/cmafiaframework.hpp"
 #include "classes/CModel.hpp"
 #include "classes/CMusic.hpp"
