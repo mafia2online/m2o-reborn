@@ -195,6 +195,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x4E9890, this, 1, 0, 0);
         }
 
+        void SetActualTuningTable(int tuningTable)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9DA440, this, tuningTable);
+        }
+
         void SetColor(int primary, int secondary)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x9BBF70, this, primary, secondary);
