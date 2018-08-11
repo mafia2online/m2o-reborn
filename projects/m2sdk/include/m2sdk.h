@@ -134,6 +134,7 @@ namespace M2 {
 #include "classes/CPlayer2.hpp"
 #include "classes/CPlayerModelManager.hpp"
 #include "classes/CPlayerRadio.hpp"
+#include "classes/CPoliceRadio.hpp"
 #include "classes/CPoliceWanted.hpp"
 #include "classes/CRangeMeter.hpp"
 #include "classes/CRenderCamera.hpp"

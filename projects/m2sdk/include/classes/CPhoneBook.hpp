@@ -22,7 +22,7 @@ namespace M2
             return Mem::InvokeFunction<Mem::call_this, bool>(0xA126B0, this, a2, a3, a4);
         }
 
-        bool AddNumber(int a2, int a3, int a4, int a5, int a6, char *a7, int hidden)
+        bool AddNumber(int a2, int a3, int a4, int a5, char *a6, char *a7, int hidden)
         {
             return Mem::InvokeFunction<Mem::call_this, bool>(0xA125E0, this, a2, a3, a4, a5, a6, a7, hidden);
         }
