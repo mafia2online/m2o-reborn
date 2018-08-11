@@ -10,22 +10,20 @@
 #include "nuklear.h"
 
 // instead of including whole m2sdk.h, we can just use this:
+#include "../m2sdk/include/utils/Memory.hpp"
 namespace M2 {
     void Initialize(void (*)(void));
     void *GetCameraWorldViewProjection();
 };
-#include "../m2sdk/include/utils/Memory.hpp"
-
-static std::string mod_path;
 
 #include "m2o_client.h"
-#include "win32/gfx_impl.hpp"
-#include "win32/vfs_impl.hpp"
-#include "win32/input_impl.hpp"
-#include "win32/exceptions_impl.hpp"
 
-extern "C" {
-    // NOTE: Tell the OS to prefer dedicated video card.
+#include "win32/gfx.hpp"
+#include "win32/vfs.hpp"
+#include "win32/input.hpp"
+#include "win32/exceptions.hpp"
+
+extern "C" { // NOTE: Tell the OS to prefer dedicated video card.
     __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
     __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; // ATI/AMD
 }
@@ -133,8 +131,6 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
             auto temp_pos  = temp_path.rfind("\\");
 
             auto modpath = temp_path.erase(temp_pos, std::string::npos);
-
-            mod_path = modpath;
 
             zpl_mutex_init(&debug_log_mutex);
             zpl_file_remove((modpath + "\\debug.log").c_str());

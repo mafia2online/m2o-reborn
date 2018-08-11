@@ -80,13 +80,19 @@ extern "C" {
 // !
 // =======================================================================//
 
-    // cef_init()
-    // cef_free()
-    // cef_tick()
-    // cef_browser_create()
-    // cef_browser_destroy()
-    // cef_url_set()
-    // cef_url_get()
+    typedef int cef_handle;
+
+    int cef_init();
+    int cef_free();
+    int cef_tick();
+
+    cef_handle cef_browser_create(const char *url, int w, int h);
+
+    int cef_browser_reload(cef_handle handle);
+    int cef_browser_destroy(cef_handle handle);
+
+    int cef_url_set(const char *url);
+    int cef_url_get(char *url);
 
 // =======================================================================//
 // !
