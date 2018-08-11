@@ -17,6 +17,16 @@ namespace M2
     class C_Lockpick : public ICLockpick
     {
     public:
+        void Close()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x455C20, this);
+        }
+
+        void Init()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x4F3150, this);
+        }
+
         void Start()
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x455C00, this);
