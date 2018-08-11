@@ -22,5 +22,10 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x450C10, this);
         }
+
+        void Start(int unk)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x450A00, this, unk);
+        }
     };
 };
