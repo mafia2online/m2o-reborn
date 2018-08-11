@@ -152,6 +152,7 @@ namespace M2 {
 #include "classes/CSlotManager.hpp"
 #include "classes/CSpeedometer.hpp"
 #include "classes/CSyncObject.hpp"
+#include "classes/CTelephone.hpp"
 #include "classes/CTextDatabase.hpp"
 #include "classes/CTickedModuleManager.hpp"
 #include "classes/CTimer.hpp"
