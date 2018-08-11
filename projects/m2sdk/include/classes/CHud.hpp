@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "CHudScriptW.h"
+#include "CHudScriptW.hpp"
 #include "CTimer.hpp"
 #include "CSpeedometer.hpp"
 #include "CHints.hpp"
