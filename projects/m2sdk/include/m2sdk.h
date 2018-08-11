@@ -115,6 +115,7 @@ namespace M2 {
 #include "classes/CGameInputModule.hpp"
 #include "classes/CGameRenderingSystemModule.hpp"
 #include "classes/CGameTrafficModule.hpp"
+#include "classes/CGameVehicleModule.hpp"
 #include "classes/CGfxEffects.hpp"
 #include "classes/CGfxEnvironmentEffects.hpp"
 #include "classes/CGuiGame.hpp"
