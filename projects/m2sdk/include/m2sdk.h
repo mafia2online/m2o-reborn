@@ -130,6 +130,7 @@ namespace M2 {
 #include "classes/CModel.hpp"
 #include "classes/CMusic.hpp"
 #include "classes/CNavigation.hpp"
+#include "classes/CPhoneBook.hpp"
 #include "classes/CPlayer2.hpp"
 #include "classes/CPlayerModelManager.hpp"
 #include "classes/CPlayerRadio.hpp"
