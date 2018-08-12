@@ -15,9 +15,15 @@ namespace M2
     public:
     };
 
-    class C_CarOwnerDB : public GameClassWrapper<ICCarOwnerDB, ICRangeMeter, 0x1CCAC74>
+    class C_CarOwnerDB : public GameClassWrapper<C_CarOwnerDB, ICCarOwnerDB, 0x1CCAC74>
     {
     public:
+
+        C_Entity *GetCarOwner(C_Entity *car)
+        {
+            return Mem::InvokeFunction<Mem::call_this, C_Entity*>(0xD453D0, this, car);
+        }
+
         bool IsLockpickedCar(C_Entity *car)
         {
             return Mem::InvokeFunction<Mem::call_this, bool>(0xD45460, this, car);

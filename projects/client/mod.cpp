@@ -353,33 +353,14 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 2);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 1);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
     }
 
     if (input_key_down(VK_F4) && mod.spawned && ent) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 4);
-        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-        ent->SetPosition(pos);
-        mod_log("Ped created\n");
-    }
-
-
-    if (GetAsyncKeyState(VK_F6) & 0x1) {
-        vec3_t pos;
-        pos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
-
-        pos.z += 2.0;
-
-        M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"load_test\")");
-        M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
-        M2::Wrappers::lua::Execute("icon:Activate()");
-        M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
-
-        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed());
-        player->GetInventory()->AddWeapon(12, 120);
+        
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
