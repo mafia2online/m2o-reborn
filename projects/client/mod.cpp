@@ -74,9 +74,26 @@ void mod_install() {
 
     M2::AttachHandler(M2_EVENT_CAR_ENTER_REQUEST, [](m2sdk_event *data) {
         data->arg5 = (void *)true;
-        // data->arg5 = (void *)false; // to block entering the car
+    });
 
-        mod_log("[game-event] ped request vehicle enter (%s)\n", ((bool)data->arg5) ? "granted" : "denied");
+    M2::AttachHandler(M2_EVENT_CAR_HOOD_OPEN_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_HOOD_CLOSE_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_TRUNK_OPEN_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_TRUNK_CLOSE_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+    });
+
+    M2::AttachHandler(M2_EVENT_CAR_FUELTANK_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
     });
 
     M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event *data) {
@@ -140,7 +157,7 @@ void mod_respawn() {
 
     /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
-    ped->CEntity->SetPosition(vec3(-421.75f, 479.31f, 0.05f));
+    ped->CEntity->SetPosition(vec3(70.760f, 910.812f, -18.354f));
 
     /* Enabling controls */
     ped->CPlayer->LockControls(false);
@@ -161,6 +178,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     // therotically we shouldn't call it here but because it's a
     // sync object it's fine itll work but the local player isn't created just yet.
+    M2::C_GuiGame::Get()->StartGame(M2::E_iLoadType::TYPE_NEW_GAME, 0, 1, "freeride", false);
     M2::C_GameGuiModule::Get()->FaderFadeIn(1);
 
     ctx = new librg_ctx_t;
@@ -335,42 +353,44 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 10);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 2);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
     }
 
     if (input_key_down(VK_F4) && mod.spawned && ent) {
-        vec3_t dir = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetDir();
-        M2::S_HumanCommandMoveDir *moveCMD = new M2::S_HumanCommandMoveDir;
-        moveCMD->x = dir.x;
-        moveCMD->y = dir.y;
-        moveCMD->z = dir.z;
-        reinterpret_cast<M2::C_Human2*>(ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCMD);
-
-        mod_log("Command added\n");
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 4);
+        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+        ent->SetPosition(pos);
+        mod_log("Ped created\n");
     }
 
-    // if (input_key_down(VK_F6) && mod.spawned) {
-    //     void *command;
-    //     void *command2;
-    //     command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
-    //     mod_log("0x%p\n0x%p\n", command, command2);
-    // }
 
-    if (input_key_down(VK_F7)) {
-        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar->SetVehicleDirty(100.0);
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        vec3_t pos;
+        pos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
+
+        pos.z += 2.0;
+
+        M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"load_test\")");
+        M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
+        M2::Wrappers::lua::Execute("icon:Activate()");
+        M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
+
+        auto player = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed());
+        player->GetInventory()->AddWeapon(12, 120);
     }
 
-    if (input_key_down(VK_F6)) {
-        M2::C_Car *car = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->m_pCurrentCar;
-        if (!car) {
-            mod_log("null ptr\n");
-            return;
+    if (GetAsyncKeyState(VK_F7) & 0x1) {
+        M2::C_Entity *test = M2::C_WrappersList::Get()->GetEntityByName("RTR_POUTA1_00");
+        if (test) {
+            BYTE type = *(BYTE*)(test + 0x1C);
+            mod_log("type : %x\nptr : 0x%p\n", type, test);
         }
-
-        float level = *(float*)(car + 0xE8C);
-        mod_log("level : %d\n", level);
+        else {
+            mod_log("null ptr\n");
+        }
     }
+
 }

@@ -276,6 +276,148 @@ void __declspec(naked) CCarActionBreakIn__TestAction__Hook()
         retn    4
     }
 }
+
+M2::C_Car *tryHoodOpenCar = nullptr;
+M2::C_Car *tryHoodCloseCar = nullptr;
+M2::C_Car *tryTrunkOpenCar = nullptr;
+M2::C_Car *tryTrunkCloseCar = nullptr;
+M2::C_Car *tryFuelTank = nullptr;
+
+bool tryHoodOpenAnswer;
+bool tryHoodCloseAnswer;
+bool tryTrunkOpenAnswer;
+bool tryTrunkCloseAnswer;
+bool tryFuelTankAnswer;
+
+bool player_request_hood_open(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_HOOD_OPEN_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionOpenHood__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryHoodOpenCar, esi;
+    }
+
+    tryHoodOpenAnswer = player_request_hood_open(tryHoodOpenCar);
+
+    __asm {
+        pop     edi;
+        pop     esi;
+        mov     al, tryHoodOpenAnswer;
+        pop     ebx;
+        retn    4;
+    }
+}
+
+bool player_request_hood_close(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_HOOD_CLOSE_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionCloseHood__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryHoodCloseCar, esi;
+    }
+
+    tryHoodCloseAnswer = player_request_hood_open(tryHoodCloseCar);
+
+    __asm {
+        pop edi;
+        mov al, tryHoodCloseAnswer;
+        pop esi;
+        retn 4;
+    }
+}
+
+bool player_request_trunk_open(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_TRUNK_OPEN_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionOpenTrunk__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryTrunkOpenCar, esi;
+    }
+
+    tryTrunkOpenAnswer = player_request_trunk_open(tryTrunkOpenCar);
+
+    __asm {
+        pop edi;
+        pop esi;
+        mov al, tryTrunkOpenAnswer;
+        pop ebx;
+        retn 4;
+    }
+}
+
+bool player_request_trunk_close(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_TRUNK_CLOSE_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionCloseTrunk__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryTrunkCloseCar, esi;
+    }
+
+    tryTrunkCloseAnswer = player_request_trunk_close(tryTrunkCloseCar);
+
+    __asm {
+        mov al, tryTrunkCloseAnswer;
+        pop esi;
+        retn 4;
+    }
+}
+
+bool player_request_fueltank(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_FUELTANK_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionTankFuel__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryFuelTank, esi;
+    }
+
+    tryFuelTankAnswer = player_request_fueltank(tryFuelTank);
+
+    __asm {
+        mov al, tryFuelTankAnswer;
+        pop esi;
+        retn 4;
+    }
+}
 /*
 DWORD _CHuman2__AddCommand;
 void __declspec(naked) CHuman2__AddCommand()

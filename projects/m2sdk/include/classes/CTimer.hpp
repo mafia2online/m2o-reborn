@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "CHudScriptW.h"
+#include "CHudScriptW.hpp"
 
 namespace M2
 {

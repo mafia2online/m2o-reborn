@@ -29,6 +29,11 @@ typedef enum {
     M2_EVENT_DRIVE_END,
     M2_EVENT_CAR_ENTER_REQUEST,
     M2_EVENT_CAR_ENTER,
+    M2_EVENT_CAR_HOOD_OPEN_REQUEST,
+    M2_EVENT_CAR_HOOD_CLOSE_REQUEST,
+    M2_EVENT_CAR_TRUNK_OPEN_REQUEST,
+    M2_EVENT_CAR_TRUNK_CLOSE_REQUEST,
+    M2_EVENT_CAR_FUELTANK_REQUEST
 } m2sdk_event_id;
 
 typedef union {
@@ -96,6 +101,7 @@ namespace M2 {
 /* Classes */
 #include "classes/CActor.hpp"
 #include "classes/CActorVehicle.hpp"
+#include "classes/CApplication.hpp"
 #include "classes/ccamera.hpp"
 #include "classes/CGameCamera.hpp"
 #include "classes/CCar.hpp"
@@ -114,24 +120,30 @@ namespace M2 {
 #include "classes/CGameInputModule.hpp"
 #include "classes/CGameRenderingSystemModule.hpp"
 #include "classes/CGameTrafficModule.hpp"
+#include "classes/CGameVehicleModule.hpp"
 #include "classes/CGfxEffects.hpp"
 #include "classes/CGfxEnvironmentEffects.hpp"
+#include "classes/CGuiGame.hpp"
 #include "classes/CHints.hpp"
 #include "classes/CHud.hpp"
-#include "classes/CHudScriptW.h"
+#include "classes/CHudScriptW.hpp"
 #include "classes/chuman2.hpp"
 #include "classes/CHumanHeadController.hpp"
 #include "classes/CHumanInventory.hpp"
 #include "classes/CHumanScript.hpp"
 #include "classes/CHumanWeaponController.hpp"
+#include "classes/CLockpick.hpp"
 #include "classes/cmafiaframework.hpp"
 #include "classes/CModel.hpp"
 #include "classes/CMusic.hpp"
 #include "classes/CNavigation.hpp"
+#include "classes/CPhoneBook.hpp"
 #include "classes/CPlayer2.hpp"
 #include "classes/CPlayerModelManager.hpp"
 #include "classes/CPlayerRadio.hpp"
+#include "classes/CPoliceRadio.hpp"
 #include "classes/CPoliceWanted.hpp"
+#include "classes/CRadio.hpp"
 #include "classes/CRangeMeter.hpp"
 #include "classes/CRenderCamera.hpp"
 #include "classes/CResources.hpp"
@@ -149,6 +161,7 @@ namespace M2 {
 #include "classes/CSlotManager.hpp"
 #include "classes/CSpeedometer.hpp"
 #include "classes/CSyncObject.hpp"
+#include "classes/CTelephone.hpp"
 #include "classes/CTextDatabase.hpp"
 #include "classes/CTickedModuleManager.hpp"
 #include "classes/CTimer.hpp"
