@@ -18,6 +18,11 @@ namespace M2
     class C_RangeMeter : public GameClassWrapper<C_RangeMeter, ICRangeMeter, 0x1CBFF00>
     {
     public:
+        void CloseSeason()
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0xAAB9A0, this);
+        }
+
         int DespawnAllElements()
         {
             return Mem::InvokeFunction<Mem::call_this, int>(0xAA2920, this);
@@ -26,6 +31,11 @@ namespace M2
         int FreeUnrelatedElements()
         {
             return Mem::InvokeFunction<Mem::call_this, int>(0xA6BAD0, this);
+        }
+
+        void OpenSeason(int season)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0xAB0800, this, season);
         }
 
         bool SwitchGenerators(bool trigger)

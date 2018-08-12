@@ -17,5 +17,16 @@ namespace M2
             _asm push bSwitch;
             _asm call dwFunc;
         }
+
+        static void SwitchSeason(bool winter)
+        {
+            if (winter) {
+                M2::C_RangeMeter::Get()->OpenSeason(50);
+            }
+            else {
+                M2::C_RangeMeter::Get()->OpenSeason(140);
+
+            }
+        }
     };
 };

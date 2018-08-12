@@ -106,6 +106,7 @@ namespace M2 {
 #include "classes/CGameCamera.hpp"
 #include "classes/CCar.hpp"
 #include "classes/CCarManager.hpp"
+#include "classes/CCarOwnerDB.hpp"
 #include "classes/CCore.hpp"
 #include "classes/CDoor.hpp"
 #include "classes/CEntity.hpp"

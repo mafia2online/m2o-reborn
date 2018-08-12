@@ -25,6 +25,8 @@ namespace M2
 
 		void DoModelSelectByActor(int unk, int unk2, int unk3, int unk4)
 		{
+            //unk must be 1 or -1
+            //unk3/4 are always 0
 			Mem::InvokeFunction<Mem::call_this, void>(0x0431300, this, unk, unk2, unk3, unk4);
 		}
 

@@ -194,6 +194,8 @@ namespace M2
 
         void ScrDoAction(C_SyncObject **syncObject, M2::C_Vehicle *veh, bool bEnter, M2::E_VehicleSeat seat, int iAnimate)
         {
+            // In fact 'bEnter' is enums.ActorActions => Search for DOOR_OPEN in binary for list of actions
+
             int iEnter = (bEnter) ? 1 : 0;
             bool bAnimate = (int)!iAnimate;
             int iSeat = (int)seat;
@@ -268,6 +270,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void>(0x994FC0, this, unk, unk2);
         }
 
+        void ScrTalkAi(int unk, const char *talk)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x994B80, this, unk, talk);
+        }
+
         void ScrSetAttackMode(int mode)
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x93B850, this, mode);
@@ -307,6 +314,11 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x0D6D040, this);
 		}
+
+        void ScriptMakeCarOwnership(C_Entity *car)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x91DDA0, this, car);
+        }
 
         void ScriptModelToHands(int model, int hand, int unk)
         {
@@ -392,6 +404,16 @@ namespace M2
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x091DD30, this, show);
 		}
+
+        void StartWatchByTarget(int lookType, C_Entity *entityToLookAt, Vector3 const &lookOffset, float unk1, float unk2)
+        {
+            Mem::InvokeFunction < Mem::call_this, void>(0x95CE30, this, lookType, entityToLookAt, lookOffset, unk1, unk2);
+        }
+
+        void StopWatch()
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x955320, this, 0);
+        }
 
 		C_Entity *UnregisterFollower(C_Entity *ent)
 		{
