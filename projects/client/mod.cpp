@@ -92,6 +92,10 @@ void mod_install() {
         data->arg5 = (void *)true;
     });
 
+    M2::AttachHandler(M2_EVENT_CAR_FUELTANK_REQUEST, [](m2sdk_event *data) {
+        data->arg5 = (void *)true;
+    });
+
     M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event *data) {
         auto player = (M2::C_Player2 *)data->arg1;
         auto car    = (M2::C_Car *)data->arg2;
@@ -349,23 +353,18 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 25);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 2);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
     }
 
     if (input_key_down(VK_F4) && mod.spawned && ent) {
-        auto car = reinterpret_cast<M2::C_Car*>(ent);
-        car->OpenTrunk();
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 4);
+        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+        ent->SetPosition(pos);
+        mod_log("Ped created\n");
     }
-
-    // if (input_key_down(VK_F6) && mod.spawned) {
-    //     void *command;
-    //     void *command2;
-    //     command2 =  reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetCurrentMoveCommand(&command);
-    //     mod_log("0x%p\n0x%p\n", command, command2);
-    // }
 
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {

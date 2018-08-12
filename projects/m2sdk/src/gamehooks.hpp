@@ -281,10 +281,13 @@ M2::C_Car *tryHoodOpenCar = nullptr;
 M2::C_Car *tryHoodCloseCar = nullptr;
 M2::C_Car *tryTrunkOpenCar = nullptr;
 M2::C_Car *tryTrunkCloseCar = nullptr;
+M2::C_Car *tryFuelTank = nullptr;
+
 bool tryHoodOpenAnswer;
 bool tryHoodCloseAnswer;
 bool tryTrunkOpenAnswer;
 bool tryTrunkCloseAnswer;
+bool tryFuelTankAnswer;
 
 bool player_request_hood_open(M2::C_Car *car) {
     m2sdk_event event = { 0 }; {
@@ -386,6 +389,31 @@ void __declspec(naked) CCarActionCloseTrunk__TestAction__Hook()
 
     __asm {
         mov al, tryTrunkCloseAnswer;
+        pop esi;
+        retn 4;
+    }
+}
+
+bool player_request_fueltank(M2::C_Car *car) {
+    m2sdk_event event = { 0 }; {
+        event.arg1 = (void *)car;
+    }
+
+    M2::TriggerHandler(M2_EVENT_CAR_FUELTANK_REQUEST, &event);
+    return (bool)event.arg5;
+}
+
+void __declspec(naked) CCarActionTankFuel__TestAction__Hook()
+{
+    __asm
+    {
+        mov tryFuelTank, esi;
+    }
+
+    tryFuelTankAnswer = player_request_fueltank(tryFuelTank);
+
+    __asm {
+        mov al, tryFuelTankAnswer;
         pop esi;
         retn 4;
     }

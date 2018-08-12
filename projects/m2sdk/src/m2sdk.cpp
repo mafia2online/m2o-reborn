@@ -66,6 +66,7 @@ void M2::Initialize(m2sdk_callback callback) {
     Mem::Hooks::InstallJmpPatch(0xA3F05C, (DWORD)CCarActionCloseHood__TestAction__Hook);
     Mem::Hooks::InstallJmpPatch(0xA3EC95, (DWORD)CCarActionOpenTrunk__TestAction__Hook);
     Mem::Hooks::InstallJmpPatch(0xA3EE72, (DWORD)CCarActionCloseTrunk__TestAction__Hook);
+    Mem::Hooks::InstallJmpPatch(0xA23482, (DWORD)CCarActionTankFuel__TestAction__Hook);
 
     // Patch for vehicle enter condition verification
     Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
@@ -93,8 +94,8 @@ void M2::Initialize(m2sdk_callback callback) {
     *(BYTE *)0x0950D61 = 0x75;
 
     // Disable game controlling engine state and radio
-    Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
-    Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
+    //Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
+    //Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
 
     // Disable game pause when minimized or in background
     Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
