@@ -85,5 +85,4 @@ namespace M2
         StopAnim				- LUA sub_D76580
         */
     };
-
 };

@@ -62,6 +62,12 @@ void M2::Initialize(m2sdk_callback callback) {
     // Patchs for enter action testing
     Mem::Hooks::InstallJmpPatch(0xA3E8E1, (DWORD)CCarActionEnter__TestAction__Hook);
     Mem::Hooks::InstallJmpPatch(0xA3F0A6, (DWORD)CCarActionBreakIn__TestAction__Hook);
+    Mem::Hooks::InstallJmpPatch(0xA23088, (DWORD)CCarActionOpenHood__TestAction__Hook);
+    Mem::Hooks::InstallJmpPatch(0xA3F05C, (DWORD)CCarActionCloseHood__TestAction__Hook);
+    Mem::Hooks::InstallJmpPatch(0xA3EC95, (DWORD)CCarActionOpenTrunk__TestAction__Hook);
+    Mem::Hooks::InstallJmpPatch(0xA3EE72, (DWORD)CCarActionCloseTrunk__TestAction__Hook);
+
+    // Patch for vehicle enter condition verification
     Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
 
     // Hooking human death
@@ -77,6 +83,7 @@ void M2::Initialize(m2sdk_callback callback) {
 
     // Player input hook
     CPlayer2__UpdateInput__Return = Mem::Hooks::InstallNotDumbJMP(0x43BD42, (M2_Address)CPlayer2__UpdateInput);
+
 
     // noop the CreateMutex, allow to run multiple instances
     Mem::Hooks::InstallJmpPatch(0x00401B89, 0x00401C16);
@@ -115,7 +122,7 @@ void M2::Initialize(m2sdk_callback callback) {
 
     // Disable DLC loadings (NONO, WE NEED DLCs !)
     //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
-    //
+    
 }
 
 void M2::Free() {}
