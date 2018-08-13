@@ -8,6 +8,9 @@
 #define LIBRG_IMPLEMENTATION
 #include "librg.h"
 #include "librg_ext.h"
+
+#define m2sdk_log zpl_printf
+
 #include "m2sdk.h"
 
 #include "m2o_api.h"
@@ -157,7 +160,7 @@ void mod_respawn() {
 
     /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
-    ped->CEntity->SetPosition(vec3(70.760f, 910.812f, -18.354f));
+    ped->CEntity->SetPosition(vec3(240.641052, 699.223755, -24.153996));
 
     /* Enabling controls */
     ped->CPlayer->LockControls(false);
@@ -353,25 +356,59 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 1);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 10);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
     }
 
-    if (input_key_down(VK_F4) && mod.spawned && ent) {
-        
+    if (input_key_down(VK_F4) && mod.spawned) {
+        vec3_t pos;
+        pos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
+
+        pos.z += 2.0;
+
+        M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"load_test\")");
+        M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
+        M2::Wrappers::lua::Execute("icon:Activate()");
+        M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
         M2::C_Entity *test = M2::C_WrappersList::Get()->GetEntityByName("RTR_POUTA1_00");
         if (test) {
-            BYTE type = *(BYTE*)(test + 0x1C);
-            mod_log("type : %x\nptr : 0x%p\n", type, test);
+            mod_log("entity : 0x%p\n", test);
         }
         else {
             mod_log("null ptr\n");
         }
+    }
+
+    if (GetAsyncKeyState(VK_F6) & 0x1) {
+        auto tables = M2::C_Tables::Get();
+        M2::C_TableData *instance = tables->GetInterface()->m_pWeaponsTable;
+        if (!instance) {
+            return mod_log("nullptr instance\n");
+        }
+
+        mod_log("tables : 0x%p\ninstance 0x%p\n",tables, instance);
+        mod_log("size : %d/%d\n", instance->m_iUsedLines, instance->m_iAvailableLines);
+        /*int size = instance->m_iUsedLines + instance->m_iAvailableLines;
+        mod_log("size : %d\n", size);
+        if (size > 0) {
+            for (int i = 0; i < size; ++i)
+            {
+                int test = instance->GetLine<int>(i);
+                mod_log("line contain = %d\n", test);
+            }
+        }
+        mod_log("%s\n", tables->GetModelFileName(M2::EntityTypes::Entity_Item, 10));
+        mod_log("%s\n", tables->GetModelFileName(M2::EntityTypes::Entity_Item, 11));*/
+
+        void *line = instance->GetLine<void *>(10);
+        
+        char *result = (char*)*(DWORD*)((*(DWORD*)line + 0x30));
+        mod_log("%s\n", result);
     }
 
 }

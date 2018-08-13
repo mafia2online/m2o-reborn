@@ -12,7 +12,7 @@
 #define Byte unsigned char
 
 #if !defined(m2sdk_log)
-#define m2sdk_log(fmt, ...)
+#define m2sdk_log(fmt, ...) 
 #endif
 
 #define pad(p,n,s) Byte p##__##n##[s]
@@ -143,7 +143,9 @@ namespace M2 {
 #include "classes/CPlayerModelManager.hpp"
 #include "classes/CPlayerRadio.hpp"
 #include "classes/CPoliceRadio.hpp"
+#include "classes/CPoliceRootCoordinator.hpp"
 #include "classes/CPoliceWanted.hpp"
+#include "classes/CPoliceWrapper.hpp"
 #include "classes/CRadio.hpp"
 #include "classes/CRangeMeter.hpp"
 #include "classes/CRenderCamera.hpp"
@@ -162,6 +164,8 @@ namespace M2 {
 #include "classes/CSlotManager.hpp"
 #include "classes/CSpeedometer.hpp"
 #include "classes/CSyncObject.hpp"
+#include "classes/CTableData.hpp"
+#include "classes/CTables.hpp"
 #include "classes/CTelephone.hpp"
 #include "classes/CTextDatabase.hpp"
 #include "classes/CTickedModuleManager.hpp"

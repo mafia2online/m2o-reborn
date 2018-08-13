@@ -38,6 +38,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, bool>(0xAB0800, this, season);
         }
 
+        bool SetPolice(bool police)
+        {
+            return Mem::InvokeFunction<Mem::call_this, bool>(0xA25940, this, police);
+        }
+
         bool SwitchGenerators(bool trigger)
         {
             return Mem::InvokeFunction<Mem::call_this, bool>(0xAAB870, this, trigger);
