@@ -54,6 +54,7 @@ typedef void (*m2sdk_callback_event)(m2sdk_event *);
 namespace M2 {
 
     void Initialize(m2sdk_callback callback);
+    void InitializeSDKHandlers();
     void Free();
 
     void AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback);
@@ -105,6 +106,14 @@ namespace M2 {
 #include "classes/ccamera.hpp"
 #include "classes/CGameCamera.hpp"
 #include "classes/CCar.hpp"
+#include "classes/CCarActionBreakIn.hpp"
+#include "classes/CCarActionCloseHood.hpp"
+#include "classes/CCarActionCloseTrunk.hpp"
+#include "classes/CCarActionEnter.hpp"
+#include "classes/CCarActionOpenHood.hpp"
+#include "classes/CCarActionOpenTrunk.hpp"
+#include "classes/CCarActionTankFuel.hpp"
+#include "classes/CCarActionThrowFrom.hpp"
 #include "classes/CCarManager.hpp"
 #include "classes/CCarOwnerDB.hpp"
 #include "classes/CCore.hpp"

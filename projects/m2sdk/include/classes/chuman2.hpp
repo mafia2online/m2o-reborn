@@ -14,6 +14,8 @@
 #include "CCar.hpp"
 #include "CScene.hpp"
 
+#include <functional>
+
 namespace M2
 {
     enum E_Command : int
@@ -135,4 +137,91 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, int>(0x94EA80, this, &rot);
         }
 	};
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+    namespace C_Human2_Hooks
+    {
+        void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)>);
+        void HookDoDamage(std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)>);
+
+        namespace FunctionPointers
+        {
+            std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> setupDeath;
+            std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)> doDamage;
+        };
+
+        namespace Functions
+        {
+            inline void SetupDeath(M2::C_Human2* human, M2::C_EntityMessageDamage* message)
+            {
+                if (FunctionPointers::setupDeath != nullptr) {
+                    FunctionPointers::setupDeath(human, message);
+                }
+            }
+
+            inline void DoDamage(M2::C_Human2* human, M2::C_EntityMessageDamage* message)
+            {
+                if (FunctionPointers::doDamage != nullptr) {
+                    FunctionPointers::doDamage(human, message);
+                }
+            }
+        };
+
+        namespace NakedFunctions
+        {
+            DWORD MineDeathHook_JumpBack = 0x00990CFF;
+            DWORD _CHuman2__SetupDeath = 0x0098C160;
+            void __declspec(naked) CHuman2__SetupDeath_Hook()
+            {
+                __asm {
+                    pushad
+                    push esi
+                    push ebp
+                    call Functions::SetupDeath
+                    add esp, 0x8
+                    popad
+
+                    push    esi
+                    mov     ecx, ebp
+                    call    _CHuman2__SetupDeath
+
+                    jmp MineDeathHook_JumpBack
+                }
+            }
+
+            DWORD _CHuman2__DoDamage = 0x09907D0;
+            DWORD _DoDamage__JumpBack = 0x042FC6F;
+            __declspec(naked) void CHuman2__DoDamage__Hook()
+            {
+                __asm
+                {
+                    pushad;
+                    push esi;
+                    push edi;
+                    call Functions::DoDamage;
+                    add esp, 0x8;
+                    popad;
+
+                    push edi;
+                    mov ecx, esi;
+                    call _CHuman2__DoDamage;
+
+                    jmp _DoDamage__JumpBack;
+                }
+            }
+        };
+
+        void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
+        {
+            FunctionPointers::setupDeath = ptr;
+            Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)NakedFunctions::CHuman2__SetupDeath_Hook);
+        }
+
+        void HookDoDamage(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
+        {
+            FunctionPointers::doDamage = ptr;
+            Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)NakedFunctions::CHuman2__DoDamage__Hook);
+        }
+    };
+#endif
 };

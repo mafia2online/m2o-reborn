@@ -385,30 +385,8 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {
-        auto tables = M2::C_Tables::Get();
-        M2::C_TableData *instance = tables->GetInterface()->m_pWeaponsTable;
-        if (!instance) {
-            return mod_log("nullptr instance\n");
-        }
-
-        mod_log("tables : 0x%p\ninstance 0x%p\n",tables, instance);
-        mod_log("size : %d/%d\n", instance->m_iUsedLines, instance->m_iAvailableLines);
-        /*int size = instance->m_iUsedLines + instance->m_iAvailableLines;
-        mod_log("size : %d\n", size);
-        if (size > 0) {
-            for (int i = 0; i < size; ++i)
-            {
-                int test = instance->GetLine<int>(i);
-                mod_log("line contain = %d\n", test);
-            }
-        }
-        mod_log("%s\n", tables->GetModelFileName(M2::EntityTypes::Entity_Item, 10));
-        mod_log("%s\n", tables->GetModelFileName(M2::EntityTypes::Entity_Item, 11));*/
-
-        void *line = instance->GetLine<void *>(10);
-        
-        char *result = (char*)*(DWORD*)((*(DWORD*)line + 0x30));
-        mod_log("%s\n", result);
+        auto player = M2::C_Game::Get()->GetLocalPed();
+        reinterpret_cast<M2::C_Human2*>(player)->GetScript()->SetHealth(0.0);
     }
 
 }
