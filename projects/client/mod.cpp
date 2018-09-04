@@ -381,11 +381,18 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         int handle = gfx_create_texture_file("D:\\Projects\\m2o\\m2o-reborn\\binary\\pug.bmp");
 
         gfx_position_set(handle, 200, 200);
-        gfx_scale_set(handle, 0.5f, 1.0f);
+        gfx_scale_set(handle, 1.0f, 1.0f);
         gfx_render_add(handle, 15);
         mod_log("attaching handle %d at layer 15\n", handle);
 
+        int h2 = gfx_create_text(0, 32, "hello привет!", vec4f(255, 255, 255, 255));
+
+        gfx_position_set(h2, 10, 10);
+        gfx_render_add(h2, 150);
+
         gfx_render_dump();
+
+
     }
 
     if (input_key_down(VK_F9)) {

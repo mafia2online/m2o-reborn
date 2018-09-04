@@ -41,10 +41,10 @@ struct gfx_t {
     char fontpaths[8][MAX_PATH];
     int  object_cursor;
 
-    zpl_array(TTF_Font *) fonts;
     zpl_array(gfx_object) objects;
     zpl_array(gfx_handle) queue;
 
+    std::unordered_map<int, TTF_Font *> fonts;
     SDL_Renderer *rnd;
 
     gfx_d3dcreate9_cb       method;
@@ -56,6 +56,8 @@ enum {GFX_TEXTURE, GFX_RECTANGLE, GFX_LINE};
 
 static gfx_t gfx_state;
 static zpl_mutex gfx_lock;
+
+#define GFX_MAX_FONTS 255
 
 // =======================================================================//
 // !
@@ -70,6 +72,10 @@ static zpl_mutex gfx_lock;
 
         if (!zpl_file_exists(filename)) {
             return -2;
+        }
+
+        if (fontid > GFX_MAX_FONTS) {
+            return -3;
         }
 
         zpl_memcopy(&gfx_state.fontpaths[fontid], filename, zpl_strlen(filename));
@@ -98,19 +104,17 @@ static zpl_mutex gfx_lock;
             return NULL;
         }
 
-        if (fontid > zpl_array_capacity(gfx_state.fonts)) {
-            zpl_array_set_capacity(gfx_state.fonts, fontid + 1);
+        if (fontid > GFX_MAX_FONTS) {
+            return NULL;
         }
 
-        if (fontid + 1 > zpl_array_count(gfx_state.fonts)) {
-            zpl_array_count(gfx_state.fonts) = fontid + 1;
+        int key = fontid + GFX_MAX_FONTS * size;
+
+        if (gfx_state.fonts.find(key) == gfx_state.fonts.end()) {
+            gfx_state.fonts[key] = TTF_OpenFont(gfx_state.fontpaths[fontid], size);
         }
 
-        if (gfx_state.fonts[fontid] == NULL) {
-            gfx_state.fonts[fontid] = TTF_OpenFont(gfx_state.fontpaths[fontid], size);
-        }
-
-        return gfx_state.fonts[fontid];
+        return gfx_state.fonts[key];
     }
 
 // =======================================================================//
@@ -635,7 +639,6 @@ static zpl_mutex gfx_lock;
         gfx_state.method = (gfx_d3dcreate9_cb)(Mem::Hooks::InstallDetourPatch("d3d9.dll", "Direct3DCreate9", (DWORD)gfx_d3dcreate9_hook));
 
         TTF_Init();
-        zpl_array_init_reserve(gfx_state.fonts, zpl_heap(), 32);
         zpl_array_init_reserve(gfx_state.objects, zpl_heap(), 4);
         zpl_array_init(gfx_state.queue, zpl_heap());
         zpl_mutex_init(&gfx_lock);
@@ -651,15 +654,12 @@ static zpl_mutex gfx_lock;
         gfx_state.installed = false;
         Mem::Hooks::UninstallDetourPatch(gfx_state.method, (DWORD)gfx_d3dcreate9_hook);
 
-        for (i32 i = 0; i < 0; i++) {
-            if (gfx_state.fonts[i] != NULL) {
-                TTF_CloseFont(gfx_state.fonts[i]);
-            }
+        for (const auto& item : gfx_state.fonts) {
+            TTF_CloseFont(item.second);
         }
 
         zpl_mutex_destroy(&gfx_lock);
         zpl_array_free(gfx_state.queue);
-        zpl_array_free(gfx_state.fonts);
         zpl_array_free(gfx_state.objects);
         TTF_Quit();
 
