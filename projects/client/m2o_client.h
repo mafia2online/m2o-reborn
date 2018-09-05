@@ -26,6 +26,9 @@ extern "C" {
     void platform_init();
     void platform_free();
 
+    void *platform_windowid();
+    const char *platform_path();
+
 // =======================================================================//
 // !
 // ! Graphics

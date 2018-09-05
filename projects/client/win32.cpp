@@ -19,6 +19,7 @@ namespace M2 {
 #include "m2o_client.h"
 
 #include "win32/gfx.hpp"
+#include "win32/cef.hpp"
 #include "win32/vfs.hpp"
 #include "win32/input.hpp"
 #include "win32/exceptions.hpp"
@@ -36,6 +37,8 @@ extern "C" { // NOTE: Tell the OS to prefer dedicated video card.
 
 typedef WNDPROC wnd_wndproc_cb;
 wnd_wndproc_cb mod_wndproc_original;
+static HWND mod_win32_hwnd;
+static char mod_win32_path[MAX_PATH];
 
 LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     // mod_log("mod_wndproc_hook %x %u %u %u\n", hWnd, uMsg, wParam, lParam);
@@ -44,12 +47,20 @@ LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 void platform_free() {}
 void platform_init() {
-    HWND hWnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
-    SetWindowText(hWnd, M2O_VERSION_PRETTY);
+    mod_win32_hwnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
+    SetWindowText(mod_win32_hwnd, M2O_VERSION_PRETTY);
 
     // hook the wind proc
-    mod_wndproc_original = (wnd_wndproc_cb)SetWindowLongPtr(hWnd, GWL_WNDPROC, (LONG_PTR)mod_wndproc_hook);
-    SetWindowLongW(hWnd, GWL_WNDPROC, GetWindowLong(hWnd, GWL_WNDPROC));
+    mod_wndproc_original = (wnd_wndproc_cb)SetWindowLongPtr(mod_win32_hwnd, GWL_WNDPROC, (LONG_PTR)mod_wndproc_hook);
+    SetWindowLongW(mod_win32_hwnd, GWL_WNDPROC, GetWindowLong(mod_win32_hwnd, GWL_WNDPROC));
+}
+
+void *platform_windowid() {
+    return (void *)mod_win32_hwnd;
+}
+
+const char *platform_path() {
+    return mod_win32_path;
 }
 
 // =======================================================================//
@@ -131,6 +142,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
             auto temp_pos  = temp_path.rfind("\\");
 
             auto modpath = temp_path.erase(temp_pos, std::string::npos);
+            zpl_strcpy(mod_win32_path, modpath.c_str());
 
             zpl_mutex_init(&debug_log_mutex);
             zpl_file_remove((modpath + "\\debug.log").c_str());
@@ -142,7 +154,6 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
 
             /* attach custom exception handler */
             exceptions_init((modpath + "\\exceptions").c_str());
-
 
             /* attach gfx rendering hooks */
             gfx_init();

@@ -67,6 +67,8 @@ if (M2O_CEF)
         ${PROJECT_SOURCE_DIR}/../../vendor/cef
         ${PROJECT_SOURCE_DIR}/../../vendor/cef/include
     )
+
+    set(LIBRARIES ${LIBRARIES} libcef libcef_dll_wrapper)
 endif()
 
 link_directories(${LIBRARY_FOLDERS})
