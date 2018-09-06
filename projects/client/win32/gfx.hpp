@@ -154,7 +154,7 @@ static zpl_mutex gfx_lock;
         gfx_object *obj = &gfx_state.objects[handle];
 
         obj->type    = GFX_TEXTURE;
-        obj->texture = SDL_CreateTexture(gfx_state.rnd, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_STREAMING, w, h);
+        obj->texture = SDL_CreateTexture(gfx_state.rnd, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
         obj->scalex  = 1.0f;
         obj->scaley  = 1.0f;
         obj->data.x  = 0;
@@ -279,11 +279,12 @@ static zpl_mutex gfx_lock;
     }
 
     int gfx_update_texture(gfx_handle handle, const void *pixels, int w, int h) {
+        mod_log("gfx_update_texture");
         if (!gfx_exists(handle)) {
             return -1;
         }
 
-        u8 *texture_data  = NULL;
+        void *texture_data  = NULL;
         int texture_pitch = 0;
 
         zpl_mutex_lock(&gfx_lock);
@@ -294,8 +295,13 @@ static zpl_mutex gfx_lock;
             return -2;
         }
 
-        SDL_LockTexture(obj->texture, 0, (void **)&texture_data, &texture_pitch);
-        memcpy(texture_data, pixels, w * h * 4);
+        if (SDL_LockTexture(obj->texture, NULL, &texture_data, &texture_pitch) != 0) {
+            zpl_mutex_unlock(&gfx_lock);
+            mod_log(SDL_GetError());
+            return -3;
+        }
+
+        zpl_memcopy(texture_data, pixels, w * h * 4);
         SDL_UnlockTexture(obj->texture);
 
         zpl_mutex_unlock(&gfx_lock);
@@ -397,6 +403,7 @@ static zpl_mutex gfx_lock;
     }
 
     int gfx_render_exists(gfx_handle handle) {
+        mod_log("gfx_render_exists");
         if (!gfx_exists(handle)) {
             return -1;
         }
@@ -450,6 +457,8 @@ static zpl_mutex gfx_lock;
         if (!gfx_state.rnd) {
             return -1;
         }
+
+        //mod_log("gfx_render_draw");
 
         SDL_SetRenderDrawBlendMode(gfx_state.rnd, SDL_BLENDMODE_BLEND);
 

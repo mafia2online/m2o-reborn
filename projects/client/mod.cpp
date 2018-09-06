@@ -177,6 +177,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     librg_option_set(LIBRG_PLATFORM_PROTOCOL, M2O_VERSION_PROTOCOL);
 
     librg_init(ctx);
+    cef_init();
 
     // setup callbacks
     librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, [](librg_event_t *event) {
@@ -308,6 +309,7 @@ void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
 void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     // tick networking
     librg_tick(ctx);
+    cef_tick();
 
     // interpolate all entities
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), [](librg_ctx_t *ctx, librg_entity_t *entity) {
@@ -392,14 +394,14 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
         gfx_render_dump();
 
-
     }
 
     if (input_key_down(VK_F9)) {
-        int handle = gfx_create_rect(200, 200, 500, 500, vec4f(255, 0, 0, 255));
-        gfx_render_add(handle, -10);
-        mod_log("attaching handle %d at layer -10\n", handle);
+        // int handle = gfx_create_rect(200, 200, 500, 500, vec4f(255, 0, 0, 255));
+        // gfx_render_add(handle, -10);
+        // mod_log("attaching handle %d at layer -10\n", handle);
 
-        gfx_render_dump();
+        // gfx_render_dump();
+        cef_browser_create("https://discordapp.com", 800, 600);
     }
 }

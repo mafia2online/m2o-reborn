@@ -16,9 +16,9 @@ file(GLOB_RECURSE FILES
 
 set(LIBRARIES m2sdk discord-rpc SDL2 SDL2_ttf libfreetype-6)
 set(LIBRARY_FOLDERS
-    ${PROJECT_SOURCE_DIR}/../../vendor/discord/${CMAKE_BUILD_TYPE}/
-    ${PROJECT_SOURCE_DIR}/../../vendor/sdl/${CMAKE_BUILD_TYPE}/
-    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/lib/
+    ${PROJECT_SOURCE_DIR}/../../vendor/discord/
+    ${PROJECT_SOURCE_DIR}/../../vendor/sdl/
+    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/
 )
 set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/
@@ -47,7 +47,7 @@ if (WIN32)
         ws2_32  # for librg
         psapi   # for librg
         winmm   # for librg
-        d3d9
+        # d3d9
         d3dx9
         dxgi
         dinput8
@@ -62,7 +62,7 @@ endif()
 if (M2O_CEF)
     message("-- M2O_CEF enabled, linking with CEF ...")
 
-    set(LIBRARY_FOLDERS ${LIBRARY_FOLDERS} ${PROJECT_SOURCE_DIR}/../../vendor/cef/${CMAKE_BUILD_TYPE}/)
+    set(LIBRARY_FOLDERS ${LIBRARY_FOLDERS} ${PROJECT_SOURCE_DIR}/../../vendor/cef/)
     set(INCLUDE_FOLDERS ${INCLUDE_FOLDERS}
         ${PROJECT_SOURCE_DIR}/../../vendor/cef
         ${PROJECT_SOURCE_DIR}/../../vendor/cef/include

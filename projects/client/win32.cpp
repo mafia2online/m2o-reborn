@@ -41,6 +41,8 @@ static HWND mod_win32_hwnd;
 static char mod_win32_path[MAX_PATH];
 
 LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    mod_win32_hwnd = hWnd;
+
     // mod_log("mod_wndproc_hook %x %u %u %u\n", hWnd, uMsg, wParam, lParam);
     return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
 }
