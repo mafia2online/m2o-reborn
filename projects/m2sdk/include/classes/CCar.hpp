@@ -58,6 +58,11 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x09BCF30, this);
 		}
 
+        void CreateController(int controller)
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x9D9F20, this, controller);
+        }
+
         void DoorChangeState(int door)
         {
             Mem::InvokeFunction<Mem::call_this, void *>(0x4DBE10, this, door);
@@ -193,6 +198,11 @@ namespace M2
         void RestoreCar()
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x4E9890, this, 1, 0, 0);
+        }
+
+        void SetAIController(int controller)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0x9A0EB0, this, controller);
         }
 
         void SetActualTuningTable(int tuningTable)
