@@ -166,7 +166,6 @@ static zpl_mutex gfx_lock;
 
         if (!obj->texture) {
             obj->valid = 0;
-            zpl_array_count(gfx_state.objects)--;
             zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
@@ -202,7 +201,6 @@ static zpl_mutex gfx_lock;
 
         if (!obj->texture) {
             obj->valid = 0;
-            zpl_array_count(gfx_state.objects)--;
             zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
@@ -239,7 +237,6 @@ static zpl_mutex gfx_lock;
 
         if (!obj->texture) {
             obj->valid = 0;
-            zpl_array_count(gfx_state.objects)--;
             zpl_mutex_unlock(&gfx_lock);
             return -1;
         }
@@ -351,9 +348,7 @@ static zpl_mutex gfx_lock;
                 break;
         }
 
-        zpl_array_count(gfx_state.objects)--;
         gfx_state.objects[handle].valid = 0;
-
         zpl_mutex_unlock(&gfx_lock);
         return 0;
     }

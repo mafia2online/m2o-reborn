@@ -2,8 +2,6 @@
 #include "cef_client.h"
 #include "wrapper/cef_helpers.h"
 
-#define CEF_DEFAULT_GFX_LAYER 200
-
 class RenderHandler;
 class BrowserClient;
 
@@ -65,13 +63,15 @@ class RenderHandler : public CefRenderHandler {
             mTexture = -1;
 
             resize(w, h, zindex);
-            //show(zindex);
+            show(zindex);
         }
 
         ~RenderHandler() {
             delete[] mPixelBuffer;
             delete[] mPopupBuffer;
             delete[] mPixelBufferRow;
+
+            gfx_destroy(mTexture);
         }
 
         void show(int zindex) {
@@ -97,7 +97,7 @@ class RenderHandler : public CefRenderHandler {
                 delete[] mPixelBufferRow;
                 mPixelBufferRow = new unsigned char[mPixelBufferWidth * mBufferDepth];
 
-                //int was_visible = gfx_render_exists(mTexture);
+                int was_visible = gfx_render_exists(mTexture);
 
                 if (mTexture != -1) {
                     gfx_destroy(mTexture);
@@ -105,9 +105,9 @@ class RenderHandler : public CefRenderHandler {
 
                 mTexture = gfx_create_texture(width, height);
 
-                //if (was_visible > 0) {
+                if (was_visible > 0) {
                     gfx_render_add(mTexture, zindex);
-                //}
+                }
             }
         }
 
@@ -121,7 +121,6 @@ class RenderHandler : public CefRenderHandler {
                 dst += mPixelBufferWidth * mBufferDepth * (mFlipYPixels ? -1 : 1);
             }
         }
-
 
         bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override {
             rect = CefRect(0, 0, mPixelBufferWidth, mPixelBufferHeight);
@@ -177,7 +176,7 @@ class RenderHandler : public CefRenderHandler {
         void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override {
             CEF_REQUIRE_UI_THREAD();
 
-            mod_log("Popup state set to %d", show);
+            mod_log("[cef] Popup state set to %d", show);
 
             if (!show) {
                 delete[] mPopupBuffer;
@@ -234,21 +233,20 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler {
             }
         }
 
-
         void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) {
-            mod_log("OnLoadEnd(%d)", httpStatusCode);
+            mod_log("[cef] OnLoadEnd(%d)", httpStatusCode);
         }
 
         bool OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString & failedUrl, CefString & errorText) {
-            mod_log("OnLoadError()");
+            mod_log("[cef] OnLoadError()");
         }
 
         void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) {
-            mod_log("OnLoadingStateChange()");
+            mod_log("[cef] OnLoadingStateChange()");
         }
 
         void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) {
-            mod_log("OnLoadStart()");
+            mod_log("[cef] OnLoadStart()");
         }
 
         bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
@@ -258,7 +256,7 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler {
                            CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
                            CefBrowserSettings& settings, bool* no_javascript_access)
         {
-            mod_log("Page wants to open a popup");
+            mod_log("[cef] Page wants to open a popup");
 
             return true;
         };
@@ -389,7 +387,7 @@ class CefMinimal : public CefApp {
                 cef_state.objects[cef_state.object_cursor].valid = 1;
 
                 zpl_array_count(cef_state.objects)++;
-                return gfx_state.object_cursor;
+                return cef_state.object_cursor;
             }
         }
 
@@ -429,6 +427,19 @@ class CefMinimal : public CefApp {
     }
 
     int cef_browser_destroy(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_object *obj = &cef_state.objects[handle];
+
+        cef_state.objects[handle].valid = 0;
+        cef_state.objects[handle].browser.get()->GetHost()->CloseBrowser(true);
+
+        cef_state.objects[handle].browser   = NULL;
+        cef_state.objects[handle].client    = NULL;
+        cef_state.objects[handle].renderer  = NULL;
+
         return 0;
     }
 
@@ -437,16 +448,6 @@ class CefMinimal : public CefApp {
 // ! Operation interface
 // !
 // =======================================================================//
-
-    int cef_browser_reload(cef_handle handle) {
-        if (!cef_exists(handle)) {
-            return -1;
-        }
-
-        cef_state.objects[handle].browser.get()->Reload();
-
-        return 0;
-    }
 
     int cef_browser_resize(cef_handle handle, int w, int h) {
         if (!cef_exists(handle)) {
@@ -498,6 +499,22 @@ class CefMinimal : public CefApp {
         return 0;
     }
 
+// =======================================================================//
+// !
+// ! Location hanlding
+// !
+// =======================================================================//
+
+    int cef_browser_reload(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].browser.get()->Reload();
+
+        return 0;
+    }
+
     int cef_url_set(cef_handle handle, const char *url) {
         if (!cef_exists(handle)) {
             return -1;
@@ -517,7 +534,7 @@ class CefMinimal : public CefApp {
         CefString cefurl = cef_state.objects[handle].browser.get()->GetMainFrame()->GetURL();
         auto str = cefurl.ToString();
 
-        if (str.size() + 1 > maxlen) {
+        if (str.size() + 1 > (u32)maxlen) {
             return -1;
         }
 

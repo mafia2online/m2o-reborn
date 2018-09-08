@@ -408,10 +408,11 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (input_key_down(VK_F10)) {
+        cef_browser_destroy(browser);
         // cef_browser_resize(browser, 1024, 768);
-        char myurl[1024];
-        cef_url_set(browser, "https://google.com");
+        // char myurl[1024];
+        // cef_url_set(browser, "https://google.com");
 
-        //mod_log("the url: %s;", myurl);
+        // //mod_log("the url: %s;", myurl);
     }
 }
