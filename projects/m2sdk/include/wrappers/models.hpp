@@ -336,4 +336,89 @@ namespace M2
             }
         };
     };
+
+    class CModelManager
+    {
+        CModelManager()
+        {
+            this->modelMgr = (M2::C_SlotWrapper*)M2::Alloc(0x18);
+            printf("Allocated\n");
+            Mem::InvokeFunction<Mem::call_this, void>(0x599C50, this->modelMgr);
+            printf("Constructed\n");
+            //this->modelMgr->m_szMgrName = name;
+
+            //this->modelMgr = M2::C_PlayerModelManager::Get()->GetInterface();
+        }
+    public:
+        M2::C_SlotWrapper *modelMgr;
+        M2::C_Model *m_pModel;
+        static CModelManager &Get()
+        {
+            static CModelManager instance = CModelManager();
+            return instance;
+        }
+
+        bool AllocateSlot()
+        {
+            return C_SlotManager::Get()->ConnectToFreeSlotByType(E_SlotTypes::SLOT_CAR_UNIVERS, this->modelMgr);
+        }
+
+        int GetSlotState(M2::C_Slot* slot)
+        {
+            return slot->GetState(0);
+        }
+
+        bool LoadDataToSlot(const char* path)
+        {
+            return this->modelMgr->m_pSlot->LoadData(path, 0, 0, 0);
+        }
+
+        void DisconnectFromSlot()
+        {
+            Mem::InvokeFunction<Mem::call_this, void>(0x5AD300, this->modelMgr);
+        }
+
+        void OpenModel(M2::EntityTypes type, const char* modelname)
+        {
+            //Mem::InvokeFunction<Mem::call_this, bool>(0x5CBBE0, this->mgr, modelname);
+
+
+            char fullpath[256] = { 0 };
+            switch (type)
+            {
+                case M2::EntityTypes::Entity_Player:
+                {
+                    sprintf(fullpath, "/sds/player/%s.sds", modelname);
+                    break;
+                }
+                case M2::EntityTypes::Entity_Car:
+                {
+                    sprintf(fullpath, "/sds/cars/%s.sds", modelname);
+                    break;
+                }
+            }
+
+            /*std::vector<C_SlotWrapper*> vvector;
+            Mem::InvokeFunction<Mem::call_this, void>(0x4D9830, vvector, &this->modelMgr);*/
+
+            printf("Allocating slot\n");
+            if (!this->AllocateSlot())
+            {
+                printf("Failed to allocate a new slot!\n");
+                return;
+            }
+
+            if (this->LoadDataToSlot(fullpath))
+            {
+                printf("Data loaded to slot!\ntest : %s\n",this->modelMgr->m_pSlot->m_sName);
+                if (this->modelMgr->m_pSlot)
+                {
+                    printf("Slot wasn't null");
+                    this->m_pModel = this->modelMgr->m_pSlot->GetModelByFileName(fullpath);
+                }
+            }
+            this->DisconnectFromSlot();
+            printf("Disconnected from slot");
+        }
+    };
 };
