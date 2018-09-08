@@ -1,6 +1,8 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
+// disable dll exports for SDL
+#define DECLSPEC
 #include "SDL.h"
 #include "SDL_ttf.h"
 
@@ -169,6 +171,8 @@ static zpl_mutex gfx_lock;
             return -1;
         }
 
+        SDL_SetTextureBlendMode(obj->texture, SDL_BLENDMODE_BLEND);
+
         zpl_mutex_unlock(&gfx_lock);
         return handle;
     }
@@ -303,6 +307,10 @@ static zpl_mutex gfx_lock;
 
         zpl_memcopy(texture_data, pixels, w * h * 4);
         SDL_UnlockTexture(obj->texture);
+
+        // if (SDL_UpdateTexture(obj->texture, NULL, pixels, 1) != 0) {
+        //     mod_log(SDL_GetError());
+        // }
 
         zpl_mutex_unlock(&gfx_lock);
 

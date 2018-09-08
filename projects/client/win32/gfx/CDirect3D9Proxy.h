@@ -111,6 +111,26 @@ HMONITOR STDMETHODCALLTYPE CDirect3D9Proxy::GetAdapterMonitor(UINT Adapter) {
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS * pPresentationParameters, IDirect3DDevice9 ** ppReturnedDeviceInterface) {
+    // D3DCAPS9 caps;
+    // DWORD device_flags = pPresentationParameters->Flags; 
+    
+    // GetDeviceCaps(Adapter, DeviceType, &caps);
+
+    // //device_flags |= D3DCREATE_FPU_PRESERVE;
+    // if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
+    //     device_flags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+    // } else {
+    //     device_flags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    // }
+
+    // device_flags |= D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
+    
+    // if (SDL_GetHintBoolean(SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_FALSE)) {
+    //     device_flags |= D3DCREATE_MULTITHREADED;
+    // }
+    
+    // pPresentationParameters->Flags = device_flags;
+
     HRESULT hr = m_pD3D->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface );
 
     if (SUCCEEDED(hr)) {

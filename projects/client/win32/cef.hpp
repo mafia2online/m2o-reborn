@@ -5,9 +5,7 @@
 #define CEF_DEFAULT_GFX_LAYER 200
 gfx_handle g_texture = -1;
 
-class RenderHandler :
-    public CefRenderHandler
-{
+class RenderHandler : public CefRenderHandler {
     public:
         unsigned char* mPixelBuffer;
         int mPixelBufferWidth;
@@ -18,7 +16,9 @@ class RenderHandler :
         int mBufferDepth;
         bool mFlipYPixels;
 
-        RenderHandler() {
+        gfx_handle mTexture;
+
+        RenderHandler(int w, int h) {
             // inidcates if we should flip the pixel buffer in Y direction
             mFlipYPixels = false;
 
@@ -35,6 +35,11 @@ class RenderHandler :
 
             // depth is same for all buffer
             mBufferDepth = 4;
+
+            mTexture = gfx_create_texture(w, h);
+
+            resize(w, h);
+            show();
         }
 
         ~RenderHandler() {
@@ -43,10 +48,16 @@ class RenderHandler :
             delete[] mPixelBufferRow;
         }
 
-        void resizePixelBuffer(int width, int height)
-        {
-            if (mPixelBufferWidth != width || mPixelBufferHeight != height)
-            {
+        void show() {
+            gfx_render_add(mTexture, CEF_DEFAULT_GFX_LAYER);
+        }
+
+        void hide() {
+            gfx_render_remove(mTexture);
+        }
+
+        void resize(int width, int height) {
+            if (mPixelBufferWidth != width || mPixelBufferHeight != height) {
                 delete[] mPixelBuffer;
                 mPixelBufferWidth = width;
                 mPixelBufferHeight = height;
@@ -58,13 +69,11 @@ class RenderHandler :
             }
         }
 
-        void copyPopupIntoView()
-        {
+        void copyPopupIntoView() {
             int popup_y = (mFlipYPixels ? (mPixelBufferHeight - mPopupBufferRect.y) : mPopupBufferRect.y);
             unsigned char* src = (unsigned char*)mPopupBuffer;
             unsigned char* dst = mPixelBuffer + popup_y * mPixelBufferWidth * mBufferDepth + mPopupBufferRect.x * mBufferDepth;
-            while (src < (unsigned char*)mPopupBuffer + mPopupBufferRect.width * mPopupBufferRect.height * mBufferDepth)
-            {
+            while (src < (unsigned char*)mPopupBuffer + mPopupBufferRect.width * mPopupBufferRect.height * mBufferDepth) {
                 memcpy(dst, src, mPopupBufferRect.width * mBufferDepth);
                 src += mPopupBufferRect.width * mBufferDepth;
                 dst += mPixelBufferWidth * mBufferDepth * (mFlipYPixels ? -1 : 1);
@@ -72,37 +81,25 @@ class RenderHandler :
         }
 
 
-        bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override
-        {
-            mod_log("called GetViewRect");
-            int width = 800;
-            int height = 600;
-            rect = CefRect(0, 0, width, height);
+        bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override {
+            rect = CefRect(0, 0, mPixelBufferWidth, mPixelBufferHeight);
             return true;
         }
 
-        void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList& dirtyRects, const void* buffer, int width, int height) override
-        {
-            mod_log("OnPaint");
+        void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList& dirtyRects, const void* buffer, int width, int height) override {
             CEF_REQUIRE_UI_THREAD();
 
-            resizePixelBuffer(width, height);
-
             // whole page was updated
-            if (type == PET_VIEW)
-            {
-                // create (firs time) or resize (browser size changed) a buffer for pixels
+            if (type == PET_VIEW) {
                 // and copy them in
                 memcpy(mPixelBuffer, buffer, width * height * mBufferDepth);
 
                 // we need to flip pixel buffer in Y direction as per settings
-                if (mFlipYPixels)
-                {
+                if (mFlipYPixels) {
                     const size_t stride = mPixelBufferWidth * mBufferDepth;
                     unsigned char* lower = mPixelBuffer;
                     unsigned char* upper = mPixelBuffer + (mPixelBufferHeight - 1) * stride;
-                    while (lower < upper)
-                    {
+                    while (lower < upper) {
                         memcpy(mPixelBufferRow, lower, stride);
                         memcpy(lower, upper, stride);
                         memcpy(upper, mPixelBufferRow, stride);
@@ -113,14 +110,12 @@ class RenderHandler :
 
                 // if there is still a popup open, write it into the page too (it's pixels will have been
                 // copied into it's buffer by a call to OnPaint with type of PET_POPUP earlier)
-                if (mPopupBuffer != nullptr)
-                {
+                if (mPopupBuffer != nullptr) {
                     copyPopupIntoView();
                 }
             }
             // popup was updated
-            else if (type == PET_POPUP)
-            {
+            else if (type == PET_POPUP) {
                 // copy over the popup pixels into it's buffer
                 // (popup buffer created in onPopupSize() as we know the size there)
                 memcpy(mPopupBuffer, buffer, width * height * mBufferDepth);
@@ -131,53 +126,17 @@ class RenderHandler :
             }
 
             // if we have a buffer, indicate to consuming app that the page changed.
-            if (mPixelBufferWidth > 0 && mPixelBufferHeight > 0)
-            {
-                mod_log("OnPaint() for size: %d x %d", width, height);
-                // zpl_mutex_lock(&mod.mutexes.cef);
-
-                if (g_texture == -1) {
-                    return;
-                }
-
-                gfx_update_texture(g_texture, mPixelBuffer, mPixelBufferWidth, mPixelBufferHeight);
-
-                // // RECT rect  = {x,y,z,w};  // the dimensions you want to lock
-                // D3DLOCKED_RECT lockedRect = {0}; // "out" parameter from LockRect function below
-                // g_texture->LockRect(0, &lockedRect, NULL, 0);
-
-                // // copy the memory into lockedRect.pBits
-                // // make sure you increment each row by "Pitch"
-
-                // unsigned char* bits = ( unsigned char* )lockedRect.pBits;
-                // // for( int row = 0; row < numRows; row++ )
-                // // {
-                // //     // copy one row of data into "bits", e.g. memcpy( bits, srcData, size )
-                // //     ...
-
-                // //     // move to the next row
-                // //     bits += lockedRect.Pitch;
-                // // }
-
-                // memcpy(bits, mPixelBuffer, mPixelBufferWidth * mPixelBufferHeight * mBufferDepth);
-
-                // // unlock when done
-                // g_texture->UnlockRect(0);
-
-                // zpl_mutex_unlock(&mod.mutexes.cef);
-
-                // mParent->getCallbackManager()->onPageChanged(mPixelBuffer, 0, 0, mPixelBufferWidth, mPixelBufferHeight);
+            if (mPixelBufferWidth > 0 && mPixelBufferHeight > 0) {
+                gfx_update_texture(mTexture, mPixelBuffer, mPixelBufferWidth, mPixelBufferHeight);
             }
         }
 
         // CefRenderHandler override
-        void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override
-        {
+        void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override {
             CEF_REQUIRE_UI_THREAD();
 
             mod_log("Popup state set to %d", show);
-            if (!show)
-            {
+            if (!show) {
                 delete[] mPopupBuffer;
                 mPopupBuffer = nullptr;
 
@@ -186,65 +145,48 @@ class RenderHandler :
         }
 
         // CefRenderHandler override
-        void OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) override
-        {
+        void OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) override {
             CEF_REQUIRE_UI_THREAD();
 
             mPopupBufferRect = rect;
-            if (mPopupBuffer == nullptr)
-            {
+            if (mPopupBuffer == nullptr) {
                 mPopupBuffer = new unsigned char[rect.width * rect.height * mBufferDepth];
                 memset(mPopupBuffer, 0xff, rect.width * rect.height * mBufferDepth);
             }
         }
 
-
         IMPLEMENT_REFCOUNTING(RenderHandler);
 };
 
-class BrowserClient :
-    public CefClient,
-    public CefLifeSpanHandler
-{
+class BrowserClient : public CefClient, public CefLifeSpanHandler {
     public:
-        BrowserClient(RenderHandler* render_handler) :
-            render_handler_(render_handler)
-        {
-        }
+        BrowserClient(RenderHandler* render_handler) : render_handler_(render_handler) {}
 
-        CefRefPtr<CefRenderHandler> GetRenderHandler() override
-        {
+        CefRefPtr<CefRenderHandler> GetRenderHandler() override {
             return render_handler_;
         }
 
-        CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override
-        {
+        CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
             return this;
         }
 
-        void OnAfterCreated(CefRefPtr<CefBrowser> browser) override
-        {
+        void OnAfterCreated(CefRefPtr<CefBrowser> browser) override {
             CEF_REQUIRE_UI_THREAD();
-
             browser_list_.push_back(browser);
         }
 
-        void OnBeforeClose(CefRefPtr<CefBrowser> browser) override
-        {
+        void OnBeforeClose(CefRefPtr<CefBrowser> browser) override {
             CEF_REQUIRE_UI_THREAD();
 
             BrowserList::iterator bit = browser_list_.begin();
-            for (; bit != browser_list_.end(); ++bit)
-            {
-                if ((*bit)->IsSame(browser))
-                {
+            for (; bit != browser_list_.end(); ++bit) {
+                if ((*bit)->IsSame(browser)) {
                     browser_list_.erase(bit);
                     break;
                 }
             }
 
-            if (browser_list_.empty())
-            {
+            if (browser_list_.empty()) {
                 // gExitFlag = true;
             }
         }
@@ -293,49 +235,6 @@ class CefMinimal : public CefApp
         {
         }
 
-        bool init(int argc, char* argv[])
-        {
-            CefSettings settings;
-            CefMainArgs args(GetModuleHandle(nullptr));
-
-            std::string path(platform_path());
-
-            CefString(&settings.resources_dir_path)     = path + "\\cef";
-            CefString(&settings.log_file)               = path + "\\cef\\ceflog.txt";
-            CefString(&settings.locales_dir_path)       = path + "\\cef\\locales";
-            CefString(&settings.cache_path)             = path + "\\cef\\cache";
-            CefString(&settings.browser_subprocess_path)= path + "\\cef_worker.exe";
-
-            settings.single_process                 = true;
-            settings.multi_threaded_message_loop    = false;
-            settings.log_severity                   = LOGSEVERITY_WARNING; // LOGSEVERITY_ERROR;
-            settings.remote_debugging_port          = 7777;
-            settings.windowless_rendering_enabled   = true;
-
-            if (CefInitialize(args, settings, this, nullptr)) {
-                mod_log("CefMinimal initialized okay");
-
-                render_handler_ = new RenderHandler();
-                browser_client_ = new BrowserClient(render_handler_);
-                HWND win_id = (HWND)platform_windowid();
-
-                CefWindowInfo window_info;
-                window_info.SetAsWindowless(win_id);
-
-                CefBrowserSettings browser_settings;
-                browser_settings.windowless_frame_rate = 60;
-                browser_settings.background_color = 0xffffffff;
-
-                CefString url = "https://google.com/";
-                browser_ = CefBrowserHost::CreateBrowserSync(window_info, browser_client_.get(), url, browser_settings, nullptr);
-
-                return true;
-            }
-
-            mod_log("Unable to initialize");
-            return false;
-        }
-
         void navigate(const std::string url)
         {
             if (browser_.get() && browser_->GetMainFrame())
@@ -364,25 +263,12 @@ class CefMinimal : public CefApp
             }
         }
 
-        void update()
-        {
-            CefDoMessageLoopWork();
-        }
-
         void requestExit()
         {
             if (browser_.get() && browser_->GetHost())
             {
                 browser_->GetHost()->CloseBrowser(true);
             }
-        }
-
-        void shutdown()
-        {
-            render_handler_ = nullptr;
-            browser_client_ = nullptr;
-            browser_ = nullptr;
-            CefShutdown();
         }
 
         IMPLEMENT_REFCOUNTING(CefMinimal);
@@ -399,26 +285,71 @@ class CefMinimal : public CefApp
 // !
 // =======================================================================//
 
-CefRefPtr<CefMinimal> cm;
-bool foobar = 0;
+CefRefPtr<CefMinimal> cef_minimal;
+CefRefPtr<CefBrowser> browser_;
 
 int cef_init() {
-    cm = new CefMinimal();
-    cm->init(0, nullptr);
+    cef_minimal = new CefMinimal();
 
-    return 0;
-}
+    CefSettings settings;
+    CefMainArgs args(GetModuleHandle(nullptr));
 
-cef_handle cef_browser_create(const char *url, int w, int h) {
-    g_texture = gfx_create_texture(w, h);
-    gfx_render_add(g_texture, CEF_DEFAULT_GFX_LAYER);
+    std::string path(platform_path());
 
-    cm->navigate(url);
+    CefString(&settings.resources_dir_path)     = path + "\\cef";
+    CefString(&settings.log_file)               = path + "\\cef\\ceflog.txt";
+    CefString(&settings.locales_dir_path)       = path + "\\cef\\locales";
+    CefString(&settings.cache_path)             = path + "\\cef\\cache";
+    CefString(&settings.user_data_path)         = path + "\\cef\\userdata";
+    CefString(&settings.browser_subprocess_path)= path + "\\cef_worker.exe";
+    // CefString(&settings.user_agent)             = "m2o-reborn client (HTTP 1.1, CEF Backend)";
 
-    return 0;
+    settings.single_process                 = false;
+    settings.multi_threaded_message_loop    = false;
+    settings.log_severity                   = LOGSEVERITY_WARNING; // LOGSEVERITY_ERROR;
+    settings.remote_debugging_port          = 7777;
+    settings.windowless_rendering_enabled   = true;
+    settings.background_color               = 0x00000000;
+
+    if (CefInitialize(args, settings, cef_minimal, nullptr)) {
+        return 0;
+    }
+
+    mod_log("[error] unable to initalize cef...");
+    return -1;
 }
 
 int cef_tick() {
-    if (cm) cm->update();
+    CefDoMessageLoopWork();
+    return 0;
+}
+
+int cef_free() {
+    CefShutdown();
+    return 0;
+}
+
+cef_handle cef_browser_create(const char *urlz, int w, int h) {
+    auto client = new BrowserClient(new RenderHandler(w, h));
+    HWND win_id = (HWND)platform_windowid();
+
+    CefWindowInfo window_info;
+    window_info.SetAsWindowless(NULL);
+
+    CefBrowserSettings browser_settings;
+    browser_settings.windowless_frame_rate = 60;
+    browser_settings.background_color = 0x00000000;
+
+    CefString url = "https://google.com/";
+    browser_ = CefBrowserHost::CreateBrowserSync(window_info, client, url, browser_settings, nullptr);
+
+    return 0;
+}
+
+int cef_browser_reload(cef_handle handle) {
+    return 0;
+}
+
+int cef_browser_destroy(cef_handle handle) {
     return 0;
 }

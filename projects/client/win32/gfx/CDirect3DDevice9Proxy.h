@@ -165,7 +165,21 @@ ULONG STDMETHODCALLTYPE CDirect3DDevice9Proxy::Release() {
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::TestCooperativeLevel() {
-    return m_pD3DDevice->TestCooperativeLevel();
+    HRESULT res = m_pD3DDevice->TestCooperativeLevel();
+    /*
+    if (res == D3D_OK) {
+        mod_log("TestCooperativeLevel: D3D_OK");
+    } else if (res == D3DERR_DEVICELOST) {
+        mod_log("TestCooperativeLevel: D3DERR_DEVICELOST");
+    }
+    else if (res == D3DERR_DEVICENOTRESET) {
+        mod_log("TestCooperativeLevel: D3DERR_DEVICENOTRESET");
+    }
+    else if (res == D3DERR_DRIVERINTERNALERROR) {
+        mod_log("TestCooperativeLevel: D3DERR_DRIVERINTERNALERROR");
+    }
+    */
+    return res;
 }
 
 UINT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetAvailableTextureMem() {
@@ -221,19 +235,42 @@ UINT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetNumberOfSwapChains() {
     return m_pD3DDevice->GetNumberOfSwapChains();
 }
 
+extern "C" int D3D_Reset(SDL_Renderer * renderer, void *);
+
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pPresentationParameters) {
-    // HRESULT hResult = 0;
+    DWORD device_flags = pPresentationParameters->Flags;
 
+    mod_log("d3d9::reset");
 
-    // graphics_device_lost(m_pD3DDevice);
+    if (D3D_Reset(gfx_state.rnd, (void *)pPresentationParameters)) {
+        mod_log(SDL_GetError());
+    }
 
-    HRESULT hResult = m_pD3DDevice->Reset(pPresentationParameters);
+    return D3D_OK;
+    /*
+    HRESULT res = m_pD3DDevice->Reset(pPresentationParameters);
 
-    // if (SUCCEEDED(hResult)) {
-    //     // graphics_device_reset(m_pD3DDevice, pPresentationParameters);
-    // }
+    if (res == D3D_OK) {
+        mod_log("Reset: D3D_OK");
+    }
+    else if (res == D3DERR_DEVICELOST) {
+        mod_log("Reset: D3DERR_DEVICELOST");
+    }
+    else if (res == D3DERR_UNSUPPORTEDALPHAARG) {
+        mod_log("Reset: D3DERR_UNSUPPORTEDALPHAARG");
+    }
+    else if (res == D3DERR_INVALIDCALL) {
+        mod_log("Reset: D3DERR_INVALIDCALL");
+    }
+    else if (res == D3DERR_DEVICEHUNG) {
+        mod_log("Reset: D3DERR_DEVICEHUNG");
+    }
+    else {
+        mod_log("Reset: D3DERR_WTF");
+    }
 
-    return hResult;
+    return res;
+    */
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Present(const RECT * pSourceRect, const RECT * pDestRect, HWND hDestWindowOverride, const RGNDATA * pDirtyRegion) {

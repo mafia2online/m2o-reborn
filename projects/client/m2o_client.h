@@ -94,8 +94,8 @@ extern "C" {
     int cef_browser_reload(cef_handle handle);
     int cef_browser_destroy(cef_handle handle);
 
-    int cef_url_set(const char *url);
-    int cef_url_get(char *url);
+    int cef_url_set(cef_handle browser, const char *url);
+    int cef_url_get(cef_handle browser, char *url);
 
 // =======================================================================//
 // !
