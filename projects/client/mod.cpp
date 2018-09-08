@@ -396,12 +396,22 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     }
 
+    static cef_handle browser;
+
     if (input_key_down(VK_F9)) {
         // int handle = gfx_create_rect(200, 200, 500, 500, vec4f(255, 0, 0, 255));
         // gfx_render_add(handle, -10);
         // mod_log("attaching handle %d at layer -10\n", handle);
 
         // gfx_render_dump();
-        cef_browser_create("https://discordapp.com", 800, 600);
+        browser = cef_browser_create("https://discordapp.com", 800, 600, 200);
+    }
+
+    if (input_key_down(VK_F10)) {
+        // cef_browser_resize(browser, 1024, 768);
+        char myurl[1024];
+        cef_url_set(browser, "https://google.com");
+
+        //mod_log("the url: %s;", myurl);
     }
 }

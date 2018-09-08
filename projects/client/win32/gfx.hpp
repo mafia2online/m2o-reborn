@@ -283,7 +283,6 @@ static zpl_mutex gfx_lock;
     }
 
     int gfx_update_texture(gfx_handle handle, const void *pixels, int w, int h) {
-        mod_log("gfx_update_texture");
         if (!gfx_exists(handle)) {
             return -1;
         }
@@ -307,10 +306,6 @@ static zpl_mutex gfx_lock;
 
         zpl_memcopy(texture_data, pixels, w * h * 4);
         SDL_UnlockTexture(obj->texture);
-
-        // if (SDL_UpdateTexture(obj->texture, NULL, pixels, 1) != 0) {
-        //     mod_log(SDL_GetError());
-        // }
 
         zpl_mutex_unlock(&gfx_lock);
 
@@ -411,7 +406,6 @@ static zpl_mutex gfx_lock;
     }
 
     int gfx_render_exists(gfx_handle handle) {
-        mod_log("gfx_render_exists");
         if (!gfx_exists(handle)) {
             return -1;
         }

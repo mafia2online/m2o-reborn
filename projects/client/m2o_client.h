@@ -89,13 +89,20 @@ extern "C" {
     int cef_free();
     int cef_tick();
 
-    cef_handle cef_browser_create(const char *url, int w, int h);
+    cef_handle cef_browser_create(const char *url, int w, int h, int zindex);
 
+    int cef_browser_resize(cef_handle handle, int w, int h);
     int cef_browser_reload(cef_handle handle);
     int cef_browser_destroy(cef_handle handle);
 
-    int cef_url_set(cef_handle browser, const char *url);
-    int cef_url_get(cef_handle browser, char *url);
+    int cef_browser_show(cef_handle handle);
+    int cef_browser_hide(cef_handle handle);
+
+    int cef_zindex_get(cef_handle handle);
+    int cef_zindex_set(cef_handle handle, int zindex);
+
+    int cef_url_set(cef_handle handle, const char *url);
+    int cef_url_get(cef_handle handle, char *url, int maxlen);
 
 // =======================================================================//
 // !

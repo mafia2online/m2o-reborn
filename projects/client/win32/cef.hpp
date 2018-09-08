@@ -3,7 +3,34 @@
 #include "wrapper/cef_helpers.h"
 
 #define CEF_DEFAULT_GFX_LAYER 200
-gfx_handle g_texture = -1;
+
+class RenderHandler;
+class BrowserClient;
+
+struct cef_object {
+    u8 type;
+
+    u8 valid : 1;
+    u8 queued : 1;
+    u8 metadata : 6;
+
+    i32 zindex;
+
+    CefRefPtr<CefBrowser> browser;
+    CefRefPtr<BrowserClient> client;
+    CefRefPtr<RenderHandler> renderer;
+};
+
+struct {
+    int object_cursor;
+    zpl_array(cef_object) objects;
+} cef_state;
+
+// =======================================================================//
+// !
+// ! CEF interfaces
+// !
+// =======================================================================//
 
 class RenderHandler : public CefRenderHandler {
     public:
@@ -18,7 +45,7 @@ class RenderHandler : public CefRenderHandler {
 
         gfx_handle mTexture;
 
-        RenderHandler(int w, int h) {
+        RenderHandler(int w, int h, int zindex) {
             // inidcates if we should flip the pixel buffer in Y direction
             mFlipYPixels = false;
 
@@ -35,11 +62,10 @@ class RenderHandler : public CefRenderHandler {
 
             // depth is same for all buffer
             mBufferDepth = 4;
+            mTexture = -1;
 
-            mTexture = gfx_create_texture(w, h);
-
-            resize(w, h);
-            show();
+            resize(w, h, zindex);
+            //show(zindex);
         }
 
         ~RenderHandler() {
@@ -48,15 +74,19 @@ class RenderHandler : public CefRenderHandler {
             delete[] mPixelBufferRow;
         }
 
-        void show() {
-            gfx_render_add(mTexture, CEF_DEFAULT_GFX_LAYER);
+        void show(int zindex) {
+            gfx_render_add(mTexture, zindex);
         }
 
         void hide() {
             gfx_render_remove(mTexture);
         }
 
-        void resize(int width, int height) {
+        void changeIndex(int zindex) {
+            gfx_zindex_set(mTexture, zindex);
+        }
+
+        void resize(int width, int height, int zindex) {
             if (mPixelBufferWidth != width || mPixelBufferHeight != height) {
                 delete[] mPixelBuffer;
                 mPixelBufferWidth = width;
@@ -66,6 +96,18 @@ class RenderHandler : public CefRenderHandler {
 
                 delete[] mPixelBufferRow;
                 mPixelBufferRow = new unsigned char[mPixelBufferWidth * mBufferDepth];
+
+                //int was_visible = gfx_render_exists(mTexture);
+
+                if (mTexture != -1) {
+                    gfx_destroy(mTexture);
+                }
+
+                mTexture = gfx_create_texture(width, height);
+
+                //if (was_visible > 0) {
+                    gfx_render_add(mTexture, zindex);
+                //}
             }
         }
 
@@ -136,6 +178,7 @@ class RenderHandler : public CefRenderHandler {
             CEF_REQUIRE_UI_THREAD();
 
             mod_log("Popup state set to %d", show);
+
             if (!show) {
                 delete[] mPopupBuffer;
                 mPopupBuffer = nullptr;
@@ -228,27 +271,20 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler {
         BrowserList browser_list_;
 };
 
-class CefMinimal : public CefApp
-{
+class CefMinimal : public CefApp {
     public:
-        ~CefMinimal()
-        {
-        }
+        ~CefMinimal() { }
 
-        void navigate(const std::string url)
-        {
-            if (browser_.get() && browser_->GetMainFrame())
-            {
+        void navigate(const std::string url) {
+            if (browser_.get() && browser_->GetMainFrame()) {
                 mod_log("CefMinimal loading URL %s", url);
                 browser_->GetMainFrame()->LoadURL(url);
             }
         }
 
-        void clickCenter()
-        {
+        void clickCenter() {
             // send to CEF
-            if (browser_ && browser_->GetHost())
-            {
+            if (browser_ && browser_->GetHost()) {
                 CefMouseEvent cef_mouse_event;
                 cef_mouse_event.x = 512;
                 cef_mouse_event.y = 512;
@@ -263,10 +299,8 @@ class CefMinimal : public CefApp
             }
         }
 
-        void requestExit()
-        {
-            if (browser_.get() && browser_->GetHost())
-            {
+        void requestExit() {
+            if (browser_.get() && browser_->GetHost()) {
                 browser_->GetHost()->CloseBrowser(true);
             }
         }
@@ -285,71 +319,210 @@ class CefMinimal : public CefApp
 // !
 // =======================================================================//
 
-CefRefPtr<CefMinimal> cef_minimal;
-CefRefPtr<CefBrowser> browser_;
+    CefRefPtr<CefMinimal> cef_minimal;
+    CefRefPtr<CefBrowser> browser_;
 
-int cef_init() {
-    cef_minimal = new CefMinimal();
+    int cef_init() {
+        cef_minimal = new CefMinimal();
 
-    CefSettings settings;
-    CefMainArgs args(GetModuleHandle(nullptr));
+        CefSettings settings;
+        CefMainArgs args(GetModuleHandle(nullptr));
 
-    std::string path(platform_path());
+        std::string path(platform_path());
 
-    CefString(&settings.resources_dir_path)     = path + "\\cef";
-    CefString(&settings.log_file)               = path + "\\cef\\ceflog.txt";
-    CefString(&settings.locales_dir_path)       = path + "\\cef\\locales";
-    CefString(&settings.cache_path)             = path + "\\cef\\cache";
-    CefString(&settings.user_data_path)         = path + "\\cef\\userdata";
-    CefString(&settings.browser_subprocess_path)= path + "\\cef_worker.exe";
-    // CefString(&settings.user_agent)             = "m2o-reborn client (HTTP 1.1, CEF Backend)";
+        CefString(&settings.resources_dir_path)     = path + "\\cef";
+        CefString(&settings.log_file)               = path + "\\cef\\ceflog.txt";
+        CefString(&settings.locales_dir_path)       = path + "\\cef\\locales";
+        CefString(&settings.cache_path)             = path + "\\cef\\cache";
+        CefString(&settings.user_data_path)         = path + "\\cef\\userdata";
+        CefString(&settings.browser_subprocess_path)= path + "\\cef_worker.exe";
+        // CefString(&settings.user_agent)             = "m2o-reborn client (HTTP 1.1, CEF Backend)";
 
-    settings.single_process                 = false;
-    settings.multi_threaded_message_loop    = false;
-    settings.log_severity                   = LOGSEVERITY_WARNING; // LOGSEVERITY_ERROR;
-    settings.remote_debugging_port          = 7777;
-    settings.windowless_rendering_enabled   = true;
-    settings.background_color               = 0x00000000;
+        settings.single_process                 = false;
+        settings.multi_threaded_message_loop    = false;
+        settings.log_severity                   = LOGSEVERITY_WARNING; // LOGSEVERITY_ERROR;
+        settings.remote_debugging_port          = 7777;
+        settings.windowless_rendering_enabled   = true;
+        settings.background_color               = 0x00000000;
 
-    if (CefInitialize(args, settings, cef_minimal, nullptr)) {
+        if (!CefInitialize(args, settings, cef_minimal, nullptr)) {
+            mod_log("[error] unable to initalize cef...");
+            return -1;
+        }
+
+        zpl_array_init(cef_state.objects, zpl_heap());
+        zpl_array_set_capacity(cef_state.objects, 16);
+
+        return -1;
+    }
+
+    int cef_tick() {
+        CefDoMessageLoopWork();
         return 0;
     }
 
-    mod_log("[error] unable to initalize cef...");
-    return -1;
-}
+    int cef_free() {
+        CefShutdown();
+        zpl_array_free(cef_state.objects);
+        return 0;
+    }
 
-int cef_tick() {
-    CefDoMessageLoopWork();
-    return 0;
-}
+// =======================================================================//
+// !
+// ! Resource creation/destruction
+// !
+// =======================================================================//
 
-int cef_free() {
-    CefShutdown();
-    return 0;
-}
+    i32 cef_handle_next() {
+        int capacity = (int)zpl_array_capacity(cef_state.objects);
 
-cef_handle cef_browser_create(const char *urlz, int w, int h) {
-    auto client = new BrowserClient(new RenderHandler(w, h));
-    HWND win_id = (HWND)platform_windowid();
+        if (zpl_array_count(cef_state.objects) + 1 >= capacity) {
+            zpl_array_set_capacity(cef_state.objects, capacity * 2);
+            capacity = (int)zpl_array_capacity(cef_state.objects);
+        }
 
-    CefWindowInfo window_info;
-    window_info.SetAsWindowless(NULL);
+        for (; cef_state.object_cursor <= capacity; ++cef_state.object_cursor) {
+            if (cef_state.object_cursor == capacity) { cef_state.object_cursor = 0; }
 
-    CefBrowserSettings browser_settings;
-    browser_settings.windowless_frame_rate = 60;
-    browser_settings.background_color = 0x00000000;
+            if (!cef_state.objects[cef_state.object_cursor].valid) {
+                zpl_zero_item(&cef_state.objects[cef_state.object_cursor]);
+                cef_state.objects[cef_state.object_cursor].valid = 1;
 
-    CefString url = "https://google.com/";
-    browser_ = CefBrowserHost::CreateBrowserSync(window_info, client, url, browser_settings, nullptr);
+                zpl_array_count(cef_state.objects)++;
+                return gfx_state.object_cursor;
+            }
+        }
 
-    return 0;
-}
+        return -1;
+    }
 
-int cef_browser_reload(cef_handle handle) {
-    return 0;
-}
+    cef_handle cef_browser_create(const char *url, int w, int h, int zindex) {
+        int handle      = cef_handle_next();
+        cef_object *obj = &cef_state.objects[handle];
 
-int cef_browser_destroy(cef_handle handle) {
-    return 0;
-}
+        HWND win_id = (HWND)platform_windowid();
+
+        CefWindowInfo window_info;
+        window_info.SetAsWindowless(NULL);
+
+        CefBrowserSettings settings;
+        settings.windowless_frame_rate = 60;
+        settings.background_color = 0x00000000;
+
+        CefString cefurl(url);
+
+        obj->type     = 0;
+        obj->zindex   = zindex;
+        obj->renderer = new RenderHandler(w, h, zindex);
+        obj->client   = new BrowserClient(obj->renderer);
+        obj->browser  = CefBrowserHost::CreateBrowserSync(window_info, obj->client, cefurl, settings, nullptr);
+
+        return (cef_handle)handle;
+    }
+
+    int cef_exists(cef_handle handle) {
+        if (handle >= 0 && handle > zpl_array_capacity(cef_state.objects)) {
+            return 0;
+        }
+
+        return cef_state.objects[handle].valid;
+    }
+
+    int cef_browser_destroy(cef_handle handle) {
+        return 0;
+    }
+
+// =======================================================================//
+// !
+// ! Operation interface
+// !
+// =======================================================================//
+
+    int cef_browser_reload(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].browser.get()->Reload();
+
+        return 0;
+    }
+
+    int cef_browser_resize(cef_handle handle, int w, int h) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].renderer.get()->resize(w, h, cef_state.objects[handle].zindex);
+        cef_state.objects[handle].browser.get()->GetHost()->WasResized();
+
+        return 0;
+    }
+
+    int cef_browser_show(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].renderer.get()->show(cef_state.objects[handle].zindex);
+
+        return 0;
+    }
+
+    int cef_browser_hide(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].renderer.get()->hide();
+
+        return 0;
+    }
+
+    int cef_zindex_get(cef_handle handle) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        return cef_state.objects[handle].zindex;
+    }
+
+    int cef_zindex_set(cef_handle handle, int zindex) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        cef_state.objects[handle].zindex = zindex;
+        cef_state.objects[handle].renderer.get()->changeIndex(zindex);
+
+        return 0;
+    }
+
+    int cef_url_set(cef_handle handle, const char *url) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        CefString cefurl(url);
+        cef_state.objects[handle].browser.get()->GetMainFrame()->LoadURL(cefurl);
+
+        return 0;
+    }
+
+    int cef_url_get(cef_handle handle, char *url, int maxlen) {
+        if (!cef_exists(handle)) {
+            return -1;
+        }
+
+        CefString cefurl = cef_state.objects[handle].browser.get()->GetMainFrame()->GetURL();
+        auto str = cefurl.ToString();
+
+        if (str.size() + 1 > maxlen) {
+            return -1;
+        }
+
+        zpl_memcopy(url, str.c_str(), str.size());
+        url[str.size()] = '\0';
+
+        return str.size();
+    }
