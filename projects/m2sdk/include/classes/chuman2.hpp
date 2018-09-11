@@ -11,6 +11,7 @@
 #include "CHumanInventory.hpp"
 #include "CHumanScript.hpp"
 #include "CHumanWeaponController.hpp"
+#include "CHumanHeadController.hpp"
 #include "CCar.hpp"
 #include "CScene.hpp"
 
@@ -61,7 +62,7 @@ namespace M2
 		C_HumanInventory	*m_pInventory;				//00A0 - 00A4
 		C_HumanScript		*m_pScript;					//00A4 - 00A8
         C_AIController      *m_pAIController;           //00A8 - 00AC
-        void                *m_pUnk;                    //00AC - 00B0
+        pad(ICHuman2, pad2, 0x4);
 		C_HumanWeaponController *m_pWeaponController;	//00B0 - 00B4
         C_HumanHeadController   *m_pHeadController;     //00B4 - 00B8
 	};

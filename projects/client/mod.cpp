@@ -356,7 +356,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 10);
+        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 10);
         auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
         ent->SetPosition(pos);
         mod_log("Ped created\n");
@@ -385,8 +385,12 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {
-        auto player = M2::C_Game::Get()->GetLocalPed();
-        reinterpret_cast<M2::C_Human2*>(player)->GetScript()->SetHealth(0.0);
+        char *fileName = M2::C_Tables::Get()->GetModelFileName(M2::EntityTypes::Entity_Car, 5);
+        mod_log("Veh file : %s\n", fileName);
+
+        M2::CModelManager::Get().OpenModel(M2::EntityTypes::Entity_Car, fileName);
+        M2::C_Model* model = M2::CModelManager::Get().m_pModel;
+        mod_log("Model ptr: 0x%X", model);
     }
 
 }
