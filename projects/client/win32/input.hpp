@@ -10,12 +10,22 @@ typedef struct {
     int state;
 } input_mousebtn_t;
 
+enum {
+    ZINPUT_MOUSE,
+    ZINPUT_KEYBOARD,
+    ZINPUT_JOYSTICK,
+};
+
+class CDirectInputDevice8Proxy;
+
 struct input_state {
     IDirectInput8 *proxy;
     input_dxi8create_cb method;
 
     bool installed;
     bool blocked;
+
+    CDirectInputDevice8Proxy* devices[4];
 
     struct {
         int x;
@@ -33,6 +43,7 @@ struct input_state {
 
             input_mousebtn_t buttons[3];
         };
+
     } mouse;
 };
 
@@ -89,6 +100,42 @@ void input_mouse_position(int *x, int *y) {
 
 void input_block_set(bool value) {
     _input_state.blocked = value;
+
+    if (value) {
+        _input_state.devices[ZINPUT_MOUSE]->masterAquired = false;
+        _input_state.devices[ZINPUT_MOUSE]->Unacquire();
+    }
+    else {
+        _input_state.devices[ZINPUT_MOUSE]->masterAquired = true;
+        _input_state.devices[ZINPUT_MOUSE]->Acquire();
+    }
+
+    // ShowCursor(value);
+
+    /*
+    DWORD flags = _input_state.devices[ZINPUT_MOUSE]->cachedFlags;
+
+    if (value) {
+        //flags &= ~(DISCL_EXCLUSIVE);
+        flags |= DISCL_NONEXCLUSIVE;
+        flags |= DISCL_FOREGROUND;
+
+        _input_state.devices[ZINPUT_MOUSE]->SetCoopLvl(DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+        _input_state.devices[ZINPUT_MOUSE]->Unacquire();
+        _input_state.devices[ZINPUT_MOUSE]->Acquire();
+
+        mod_log("unaquiring the input");
+    } else {
+        flags &= ~(DISCL_NONEXCLUSIVE);
+        flags &= ~(DISCL_FOREGROUND);
+        //flags |= DISCL_EXCLUSIVE;
+
+        _input_state.devices[ZINPUT_MOUSE]->SetCoopLvl(DISCL_EXCLUSIVE);
+        _input_state.devices[ZINPUT_MOUSE]->Acquire();
+
+        mod_log("aquiring the input");
+    }
+    */
 }
 
 bool input_block_get() {

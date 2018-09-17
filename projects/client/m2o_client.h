@@ -24,6 +24,7 @@ extern "C" {
     void mod_log(const char* format, ...);
 
     void platform_init();
+    void platform_tick();
     void platform_free();
 
     void *platform_windowid();
@@ -90,6 +91,9 @@ extern "C" {
     int cef_tick();
 
     cef_handle cef_browser_create(const char *url, int w, int h, int zindex);
+
+    int cef_inject_event(void *);
+    int cef_exists(cef_handle handle);
 
     int cef_browser_resize(cef_handle handle, int w, int h);
     int cef_browser_reload(cef_handle handle);

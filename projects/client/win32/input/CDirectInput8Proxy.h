@@ -56,8 +56,7 @@ ULONG STDMETHODCALLTYPE CDirectInput8Proxy::Release() {
 HRESULT STDMETHODCALLTYPE CDirectInput8Proxy::CreateDevice(REFGUID rguid, LPDIRECTINPUTDEVICE8A * lplpDirectInputDevice, LPUNKNOWN pUknOuter) {
     HRESULT hResult = m_pDevice->CreateDevice( rguid, lplpDirectInputDevice, pUknOuter );
 
-    if ( hResult == DI_OK )
-    {
+    if (hResult == DI_OK) {
         eDIDeviceType type = DIDEVICE_TYPE_UNKNOWN;
 
         if(rguid == GUID_SysMouse)
@@ -68,6 +67,12 @@ HRESULT STDMETHODCALLTYPE CDirectInput8Proxy::CreateDevice(REFGUID rguid, LPDIRE
             type = DIDEVICE_TYPE_JOYSTICK;
 
         *lplpDirectInputDevice = new CDirectInputDevice8Proxy( *lplpDirectInputDevice, type );
+
+        if (type == DIDEVICE_TYPE_MOUSE) {
+            _input_state.devices[ZINPUT_MOUSE] = (CDirectInputDevice8Proxy *)*lplpDirectInputDevice;
+        } else if (type == DIDEVICE_TYPE_KEYBOARD) {
+            _input_state.devices[ZINPUT_KEYBOARD] = (CDirectInputDevice8Proxy *)*lplpDirectInputDevice;
+        }
     }
 
     return hResult;

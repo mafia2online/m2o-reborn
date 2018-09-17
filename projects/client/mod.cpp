@@ -308,8 +308,8 @@ void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
 
 void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     // tick networking
+    platform_tick();
     librg_tick(ctx);
-    cef_tick();
 
     // interpolate all entities
     librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), [](librg_ctx_t *ctx, librg_entity_t *entity) {
@@ -324,7 +324,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         input_block_set(!input_block_get());
     }
 
-    /* show/hide mouse */
+    /* create a car */
     if (input_key_down(VK_F2)) {
         mod_message_send(ctx, MOD_CAR_CREATE, nullptr);
     }
@@ -404,7 +404,10 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         // mod_log("attaching handle %d at layer -10\n", handle);
 
         // gfx_render_dump();
-        browser = cef_browser_create("https://discordapp.com", 800, 600, 200);
+
+        int x, y;
+        gfx_util_screensize(&x, &y);
+        browser = cef_browser_create("https://google.com", x, y, 200);
     }
 
     if (input_key_down(VK_F10)) {

@@ -127,6 +127,14 @@ class RenderHandler : public CefRenderHandler {
             return true;
         }
 
+        void OnCursorChange(CefRefPtr<CefBrowser> browser,
+                          CefCursorHandle cursor,
+                          CursorType type,
+                          const CefCursorInfo& custom_cursor_info) override {
+            mod_log("cursor has changed to %d", type);
+            SetCursor(cursor);
+        }
+
         void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList& dirtyRects, const void* buffer, int width, int height) override {
             CEF_REQUIRE_UI_THREAD();
 
@@ -354,6 +362,124 @@ class CefMinimal : public CefApp {
         return -1;
     }
 
+    int cef_handle_sdl(SDL_Event *event) {
+        /*
+        switch (e.type)
+        {
+            case SDL_KEYDOWN:
+                {
+                    CefKeyEvent event;
+                    event.modifiers = getKeyboardModifiers(e.key.keysym.mod);
+                    event.windows_key_code = getWindowsKeyCode(e.key.keysym);
+
+                    event.type = KEYEVENT_RAWKEYDOWN;
+                    browser->GetHost()->SendKeyEvent(event);
+
+                    event.type = KEYEVENT_CHAR;
+                    browser->GetHost()->SendKeyEvent(event);
+                }
+                break;
+
+            case SDL_KEYUP:
+                {
+                    CefKeyEvent event;
+                    event.modifiers = getKeyboardModifiers(e.key.keysym.mod);
+                    event.windows_key_code = getWindowsKeyCode(e.key.keysym);
+
+                    event.type = KEYEVENT_KEYUP;
+
+                    browser->GetHost()->SendKeyEvent(event);
+                }
+                break;
+
+            case SDL_WINDOWEVENT:
+                switch (e.window.event)
+                {
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
+                        renderHandler->resize(e.window.data1, e.window.data2);
+                        browser->GetHost()->WasResized();
+                        break;
+
+                    case SDL_WINDOWEVENT_FOCUS_GAINED:
+                        browser->GetHost()->SetFocus(true);
+                        break;
+
+                    case SDL_WINDOWEVENT_FOCUS_LOST:
+                        browser->GetHost()->SetFocus(false);
+                        break;
+
+                    case SDL_WINDOWEVENT_HIDDEN:
+                    case SDL_WINDOWEVENT_MINIMIZED:
+                        browser->GetHost()->SetWindowVisibility(false);
+                        browser->GetHost()->WasHidden(true);
+                        break;
+
+                    case SDL_WINDOWEVENT_SHOWN:
+                    case SDL_WINDOWEVENT_RESTORED:
+                        browser->GetHost()->SetWindowVisibility(true);
+                        browser->GetHost()->WasHidden(false);
+                        break;
+
+                    case SDL_WINDOWEVENT_CLOSE:
+                        e.type = SDL_QUIT;
+                        SDL_PushEvent(&e);
+                        break;
+                }
+                break;
+
+            case SDL_MOUSEMOTION:
+                {
+                    CefMouseEvent event;
+                    event.x = e.motion.x;
+                    event.y = e.motion.y;
+
+                    browser->GetHost()->SendMouseMoveEvent(event, false);
+                }
+                break;
+
+            case SDL_MOUSEBUTTONUP:
+                {
+                    CefMouseEvent event;
+                    event.x = e.button.x;
+                    event.y = e.button.y;
+
+                    browser->GetHost()->SendMouseClickEvent(event, translateMouseButton(e.button), true, 1);
+                }
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                {
+                    CefMouseEvent event;
+                    event.x = e.button.x;
+                    event.y = e.button.y;
+
+                    browser->GetHost()->SendMouseClickEvent(event, translateMouseButton(e.button), false, 1);
+                }
+                break;
+
+            case SDL_MOUSEWHEEL:
+                {
+                    int delta_x = e.wheel.x;
+                    int delta_y = e.wheel.y;
+
+                    if (SDL_MOUSEWHEEL_FLIPPED == e.wheel.direction)
+                    {
+                        delta_y *= -1;
+                    }
+                    else
+                    {
+                        delta_x *= -1;
+                    }
+
+                    CefMouseEvent event;
+                    browser->GetHost()->SendMouseWheelEvent(event, delta_x, delta_y);
+                }
+                break;
+        }
+        */
+        return 0;
+    }
+
     int cef_tick() {
         CefDoMessageLoopWork();
         return 0;
@@ -362,6 +488,19 @@ class CefMinimal : public CefApp {
     int cef_free() {
         CefShutdown();
         zpl_array_free(cef_state.objects);
+        return 0;
+    }
+
+    int cef_inject_event(void *evt) {
+        auto event = (SDL_Event *)evt;
+
+        if (event->type == SDL_MOUSEMOTION && input_block_get() && cef_exists(0)) {
+            CefMouseEvent ax;
+            ax.x = event->motion.x;
+            ax.y = event->motion.y;
+            cef_state.objects[0].browser.get()->GetHost()->SendMouseMoveEvent(ax, false);
+        }
+
         return 0;
     }
 
@@ -414,6 +553,8 @@ class CefMinimal : public CefApp {
         obj->renderer = new RenderHandler(w, h, zindex);
         obj->client   = new BrowserClient(obj->renderer);
         obj->browser  = CefBrowserHost::CreateBrowserSync(window_info, obj->client, cefurl, settings, nullptr);
+
+        obj->browser->GetHost()->SetFocus(true);
 
         return (cef_handle)handle;
     }

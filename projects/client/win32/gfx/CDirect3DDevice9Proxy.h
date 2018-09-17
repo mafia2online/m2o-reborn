@@ -212,14 +212,17 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetCreationParameters(D3DDEVICE
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::SetCursorProperties(UINT XHotSpot, UINT YHotSpot, IDirect3DSurface9 * pCursorBitmap) {
+    mod_log("CDirect3DDevice9Proxy::SetCursorProperties");
     return m_pD3DDevice->SetCursorProperties(XHotSpot, YHotSpot, pCursorBitmap);
 }
 
 void STDMETHODCALLTYPE CDirect3DDevice9Proxy::SetCursorPosition(int X, int Y, DWORD Flags) {
+    mod_log("CDirect3DDevice9Proxy::SetCursorPosition");
     return m_pD3DDevice->SetCursorPosition(X, Y, Flags);
 }
 
 BOOL STDMETHODCALLTYPE CDirect3DDevice9Proxy::ShowCursor(BOOL bShow) {
+    mod_log("CDirect3DDevice9Proxy::ShowCursor");
     return m_pD3DDevice->ShowCursor(bShow);
 }
 
@@ -240,37 +243,14 @@ extern "C" int D3D_Reset(SDL_Renderer * renderer, void *);
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pPresentationParameters) {
     DWORD device_flags = pPresentationParameters->Flags;
 
-    mod_log("d3d9::reset");
-
     if (D3D_Reset(gfx_state.rnd, (void *)pPresentationParameters)) {
         mod_log(SDL_GetError());
     }
 
+    // save new values
+    gfx_state.present_params = *pPresentationParameters;
+
     return D3D_OK;
-    /*
-    HRESULT res = m_pD3DDevice->Reset(pPresentationParameters);
-
-    if (res == D3D_OK) {
-        mod_log("Reset: D3D_OK");
-    }
-    else if (res == D3DERR_DEVICELOST) {
-        mod_log("Reset: D3DERR_DEVICELOST");
-    }
-    else if (res == D3DERR_UNSUPPORTEDALPHAARG) {
-        mod_log("Reset: D3DERR_UNSUPPORTEDALPHAARG");
-    }
-    else if (res == D3DERR_INVALIDCALL) {
-        mod_log("Reset: D3DERR_INVALIDCALL");
-    }
-    else if (res == D3DERR_DEVICEHUNG) {
-        mod_log("Reset: D3DERR_DEVICEHUNG");
-    }
-    else {
-        mod_log("Reset: D3DERR_WTF");
-    }
-
-    return res;
-    */
 }
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Present(const RECT * pSourceRect, const RECT * pDestRect, HWND hDestWindowOverride, const RGNDATA * pDirtyRegion) {
@@ -369,21 +349,18 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetDepthStencilSurface(IDirect3
     return m_pD3DDevice->GetDepthStencilSurface(ppZStencilSurface);
 }
 
-HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene( ) {
-    // Call our real handler
+HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::BeginScene() {
     HRESULT hr = m_pD3DDevice->BeginScene();
 
-    /*// Possible fix for missing textures on some chipsets
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-    m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-    m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);*/
-
-    // graphics_device_prerender();
+    // Possible fix for missing textures on some chipsets
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+    // m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+    // m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    // m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     return hr;
 }

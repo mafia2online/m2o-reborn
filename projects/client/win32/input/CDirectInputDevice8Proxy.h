@@ -48,11 +48,16 @@ public:
     HRESULT APIENTRY SendForceFeedbackCommand(DWORD dwFlags);
     HRESULT APIENTRY SetActionMap(LPDIACTIONFORMAT lpdiActionFormat, LPCTSTR lptszUserName, DWORD dwFlags);
     HRESULT APIENTRY SetCooperativeLevel(HWND hwnd, DWORD dwFlags);
+    void SetCoopLvl(DWORD dwFlags);
     HRESULT APIENTRY SetDataFormat(LPCDIDATAFORMAT lpdf);
     HRESULT APIENTRY SetEventNotification(HANDLE hEvent);
     HRESULT APIENTRY SetProperty(REFGUID rguidProp, LPCDIPROPHEADER pdiph);
     HRESULT APIENTRY Unacquire();
     HRESULT APIENTRY WriteEffectToFile(LPCSTR lpszFileName, DWORD dwEntries, LPDIFILEEFFECT rgDiFileEft, DWORD dwFlags);
+
+    HWND cachedHWND;
+    DWORD cachedFlags;
+    bool masterAquired;
 
 private:
     IDirectInputDevice8 *m_pIDirectInputDevice8;
@@ -62,6 +67,7 @@ private:
 CDirectInputDevice8Proxy::CDirectInputDevice8Proxy(IDirectInputDevice8* pOriginal, eDIDeviceType devicetype) {
     m_pIDirectInputDevice8 = pOriginal;
     m_DeviceType = devicetype;
+    masterAquired = true;
 }
 
 CDirectInputDevice8Proxy::~CDirectInputDevice8Proxy() { }
@@ -83,7 +89,10 @@ ULONG APIENTRY CDirectInputDevice8Proxy::AddRef(void) {
 }
 
 HRESULT APIENTRY CDirectInputDevice8Proxy::Acquire() {
-    return m_pIDirectInputDevice8->Acquire();
+    if (masterAquired)
+        return m_pIDirectInputDevice8->Acquire();
+
+    return DI_OK;
 }
 
 HRESULT APIENTRY CDirectInputDevice8Proxy::BuildActionMap(LPDIACTIONFORMAT lpdiaf, LPCTSTR lpszUserName, DWORD dwFlags) {
@@ -122,9 +131,9 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceInfo(LPDIDEVICEINSTANCE pdid
     return m_pIDirectInputDevice8->GetDeviceInfo(pdidi);
 }
 
-struct mod_di_keys_t {
-    byte state[256];
-};
+// struct mod_di_keys_t {
+//     byte state[256];
+// };
 
 HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID lpvData) {
     HRESULT hResult = m_pIDirectInputDevice8->GetDeviceState(cbData, lpvData);
@@ -144,56 +153,56 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
     //     hResult = m_pIDirectInputDevice8->GetDeviceState(cbData, lpvData);
     // }
 
-    if (hResult == DI_OK) {
-        if (m_DeviceType == DIDEVICE_TYPE_MOUSE) {
-            _input_state.mouse.state = *(DIMOUSESTATE*)lpvData;
+    // if (hResult == DI_OK) {
+    //     if (m_DeviceType == DIDEVICE_TYPE_MOUSE) {
+    //         _input_state.mouse.state = *(DIMOUSESTATE*)lpvData;
 
-            _input_state.mouse.x += _input_state.mouse.state.lX;
-            _input_state.mouse.y += _input_state.mouse.state.lY;
-            _input_state.mouse.z = _input_state.mouse.state.lZ;
+    //         _input_state.mouse.x += _input_state.mouse.state.lX;
+    //         _input_state.mouse.y += _input_state.mouse.state.lY;
+    //         _input_state.mouse.z = _input_state.mouse.state.lZ;
 
-            int screenWidth, screenHeight;
-            gfx_util_screensize(&screenWidth, &screenHeight);
+    //         int screenWidth, screenHeight;
+    //         gfx_util_screensize(&screenWidth, &screenHeight);
 
-            if (_input_state.mouse.x <= 0)
-                _input_state.mouse.x = 0;
-            if (_input_state.mouse.x > screenWidth)
-                _input_state.mouse.x = screenWidth;
-            if (_input_state.mouse.y <= 0)
-                _input_state.mouse.y = 0;
-            if (_input_state.mouse.y > screenHeight)
-                _input_state.mouse.y = screenHeight;
+    //         if (_input_state.mouse.x <= 0)
+    //             _input_state.mouse.x = 0;
+    //         if (_input_state.mouse.x > screenWidth)
+    //             _input_state.mouse.x = screenWidth;
+    //         if (_input_state.mouse.y <= 0)
+    //             _input_state.mouse.y = 0;
+    //         if (_input_state.mouse.y > screenHeight)
+    //             _input_state.mouse.y = screenHeight;
 
-            for (usize i = 0; i < 3; i++) {
-                auto button = &_input_state.mouse.buttons[i];
-                auto btn_id = NK_BUTTON_LEFT;
+    //         for (usize i = 0; i < 3; i++) {
+    //             auto button = &_input_state.mouse.buttons[i];
+    //             auto btn_id = NK_BUTTON_LEFT;
 
-                if (i == 1) btn_id = NK_BUTTON_RIGHT;
-                if (i == 2) btn_id = NK_BUTTON_MIDDLE;
+    //             if (i == 1) btn_id = NK_BUTTON_RIGHT;
+    //             if (i == 2) btn_id = NK_BUTTON_MIDDLE;
 
-                button->id    = btn_id;
-                button->state = (_input_state.mouse.state.rgbButtons[i]) ? 1 : 0;
-            }
+    //             button->id    = btn_id;
+    //             button->state = (_input_state.mouse.state.rgbButtons[i]) ? 1 : 0;
+    //         }
 
-            if (_input_state.blocked) {
-                ((DIMOUSESTATE*)lpvData)->lX = 0;
-                ((DIMOUSESTATE*)lpvData)->lY = 0;
-                ((DIMOUSESTATE*)lpvData)->lZ = 0;
+    //         if (_input_state.blocked) {
+    //             ((DIMOUSESTATE*)lpvData)->lX = 0;
+    //             ((DIMOUSESTATE*)lpvData)->lY = 0;
+    //             ((DIMOUSESTATE*)lpvData)->lZ = 0;
 
-                for (usize i = 0; i < 4; i++) {
-                    ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;
-                }
-            }
-        }
+    //             for (usize i = 0; i < 4; i++) {
+    //                 ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;
+    //             }
+    //         }
+    //     }
 
-        if (m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
-            if (_input_state.blocked /*&& nk_ctx->active && nk_ctx->active->edit.active*/) {
-                for (usize i = 0; i < 256; i++) {
-                    ((mod_di_keys_t*)lpvData)->state[i] = 0;
-                }
-            }
-        }
-    }
+    //     if (m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
+    //         if (_input_state.blocked /*&& nk_ctx->active && nk_ctx->active->edit.active*/) {
+    //             for (usize i = 0; i < 256; i++) {
+    //                 ((mod_di_keys_t*)lpvData)->state[i] = 0;
+    //             }
+    //         }
+    //     }
+    // }
 
     return hResult;
 }
@@ -253,21 +262,27 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::SetCooperativeLevel(HWND hwnd, DWORD 
         // if ((dwCustomFlags & DISCL_EXCLUSIVE) != 0) {
         //     dwCustomFlags &= ~(DISCL_EXCLUSIVE);
         // }
-        // dwCustomFlags |= DISCL_NONEXCLUSIVE;
 
-        // // enabled native-feel mouse
-        // // good for windwed mode, with cursor showing
+        //dwCustomFlags |= DISCL_NONEXCLUSIVE;
+        //dwCustomFlags |= DISCL_FOREGROUND;
+
+        // enabled native-feel mouse
+        // good for windwed mode, with cursor showing
         // mod_log("dxinput: setting background mode\n");
         // if ((dwCustomFlags & DISCL_FOREGROUND) != 0) {
         //     dwCustomFlags &= ~(DISCL_FOREGROUND);
         // }
         // dwCustomFlags |= DISCL_BACKGROUND;
-
-        // TODO: move wndproc hook into here maybe
-        // wndproc_install(hwnd);
     }
 
+    cachedHWND  = hwnd;
+    cachedFlags = dwCustomFlags;
+
     return m_pIDirectInputDevice8->SetCooperativeLevel(hwnd, dwCustomFlags);
+}
+
+void CDirectInputDevice8Proxy::SetCoopLvl(DWORD dwFlags) {
+    m_pIDirectInputDevice8->SetCooperativeLevel(cachedHWND, dwFlags);
 }
 
 HRESULT APIENTRY CDirectInputDevice8Proxy::SetDataFormat(LPCDIDATAFORMAT lpdf) {
