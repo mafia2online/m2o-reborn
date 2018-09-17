@@ -131,9 +131,9 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceInfo(LPDIDEVICEINSTANCE pdid
     return m_pIDirectInputDevice8->GetDeviceInfo(pdidi);
 }
 
-// struct mod_di_keys_t {
-//     byte state[256];
-// };
+struct mod_di_keys_t {
+    byte state[256];
+};
 
 HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID lpvData) {
     HRESULT hResult = m_pIDirectInputDevice8->GetDeviceState(cbData, lpvData);
@@ -153,56 +153,27 @@ HRESULT APIENTRY CDirectInputDevice8Proxy::GetDeviceState(DWORD cbData, LPVOID l
     //     hResult = m_pIDirectInputDevice8->GetDeviceState(cbData, lpvData);
     // }
 
-    // if (hResult == DI_OK) {
-    //     if (m_DeviceType == DIDEVICE_TYPE_MOUSE) {
-    //         _input_state.mouse.state = *(DIMOUSESTATE*)lpvData;
+    if (hResult == DI_OK) {
+        if (m_DeviceType == DIDEVICE_TYPE_MOUSE) {
+            if (_input_state.blocked) {
+                ((DIMOUSESTATE*)lpvData)->lX = 0;
+                ((DIMOUSESTATE*)lpvData)->lY = 0;
+                ((DIMOUSESTATE*)lpvData)->lZ = 0;
 
-    //         _input_state.mouse.x += _input_state.mouse.state.lX;
-    //         _input_state.mouse.y += _input_state.mouse.state.lY;
-    //         _input_state.mouse.z = _input_state.mouse.state.lZ;
+                for (usize i = 0; i < 4; i++) {
+                    ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;
+                }
+            }
+        }
 
-    //         int screenWidth, screenHeight;
-    //         gfx_util_screensize(&screenWidth, &screenHeight);
-
-    //         if (_input_state.mouse.x <= 0)
-    //             _input_state.mouse.x = 0;
-    //         if (_input_state.mouse.x > screenWidth)
-    //             _input_state.mouse.x = screenWidth;
-    //         if (_input_state.mouse.y <= 0)
-    //             _input_state.mouse.y = 0;
-    //         if (_input_state.mouse.y > screenHeight)
-    //             _input_state.mouse.y = screenHeight;
-
-    //         for (usize i = 0; i < 3; i++) {
-    //             auto button = &_input_state.mouse.buttons[i];
-    //             auto btn_id = NK_BUTTON_LEFT;
-
-    //             if (i == 1) btn_id = NK_BUTTON_RIGHT;
-    //             if (i == 2) btn_id = NK_BUTTON_MIDDLE;
-
-    //             button->id    = btn_id;
-    //             button->state = (_input_state.mouse.state.rgbButtons[i]) ? 1 : 0;
-    //         }
-
-    //         if (_input_state.blocked) {
-    //             ((DIMOUSESTATE*)lpvData)->lX = 0;
-    //             ((DIMOUSESTATE*)lpvData)->lY = 0;
-    //             ((DIMOUSESTATE*)lpvData)->lZ = 0;
-
-    //             for (usize i = 0; i < 4; i++) {
-    //                 ((DIMOUSESTATE*)lpvData)->rgbButtons[i] = 0;
-    //             }
-    //         }
-    //     }
-
-    //     if (m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
-    //         if (_input_state.blocked /*&& nk_ctx->active && nk_ctx->active->edit.active*/) {
-    //             for (usize i = 0; i < 256; i++) {
-    //                 ((mod_di_keys_t*)lpvData)->state[i] = 0;
-    //             }
-    //         }
-    //     }
-    // }
+        if (m_DeviceType == DIDEVICE_TYPE_KEYBOARD) {
+            if (_input_state.blocked) {
+                for (usize i = 0; i < 256; i++) {
+                    ((mod_di_keys_t*)lpvData)->state[i] = 0;
+                }
+            }
+        }
+    }
 
     return hResult;
 }
