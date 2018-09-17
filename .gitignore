@@ -18,9 +18,25 @@ Thumbs.db
 
 # project stuff
 binary/*
-!binary/files/
-!binary/game_files/
-!binary/resources/
-!binary/steam_appid.txt
-!binary/steam_api.dll
+!binary/cef
+binary/cef/cache/
+binary/cef/userdata/
+binary/cef/ceflog.txt
+!binary/files
+!binary/chrome_elf.dll
+!binary/d3dcompiler_43.dll
+!binary/d3dcompiler_47.dll
+!binary/icudtl.dat
+!binary/launcher.exe
+!binary/libcef.dll
+!binary/libEGL.dll
+!binary/libfreetype-6.dll
+!binary/libGLESv2.dll
 !binary/m2o-2clients.exe
+!binary/natives_blob.bin
+!binary/snapshot_blob.bin
+!binary/steam_api.dll
+!binary/steam_appid.txt
+!binary/v8_context_snapshot.bin
+!binary/widevinecdmadapter.dll
+!binary/zlib1.dll
