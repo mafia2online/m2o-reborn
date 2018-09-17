@@ -83,7 +83,10 @@ void platform_tick() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         input_inject_event(&event);
-        cef_inject_event((void *)&event);
+
+        if (input_block_get()) {
+            cef_inject_event((void *)&event);
+        }
     }
 }
 

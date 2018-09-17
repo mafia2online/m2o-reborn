@@ -261,8 +261,7 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler {
                            CefLifeSpanHandler::WindowOpenDisposition target_disposition,
                            bool user_gesture, const CefPopupFeatures& popupFeatures,
                            CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
-                           CefBrowserSettings& settings, bool* no_javascript_access)
-        {
+                           CefBrowserSettings& settings, bool* no_javascript_access) {
             mod_log("[cef] Page wants to open a popup");
 
             return true;
@@ -280,27 +279,16 @@ class CefMinimal : public CefApp {
     public:
         ~CefMinimal() { }
 
+        void CefMinimal::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
+            command_line->AppendSwitch("disable-smooth-scrolling");
+            command_line->AppendSwitchWithValue("disable-features", "TouchpadAndWheelScrollLatching");
+            command_line->AppendSwitchWithValue("disable-features", "AsyncWheelEvents");
+        }
+
         void navigate(const std::string url) {
             if (browser_.get() && browser_->GetMainFrame()) {
                 mod_log("CefMinimal loading URL %s", url);
                 browser_->GetMainFrame()->LoadURL(url);
-            }
-        }
-
-        void clickCenter() {
-            // send to CEF
-            if (browser_ && browser_->GetHost()) {
-                CefMouseEvent cef_mouse_event;
-                cef_mouse_event.x = 512;
-                cef_mouse_event.y = 512;
-                cef_mouse_event.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
-
-                bool is_up = false;
-                int last_click_count = 1;
-                browser_->GetHost()->SendMouseClickEvent(cef_mouse_event, MBT_LEFT, is_up, last_click_count);
-
-                is_up = true;
-                browser_->GetHost()->SendMouseClickEvent(cef_mouse_event, MBT_LEFT, is_up, last_click_count);
             }
         }
 
@@ -325,7 +313,6 @@ class CefMinimal : public CefApp {
 // =======================================================================//
 
     CefRefPtr<CefMinimal> cef_minimal;
-    CefRefPtr<CefBrowser> browser_;
 
     int cef_init() {
         cef_minimal = new CefMinimal();
@@ -361,124 +348,6 @@ class CefMinimal : public CefApp {
         return -1;
     }
 
-    int cef_handle_sdl(SDL_Event *event) {
-        /*
-        switch (e.type)
-        {
-            case SDL_KEYDOWN:
-                {
-                    CefKeyEvent event;
-                    event.modifiers = getKeyboardModifiers(e.key.keysym.mod);
-                    event.windows_key_code = getWindowsKeyCode(e.key.keysym);
-
-                    event.type = KEYEVENT_RAWKEYDOWN;
-                    browser->GetHost()->SendKeyEvent(event);
-
-                    event.type = KEYEVENT_CHAR;
-                    browser->GetHost()->SendKeyEvent(event);
-                }
-                break;
-
-            case SDL_KEYUP:
-                {
-                    CefKeyEvent event;
-                    event.modifiers = getKeyboardModifiers(e.key.keysym.mod);
-                    event.windows_key_code = getWindowsKeyCode(e.key.keysym);
-
-                    event.type = KEYEVENT_KEYUP;
-
-                    browser->GetHost()->SendKeyEvent(event);
-                }
-                break;
-
-            case SDL_WINDOWEVENT:
-                switch (e.window.event)
-                {
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                        renderHandler->resize(e.window.data1, e.window.data2);
-                        browser->GetHost()->WasResized();
-                        break;
-
-                    case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        browser->GetHost()->SetFocus(true);
-                        break;
-
-                    case SDL_WINDOWEVENT_FOCUS_LOST:
-                        browser->GetHost()->SetFocus(false);
-                        break;
-
-                    case SDL_WINDOWEVENT_HIDDEN:
-                    case SDL_WINDOWEVENT_MINIMIZED:
-                        browser->GetHost()->SetWindowVisibility(false);
-                        browser->GetHost()->WasHidden(true);
-                        break;
-
-                    case SDL_WINDOWEVENT_SHOWN:
-                    case SDL_WINDOWEVENT_RESTORED:
-                        browser->GetHost()->SetWindowVisibility(true);
-                        browser->GetHost()->WasHidden(false);
-                        break;
-
-                    case SDL_WINDOWEVENT_CLOSE:
-                        e.type = SDL_QUIT;
-                        SDL_PushEvent(&e);
-                        break;
-                }
-                break;
-
-            case SDL_MOUSEMOTION:
-                {
-                    CefMouseEvent event;
-                    event.x = e.motion.x;
-                    event.y = e.motion.y;
-
-                    browser->GetHost()->SendMouseMoveEvent(event, false);
-                }
-                break;
-
-            case SDL_MOUSEBUTTONUP:
-                {
-                    CefMouseEvent event;
-                    event.x = e.button.x;
-                    event.y = e.button.y;
-
-                    browser->GetHost()->SendMouseClickEvent(event, translateMouseButton(e.button), true, 1);
-                }
-                break;
-
-            case SDL_MOUSEBUTTONDOWN:
-                {
-                    CefMouseEvent event;
-                    event.x = e.button.x;
-                    event.y = e.button.y;
-
-                    browser->GetHost()->SendMouseClickEvent(event, translateMouseButton(e.button), false, 1);
-                }
-                break;
-
-            case SDL_MOUSEWHEEL:
-                {
-                    int delta_x = e.wheel.x;
-                    int delta_y = e.wheel.y;
-
-                    if (SDL_MOUSEWHEEL_FLIPPED == e.wheel.direction)
-                    {
-                        delta_y *= -1;
-                    }
-                    else
-                    {
-                        delta_x *= -1;
-                    }
-
-                    CefMouseEvent event;
-                    browser->GetHost()->SendMouseWheelEvent(event, delta_x, delta_y);
-                }
-                break;
-        }
-        */
-        return 0;
-    }
-
     int cef_tick() {
         CefDoMessageLoopWork();
         return 0;
@@ -487,19 +356,6 @@ class CefMinimal : public CefApp {
     int cef_free() {
         CefShutdown();
         zpl_array_free(cef_state.objects);
-        return 0;
-    }
-
-    int cef_inject_event(void *evt) {
-        auto event = (SDL_Event *)evt;
-
-        if (event->type == SDL_MOUSEMOTION && input_block_get() && cef_exists(0)) {
-            CefMouseEvent ax;
-            ax.x = event->motion.x;
-            ax.y = event->motion.y;
-            cef_state.objects[0].browser.get()->GetHost()->SendMouseMoveEvent(ax, false);
-        }
-
         return 0;
     }
 
@@ -682,4 +538,379 @@ class CefMinimal : public CefApp {
         url[str.size()] = '\0';
 
         return str.size();
+    }
+
+    // =======================================================================//
+    // !
+    // ! Input handling
+    // !
+    // =======================================================================//
+
+    CefBrowserHost::MouseButtonType cef__translatemousebtn(SDL_MouseButtonEvent const &e) {
+        CefBrowserHost::MouseButtonType result;
+        switch (e.button) {
+        case SDL_BUTTON_LEFT:
+        case SDL_BUTTON_X1:
+            result = MBT_LEFT;
+            break;
+
+        case SDL_BUTTON_MIDDLE:
+            result = MBT_MIDDLE;
+            break;
+
+        case SDL_BUTTON_RIGHT:
+        case SDL_BUTTON_X2:
+            result = MBT_RIGHT;
+            break;
+        }
+        return result;
+    }
+
+    int cef__keyboard_modifiers(uint16_t const mod) {
+        int result = EVENTFLAG_NONE;
+
+        if (mod & KMOD_NUM) {
+            result |= EVENTFLAG_NUM_LOCK_ON;
+        }
+
+        if (mod & KMOD_CAPS) {
+            result |= EVENTFLAG_CAPS_LOCK_ON;
+        }
+
+        if (mod & KMOD_CTRL) {
+            result |= EVENTFLAG_CONTROL_DOWN;
+        }
+
+        if (mod & KMOD_SHIFT) {
+            result |= EVENTFLAG_SHIFT_DOWN;
+        }
+
+        if (mod & KMOD_ALT) {
+            result |= EVENTFLAG_ALT_DOWN;
+        }
+        return result;
+    }
+
+    int cef__windows_keycode(SDL_Keysym const &key) {
+        int result = 0;
+
+        bool shift = !!(key.mod & KMOD_SHIFT);
+        bool caps = !!(key.mod & KMOD_CAPS);
+        bool alt_gr = !!(key.mod & KMOD_RALT);
+        bool uppercase = (caps && !shift) || (shift && !caps);
+
+        // mapped from azerty windows 8 asus laptop
+        switch (key.sym) {
+        case SDLK_RETURN:
+            result = 13;
+            break;
+        case SDLK_ESCAPE:
+            result = 27;
+            break;
+        case SDLK_BACKSPACE:
+            result = 8;
+            break;
+        case SDLK_TAB:
+            result = 9;
+            break;
+        case SDLK_SPACE:
+            result = 32;
+            break;
+        case SDLK_EXCLAIM:
+            result = uppercase ? 167 : 33; // § : !
+            break;
+
+        case SDLK_QUOTEDBL:
+            result = 34;
+            break;
+        case SDLK_HASH:
+            result = 35;
+            break;
+        case SDLK_DOLLAR:
+            result = 36;
+            break;
+        case SDLK_PERCENT:
+            result = 37;
+            break;
+        case SDLK_AMPERSAND:
+            result = 38;
+            break;
+        case SDLK_QUOTE:
+            result = 39;
+            break;
+        case SDLK_LEFTPAREN:
+            result = 40;
+            break;
+        case SDLK_RIGHTPAREN:
+            result = alt_gr ? 93 : uppercase ? 176 : 41; // ] ? ° : )
+            break;
+        case SDLK_ASTERISK:
+            result = uppercase ? 181 : 42; // µ : *
+            break;
+        case SDLK_PLUS:
+            result = 43;
+            break;
+        case SDLK_COMMA:
+            result = uppercase ? 63 : 44; // '?' : ,
+            break;
+        case SDLK_MINUS:
+            result = 45;
+            break;
+        case SDLK_PERIOD:
+            result = 46;
+            break;
+        case SDLK_SLASH:
+            result = 47;
+            break;
+
+        case SDLK_0:
+            result = alt_gr ? 64 : uppercase ? 48 : 224; // @ ? 0 : à
+            break;
+        case SDLK_1:
+            result = uppercase ? 49 : 38; // 1 : & (KO)
+            break;
+        case SDLK_2:
+            result = alt_gr ? 126 : uppercase ? 50 : 233; // ~ ? 2 : é
+            break;
+        case SDLK_3:
+            result = alt_gr ? 35 : uppercase ? 51 : 34; // # ? 3 : "
+            break;
+        case SDLK_4:
+            result = alt_gr ? 123 : uppercase ? 52 : 39; // { ? 4 : '
+            break;
+        case SDLK_5:
+            result = alt_gr ? 91 : uppercase ? 53 : 40; // [ ? 5 : ( (KO)
+            break;
+        case SDLK_6:
+            result = alt_gr ? 124 : uppercase ? 54 : 45; // | ? 6 : -
+            break;
+        case SDLK_7:
+            result = alt_gr ? 96 : uppercase ? 55 : 232; // ` ? 7 : è
+            break;
+        case SDLK_8:
+            result = alt_gr ? 92 : uppercase ? 56 : 95; // \ ? 8 : _
+            break;
+        case SDLK_9:
+            result = alt_gr ? 94 : uppercase ? 57 : 231; // ^ ? 9 : ç
+            break;
+
+        case SDLK_COLON:
+            result = uppercase ? 47 : 58; // / : :
+            break;
+        case SDLK_SEMICOLON:
+            result = uppercase ? 46 : 59; // . (KO) : ;
+            break;
+        case SDLK_LESS:
+            result = uppercase ? 62 : 60; // > : <
+            break;
+        case SDLK_EQUALS:
+            result = alt_gr ? 125 : uppercase ? 43 : 61; // } ? + : =
+            break;
+        case SDLK_GREATER:
+            result = 62;
+            break;
+        case SDLK_QUESTION:
+            result = 63;
+            break;
+        case SDLK_AT:
+            result = 64;
+            break;
+        case SDLK_LEFTBRACKET:
+            result = 91;
+            break;
+        case SDLK_BACKSLASH:
+            result = 92;
+            break;
+        case SDLK_RIGHTBRACKET:
+            result = 93;
+            break;
+        case SDLK_CARET:
+            result = uppercase ? 168 : 94; // ^ : ¨
+            break;
+        case SDLK_UNDERSCORE:
+            result = 95;
+            break;
+        case SDLK_BACKQUOTE:
+            result = 96;
+            break;
+
+        case SDLK_a:
+            result = uppercase ? 65 : 97;
+            break;
+        case SDLK_b:
+            result = uppercase ? 66 : 98;
+            break;
+        case SDLK_c:
+            result = uppercase ? 67 : 99;
+            break;
+        case SDLK_d:
+            result = uppercase ? 68 : 100;
+            break;
+        case SDLK_e:
+            result = uppercase ? 69 : 101;
+            break;
+        case SDLK_f:
+            result = uppercase ? 70 : 102;
+            break;
+        case SDLK_g:
+            result = uppercase ? 71 : 103;
+            break;
+        case SDLK_h:
+            result = uppercase ? 72 : 104;
+            break;
+        case SDLK_i:
+            result = uppercase ? 73 : 105;
+            break;
+        case SDLK_j:
+            result = uppercase ? 74 : 106;
+            break;
+        case SDLK_k:
+            result = uppercase ? 75 : 107;
+            break;
+        case SDLK_l:
+            result = uppercase ? 76 : 108;
+            break;
+        case SDLK_m:
+            result = uppercase ? 77 : 109;
+            break;
+        case SDLK_n:
+            result = uppercase ? 78 : 110;
+            break;
+        case SDLK_o:
+            result = uppercase ? 79 : 111;
+            break;
+        case SDLK_p:
+            result = uppercase ? 80 : 112;
+            break;
+        case SDLK_q:
+            result = uppercase ? 81 : 113;
+            break;
+        case SDLK_r:
+            result = uppercase ? 82 : 114;
+            break;
+        case SDLK_s:
+            result = uppercase ? 83 : 115;
+            break;
+        case SDLK_t:
+            result = uppercase ? 84 : 116;
+            break;
+        case SDLK_u:
+            result = uppercase ? 85 : 117;
+            break;
+        case SDLK_v:
+            result = uppercase ? 86 : 118;
+            break;
+        case SDLK_w:
+            result = uppercase ? 87 : 119;
+            break;
+        case SDLK_x:
+            result = uppercase ? 88 : 120;
+            break;
+        case SDLK_y:
+            result = uppercase ? 89 : 121;
+            break;
+        case SDLK_z:
+            result = uppercase ? 90 : 122;
+            break;
+        }
+        return result;
+    }
+
+    int cef_inject_event(void *evt) {
+        auto e = (SDL_Event *)evt;
+        if (!cef_exists(0)) return 0;
+        auto host = cef_state.objects[0].browser.get()->GetHost();
+
+        // if (event->type == SDL_MOUSEMOTION && ) {
+        //     CefMouseEvent ax;
+        //     ax.x = event->motion.x;
+        //     ax.y = event->motion.y;
+        //     host->SendMouseMoveEvent(ax, false);
+        // }
+
+        switch (e->type) {
+            case SDL_KEYDOWN: {
+                CefKeyEvent event;
+                event.modifiers = cef__keyboard_modifiers(e->key.keysym.mod);
+                event.windows_key_code = cef__windows_keycode(e->key.keysym);
+                event.type = KEYEVENT_RAWKEYDOWN;
+                host->SendKeyEvent(event);
+                event.type = KEYEVENT_CHAR;
+                host->SendKeyEvent(event);
+            } break;
+
+            case SDL_KEYUP: {
+                CefKeyEvent event;
+                event.modifiers = cef__keyboard_modifiers(e->key.keysym.mod);
+                event.windows_key_code = cef__windows_keycode(e->key.keysym);
+                event.type = KEYEVENT_KEYUP;
+                host->SendKeyEvent(event);
+            } break;
+
+            case SDL_WINDOWEVENT:
+                switch (e->window.event) {
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    cef_browser_resize(0, e->window.data1, e->window.data2);
+                    host->WasResized();
+                    break;
+
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    host->SetFocus(true);
+                    break;
+
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                    host->SetFocus(false);
+                    break;
+
+                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    host->WasHidden(true);
+                    break;
+
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_RESTORED:
+                    host->WasHidden(false);
+                    break;
+                } break;
+
+            case SDL_MOUSEMOTION: {
+                CefMouseEvent event;
+                event.x = e->motion.x;
+                event.y = e->motion.y;
+                host->SendMouseMoveEvent(event, false);
+            } break;
+
+            case SDL_MOUSEBUTTONUP: {
+                CefMouseEvent event;
+                event.x = e->button.x;
+                event.y = e->button.y;
+                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), true, 1);
+            } break;
+
+            case SDL_MOUSEBUTTONDOWN: {
+                CefMouseEvent event;
+                event.x = e->button.x;
+                event.y = e->button.y;
+                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), false, 1);
+            } break;
+
+            case SDL_MOUSEWHEEL: {
+                int coef = 50;
+                int delta_x = e->wheel.x * coef;
+                int delta_y = e->wheel.y * coef;
+
+                if (SDL_MOUSEWHEEL_FLIPPED == e->wheel.direction) {
+                    delta_y *= -1;
+                } else {
+                    delta_x *= -1;
+                }
+
+                mod_log("sending mousewheel %d %d", delta_x, delta_y);
+
+                CefMouseEvent event;
+                host->SendMouseWheelEvent(event, delta_x, delta_y);
+            } break;
+        }
+
+        return 0;
     }
