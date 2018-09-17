@@ -1,9 +1,9 @@
-
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include <TlHelp32.h>
 
 typedef HRESULT (WINAPI *input_dxi8create_cb)(HINSTANCE, DWORD, REFIID, LPVOID *, LPUNKNOWN);
+typedef int (WINAPI *input_showcursor_cb)(BOOL bShow);
 
 typedef struct {
     int id;
@@ -20,7 +20,8 @@ class CDirectInputDevice8Proxy;
 
 struct input_state {
     IDirectInput8 *proxy;
-    input_dxi8create_cb method;
+    input_dxi8create_cb hooked_dxi8create;
+    input_showcursor_cb hooked_showcursor;
 
     bool installed;
     bool blocked;
@@ -59,7 +60,7 @@ static input_state _input_state;
 // =======================================================================//
 
 HRESULT WINAPI input_dxi8create_hook(HINSTANCE hInst, DWORD dwVersion, REFIID riidltf, LPVOID * ppvOut, LPUNKNOWN punkOuter) {
-    HRESULT hr = _input_state.method(hInst, dwVersion, riidltf, ppvOut, punkOuter);
+    HRESULT hr = _input_state.hooked_dxi8create(hInst, dwVersion, riidltf, ppvOut, punkOuter);
 
     if (SUCCEEDED(hr)) {
         IDirectInput8 *pInput = static_cast<IDirectInput8*>(*ppvOut);
@@ -73,6 +74,18 @@ HRESULT WINAPI input_dxi8create_hook(HINSTANCE hInst, DWORD dwVersion, REFIID ri
     return hr;
 }
 
+int WINAPI input_showcursor_hook(BOOL bShow) {
+    if (!bShow)
+        return -1;
+    else
+        return 1;
+}
+
+HCURSOR WINAPI input_setcursor_hook(_In_opt_ HCURSOR hCursor) {
+    mod_log("SetCusror %x", hCursor);
+    return 0;
+}
+
 // =======================================================================//
 // !
 // ! Control methods
@@ -82,20 +95,32 @@ HRESULT WINAPI input_dxi8create_hook(HINSTANCE hInst, DWORD dwVersion, REFIID ri
 void input_init() {
     if (_input_state.installed == false) {
         _input_state.installed = true;
-        _input_state.method = (input_dxi8create_cb)(Mem::Hooks::InstallDetourPatch("dinput8.dll", "DirectInput8Create", (DWORD)input_dxi8create_hook));
+        _input_state.hooked_dxi8create = (input_dxi8create_cb)(Mem::Hooks::InstallDetourPatch("dinput8.dll", "DirectInput8Create", (DWORD)input_dxi8create_hook));
+        _input_state.hooked_showcursor = (input_showcursor_cb)Mem::Hooks::InstallDetourPatch("user32.dll", "ShowCursor", (DWORD)input_showcursor_hook);
     }
 }
 
 void input_free() {
     if (_input_state.installed) {
         _input_state.installed = false;
-        Mem::Hooks::UninstallDetourPatch(_input_state.method, (DWORD)input_dxi8create_hook);
+        Mem::Hooks::UninstallDetourPatch(_input_state.hooked_dxi8create, (DWORD)input_dxi8create_hook);
     }
 }
 
 void input_mouse_position(int *x, int *y) {
     *x = _input_state.mouse.x;
     *y = _input_state.mouse.y;
+}
+
+int input_inject_event(void *evt) {
+    auto event = (SDL_Event *)evt;
+
+    switch (event->type) {
+        case SDL_MOUSEMOTION:
+            break;
+    }
+
+    return 0;
 }
 
 void input_block_set(bool value) {
@@ -110,32 +135,12 @@ void input_block_set(bool value) {
         _input_state.devices[ZINPUT_MOUSE]->Acquire();
     }
 
-    // ShowCursor(value);
-
-    /*
-    DWORD flags = _input_state.devices[ZINPUT_MOUSE]->cachedFlags;
-
     if (value) {
-        //flags &= ~(DISCL_EXCLUSIVE);
-        flags |= DISCL_NONEXCLUSIVE;
-        flags |= DISCL_FOREGROUND;
-
-        _input_state.devices[ZINPUT_MOUSE]->SetCoopLvl(DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-        _input_state.devices[ZINPUT_MOUSE]->Unacquire();
-        _input_state.devices[ZINPUT_MOUSE]->Acquire();
-
-        mod_log("unaquiring the input");
-    } else {
-        flags &= ~(DISCL_NONEXCLUSIVE);
-        flags &= ~(DISCL_FOREGROUND);
-        //flags |= DISCL_EXCLUSIVE;
-
-        _input_state.devices[ZINPUT_MOUSE]->SetCoopLvl(DISCL_EXCLUSIVE);
-        _input_state.devices[ZINPUT_MOUSE]->Acquire();
-
-        mod_log("aquiring the input");
+        _input_state.hooked_showcursor(true);
     }
-    */
+    else {
+        while (_input_state.hooked_showcursor(value) >= 0) {}
+    }
 }
 
 bool input_block_get() {

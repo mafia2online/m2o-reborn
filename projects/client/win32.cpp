@@ -19,9 +19,9 @@ namespace M2 {
 #include "m2o_client.h"
 
 #include "win32/gfx.hpp"
+#include "win32/input.hpp"
 #include "win32/cef.hpp"
 #include "win32/vfs.hpp"
-#include "win32/input.hpp"
 #include "win32/exceptions.hpp"
 
 extern "C" { // NOTE: Tell the OS to prefer dedicated video card.
@@ -82,6 +82,7 @@ void platform_tick() {
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+        input_inject_event(&event);
         cef_inject_event((void *)&event);
     }
 }

@@ -131,8 +131,7 @@ class RenderHandler : public CefRenderHandler {
                           CefCursorHandle cursor,
                           CursorType type,
                           const CefCursorInfo& custom_cursor_info) override {
-            mod_log("cursor has changed to %d", type);
-            SetCursor(cursor);
+            SetClassLong((HWND)platform_windowid(), GCL_HCURSOR, (LONG)cursor);
         }
 
         void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList& dirtyRects, const void* buffer, int width, int height) override {
