@@ -365,7 +365,7 @@ class CefMinimal : public CefApp {
 // !
 // =======================================================================//
 
-    i32 cef_handle_next() {
+    i32 cef__handle_next() {
         int capacity = (int)zpl_array_capacity(cef_state.objects);
 
         if (zpl_array_count(cef_state.objects) + 1 >= capacity) {
@@ -389,7 +389,7 @@ class CefMinimal : public CefApp {
     }
 
     cef_handle cef_browser_create(const char *url, int w, int h, int zindex) {
-        int handle      = cef_handle_next();
+        int handle      = cef__handle_next();
         cef_object *obj = &cef_state.objects[handle];
 
         HWND win_id = (HWND)platform_windowid();
