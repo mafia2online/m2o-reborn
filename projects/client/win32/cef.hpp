@@ -566,253 +566,26 @@ class CefMinimal : public CefApp {
         return result;
     }
 
-    int cef__keyboard_modifiers(uint16_t const mod) {
-        int result = EVENTFLAG_NONE;
-
-        if (mod & KMOD_NUM) {
-            result |= EVENTFLAG_NUM_LOCK_ON;
-        }
-
-        if (mod & KMOD_CAPS) {
-            result |= EVENTFLAG_CAPS_LOCK_ON;
-        }
-
-        if (mod & KMOD_CTRL) {
-            result |= EVENTFLAG_CONTROL_DOWN;
-        }
-
-        if (mod & KMOD_SHIFT) {
-            result |= EVENTFLAG_SHIFT_DOWN;
-        }
-
-        if (mod & KMOD_ALT) {
-            result |= EVENTFLAG_ALT_DOWN;
-        }
-        return result;
+    bool IsKeyDown(WPARAM wparam) {
+        return (GetKeyState(wparam) & 0x8000) != 0;
     }
 
-    int cef__windows_keycode(SDL_Keysym const &key) {
-        int result = 0;
+    int cef__mouse_modifiers(uint16_t const mod) {
+        int result = EVENTFLAG_NONE;
 
-        bool shift = !!(key.mod & KMOD_SHIFT);
-        bool caps = !!(key.mod & KMOD_CAPS);
-        bool alt_gr = !!(key.mod & KMOD_RALT);
-        bool uppercase = (caps && !shift) || (shift && !caps);
+        if (mod & KMOD_NUM)     { result |= EVENTFLAG_NUM_LOCK_ON; }
+        if (mod & KMOD_CAPS)    { result |= EVENTFLAG_CAPS_LOCK_ON; }
+        if (mod & KMOD_CTRL)    { result |= EVENTFLAG_CONTROL_DOWN; }
+        if (mod & KMOD_SHIFT)   { result |= EVENTFLAG_SHIFT_DOWN; }
+        if (mod & KMOD_ALT)     { result |= EVENTFLAG_ALT_DOWN; }
 
-        // mapped from azerty windows 8 asus laptop
-        switch (key.sym) {
-        case SDLK_RETURN:
-            result = 13;
-            break;
-        case SDLK_ESCAPE:
-            result = 27;
-            break;
-        case SDLK_BACKSPACE:
-            result = 8;
-            break;
-        case SDLK_TAB:
-            result = 9;
-            break;
-        case SDLK_SPACE:
-            result = 32;
-            break;
-        case SDLK_EXCLAIM:
-            result = uppercase ? 167 : 33; // § : !
-            break;
+        if (IsKeyDown(VK_LBUTTON))
+            result |= EVENTFLAG_LEFT_MOUSE_BUTTON;
+        if (IsKeyDown(VK_MBUTTON))
+            result |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
+        if (IsKeyDown(VK_RBUTTON))
+            result |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
 
-        case SDLK_QUOTEDBL:
-            result = 34;
-            break;
-        case SDLK_HASH:
-            result = 35;
-            break;
-        case SDLK_DOLLAR:
-            result = 36;
-            break;
-        case SDLK_PERCENT:
-            result = 37;
-            break;
-        case SDLK_AMPERSAND:
-            result = 38;
-            break;
-        case SDLK_QUOTE:
-            result = 39;
-            break;
-        case SDLK_LEFTPAREN:
-            result = 40;
-            break;
-        case SDLK_RIGHTPAREN:
-            result = alt_gr ? 93 : uppercase ? 176 : 41; // ] ? ° : )
-            break;
-        case SDLK_ASTERISK:
-            result = uppercase ? 181 : 42; // µ : *
-            break;
-        case SDLK_PLUS:
-            result = 43;
-            break;
-        case SDLK_COMMA:
-            result = uppercase ? 63 : 44; // '?' : ,
-            break;
-        case SDLK_MINUS:
-            result = 45;
-            break;
-        case SDLK_PERIOD:
-            result = 46;
-            break;
-        case SDLK_SLASH:
-            result = 47;
-            break;
-
-        case SDLK_0:
-            result = alt_gr ? 64 : uppercase ? 48 : 224; // @ ? 0 : à
-            break;
-        case SDLK_1:
-            result = uppercase ? 49 : 38; // 1 : & (KO)
-            break;
-        case SDLK_2:
-            result = alt_gr ? 126 : uppercase ? 50 : 233; // ~ ? 2 : é
-            break;
-        case SDLK_3:
-            result = alt_gr ? 35 : uppercase ? 51 : 34; // # ? 3 : "
-            break;
-        case SDLK_4:
-            result = alt_gr ? 123 : uppercase ? 52 : 39; // { ? 4 : '
-            break;
-        case SDLK_5:
-            result = alt_gr ? 91 : uppercase ? 53 : 40; // [ ? 5 : ( (KO)
-            break;
-        case SDLK_6:
-            result = alt_gr ? 124 : uppercase ? 54 : 45; // | ? 6 : -
-            break;
-        case SDLK_7:
-            result = alt_gr ? 96 : uppercase ? 55 : 232; // ` ? 7 : è
-            break;
-        case SDLK_8:
-            result = alt_gr ? 92 : uppercase ? 56 : 95; // \ ? 8 : _
-            break;
-        case SDLK_9:
-            result = alt_gr ? 94 : uppercase ? 57 : 231; // ^ ? 9 : ç
-            break;
-
-        case SDLK_COLON:
-            result = uppercase ? 47 : 58; // / : :
-            break;
-        case SDLK_SEMICOLON:
-            result = uppercase ? 46 : 59; // . (KO) : ;
-            break;
-        case SDLK_LESS:
-            result = uppercase ? 62 : 60; // > : <
-            break;
-        case SDLK_EQUALS:
-            result = alt_gr ? 125 : uppercase ? 43 : 61; // } ? + : =
-            break;
-        case SDLK_GREATER:
-            result = 62;
-            break;
-        case SDLK_QUESTION:
-            result = 63;
-            break;
-        case SDLK_AT:
-            result = 64;
-            break;
-        case SDLK_LEFTBRACKET:
-            result = 91;
-            break;
-        case SDLK_BACKSLASH:
-            result = 92;
-            break;
-        case SDLK_RIGHTBRACKET:
-            result = 93;
-            break;
-        case SDLK_CARET:
-            result = uppercase ? 168 : 94; // ^ : ¨
-            break;
-        case SDLK_UNDERSCORE:
-            result = 95;
-            break;
-        case SDLK_BACKQUOTE:
-            result = 96;
-            break;
-
-        case SDLK_a:
-            result = uppercase ? 65 : 97;
-            break;
-        case SDLK_b:
-            result = uppercase ? 66 : 98;
-            break;
-        case SDLK_c:
-            result = uppercase ? 67 : 99;
-            break;
-        case SDLK_d:
-            result = uppercase ? 68 : 100;
-            break;
-        case SDLK_e:
-            result = uppercase ? 69 : 101;
-            break;
-        case SDLK_f:
-            result = uppercase ? 70 : 102;
-            break;
-        case SDLK_g:
-            result = uppercase ? 71 : 103;
-            break;
-        case SDLK_h:
-            result = uppercase ? 72 : 104;
-            break;
-        case SDLK_i:
-            result = uppercase ? 73 : 105;
-            break;
-        case SDLK_j:
-            result = uppercase ? 74 : 106;
-            break;
-        case SDLK_k:
-            result = uppercase ? 75 : 107;
-            break;
-        case SDLK_l:
-            result = uppercase ? 76 : 108;
-            break;
-        case SDLK_m:
-            result = uppercase ? 77 : 109;
-            break;
-        case SDLK_n:
-            result = uppercase ? 78 : 110;
-            break;
-        case SDLK_o:
-            result = uppercase ? 79 : 111;
-            break;
-        case SDLK_p:
-            result = uppercase ? 80 : 112;
-            break;
-        case SDLK_q:
-            result = uppercase ? 81 : 113;
-            break;
-        case SDLK_r:
-            result = uppercase ? 82 : 114;
-            break;
-        case SDLK_s:
-            result = uppercase ? 83 : 115;
-            break;
-        case SDLK_t:
-            result = uppercase ? 84 : 116;
-            break;
-        case SDLK_u:
-            result = uppercase ? 85 : 117;
-            break;
-        case SDLK_v:
-            result = uppercase ? 86 : 118;
-            break;
-        case SDLK_w:
-            result = uppercase ? 87 : 119;
-            break;
-        case SDLK_x:
-            result = uppercase ? 88 : 120;
-            break;
-        case SDLK_y:
-            result = uppercase ? 89 : 121;
-            break;
-        case SDLK_z:
-            result = uppercase ? 90 : 122;
-            break;
-        }
         return result;
     }
 
@@ -821,32 +594,7 @@ class CefMinimal : public CefApp {
         if (!cef_exists(0)) return 0;
         auto host = cef_state.objects[0].browser.get()->GetHost();
 
-        // if (event->type == SDL_MOUSEMOTION && ) {
-        //     CefMouseEvent ax;
-        //     ax.x = event->motion.x;
-        //     ax.y = event->motion.y;
-        //     host->SendMouseMoveEvent(ax, false);
-        // }
-
         switch (e->type) {
-            case SDL_KEYDOWN: {
-                CefKeyEvent event;
-                event.modifiers = cef__keyboard_modifiers(e->key.keysym.mod);
-                event.windows_key_code = cef__windows_keycode(e->key.keysym);
-                event.type = KEYEVENT_RAWKEYDOWN;
-                host->SendKeyEvent(event);
-                event.type = KEYEVENT_CHAR;
-                host->SendKeyEvent(event);
-            } break;
-
-            case SDL_KEYUP: {
-                CefKeyEvent event;
-                event.modifiers = cef__keyboard_modifiers(e->key.keysym.mod);
-                event.windows_key_code = cef__windows_keycode(e->key.keysym);
-                event.type = KEYEVENT_KEYUP;
-                host->SendKeyEvent(event);
-            } break;
-
             case SDL_WINDOWEVENT:
                 switch (e->window.event) {
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -877,6 +625,7 @@ class CefMinimal : public CefApp {
                 CefMouseEvent event;
                 event.x = e->motion.x;
                 event.y = e->motion.y;
+                event.modifiers = cef__mouse_modifiers(0);
                 host->SendMouseMoveEvent(event, false);
             } break;
 
@@ -884,14 +633,14 @@ class CefMinimal : public CefApp {
                 CefMouseEvent event;
                 event.x = e->button.x;
                 event.y = e->button.y;
-                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), true, 1);
+                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), true, e->button.clicks);
             } break;
 
             case SDL_MOUSEBUTTONDOWN: {
                 CefMouseEvent event;
                 event.x = e->button.x;
                 event.y = e->button.y;
-                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), false, 1);
+                host->SendMouseClickEvent(event, cef__translatemousebtn(e->button), false, e->button.clicks);
             } break;
 
             case SDL_MOUSEWHEEL: {
@@ -905,10 +654,120 @@ class CefMinimal : public CefApp {
                     delta_x *= -1;
                 }
 
-                mod_log("sending mousewheel %d %d", delta_x, delta_y);
-
                 CefMouseEvent event;
                 host->SendMouseWheelEvent(event, delta_x, delta_y);
+            } break;
+        }
+
+        return 0;
+    }
+
+    int cef__keyboard_modifiers(WPARAM wparam, LPARAM lparam) {
+        int modifiers = 0;
+        if (IsKeyDown(VK_SHIFT))
+            modifiers |= EVENTFLAG_SHIFT_DOWN;
+        if (IsKeyDown(VK_CONTROL))
+            modifiers |= EVENTFLAG_CONTROL_DOWN;
+        if (IsKeyDown(VK_MENU))
+            modifiers |= EVENTFLAG_ALT_DOWN;
+
+        // Low bit set from GetKeyState indicates "toggled".
+        if (::GetKeyState(VK_NUMLOCK) & 1)
+            modifiers |= EVENTFLAG_NUM_LOCK_ON;
+        if (::GetKeyState(VK_CAPITAL) & 1)
+            modifiers |= EVENTFLAG_CAPS_LOCK_ON;
+
+        switch (wparam) {
+        case VK_RETURN:
+            if ((lparam >> 16) & KF_EXTENDED)
+                modifiers |= EVENTFLAG_IS_KEY_PAD;
+            break;
+        case VK_INSERT:
+        case VK_DELETE:
+        case VK_HOME:
+        case VK_END:
+        case VK_PRIOR:
+        case VK_NEXT:
+        case VK_UP:
+        case VK_DOWN:
+        case VK_LEFT:
+        case VK_RIGHT:
+            if (!((lparam >> 16) & KF_EXTENDED))
+                modifiers |= EVENTFLAG_IS_KEY_PAD;
+            break;
+        case VK_NUMLOCK:
+        case VK_NUMPAD0:
+        case VK_NUMPAD1:
+        case VK_NUMPAD2:
+        case VK_NUMPAD3:
+        case VK_NUMPAD4:
+        case VK_NUMPAD5:
+        case VK_NUMPAD6:
+        case VK_NUMPAD7:
+        case VK_NUMPAD8:
+        case VK_NUMPAD9:
+        case VK_DIVIDE:
+        case VK_MULTIPLY:
+        case VK_SUBTRACT:
+        case VK_ADD:
+        case VK_DECIMAL:
+        case VK_CLEAR:
+            modifiers |= EVENTFLAG_IS_KEY_PAD;
+            break;
+        case VK_SHIFT:
+            if (IsKeyDown(VK_LSHIFT))
+                modifiers |= EVENTFLAG_IS_LEFT;
+            else if (IsKeyDown(VK_RSHIFT))
+                modifiers |= EVENTFLAG_IS_RIGHT;
+            break;
+        case VK_CONTROL:
+            if (IsKeyDown(VK_LCONTROL))
+                modifiers |= EVENTFLAG_IS_LEFT;
+            else if (IsKeyDown(VK_RCONTROL))
+                modifiers |= EVENTFLAG_IS_RIGHT;
+            break;
+        case VK_MENU:
+            if (IsKeyDown(VK_LMENU))
+                modifiers |= EVENTFLAG_IS_LEFT;
+            else if (IsKeyDown(VK_RMENU))
+                modifiers |= EVENTFLAG_IS_RIGHT;
+            break;
+        case VK_LWIN:
+            modifiers |= EVENTFLAG_IS_LEFT;
+            break;
+        case VK_RWIN:
+            modifiers |= EVENTFLAG_IS_RIGHT;
+            break;
+        }
+        return modifiers;
+    }
+
+    int cef_inject_wndproc(UINT message, WPARAM wParam, LPARAM lParam) {
+        switch (message) {
+            case WM_SYSCHAR:
+            case WM_SYSKEYDOWN:
+            case WM_SYSKEYUP:
+            case WM_KEYDOWN:
+            case WM_KEYUP:
+            case WM_CHAR: {
+                if (!cef_exists(0)) return 0;
+                auto host = cef_state.objects[0].browser.get()->GetHost();
+
+                CefKeyEvent event;
+                event.windows_key_code = wParam;
+                event.native_key_code = lParam;
+                event.is_system_key = message == WM_SYSCHAR || message == WM_SYSKEYDOWN || message == WM_SYSKEYUP;
+
+                if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+                    event.type = KEYEVENT_RAWKEYDOWN;
+                else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+                    event.type = KEYEVENT_KEYUP;
+                else
+                    event.type = KEYEVENT_CHAR;
+
+                event.modifiers = cef__keyboard_modifiers(wParam, lParam);
+
+                host->SendKeyEvent(event);
             } break;
         }
 

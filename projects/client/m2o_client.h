@@ -92,7 +92,6 @@ extern "C" {
 
     cef_handle cef_browser_create(const char *url, int w, int h, int zindex);
 
-    int cef_inject_event(void *);
     int cef_exists(cef_handle handle);
 
     int cef_browser_resize(cef_handle handle, int w, int h);
@@ -128,7 +127,6 @@ extern "C" {
 
     void input_init();
     void input_free();
-    int input_inject_event(void *);
     void input_mouse_position(int *x, int *y);
     void input_block_set(bool value);
     bool input_block_get();

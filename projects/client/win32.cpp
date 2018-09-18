@@ -43,13 +43,14 @@ static SDL_Window *sdlwindow;
 
 LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     mod_win32_hwnd = hWnd;
-
     // mod_log("mod_wndproc_hook %x %u %u %u\n", hWnd, uMsg, wParam, lParam);
+
+    if (input_block_get()) {
+        cef_inject_wndproc(uMsg, wParam, lParam);
+    }
+
     return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
 }
-
-// extern "C" int SDL_MouseInit(void);
-SDL_Cursor *curs;
 
 void platform_init() {
     mod_win32_hwnd = *(HWND *)((*(DWORD*)0x1ABFE30) + 28);
@@ -61,20 +62,6 @@ void platform_init() {
 
     mod_log("SDL_Init(SDL_INIT_VIDEO): %d %s", SDL_Init(SDL_INIT_VIDEO), SDL_GetError());
     sdlwindow = SDL_CreateWindowFrom(mod_win32_hwnd);
-    // mod_log(SDL_GetError());
-
-    // SDL_MouseInit();
-    // mod_log(SDL_GetError());
-
-    // if (!curs) {
-    //     curs = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-    //     mod_log(SDL_GetError());
-    //     SDL_SetCursor(curs);
-    //     mod_log(SDL_GetError());
-    // }
-
-    // SDL_ShowCursor(SDL_ENABLE);
-    // mod_log(SDL_GetError());
 }
 
 void platform_tick() {
