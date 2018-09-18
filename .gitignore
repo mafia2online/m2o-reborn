@@ -23,6 +23,9 @@ binary/*
 !binary/client/
 !binary/server/
 !binary/other/
+!binary/client.bat
+!binary/client-pair.bat
+!binary/server.sh.bat
 
 ### client
 binary/client/*
