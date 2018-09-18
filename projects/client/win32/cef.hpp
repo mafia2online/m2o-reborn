@@ -327,8 +327,7 @@ class CefMinimal : public CefApp {
         CefString(&settings.locales_dir_path)       = path + "\\cef\\locales";
         CefString(&settings.cache_path)             = path + "\\cef\\cache";
         CefString(&settings.user_data_path)         = path + "\\cef\\userdata";
-        CefString(&settings.browser_subprocess_path)= path + "\\cef_worker.exe";
-        // CefString(&settings.user_agent)             = "m2o-reborn client (HTTP 1.1, CEF Backend)";
+        CefString(&settings.browser_subprocess_path)= path + "\\m2o-worker.exe";
 
         settings.single_process                 = false;
         settings.multi_threaded_message_loop    = false;

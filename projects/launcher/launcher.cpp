@@ -13,7 +13,7 @@
 #include <steam_api.h>
 
 // #ifdef _DEBUG
-static const char *const CORE_DLL_NAME("client.dll");
+static const char *const CORE_DLL_NAME("m2o-client.dll");
 // #else
 // static const char *const CORE_DLL_NAME("client.dll");
 // #endif

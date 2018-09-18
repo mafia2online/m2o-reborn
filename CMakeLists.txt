@@ -64,7 +64,7 @@ if (M2O_CLIENT)
     if (M2O_CEF)
         set(M2O_CEF 1)
         add_definitions(-DM2O_CEF=1)
-        add_subdirectory(projects/cef_worker)
+        add_subdirectory(projects/worker)
     endif()
 
     add_subdirectory(projects/m2sdk)

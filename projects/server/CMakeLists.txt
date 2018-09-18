@@ -27,7 +27,7 @@ if (MSVC)
     # set_target_properties(server PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
 
     add_custom_command(TARGET server POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server.exe" "${CMAKE_SOURCE_DIR}/binary/server/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/server.exe" "${CMAKE_SOURCE_DIR}/binary/server/m2o-server.exe"
     )
 
     GroupSourcesNamed(server ../server)
