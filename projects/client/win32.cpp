@@ -62,6 +62,9 @@ void platform_init() {
 
     mod_log("SDL_Init(SDL_INIT_VIDEO): %d %s", SDL_Init(SDL_INIT_VIDEO), SDL_GetError());
     sdlwindow = SDL_CreateWindowFrom(mod_win32_hwnd);
+
+    // hide cursor initially
+    while (_input_state.hooked_showcursor(false) >= 0) {}
 }
 
 void platform_tick() {

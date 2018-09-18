@@ -256,16 +256,16 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler {
             mod_log("[cef] OnLoadStart()");
         }
 
-        bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-                           const CefString& target_url, const CefString& target_frame_name,
-                           CefLifeSpanHandler::WindowOpenDisposition target_disposition,
-                           bool user_gesture, const CefPopupFeatures& popupFeatures,
-                           CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
-                           CefBrowserSettings& settings, bool* no_javascript_access) {
-            mod_log("[cef] Page wants to open a popup");
+        // bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+        //                    const CefString& target_url, const CefString& target_frame_name,
+        //                    CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+        //                    bool user_gesture, const CefPopupFeatures& popupFeatures,
+        //                    CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
+        //                    CefBrowserSettings& settings, bool* no_javascript_access) {
+        //     mod_log("[cef] Page wants to open a popup");
 
-            return true;
-        };
+        //     return true;
+        // };
 
         IMPLEMENT_REFCOUNTING(BrowserClient);
 

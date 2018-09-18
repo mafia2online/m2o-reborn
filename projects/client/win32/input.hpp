@@ -81,11 +81,6 @@ int WINAPI input_showcursor_hook(BOOL bShow) {
         return 1;
 }
 
-HCURSOR WINAPI input_setcursor_hook(_In_opt_ HCURSOR hCursor) {
-    mod_log("SetCusror %x", hCursor);
-    return 0;
-}
-
 // =======================================================================//
 // !
 // ! Control methods
@@ -104,6 +99,7 @@ void input_free() {
     if (_input_state.installed) {
         _input_state.installed = false;
         Mem::Hooks::UninstallDetourPatch(_input_state.hooked_dxi8create, (DWORD)input_dxi8create_hook);
+        Mem::Hooks::UninstallDetourPatch(_input_state.hooked_showcursor, (DWORD)input_showcursor_hook);
     }
 }
 
@@ -139,7 +135,7 @@ void input_block_set(bool value) {
         _input_state.hooked_showcursor(true);
     }
     else {
-        while (_input_state.hooked_showcursor(value) >= 0) {}
+        while (_input_state.hooked_showcursor(false) >= 0) {}
     }
 }
 
