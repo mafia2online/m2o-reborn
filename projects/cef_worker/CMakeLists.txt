@@ -20,13 +20,13 @@ if (MSVC)
     set_target_properties(cef_worker PROPERTIES LINK_FLAGS "/ignore:4099")
 
     add_custom_command(TARGET cef_worker POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/cef_worker.exe" "${CMAKE_SOURCE_DIR}/binary/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/cef_worker.exe" "${CMAKE_SOURCE_DIR}/binary/client/"
     )
 
     add_custom_command(
         TARGET cef_worker
         POST_BUILD
-        COMMAND "mt.exe" -manifest "${PROJECT_SOURCE_DIR}\\manifest.xml" -outputresource:"${CMAKE_SOURCE_DIR}/binary/cef_worker.exe"\;\#1
+        COMMAND "mt.exe" -manifest "${PROJECT_SOURCE_DIR}\\manifest.xml" -outputresource:"${CMAKE_SOURCE_DIR}/binary/client/cef_worker.exe"\;\#1
         COMMENT "Adding manifest..."
     )
 endif()

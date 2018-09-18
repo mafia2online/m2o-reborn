@@ -17,26 +17,42 @@ Thumbs.db
 .sync/
 
 # project stuff
+
+## binaries
 binary/*
-!binary/cef
-binary/cef/cache/
-binary/cef/userdata/
-binary/cef/ceflog.txt
-!binary/files
-!binary/chrome_elf.dll
-!binary/d3dcompiler_43.dll
-!binary/d3dcompiler_47.dll
-!binary/icudtl.dat
-!binary/launcher.exe
-!binary/libcef.dll
-!binary/libEGL.dll
-!binary/libfreetype-6.dll
-!binary/libGLESv2.dll
-!binary/m2o-2clients.exe
-!binary/natives_blob.bin
-!binary/snapshot_blob.bin
-!binary/steam_api.dll
-!binary/steam_appid.txt
-!binary/v8_context_snapshot.bin
-!binary/widevinecdmadapter.dll
-!binary/zlib1.dll
+!binary/client/
+!binary/server/
+!binary/other/
+
+### client
+binary/client/*
+!binary/client/cef
+binary/client/cef/cache/
+binary/client/cef/userdata/
+binary/client/cef/ceflog.txt
+!binary/client/files
+!binary/client/chrome_elf.dll
+!binary/client/d3dcompiler_43.dll
+!binary/client/d3dcompiler_47.dll
+!binary/client/icudtl.dat
+!binary/client/launcher.exe
+!binary/client/libcef.dll
+!binary/client/libEGL.dll
+!binary/client/libfreetype-6.dll
+!binary/client/libGLESv2.dll
+!binary/client/natives_blob.bin
+!binary/client/snapshot_blob.bin
+!binary/client/steam_api.dll
+!binary/client/steam_appid.txt
+!binary/client/v8_context_snapshot.bin
+!binary/client/widevinecdmadapter.dll
+!binary/client/zlib1.dll
+
+### server
+binary/server/*
+!binary/server/.keep
+
+### other
+binary/other/*
+!binary/other/.keep
+!binary/other/m2o-2clients.exe

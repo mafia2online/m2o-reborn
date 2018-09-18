@@ -3,7 +3,7 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 RootFolder := RegExReplace(A_ScriptDir, "\\[^\\]+$")
-BinaryFolder := RootFolder "\binary"
+BinaryFolder := RootFolder "\client"
 
 SetWorkingDir, %BinaryFolder%  ; Ensures a consistent starting directory.
 

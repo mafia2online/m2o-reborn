@@ -81,13 +81,17 @@ if (MSVC)
     set_target_properties(client PROPERTIES LINK_FLAGS_RELEASE "/SAFESEH:NO")
 
     add_custom_command(TARGET client POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_SOURCE_DIR}/binary/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.dll" "${CMAKE_SOURCE_DIR}/binary/client/"
+    )
+
+    add_custom_command(TARGET client POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/client.pdb" "${CMAKE_SOURCE_DIR}/binary/other/"
     )
 
     add_custom_command(
         TARGET client
         POST_BUILD
-        COMMAND "mt.exe" -manifest "${PROJECT_SOURCE_DIR}\\manifest.xml" -outputresource:"${CMAKE_SOURCE_DIR}/binary/client.dll"\;\#2
+        COMMAND "mt.exe" -manifest "${PROJECT_SOURCE_DIR}\\manifest.xml" -outputresource:"${CMAKE_SOURCE_DIR}/binary/client/client.dll"\;\#2
         COMMENT "Adding manifest..."
     )
 
