@@ -33,21 +33,15 @@ set(INCLUDE_FOLDERS
 )
 
 if (WIN32)
-    include(../../misc/cmake/FindDirectX.cmake)
-
-    find_path(D3DX9_INCLUDE d3dx9.h HINTS ${DirectX_INC_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
-    find_path(D3DX9_LIBRARY d3dx9.lib HINTS ${DirectX_LIB_SEARCH_PATH} DOC "The directory where ${header} resides" CMAKE_FIND_ROOT_PATH_BOTH)
-
-    set(INCLUDE_FOLDERS ${INCLUDE_FOLDERS} ${D3DX9_INCLUDE})
+    set(INCLUDE_FOLDERS ${INCLUDE_FOLDERS} ${PROJECT_SOURCE_DIR}/../../vendor/d3d9/include/)
     set(LIBRARY_FOLDERS ${LIBRARY_FOLDERS}
-        ${D3DX9_LIBRARY}
+        ${PROJECT_SOURCE_DIR}/../../vendor/d3d9/
         ${PROJECT_SOURCE_DIR}/../../vendor/detours/lib/
     )
     set(LIBRARIES ${LIBRARIES}
         ws2_32  # for librg
         psapi   # for librg
         winmm   # for librg
-        # d3d9
         d3dx9
         dxgi
         dinput8

@@ -16,7 +16,7 @@ enum {
     ZINPUT_JOYSTICK,
 };
 
-class CDirectInputDevice8Proxy;
+struct CDirectInputDevice8Proxy;
 
 struct input_state {
     IDirectInput8 *proxy;
