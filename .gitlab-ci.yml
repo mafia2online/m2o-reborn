@@ -4,6 +4,8 @@ stages:
 
 build:
     stage: build
+    tags:
+        - win
     script:
         - mkdir build 2> NUL
         - cd build
