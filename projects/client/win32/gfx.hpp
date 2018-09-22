@@ -1,7 +1,6 @@
 #include <d3dx9.h>
 
-// disable dll exports for SDL
-#define DECLSPEC
+#define DECLSPEC /* disable dll exports for SDL */
 #include "SDL.h"
 #include "SDL_ttf.h"
 
