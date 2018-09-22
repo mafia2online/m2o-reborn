@@ -5,7 +5,7 @@ file(GLOB_RECURSE SERVER_FILES
     "${PROJECT_SOURCE_DIR}/*.cpp"
     "${PROJECT_SOURCE_DIR}/*.h"
     "${PROJECT_SOURCE_DIR}/../shared/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/librg/include/*.h"
+    "${PROJECT_SOURCE_DIR}/../../vendor/*.h"
 )
 
 add_executable(server ${SERVER_FILES})
@@ -19,7 +19,7 @@ endif()
 target_include_directories(server PUBLIC
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/../shared
-    ${PROJECT_SOURCE_DIR}/../../vendor/librg/include
+    ${PROJECT_SOURCE_DIR}/../../vendor
 )
 
 if (MSVC)

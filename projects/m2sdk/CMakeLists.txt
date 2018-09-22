@@ -15,7 +15,7 @@ add_library(m2sdk STATIC ${M2SDK_FILES})
 target_link_libraries(m2sdk detours)
 target_include_directories(m2sdk PUBLIC include
     ${PROJECT_SOURCE_DIR}/../../vendor/detours/include
-    ${PROJECT_SOURCE_DIR}/../../vendor/librg/include
+    ${PROJECT_SOURCE_DIR}/../../vendor
 )
 
 if (M2O_EXPORT_SDK)

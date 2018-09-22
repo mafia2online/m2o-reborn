@@ -5,12 +5,11 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/*.cpp"
     "${PROJECT_SOURCE_DIR}/*.h*"
     "${PROJECT_SOURCE_DIR}/../shared/*.h"
+    "${PROJECT_SOURCE_DIR}/../../vendor/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/sdl/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/librg/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/detours/include/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/nuklear/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/discord/include/*.h"
 )
 
@@ -24,10 +23,9 @@ set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/../shared
     ${PROJECT_SOURCE_DIR}/../m2sdk/include
+    ${PROJECT_SOURCE_DIR}/../../vendor
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/include
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include
-    ${PROJECT_SOURCE_DIR}/../../vendor/librg/include
-    ${PROJECT_SOURCE_DIR}/../../vendor/nuklear/include
     ${PROJECT_SOURCE_DIR}/../../vendor/detours/include
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/include
 )
