@@ -1,0 +1,24 @@
+stages:
+    - build
+    # - publish
+
+build:
+    stage: build
+    script:
+        - mkdir build 2> NUL
+        - cd build
+        - cmake .. -G"Visual Studio 15 2017" -DM2O_SERVER=1 -DM2O_CLIENT=1 -DM2O_CEF=1
+        - cmake --build .
+    # artifacts:
+    #     expire_in: '1 hour'
+    #     paths:
+    #         - compiled-$CI_BUILD_TAG.exe
+    #         - doc-$CI_BUILD_TAG.pdf
+
+# publish:
+#     image: inetprocess/gitlab-release
+#     stage: publish
+#     only:
+#         - tags
+#     script:
+#         - gitlab-release --message 'My release message' compiled-$CI_BUILD_TAG.exe doc-$CI_BUILD_TAG.pdf
