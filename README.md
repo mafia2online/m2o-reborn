@@ -1,11 +1,13 @@
 # m2o-reborn
 
-## Building (`VS` 2015/2017)
+## Building
 
 0. Install cmake
 
 ```
-https://cmake.org/files/v3.9/cmake-3.9.0-win64-x64.msi
+windows: https://cmake.org/files/v3.9/cmake-3.9.0-win64-x64.msi
+linux: using your package manager
+macos: brew install cmake
 ```
 
 1. Clone
@@ -16,55 +18,17 @@ $ git clone git@gitlab.com:Mafia2Online/M2OClient-MyU.git
 2. Generate project
 
 ```
-run vs2015_cmake.bat
-or  vs2017_cmake.bat
+$ generate.sh.bat
 ```
 
-3. Open the solution
+3. Open the solution (Windows)
 
 ```
 build/m2o-reborn.sln
 ```
 
-4. Build
+3. Build the stuff (\*nix)
 
 ```
-use gui in visual studio as always
-```
-
-5. Run
-
-```
-binary/launcher.exe
-```
-
-## Building (`make` linux/macOS)
-
-0. Install cmake
-
-```
-depends on platform
-```
-
-1. Clone
-
-```sh
-$ git clone git@gitlab.com:Mafia2Online/M2OClient-MyU.git
-```
-2. Generate project
-
-```
-$ cd build && cmake ..
-```
-
-4. Build
-
-```
-$ make -j8
-```
-
-5. Run
-
-```
-$ binary/server
+$ cd build && make -j4
 ```
