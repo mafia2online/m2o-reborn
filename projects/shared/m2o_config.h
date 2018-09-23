@@ -82,8 +82,8 @@
 // !
 // =======================================================================//
 
+// todo rename to M2O_SERVER_API
 #define m2o_export
-#define m2o_import
 
 #define M2O_FETCH_ENTITY(dest, id, returned) \
     auto dest = librg_entity_fetch(ctx, id); \

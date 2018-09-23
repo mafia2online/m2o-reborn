@@ -17,7 +17,7 @@
 #include "m2o_types.h"
 
 #include "mod/mod.h"
-#include "mod/vehicle.h"
+// #include "mod/vehicle.h"
 #include "mod/pedestrian.h"
 
 // =======================================================================//
@@ -53,7 +53,7 @@ void mod_install() {
                 mod_log("[game-event] Start to leave car\n");
 
                 librg_event_t event = { 0 }; event.entity = mod.player;
-                librg_event_trigger(ctx, MOD_CAR_EXIT_START, &event);
+                librg_event_trigger(ctx, M2O_CAR_EXIT, &event);
             } break;
         }
     });
@@ -64,9 +64,6 @@ void mod_install() {
         switch (message->m_dwMessage) {
             case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE: {
                 mod_log("[game-event] Enter/Exit Vehicle done\n");
-
-                librg_event_t event = { 0 }; event.entity = mod.player;
-                librg_event_trigger(ctx, MOD_CAR_INTERACTION_FINISH, &event);
             } break;
 
             default: {
@@ -113,7 +110,7 @@ void mod_install() {
         event.user_data = (void *)car;
         event.data = (librg_data_t*)&iseat;
 
-        librg_event_trigger(ctx, MOD_CAR_ENTER_START, &event);
+        librg_event_trigger(ctx, M2O_CAR_ENTER, &event);
     });
 }
 
@@ -132,7 +129,7 @@ bool mod_connected() {
 
 void mod_nickname_set(const char *username) {
     mod_assert(username);
-    mod_message_send(ctx, MOD_USER_SET_NAME, [&](librg_data_t *data) {
+    mod_message_send(ctx, M2O_USER_SET_NAME, [&](librg_data_t *data) {
         librg_data_wu8(data, zpl_strlen(username));
         librg_data_wptr(data, (void *)username, zpl_strlen(username));
     });
@@ -141,7 +138,7 @@ void mod_nickname_set(const char *username) {
 void mod_respawn() {
     M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetTime(0.5); /* 0.0 .. 1.0 - time of the day */
 
-    auto ped = get_ped(mod.player);
+    auto ped = m2o_ped_get(mod.player);
 
     if (M2::C_SDSLoadingTable::Get()) {
         M2::C_SDSLoadingTable::Get()->ProcessLine("free_joe_load");
@@ -176,8 +173,7 @@ void mod_respawn() {
 void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     mod_log("[GameModule]: EventGameInit\n");
 
-    // call late (post window create)
-    // platform-related code
+    // call late (post window create) platform-related code
     platform_init();
 
     // therotically we shouldn't call it here but because it's a
@@ -201,23 +197,18 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     librg_init(ctx);
     cef_init();
 
-    // setup callbacks
+    /**
+     * Connection handling callbacks
+     */
     librg_event_add(ctx, LIBRG_CONNECTION_REQUEST, [](librg_event_t *event) {
         // TODO: password sending
     });
 
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, [](librg_event_t *event) {
         mod_log("[info] connected to the server\n");
-        auto ped = new ped_t((M2::C_Entity *)M2::C_Game::Get()->GetLocalPed());
-
-        // // #if _DEBUG
-        // mod.state = MOD_STUFF_STATE;
-        // // #else
-        // // mod.state = MOD_CONNECTED_STATE;
-        // // #endif
 
         mod.player = event->entity;
-        mod.player->user_data = ped;
+        mod.player->user_data = m2o_ped_alloc(M2::C_Game::Get()->GetLocalPed());
 
         mod_nickname_set("the playah");
         mod_respawn();
@@ -229,86 +220,93 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, [](librg_event_t *event) {
         mod_log("[info] disconnected form the server\n");
-        // mod_connecting = 0;
 
-        auto CEntity = (M2::C_Entity *)M2::C_Game::Get()->GetLocalPed();
-
-        ((M2::C_Player2*)CEntity)->LockControls(true);
+        M2::C_Game::Get()->GetLocalPed()->LockControls(true);
         // object->SetPosition(zplm_vec3_zero()); // creates black textures :O
 
         // if we have been disconnected before being connected
         if (mod.player) {
-            delete mod.player->user_data;
+            m2o_ped_free((m2o_ped *)mod.player->user_data);
         }
-
-        // mod.state = MOD_TITLE_STATE;
-        // mod.player = nullptr;
     });
 
+    /**
+     * General routing callbacks
+     */
     librg_event_add(ctx, LIBRG_ENTITY_CREATE, [](librg_event_t *event) {
         switch (event->entity->type) {
-            case TYPE_PED: { module_ped_callback_create(event); } break;
-            case TYPE_CAR: { module_car_callback_create(event); } break;
+            case M2O_ENTITY_PLAYER_PED:
+            case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_create(event); } break;
+            // case M2O_ENTITY_CAR: { m2o_callback_car_create(event); } break;
         }
     });
 
     librg_event_add(ctx, LIBRG_ENTITY_UPDATE, [](librg_event_t *event) {
         switch (event->entity->type) {
-            case TYPE_PED: { module_ped_callback_update(event); } break;
-            case TYPE_CAR: { module_car_callback_update(event); } break;
+            case M2O_ENTITY_PLAYER_PED:
+            case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_update(event); } break;
+            // case M2O_ENTITY_CAR: { m2o_callback_car_update(event); } break;
         }
     });
 
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE, [](librg_event_t *event) {
         switch (event->entity->type) {
-            case TYPE_PED: { module_ped_callback_remove(event); } break;
-            case TYPE_CAR: { module_car_callback_remove(event); } break;
+            case M2O_ENTITY_PLAYER_PED:
+            case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_remove(event); } break;
+            // case M2O_ENTITY_CAR: { m2o_callback_car_remove(event); } break;
         }
     });
 
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, [](librg_event_t *event) {
         switch (event->entity->type) {
-            case TYPE_PED: { module_ped_callback_clientstream(event); } break;
-            case TYPE_CAR: { module_car_callback_clientstream(event); } break;
+            case M2O_ENTITY_PLAYER_PED:
+            case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_clientstream(event); } break;
+            // case M2O_ENTITY_CAR { m2o_callback_car_clientstream(event); } break;
         }
     });
 
+    /**
+     * Client streaming callbacks
+     */
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_ADD, [](librg_event_t *event) {
         mod_log("[info] adding an entity %d to clientstream\n", event->entity->id);
-        mod.stats.streamed_entities++;
 
-        event->entity->flags &= ~MOD_ENTITY_INTERPOLATED;
+        /* increase stats info, and remove particlar entity from being interpolated */
+        mod.stats.streamed_entities++;
+        event->entity->flags &= ~M2O_ENTITY_INTERPOLATED;
     });
 
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, [](librg_event_t *event) {
         mod_log("[info] removing an entity %d from clientstream\n", event->entity->id);
-        mod.stats.streamed_entities--;
 
+        /* decrease stats info, and add entity back to being interpolated */
+        mod.stats.streamed_entities--;
         switch (event->entity->type) {
-            case TYPE_PED:
-            case TYPE_CAR: event->entity->flags |= MOD_ENTITY_INTERPOLATED; break;
+            case M2O_ENTITY_CAR:
+            case M2O_ENTITY_DUMMY_PED:
+            case M2O_ENTITY_PLAYER_PED:
+                event->entity->flags |= M2O_ENTITY_INTERPOLATED;
+                break;
         }
     });
 
-    librg_network_add(ctx, MOD_USER_SET_NAME, [](librg_message_t *msg) {
+    /**
+     * Custom/specific callbacks
+     */
+    librg_network_add(ctx, M2O_USER_SET_NAME, [](librg_message_t *msg) {
         auto entity = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
         mod_assert(entity);
 
         u8 strsize = librg_data_ru8(msg->data);
-        auto ped   = get_ped(entity);
+        auto ped   = m2o_ped_get(entity);
         librg_data_rptr(msg->data, ped->name, strsize);
-
-        // client-specific
-        zpl_utf8_to_ucs2((u16 *)ped->cached_name, strsize, (const u8 *)ped->name);
 
         mod_log("set new name for client %u: %s\n", entity->id, ped->name);
     });
 
-    // librg_network_add(ctx, MOD_USER_MESSAGE, mod_on_user_message);
-
-    // call inits for modules
-    module_ped_init();
-    module_car_init();
+    // // call inits for modules
+    // module_ped_init();
+    // module_car_init();
 
     // discord_init();
 }
@@ -334,12 +332,18 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     librg_tick(ctx);
 
     // interpolate all entities
-    librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | MOD_ENTITY_INTERPOLATED), [](librg_ctx_t *ctx, librg_entity_t *entity) {
+    librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | M2O_ENTITY_INTERPOLATED), [](librg_ctx_t *ctx, librg_entity_t *entity) {
         switch (entity->type) {
-            case TYPE_PED: { module_ped_callback_interpolate(entity); } break;
-            case TYPE_CAR: { module_car_callback_interpolate(entity); } break;
+            case M2O_ENTITY_PLAYER_PED:
+            case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_interpolate(entity); } break;
+            // case M2O_ENTITY_CAR { m2o_callback_car_interpolate(event); } break;
         }
     });
+
+    // constnaly set our health to top (DEBUG)
+    if (mod.player) {
+        m2o_ped_get(mod.player)->CHuman->GetScript()->SetHealth(720.0f);
+    }
 
     /* show/hide mouse */
     if (input_key_down(VK_F1)) {
@@ -348,7 +352,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     /* create a car */
     if (input_key_down(VK_F2)) {
-        mod_message_send(ctx, MOD_CAR_CREATE, nullptr);
+        mod_message_send(ctx, M2O_CAR_CREATE, nullptr);
     }
 
     /* connect to the server */

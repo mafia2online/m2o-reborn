@@ -11,15 +11,14 @@ extern "C" {
 // !
 // =======================================================================//
 
-    // mod_free()
-    // mod_exit()
     void mod_install();
 
     void mod_connect(const char *host, int port);
     void mod_disconnect();
     bool mod_connected();
+
     void mod_nickname_set(const char *name);
-    // mod_message_send()
+    // void mod_message_send();
 
     void mod_log(const char* format, ...);
 
@@ -27,8 +26,8 @@ extern "C" {
     void platform_tick();
     void platform_free();
 
-    void *platform_windowid();
-    const char *platform_path();
+    void        *platform_windowid();
+    const char  *platform_path();
 
 // =======================================================================//
 // !
@@ -115,7 +114,9 @@ extern "C" {
 
     void vfs_init();
     void vfs_free();
+
     void vfs_dump_all(bool value);
+
     void vfs_override_set(const char *src, const char *dst);
     char *vfs_override_get(const char *src);
 
@@ -127,18 +128,12 @@ extern "C" {
 
     void input_init();
     void input_free();
-    void input_mouse_position(int *x, int *y);
+
     void input_block_set(bool value);
     bool input_block_get();
-    // input_mouse_button()
-    bool input_key_down(unsigned int key);
-    bool input_key_up();
-    // input_joy()
 
-    // game_vehicle_create()
-    // game_vehicle_destroy()
-    // game_ped_create()
-    // game_ped_destroy()
+    void input_mouse_position(int *x, int *y);
+    bool input_key_down(unsigned int key);
 
 #ifdef __cplusplus
 }
