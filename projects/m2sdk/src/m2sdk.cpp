@@ -1,6 +1,8 @@
 #define _SCL_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
+#define MAFIA_SDK_IMPLEMENTATION
+
 #include <unordered_map>
 #include <assert.h>
 
@@ -53,21 +55,10 @@ void M2::Initialize(m2sdk_callback callback) {
     GameStartDrive_2__Return = Mem::Hooks::InstallNotDumbJMP(0x43B394, (M2_Address)GameStartDriveHook__2);
     GameStartDrive_3__Return = Mem::Hooks::InstallNotDumbJMP(0x437940, (M2_Address)GameStartDriveHook__3);
     GameEndDrive__Return = Mem::Hooks::InstallNotDumbJMP(0x43BAAD, (M2_Address)GameEndDriveHook);
-    Mem::Hooks::InstallJmpPatch(0x437935, (M2_Address)CPlayer2__EnterCar);
 
     // Crash fix on C_Frame::Release
     Mem::Hooks::InstallJmpPatch(0x14E5BC0, (DWORD)FrameReleaseFix);
     Mem::Hooks::InstallJmpPatch(0x12F0DB0, (DWORD)FrameReleaseFix2);
-
-    // Patchs for enter action testing
-    Mem::Hooks::InstallJmpPatch(0xA3E8E1, (DWORD)CCarActionEnter__TestAction__Hook);
-    Mem::Hooks::InstallJmpPatch(0xA3F0A6, (DWORD)CCarActionBreakIn__TestAction__Hook);
-    Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)CHuman2CarWrapper__IsFreeToGetIn__Hook);
-
-    // Hooking human death
-    Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)&CHuman2__SetupDeath_Hook);
-    Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)&CHuman2__DoDamage__Hook);
-
 
     //_CHuman2__AddCommand = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x94D400, (DWORD)CHuman2__AddCommand, 5);
     __LoadCityPart = (DWORD)Mem::Hooks::InstallNotDumbJMP(0x4743C0, (DWORD)LoadCityPartsHook, 5);
@@ -86,8 +77,8 @@ void M2::Initialize(m2sdk_callback callback) {
     *(BYTE *)0x0950D61 = 0x75;
 
     // Disable game controlling engine state and radio
-    Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
-    Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
+    //Mem::Hooks::InstallJmpPatch(0x956362, 0x9563B6); // When leaving car
+    //Mem::Hooks::InstallJmpPatch(0x95621A, 0x956333); // When entering car
 
     // Disable game pause when minimized or in background
     Mem::Hooks::InstallJmpPatch(0xAC6D2B, 0xAC6F79);
@@ -115,7 +106,103 @@ void M2::Initialize(m2sdk_callback callback) {
 
     // Disable DLC loadings (NONO, WE NEED DLCs !)
     //Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
-    //
+    InitializeSDKHandlers();
+}
+
+void M2::InitializeSDKHandlers()
+{
+    M2::C_Door_Hooks::HookSolveContact([&](C_Door *instance, S_ContactEventInfo const& ev, E_DoorContactType contactType) {
+        //instance->Lock();
+    });
+
+    M2::C_CarActionOpenHood_Hooks::HookTestAction([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_HOOD_OPEN_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_CarActionCloseHood_Hooks::HookTestAction([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_HOOD_CLOSE_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_CarActionOpenTrunk_Hooks::HookTestAction([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_TRUNK_OPEN_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_CarActionCloseTrunk_Hooks::HookTestAction([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_TRUNK_CLOSE_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_CarActionEnter_Hooks::HookTestAction([&](C_Car * car) {
+        return true;
+    });
+
+    M2::C_CarActionBreakIn_Hooks::HookTestAction([&](C_Car * car) {
+        return true;
+    });
+
+    M2::C_CarActionTankFuel_Hooks::HookTestAction([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_FUELTANK_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_CarActionThrowFrom_Hooks::HookTestAction([&](C_Car * car) {
+        return true;
+    });
+
+    M2::C_Human2CarWrapper_Hooks::HookIsFreeToGetIn([&](C_Car * car) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)car;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_ENTER_REQUEST, &event);
+        return (bool)event.arg5;
+    });
+
+    M2::C_Player2_Hooks::HookEnterCar([&](C_Player2 *player, C_Actor *car, char seat) {
+        m2sdk_event event = { 0 }; {
+            event.arg1 = (void *)player;
+            event.arg2 = (void *)car;
+            event.arg3 = (void *)seat;
+        }
+
+        M2::TriggerHandler(M2_EVENT_CAR_ENTER, &event);
+    });
+
+    M2::C_Human2_Hooks::HookSetupDeath([&](C_Human2 *human, C_EntityMessageDamage *message) {
+        if (human == reinterpret_cast<C_Human2*>(C_Game::Get()->GetLocalPed())) {
+            m2sdk_log("The player just died\n");
+        }
+        else {
+            m2sdk_log("An human just died\n");
+        }
+    });
+
+    M2::C_Human2_Hooks::HookDoDamage([&](C_Human2 *human, C_EntityMessageDamage *message) {
+        printf("damage lol\n");
+    });
 }
 
 void M2::Free() {}

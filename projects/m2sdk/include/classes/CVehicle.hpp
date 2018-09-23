@@ -46,8 +46,12 @@ namespace M2
         pad(ICVehicle, pad2, 0x4);                  // 03EC - 03F0
         float                   m_fMaxSteer;        // 03F0 - 03F4
         float                   m_fAddedSteer;      // 03F4 - 03F8
-        pad(ICVehicle, pad3, 0x454);                // 03F8 - 084C
+        pad(ICVehicle, pad3, 0x440);                // 03F8 - 0838
+        char                    m_sPlate[6];        // 0838 - 083E
+        pad(ICVehicle, pad4, 0xE);                  // 083E - 084C
         C_VehicleEffectManager  *m_pEffectManager;  // 084C - 0850
+        pad(ICVehicle, pad5, 0x4F8);                // 0850 - 0D48
+        char*                   m_sPainting;        // 0D48 - 
 	};
 
 	class C_Vehicle : public ICVehicle

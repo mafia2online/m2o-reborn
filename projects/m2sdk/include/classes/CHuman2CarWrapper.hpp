@@ -6,53 +6,93 @@
 
 #pragma once
 
-class  C_Human2CarWrapper
+namespace M2
 {
-public:
-    C_Human2CarWrapper()
+    class ICHuman2CarWrapper
     {
-        DWORD functionAddress = 0x009560F0;
 
-        __asm
-        {
-            mov ecx, this
-            call functionAddress
-        }
-    }
+    };
 
-
-    void Init(M2::C_Actor* actor)
+    class  C_Human2CarWrapper : ICHuman2CarWrapper
     {
-        DWORD functionAddress = 0x00956120;
-
-        __asm
+    public:
+        C_Human2CarWrapper()
         {
-            mov ecx, this
-            push actor
-            call functionAddress
+            Mem::InvokeFunction<Mem::call_this, DWORD*>(0x009560F0, this);
         }
 
-    }
-
-    float GetSpeedFloat()
-    {
-        DWORD functionAddress = 0x00940FE0;
-
-        __asm
+        void Init(M2::C_Actor* actor)
         {
-            mov ecx, this
-            call functionAddress
+            Mem::InvokeFunction<Mem::call_this, int>(0x00956120, this, actor);
         }
-    }
 
-    bool IsCabriolet()
-    {
-        DWORD functionAddress = 0x00940320;
-
-        __asm
+        C_Car *GetCar()
         {
-            mov ecx, this
-            call functionAddress
+            return Mem::InvokeFunction<Mem::call_this, C_Car*>(0x9235F0, this);
         }
-    }
-};
+
+        float GetSpeedFloat()
+        {
+            return Mem::InvokeFunction<Mem::call_this, float>(0x00940FE0, this);
+        }
+
+        bool IsCabriolet()
+        {
+            return Mem::InvokeFunction<Mem::call_this, bool>(0x00940320, this);
+        }
+    };
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+    namespace C_Human2CarWrapper_Hooks
+    {
+        void HookIsFreeToGetIn(std::function<bool(C_Car *)>);
+
+        namespace FunctionPointers
+        {
+            std::function<bool(C_Car *)> isFreeToGetIn;
+        };
+
+        namespace Functions
+        {
+            inline bool TestAction(C_Car *car)
+            {
+                if (FunctionPointers::isFreeToGetIn != nullptr) {
+                    return FunctionPointers::isFreeToGetIn(car);
+                }
+                return false;
+            }
+        };
+
+        namespace NakedFunctions
+        {
+            DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
+            C_Car *tryCar = nullptr;
+            C_Human2CarWrapper *carWrapper;
+            bool tryAnswer = false;
+            void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+            {
+                __asm {
+                    mov carWrapper, esi;
+                }
+
+                if(carWrapper != nullptr){
+                    tryCar = carWrapper->GetCar();
+                    tryAnswer = Functions::TestAction(tryCar);
+                }
+
+                __asm {
+                    mov     al, tryAnswer
+                    pop     esi
+                    retn    8
+                }
+            }
+        };
+
+        void HookIsFreeToGetIn(std::function<bool(C_Car *)> ptr)
+        {
+            FunctionPointers::isFreeToGetIn = ptr;
+            Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)NakedFunctions::CHuman2CarWrapper__IsFreeToGetIn__Hook);
+        }
+    };
+#endif
+}

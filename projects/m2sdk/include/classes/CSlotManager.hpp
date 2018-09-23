@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "CPlayerModelManager.hpp"
+
 namespace M2
 {
     class ICSlotManager
@@ -20,6 +22,11 @@ namespace M2
         int Close(void *unk)
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x5D12A0, this, unk);
+        }
+
+        bool ConnectToFreeSlotByType(int type, void *mgr)
+        {
+            return Mem::InvokeFunction<Mem::call_this, bool>(0x5C3D10, this, type, mgr);
         }
 
         int Open()
