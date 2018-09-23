@@ -41,8 +41,8 @@ namespace M2
                     return false;
 
                 DWORD luaState = (DWORD)pUnknow->m_pLuaState;
-                DWORD address = 0x5D3F80;
-                DWORD address2 = 0x5D5BD0;
+                DWORD lua_pcall = 0x5D3F80;
+                DWORD lua_loadBuffer = 0x5D5BD0;
 
                 if (!luaState) {
                     return false;
@@ -55,7 +55,7 @@ namespace M2
                     push iLength;
                     push sCommand;
                     push luaState;
-                    call address2;
+                    call lua_loadBuffer;
                     add esp, 10h;
                 }
 
@@ -66,7 +66,7 @@ namespace M2
                     push - 1;
                     push 0;
                     push luaState;
-                    call address;
+                    call lua_pcall;
                     mov result, eax;
                     add esp, 10h;
                 }
