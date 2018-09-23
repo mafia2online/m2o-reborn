@@ -1,12 +1,12 @@
 m2o_export u32 m2o_ped_create() {
-    auto entity = librg_entity_create(ctx, TYPE_PED);
-    entity->user_data = new ped_t();
+    auto entity = librg_entity_create(ctx, M2O_ENTITY_DUMMY_PED);
+    entity->user_data = m2o_ped_alloc(NULL);
     return entity->id;
 }
 
 m2o_export bool m2o_ped_destroy(u32 pedid) {
     M2O_FETCH_ENTITY(entity, pedid, false);
-    delete (char *)entity->user_data;
+    m2o_ped_free((m2o_ped *)entity->user_data);
     librg_entity_destroy(ctx, entity->id);
     return true;
 }

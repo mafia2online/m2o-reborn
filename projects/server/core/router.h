@@ -33,7 +33,7 @@ void on_connect_accepted(librg_event_t *event) {
         entity->position.z
     );
 
-    entity->user_data = new ped_t();
+    entity->user_data = m2o_ped_alloc(NULL);
     librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 
     m2o_args args = {0};
@@ -44,7 +44,7 @@ void on_connect_accepted(librg_event_t *event) {
 }
 
 void on_connect_disconnect(librg_event_t *event) {
-    auto ped = get_ped(event->entity);
+    auto ped = m2o_ped_get(event->entity);
 
     m2o_args args = {0};
     m2o_args_init(&args);
@@ -54,7 +54,7 @@ void on_connect_disconnect(librg_event_t *event) {
 
     librg_entity_iteratex(event->ctx, LIBRG_ENTITY_ALIVE, entityid, {
         auto entity = librg_entity_fetch(ctx, entityid);
-        if (entity->type != TYPE_CAR) continue;
+        if (entity->type != M2O_ENTITY_CAR) continue;
         if (!(entity->flags & LIBRG_ENTITY_CONTROLLED)) continue;
 
         if (librg_entity_control_get(event->ctx, entity->id) == event->entity->client_peer) {
@@ -70,22 +70,25 @@ void on_entity_create(librg_event_t *event) {
     mod_log("[info] sending a create packet for entity: %d\n", event->entity->id);
 
     switch (event->entity->type) {
-        case TYPE_PED: { on_ped_create(event); } break;
-        case TYPE_CAR: { on_car_create(event); } break;
+        case M2O_ENTITY_PLAYER_PED:
+        case M2O_ENTITY_DUMMY_PED:  { on_ped_create(event); } break;
+        // case M2O_ENTITY_CAR:        { on_car_create(event); } break;
     }
 }
 
 void on_entity_update(librg_event_t *event) {
     switch (event->entity->type) {
-        case TYPE_PED: { auto ped = get_ped(event->entity); librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-        case TYPE_CAR: { auto car = get_car(event->entity); librg_data_wptr(event->data, &car->stream, sizeof(car->stream)); } break;
+        case M2O_ENTITY_PLAYER_PED:
+        case M2O_ENTITY_DUMMY_PED:  { auto ped = m2o_ped_get(event->entity); librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
+        // case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_wptr(event->data, &car->stream, sizeof(car->stream)); } break;
     }
 }
 
 void on_entity_client_update(librg_event_t *event) {
     switch (event->entity->type) {
-        case TYPE_PED: { auto ped = get_ped(event->entity); librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-        case TYPE_CAR: { auto car = get_car(event->entity); librg_data_rptr(event->data, &car->stream, sizeof(car->stream)); } break;
+        case M2O_ENTITY_PLAYER_PED:
+        case M2O_ENTITY_DUMMY_PED:  { auto ped = m2o_ped_get(event->entity); librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
+        // case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_rptr(event->data, &car->stream, sizeof(car->stream)); } break;
     }
 }
 
@@ -99,8 +102,9 @@ void on_entity_remove(librg_event_t *event) {
     }
 
     switch (event->entity->type) {
-        case TYPE_PED: { on_ped_remove(event); } break;
-        case TYPE_CAR: { on_car_remove(event); } break;
+        case M2O_ENTITY_PLAYER_PED:
+        case M2O_ENTITY_DUMMY_PED:  { on_ped_remove(event); } break;
+        // case M2O_ENTITY_CAR:        { on_car_remove(event); } break;
     }
 }
 
@@ -108,12 +112,12 @@ void on_user_name_set(librg_message_t *msg) {
     // TODO: read in a temp var first, and then apply to struct
     u8 strsize = librg_data_ru8(msg->data);
     auto entity = librg_entity_find(msg->ctx, msg->peer);
-    auto ped    = get_ped(entity);
+    auto ped    = m2o_ped_get(entity);
     librg_data_rptr(msg->data, ped->name, strsize);
 
     mod_log("[info] client %d requested name change to: %s\n", entity->id, ped->name);
 
-    mod_message_send_instream_except(ctx, MOD_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
+    mod_message_send_instream_except(ctx, M2O_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
         librg_data_wu32(data, entity->id);
         librg_data_wu8(data, strsize);
         librg_data_wptr(data, (void *)ped->name, strsize);
@@ -130,13 +134,13 @@ void on_user_message(librg_message_t *msg) {
     for (int i = 0; i < strsize; i++) input_buffer[i] = input_buffer[i] == '%' ? '\045' : input_buffer[i];
 
     auto entity = librg_entity_find(msg->ctx, msg->peer);
-    auto ped = get_ped(entity);
+    auto ped = m2o_ped_get(entity);
 
     zpl_snprintf(message_buffer, 632, "%s (%d): %s", ped->name, entity->id, input_buffer);
 
     mod_log("[chat] %s \n", message_buffer);
 
-    mod_message_send(ctx, MOD_USER_MESSAGE, [&](librg_data_t *data) {
+    mod_message_send(ctx, M2O_USER_MESSAGE, [&](librg_data_t *data) {
         librg_data_wu32(data, zpl_strlen(message_buffer));
         librg_data_wptr(data, message_buffer, zpl_strlen(message_buffer));
     });
@@ -152,13 +156,11 @@ void mod_register_routes(librg_ctx_t *ctx) {
     librg_event_add(ctx, LIBRG_ENTITY_REMOVE,           on_entity_remove);
     librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE,  on_entity_client_update);
 
-    librg_network_add(ctx, MOD_PED_CREATE,              on_ped_create_command); /* testing */
-    librg_network_add(ctx, MOD_CAR_CREATE,              on_car_create_command); /* testing */
-    librg_network_add(ctx, MOD_CAR_ENTER_START,         on_car_enter_start);
-    librg_network_add(ctx, MOD_CAR_ENTER_FINISH,        on_car_enter_finish);
-    librg_network_add(ctx, MOD_CAR_EXIT_START,          on_car_exit_start);
-    librg_network_add(ctx, MOD_CAR_EXIT_FINISH,         on_car_exit_finish);
+    librg_network_add(ctx, M2O_PED_CREATE,              on_ped_create_command); /* testing */
+    // librg_network_add(ctx, M2O_CAR_CREATE,              on_car_create_command); /* testing */
+    // librg_network_add(ctx, M2O_CAR_ENTER,               on_car_enter_start);
+    // librg_network_add(ctx, M2O_CAR_EXIT,                on_car_exit_start);
 
-    librg_network_add(ctx, MOD_USER_SET_NAME,           on_user_name_set);
-    librg_network_add(ctx, MOD_USER_MESSAGE,            on_user_message);
+    librg_network_add(ctx, M2O_USER_SET_NAME,           on_user_name_set);
+    librg_network_add(ctx, M2O_USER_MESSAGE,            on_user_message);
 }

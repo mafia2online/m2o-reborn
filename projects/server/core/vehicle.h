@@ -89,6 +89,10 @@ void on_car_exit_start(librg_message_t *msg) {
         librg_data_wu32(data, player->id);
     });
 
+    ped->state = PED_ON_GROUND;
+    ped->vehicle = M2O_INVALID_ENTITY;
+    ped->seat = 0;
+
     m2o_args args = {0};
     m2o_args_init(&args);
     m2o_args_push_integer(&args, player->id);
@@ -96,17 +100,4 @@ void on_car_exit_start(librg_message_t *msg) {
     m2o_args_push_integer(&args, ped->seat);
     m2o_event_trigger("player_vehicle_exit", &args);
     m2o_args_free(&args);
-}
-
-void on_car_exit_finish(librg_message_t *msg) {
-    auto player  = librg_entity_find(msg->ctx, msg->peer);
-    auto ped = get_ped(player);
-
-    ped->state = PED_ON_GROUND;
-    ped->vehicle = nullptr;
-    ped->seat = 0;
-
-    mod_message_send_instream_except(msg->ctx, MOD_CAR_EXIT_FINISH, player->id, player->client_peer, [&](librg_data_t *data) {
-        librg_data_wu32(data, player->id);
-    });
 }

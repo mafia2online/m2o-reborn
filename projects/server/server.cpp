@@ -1,3 +1,6 @@
+
+// todo rename to M2O_SERVER_API
+#define m2o_export
 #define M2O_SERVER
 #include "m2o_config.h"
 
@@ -39,7 +42,7 @@ librg_ctx_t *ctx;
 
 // server modules
 #include "core/settings.h"
-#include "core/vehicle.h"
+// #include "core/vehicle.h"
 #include "core/pedestrian.h"
 #include "core/plugin_manager.h"
 #include "core/router.h"
@@ -47,7 +50,6 @@ librg_ctx_t *ctx;
 /* simple bandwidth measurer */
 void mod_measure(void *user_data) {
     librg_ctx_t *ctx = (librg_ctx_t *)user_data;
-
     if (!ctx || !ctx->network.host) return;
 
     static u32 lastdl = 0;
@@ -78,7 +80,7 @@ int main() {
     mod_log("%s", test);
     mod_log("[info] server version: %s\n", M2O_VERSION_STRING);
 
-    librg_option_set(LIBRG_PLATFORM_ID, 218);
+    librg_option_set(LIBRG_PLATFORM_ID, M2O_PLATFORM_ID);
     librg_option_set(LIBRG_PLATFORM_BUILD, M2O_VERSION_NUMBER);
     librg_option_set(LIBRG_PLATFORM_PROTOCOL, M2O_VERSION_PROTOCOL);
 
@@ -98,13 +100,13 @@ int main() {
 
     mod_log("[info] settings:\n\n");
 
-    mod_log("\thostname: %s\n", mod.settings.hostname.c_str());
-    mod_log("\tpassword: (%s)\n", mod.settings.password.size() ? "yes" : "no");
-    mod_log("\tport: %d\n\n", address.port);
+    mod_log("\thostname: %s\n",     mod.settings.hostname.c_str());
+    mod_log("\tpassword: (%s)\n",   mod.settings.password.size() ? "yes" : "no");
+    mod_log("\tport: %d\n\n",       address.port);
 
-    mod_log("\tmax_connections: %d\n", ctx->max_connections);
-    mod_log("\tstream_range: %f\n", (f32)librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
-    mod_log("\ttick_delay: %f\n\n", ctx->tick_delay);
+    mod_log("\tmax_connections: %d\n",  ctx->max_connections);
+    mod_log("\tstream_range: %f\n",     (f32)librg_option_get(LIBRG_DEFAULT_STREAM_RANGE));
+    mod_log("\ttick_delay: %f\n\n",     ctx->tick_delay);
 
     mod_log("[info] starting the server...\n");
 

@@ -1,7 +1,9 @@
 
 
-void m2o_set_last_error(m2o_error error);
-m2o_error m2o_get_last_error();
+
+
+void m2o_error_set(m2o_error error);
+m2o_error m2o_error_get();
 
 void m2o_args_init(m2o_args *arg);
 void m2o_args_free(m2o_args *arg);
@@ -26,8 +28,8 @@ bool m2o_ped_destroy(u32 pedid);
 bool m2o_ped_position_set(u32 pedid, vec3_t position);
 vec3_t m2o_ped_position_get(u32 pedid);
 
-typedef void (m2o_api_set_last_error)(m2o_error error);
-typedef m2o_error (m2o_api_get_last_error)();
+typedef void (m2o_api_error_set)(m2o_error error);
+typedef m2o_error (m2o_api_error_get)();
 typedef void (m2o_api_args_init)(m2o_args *arg);
 typedef void (m2o_api_args_free)(m2o_args *arg);
 typedef usize (m2o_api_args_size)(m2o_args *arg);
@@ -48,8 +50,8 @@ typedef bool (m2o_api_ped_position_set)(u32 pedid, vec3_t position);
 typedef vec3_t (m2o_api_ped_position_get)(u32 pedid);
 
 typedef struct m2o_api_vtable {
-    m2o_api_set_last_error *set_last_error;
-    m2o_api_get_last_error *get_last_error;
+    m2o_api_error_set *error_set;
+    m2o_api_error_get *error_get;
     m2o_api_args_init *args_init;
     m2o_api_args_free *args_free;
     m2o_api_args_size *args_size;
@@ -71,8 +73,8 @@ typedef struct m2o_api_vtable {
 } m2o_api_vtable;
 
 void m2o_api_init(m2o_api_vtable *api) {
-    api->set_last_error = m2o_set_last_error;
-    api->get_last_error = m2o_get_last_error;
+    api->error_set = m2o_error_set;
+    api->error_get = m2o_error_get;
     api->args_init = m2o_args_init;
     api->args_free = m2o_args_free;
     api->args_size = m2o_args_size;

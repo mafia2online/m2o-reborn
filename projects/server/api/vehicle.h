@@ -1,13 +1,13 @@
 m2o_export u32 m2o_vehicle_create() {
     mod_log("creating a vehicle\n");
-    auto entity = librg_entity_create(ctx, TYPE_CAR);
-    entity->user_data = new car_t(entity);
+    auto entity = librg_entity_create(ctx, M2O_ENTITY_CAR);
+    entity->user_data = m2o_car_alloc(NULL);
     return entity->id;
 }
 
 m2o_export bool m2o_vehicle_destroy(u32 vehicleid) {
     M2O_FETCH_ENTITY(entity, vehicleid, false);
-    delete (char *)entity->user_data;
+    m2o_car_free((m2o_car *)entity->user_data);
     librg_entity_destroy(ctx, entity->id);
     return true;
 }

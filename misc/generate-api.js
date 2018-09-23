@@ -5,14 +5,18 @@ const exportRegionStart = '//@ M2O_EXPORT_REGION_START'
 const exportRegionEnd   = '//@ M2O_EXPORT_REGION_END'
 
 const targets = [
-    'server/api/general.h',
-    'server/api/errors.h',
-    'server/api/arguments.h',
-    'server/api/plugin.h',
-    'server/api/vehicle.h',
-    'server/api/player.h',
-    'server/api/pedestrian.h',
+    'projects/shared/m2o_config.h',
+    'projects/server/api/general.h',
+    'projects/server/api/errors.h',
+    'projects/server/api/arguments.h',
+    'projects/server/api/plugin.h',
+    'projects/server/api/vehicle.h',
+    'projects/server/api/player.h',
+    'projects/server/api/pedestrian.h',
 ];
+
+const publicOutput = 'binary/other/m2o_api.h'
+const internOutput = 'projects/server/api/api.h'
 
 const getStructs = data => {
     const results = []
@@ -139,7 +143,7 @@ const replaceTypes = data => {
         #endif
         #endif // M2O_API_H`;
 
-    fs.writeFileSync('binary/include/m2o_api.h', publicHeaderContent
+    fs.writeFileSync(publicOutput, publicHeaderContent
         .split('\n')
         .map(s => s.replace(' '.repeat(8), ''))
         .join('\n')
@@ -170,5 +174,5 @@ const replaceTypes = data => {
         '}',
     ];
 
-    fs.writeFileSync('server/api/api.h', apiImplementation.join('\n'))
+    fs.writeFileSync(internOutput, apiImplementation.join('\n'))
 })()
