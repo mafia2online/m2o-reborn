@@ -13,9 +13,9 @@
 #include "m2o_client.h"
 #include "m2o_types.h"
 
-#include "core/mod.h"
-#include "core/vehicle.h"
-#include "core/pedestrian.h"
+#include "mod/mod.h"
+#include "mod/vehicle.h"
+#include "mod/pedestrian.h"
 
 // =======================================================================//
 // !
