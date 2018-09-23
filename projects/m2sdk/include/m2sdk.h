@@ -12,7 +12,7 @@
 #define Byte unsigned char
 
 #if !defined(m2sdk_log)
-#define m2sdk_log(fmt, ...)
+#define m2sdk_log(fmt, ...) 
 #endif
 
 #define pad(p,n,s) Byte p##__##n##[s]
@@ -29,6 +29,11 @@ typedef enum {
     M2_EVENT_DRIVE_END,
     M2_EVENT_CAR_ENTER_REQUEST,
     M2_EVENT_CAR_ENTER,
+    M2_EVENT_CAR_HOOD_OPEN_REQUEST,
+    M2_EVENT_CAR_HOOD_CLOSE_REQUEST,
+    M2_EVENT_CAR_TRUNK_OPEN_REQUEST,
+    M2_EVENT_CAR_TRUNK_CLOSE_REQUEST,
+    M2_EVENT_CAR_FUELTANK_REQUEST
 } m2sdk_event_id;
 
 typedef union {
@@ -49,6 +54,7 @@ typedef void (*m2sdk_callback_event)(m2sdk_event *);
 namespace M2 {
 
     void Initialize(m2sdk_callback callback);
+    void InitializeSDKHandlers();
     void Free();
 
     void AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback);
@@ -96,10 +102,22 @@ namespace M2 {
 /* Classes */
 #include "classes/CActor.hpp"
 #include "classes/CActorVehicle.hpp"
+#include "classes/CAIController.hpp"
+#include "classes/CApplication.hpp"
+#include "classes/CAvailableStations.hpp"
 #include "classes/ccamera.hpp"
 #include "classes/CGameCamera.hpp"
 #include "classes/CCar.hpp"
+#include "classes/CCarActionBreakIn.hpp"
+#include "classes/CCarActionCloseHood.hpp"
+#include "classes/CCarActionCloseTrunk.hpp"
+#include "classes/CCarActionEnter.hpp"
+#include "classes/CCarActionOpenHood.hpp"
+#include "classes/CCarActionOpenTrunk.hpp"
+#include "classes/CCarActionTankFuel.hpp"
+#include "classes/CCarActionThrowFrom.hpp"
 #include "classes/CCarManager.hpp"
+#include "classes/CCarOwnerDB.hpp"
 #include "classes/CCore.hpp"
 #include "classes/CDoor.hpp"
 #include "classes/CEntity.hpp"
@@ -114,24 +132,35 @@ namespace M2 {
 #include "classes/CGameInputModule.hpp"
 #include "classes/CGameRenderingSystemModule.hpp"
 #include "classes/CGameTrafficModule.hpp"
+#include "classes/CGameVehicleModule.hpp"
 #include "classes/CGfxEffects.hpp"
 #include "classes/CGfxEnvironmentEffects.hpp"
+#include "classes/CGuiGame.hpp"
+#include "classes/CHashName.hpp"
 #include "classes/CHints.hpp"
 #include "classes/CHud.hpp"
-#include "classes/CHudScriptW.h"
+#include "classes/CHudScriptW.hpp"
 #include "classes/chuman2.hpp"
 #include "classes/CHumanHeadController.hpp"
 #include "classes/CHumanInventory.hpp"
 #include "classes/CHumanScript.hpp"
 #include "classes/CHumanWeaponController.hpp"
+#include "classes/CLockpick.hpp"
 #include "classes/cmafiaframework.hpp"
 #include "classes/CModel.hpp"
 #include "classes/CMusic.hpp"
 #include "classes/CNavigation.hpp"
+#include "classes/CPhoneBook.hpp"
 #include "classes/CPlayer2.hpp"
 #include "classes/CPlayerModelManager.hpp"
 #include "classes/CPlayerRadio.hpp"
+#include "classes/CPlaylistsDB.hpp"
+#include "classes/CPoliceRadio.hpp"
+#include "classes/CPoliceRootCoordinator.hpp"
 #include "classes/CPoliceWanted.hpp"
+#include "classes/CPoliceWrapper.hpp"
+#include "classes/CProgramsDB.hpp"
+#include "classes/CRadio.hpp"
 #include "classes/CRangeMeter.hpp"
 #include "classes/CRenderCamera.hpp"
 #include "classes/CResources.hpp"
@@ -147,8 +176,12 @@ namespace M2 {
 #include "classes/CSingleMesh.hpp"
 #include "classes/CSlot.hpp"
 #include "classes/CSlotManager.hpp"
+#include "classes/CSlotWrapper.hpp"
 #include "classes/CSpeedometer.hpp"
 #include "classes/CSyncObject.hpp"
+#include "classes/CTableData.hpp"
+#include "classes/CTables.hpp"
+#include "classes/CTelephone.hpp"
 #include "classes/CTextDatabase.hpp"
 #include "classes/CTickedModuleManager.hpp"
 #include "classes/CTimer.hpp"
@@ -167,6 +200,7 @@ namespace M2 {
 #include "wrappers/game.hpp"
 #include "wrappers/lua.hpp"
 #include "wrappers/models.hpp"
+#include "wrappers/radio.hpp"
 #include "wrappers/config.hpp"
 
 #endif // M2SDK_H

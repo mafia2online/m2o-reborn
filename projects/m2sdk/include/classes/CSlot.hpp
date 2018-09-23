@@ -66,9 +66,19 @@ namespace M2
     class C_Slot : public ICSlot
     {
     public:
+        bool LoadData(const char *path, int unk, int unk2, int unk3)
+        {
+            return Mem::InvokeFunction<Mem::call_this, bool>(0x5AA780, this, &path, unk, unk2, unk3);
+        }
+
         C_Model *GetModelByFileName(const char *file)
         {
             return Mem::InvokeFunction<Mem::call_this, C_Model*>(0x5991C0, this, file);
+        }
+
+        int GetState(char unk)
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x598F40, this, unk);
         }
     };
 };

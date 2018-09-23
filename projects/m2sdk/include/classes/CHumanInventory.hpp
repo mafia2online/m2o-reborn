@@ -81,5 +81,10 @@ namespace M2
 		{
 			return Mem::InvokeFunction<Mem::call_this, int>(0x0942D80, this);
 		}
+
+        int TellAmmoInWeapon(int weapon)
+        {
+            return Mem::InvokeFunction<Mem::call_this, int>(0x924180, this, weapon);
+        }
 	};
 };

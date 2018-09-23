@@ -58,4 +58,5 @@ binary/server/*
 ### other
 binary/other/*
 !binary/other/.keep
+!binary/other/pug.bmp
 !binary/other/m2o-2clients.exe
