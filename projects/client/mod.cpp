@@ -161,7 +161,7 @@ void mod_respawn() {
     /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
     // ped->CEntity->SetPosition(vec3f(-421.75f, 479.31f, 0.05f));
-    ped->CEntity->SetPosition(vec3f(240.641052, 699.223755, -24.153996));
+    ped->CEntity->SetPosition(vec3f(240.641052f, 699.223755f, -24.153996f));
 
     /* Enabling controls */
     ped->CPlayer->LockControls(false);
