@@ -4,24 +4,32 @@
 // !
 // =======================================================================//
 
+//@ M2O_EXPORT_REGION_START
+
 #define M2O_NAME "Mafia 2 Online - Reborn"
 
 #define M2O_VERSION_MAJOR 1
 #define M2O_VERSION_MINOR 0
 #define M2O_VERSION_PATCH 0
 
-#define M2O_PLATFORM_ID 218
-#define M2O_VERSION_PROTOCOL 1 /* changing parameter, blocks old clients from connecting */
-
 #define M2O_QUOTE_X(t) #t
 #define M2O_QUOTE(t) M2O_QUOTE_X(t)
+#define M2O_VERSION_CREATE(major, minor, patch) (((major)<<16) | ((minor)<<8) | (patch))
+#define M2O_VERSION_GET_MAJOR(version) (((version)>>16)&0xFF)
+#define M2O_VERSION_GET_MINOR(version) (((version)>>8)&0xFF)
+#define M2O_VERSION_GET_PATCH(version) ((version)&0xFF)
 
 #define M2O_VERSION_STRING M2O_QUOTE(M2O_VERSION_MAJOR) "." M2O_QUOTE(M2O_VERSION_MINOR) "." M2O_QUOTE(M2O_VERSION_PATCH)
-#define M2O_VERSION_NUMBER LIBRG_VERSION_CREATE(M2O_VERSION_MAJOR, M2O_VERSION_MINOR, M2O_VERSION_PATCH)
-
+#define M2O_VERSION_NUMBER M2O_VERSION_CREATE(M2O_VERSION_MAJOR, M2O_VERSION_MINOR, M2O_VERSION_PATCH)
 #define M2O_VERSION_PRETTY M2O_NAME ". v" M2O_VERSION_STRING
+
 #define M2O_ENTITY_LIMIT 16000
 #define M2O_INVALID_ENTITY M2O_ENTITY_LIMIT
+
+//@ M2O_EXPORT_REGION_END
+
+#define M2O_PLATFORM_ID 218
+#define M2O_VERSION_PROTOCOL 1 /* changing parameter, blocks old clients from connecting */
 
 #define M2O_DEBUG 1
 #define LIBRG_DEBUG 1
@@ -67,6 +75,12 @@
 #define m2o_assert_msg librg_assert_msg
 #define mod_assert librg_assert
 #define mod_assert_msg librg_assert_msg
+
+// =======================================================================//
+// !
+// ! Stuff used by server api generator
+// !
+// =======================================================================//
 
 #define m2o_export
 #define m2o_import
