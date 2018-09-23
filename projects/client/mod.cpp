@@ -161,7 +161,7 @@ void mod_respawn() {
     /* Resetting player */
     ped->CHuman->GetScript()->SetHealth(720.0f);
     // ped->CEntity->SetPosition(vec3f(-421.75f, 479.31f, 0.05f));
-    ped->CEntity->SetPosition(vec3(240.641052, 699.223755, -24.153996));
+    ped->CEntity->SetPosition(vec3f(240.641052, 699.223755, -24.153996));
 
     /* Enabling controls */
     ped->CPlayer->LockControls(false);
@@ -396,12 +396,11 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         mod_log("Model ptr: 0x%X", model);
     }
 
-<<<<<<< HEAD
     if (input_key_down(VK_F8)) {
         // int handle = gfx_create_rect(0, 0, 500, 500, vec4f(255, 255, 255, 255));
         // int handle = gfx_create_line(0, 0, 500, 500, vec4f(255, 255, 255, 255));
         // int handle = gfx_create_text(0, 24, "Hello world!", vec4f(0, 0, 255, 255));
-        int handle = gfx_create_texture_file("D:\\Projects\\m2o\\m2o-reborn\\binary\\pug.bmp");
+        int handle = gfx_create_texture_file("D:\\Projects\\m2o\\m2o-reborn\\binary\\other\\pug.bmp");
 
         gfx_position_set(handle, 200, 200);
         gfx_scale_set(handle, 1.0f, 1.0f);
@@ -439,6 +438,4 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
         // //mod_log("the url: %s;", myurl);
     }
-=======
->>>>>>> master
 }
