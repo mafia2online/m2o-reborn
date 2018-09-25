@@ -13,7 +13,7 @@ const targets = [
 ];
 
 const publicOutput = 'binary/other/m2o_api.h'
-const internOutput = 'projects/server/api/api.h'
+const internOutput = 'projects/server/api/vtable.h'
 
 const getStructs = data => {
     const results = []
@@ -157,7 +157,7 @@ const replaceTypes = data => {
             .map(line =>  line + ';')
             .join('\n')
         )
-        .join('')
+        .join('\n')
 
 
     /* generate api vtable implementation */

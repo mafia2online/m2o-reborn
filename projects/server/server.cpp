@@ -33,7 +33,7 @@ librg_ctx_t *ctx;
 #include "api/vehicle.h"
 #include "api/pedestrian.h"
 #include "api/player.h"
-#include "api/api.h"
+#include "api/vtable.h" /* auto-generated file using $ node misc/generate-api.js */
 
 // server modules
 #include "core/settings.h"

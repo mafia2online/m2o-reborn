@@ -108,7 +108,7 @@ void on_entity_remove(librg_event_t *event) {
     }
 }
 
-void on_user_name_set(librg_message_t *msg) {
+void on_player_name(librg_message_t *msg) {
     auto entity = librg_entity_find(msg->ctx, msg->peer);
     auto ped    = m2o_ped_get(entity);
 
@@ -136,7 +136,7 @@ void on_user_name_set(librg_message_t *msg) {
     });
 }
 
-void on_user_message(librg_message_t *msg) {
+void on_player_chat(librg_message_t *msg) {
     char message_buffer[632], input_buffer[512];
 
     u32 strsize = librg_data_ru32(msg->data);
@@ -173,6 +173,6 @@ void mod_register_routes(librg_ctx_t *ctx) {
     // librg_network_add(ctx, M2O_CAR_ENTER,               on_car_enter_start);
     // librg_network_add(ctx, M2O_CAR_EXIT,                on_car_exit_start);
 
-    librg_network_add(ctx, M2O_USER_SET_NAME,           on_user_name_set);
-    librg_network_add(ctx, M2O_USER_MESSAGE,            on_user_message);
+    librg_network_add(ctx, M2O_USER_SET_NAME,           on_player_name);
+    librg_network_add(ctx, M2O_USER_MESSAGE,            on_player_chat);
 }
