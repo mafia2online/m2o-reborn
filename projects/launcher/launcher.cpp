@@ -388,9 +388,10 @@ namespace Launcher
         memset(&piProcessInfo, 0, sizeof(piProcessInfo));
         siStartupInfo.cb = sizeof(siStartupInfo);
 
-		if (argc > 1) {
-			pathString += " " + std::string(argv[1]);
-		}
+
+        auto id = wrap->GetContext()->SteamUser()->GetSteamID().ConvertToUint64();
+        char buffer[256] = {0}; sprintf(buffer, " sid=%llu", id);
+        pathString += buffer;
 
         if (!CreateProcess(NULL, (LPSTR)pathString.c_str(), NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, GetAppPath(), &siStartupInfo, &piProcessInfo))
         {

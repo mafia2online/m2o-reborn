@@ -18,6 +18,7 @@
 
 struct m2o_api_vtable;
 struct mod_t {
+    bool running;
     m2o_api_vtable *api;
 
     struct {
@@ -116,10 +117,12 @@ int main() {
     librg_network_start(ctx, address);
 
     mod.api = new m2o_api_vtable;
+    mod.running = true;
+
     m2o_api_init(mod.api);
     m2o_plugins_init(ctx, &mod);
 
-    while (true) {
+    while (mod.running) {
         librg_tick(ctx);
         m2o_plugins_tick(ctx, &mod);
         zpl_sleep_ms(5);

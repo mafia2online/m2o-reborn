@@ -63,6 +63,10 @@ void platform_init() {
     mod_log("SDL_Init(SDL_INIT_VIDEO): %d %s", SDL_Init(SDL_INIT_VIDEO), SDL_GetError());
     sdlwindow = SDL_CreateWindowFrom(mod_win32_hwnd);
 
+    std::string args(GetCommandLine());
+    args = args.substr(args.find("sid=")).substr(4);
+    // mod_log("args: %s", args.c_str());
+
     // hide cursor initially
     while (_input_state.hooked_showcursor(false) >= 0) {}
 }
