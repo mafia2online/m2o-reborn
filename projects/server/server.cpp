@@ -1,6 +1,4 @@
-
-// todo rename to M2O_SERVER_API
-#define m2o_export
+#define M2O_SERVER_API
 #define M2O_SERVER
 #include "m2o_config.h"
 
@@ -32,9 +30,6 @@ static mod_t mod;
 librg_ctx_t *ctx;
 
 #include "api/general.h"
-#include "api/errors.h"
-#include "api/arguments.h"
-#include "api/plugin.h"
 #include "api/vehicle.h"
 #include "api/pedestrian.h"
 #include "api/player.h"

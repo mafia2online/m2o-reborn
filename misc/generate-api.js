@@ -1,15 +1,12 @@
 const fs = require('fs')
 
-const exportPrefix      = 'm2o_export'
-const exportRegionStart = '//@ M2O_EXPORT_REGION_START'
-const exportRegionEnd   = '//@ M2O_EXPORT_REGION_END'
+const exportPrefix      = 'M2O_SERVER_API'
+const exportRegionStart = '#define M2O_SERVER_API_REGION'
+const exportRegionEnd   = '#undef M2O_SERVER_API_REGION'
 
 const targets = [
     'projects/shared/m2o_config.h',
     'projects/server/api/general.h',
-    'projects/server/api/errors.h',
-    'projects/server/api/arguments.h',
-    'projects/server/api/plugin.h',
     'projects/server/api/vehicle.h',
     'projects/server/api/player.h',
     'projects/server/api/pedestrian.h',
@@ -73,7 +70,7 @@ const replaceTypes = data => {
         .map(file => fs.readFileSync(file, 'utf8'))
         .map(data => data
             .split('\n')
-            .filter(line => line.indexOf(exportPrefix) !== -1)
+            .filter(line => line.indexOf(exportPrefix + ' ') !== -1)
             .map(line => line
                 .replace('{', '')
                 .replace(exportPrefix, '')
@@ -84,9 +81,8 @@ const replaceTypes = data => {
     const structs = targets
         .map(file => fs.readFileSync(file, 'utf8'))
         .map(replaceTypes)
-        .map(data => getStructs(data)
-            .reduce((carry, elem) => carry.concat(elem), [])
-        )
+        .map(data => getStructs(data))
+        .reduce((carry, elem) => carry.concat(elem), [])
 
     const matches = results
         .reduce((carry, elem) => carry.concat(elem), [])
@@ -132,10 +128,13 @@ const replaceTypes = data => {
         extern "C" {
         #endif
 
-        /* definitions */
         ${structs.join('')}
+        // =======================================================================//
+        // !
+        // ! Generated methods
+        // !
+        // =======================================================================//
 
-        /* public methods */
         ${replaceTypes(vtableSignatures)}
 
         #if defined(__cplusplus)
@@ -157,11 +156,13 @@ const replaceTypes = data => {
             .map(line =>  line + ';')
             .join('\n')
         )
-        .join('\n\n')
+        .join('')
 
 
     /* generate api vtable implementation */
     const apiImplementation = [
+        '/* Mafia 2 Online Server Interal API header */',
+        `/* Generated on ${(new Date())} */`,
         internalHeader,
         '',
         vtableSignatures,

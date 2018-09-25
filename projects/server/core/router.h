@@ -39,7 +39,7 @@ void on_connect_accepted(librg_event_t *event) {
     m2o_args args = {0};
     m2o_args_init(&args);
     m2o_args_push_integer(&args, event->entity->id);
-    m2o_event_trigger("player_connect", &args);
+    m2o_event_trigger(M2O_EVENT_PLAYER_CONNECT, &args);
     m2o_args_free(&args);
 }
 
@@ -49,7 +49,7 @@ void on_connect_disconnect(librg_event_t *event) {
     m2o_args args = {0};
     m2o_args_init(&args);
     m2o_args_push_integer(&args, event->entity->id);
-    m2o_event_trigger("player_disconnect", &args);
+    m2o_event_trigger(M2O_EVENT_PLAYER_DISCONNECT, &args);
     m2o_args_free(&args);
 
     librg_entity_iteratex(event->ctx, LIBRG_ENTITY_ALIVE, entityid, {
