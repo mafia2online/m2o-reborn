@@ -7,7 +7,6 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/../shared/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/sdl/include/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/steam_api/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/discord/include/*.h"
@@ -17,7 +16,6 @@ set(LIBRARIES m2sdk discord-rpc SDL2 SDL2_ttf libfreetype-6)
 set(LIBRARY_FOLDERS
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/
-    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/
 )
 set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/
@@ -25,7 +23,6 @@ set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/../m2sdk/include
     ${PROJECT_SOURCE_DIR}/../../vendor
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/include
-    ${PROJECT_SOURCE_DIR}/../../vendor/sdl_ttf/include
     ${PROJECT_SOURCE_DIR}/../../vendor/detours/include
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/include
 )
