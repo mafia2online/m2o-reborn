@@ -36,9 +36,9 @@ void m2o_plugins_init(librg_ctx_t *ctx, mod_t *mod) {
         }
 
         mod_log("[info] successfully loaded plugin: %s@%d.%d.%d by %s\n", plugin.name,
-            LIBRG_VERSION_GET_MAJOR(plugin.version),
-            LIBRG_VERSION_GET_MINOR(plugin.version),
-            LIBRG_VERSION_GET_PATCH(plugin.version),
+            M2O_VERSION_GET_MAJOR(plugin.version),
+            M2O_VERSION_GET_MINOR(plugin.version),
+            M2O_VERSION_GET_PATCH(plugin.version),
             plugin.author
         );
 
@@ -47,7 +47,7 @@ void m2o_plugins_init(librg_ctx_t *ctx, mod_t *mod) {
 
     for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
         if (m2o_plugins[i].callbacks.plugin_tick) {
-            m2o_plugins[i].callbacks.plugin_init(NULL);
+            m2o_plugins[i].callbacks.plugin_init(NULL, NULL);
         }
     }
 
@@ -58,7 +58,7 @@ void m2o_plugins_init(librg_ctx_t *ctx, mod_t *mod) {
 void m2o_plugins_tick(librg_ctx_t *ctx, mod_t *mod) {
     for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
         if (m2o_plugins[i].callbacks.plugin_tick) {
-            m2o_plugins[i].callbacks.plugin_tick(NULL);
+            m2o_plugins[i].callbacks.plugin_tick(NULL, NULL);
         }
     }
 }
@@ -66,7 +66,7 @@ void m2o_plugins_tick(librg_ctx_t *ctx, mod_t *mod) {
 void m2o_plugins_stop(librg_ctx_t *ctx, mod_t *mod) {
     for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
         if (m2o_plugins[i].callbacks.plugin_stop) {
-            m2o_plugins[i].callbacks.plugin_stop(NULL);
+            m2o_plugins[i].callbacks.plugin_stop(NULL, NULL);
         }
     }
 
@@ -75,15 +75,31 @@ void m2o_plugins_stop(librg_ctx_t *ctx, mod_t *mod) {
 
 void m2o_event_trigger(m2o_event_type type, const m2o_args* args) {
     for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
-        m2o_callback callback = NULL;
+        m2o_callback *callback  = NULL;
+        m2o_event_result result = M2O_EVENT_RESULT_NONE;
 
         /* find needed event */
         switch (type) {
             case M2O_EVENT_NONE: break;
-            case M2O_EVENT_CUSTOM:       callback = m2o_plugins[i].callbacks.custom; break;
+            case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
         }
 
         /* trigger the plugin event, if handler exists */
-        if (callback) { callback(type, args); }
+        if (callback) { callback(args, &result); }
+    }
+}
+
+void m2o_event_trigger_result(m2o_event_type type, const m2o_args* args, m2o_event_result *result) {
+    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
+        m2o_callback *callback = NULL;
+
+        /* find needed event */
+        switch (type) {
+            case M2O_EVENT_NONE: break;
+            case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
+        }
+
+        /* trigger the plugin event, if handler exists */
+        if (callback) { callback(args, result); }
     }
 }

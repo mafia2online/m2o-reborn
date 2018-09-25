@@ -64,7 +64,7 @@
 #define when_assert(init, name) auto name = init; librg_assert(name); if (name)
 
 #ifdef M2O_SERVER
-#define mod_log librg_log
+#define mod_log zpl_printf
 #endif
 
 #define print_posm(vec, msg) mod_log("%s %f %f %f\n", msg, vec.x, vec.y, vec.z)

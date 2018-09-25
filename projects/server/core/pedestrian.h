@@ -23,7 +23,7 @@ void on_ped_create(librg_event_t *event) {
 
     // we are in the car
     if (ped->state == PED_IN_CAR) {
-        librg_data_wu32(event->data, ped->vehicle);
+        librg_data_wu32(event->data, ped->target);
         librg_data_wu8(event->data, ped->seat);
     }
 }

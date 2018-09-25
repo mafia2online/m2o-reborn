@@ -592,6 +592,8 @@ static zpl_mutex gfx_lock;
     }
 
     void gfx_util_world2screen(const vec3 *world, vec3 *screen) {
+        // TODO: method copied from old version, needs proper refactor
+
         // Get the world view projection matrix
         D3DXMATRIX mat = *(D3DXMATRIX *)M2::GetCameraWorldViewProjection();
         D3DXMatrixTranspose(&mat, &mat);

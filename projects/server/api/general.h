@@ -7,7 +7,9 @@
 // !
 // =======================================================================//
 
-    typedef union vec3_t {
+#ifndef M2O_API_DISABLE_VEC3
+
+    typedef union vec3 {
         struct {
             float x;
             float y;
@@ -15,7 +17,9 @@
         };
 
         float xyz[3];
-    } vec3_t;
+    } vec3;
+
+#endif // M2O_API_DISABLE_VEC3
 
 #undef M2O_SERVER_API_REGION
 #endif
@@ -45,15 +49,23 @@
         M2O_EVENT_PLUGIN_TICK,
         M2O_EVENT_PLUGIN_STOP,
 
+        M2O_EVENT_SERVER_CONSOLE, /* not implemented */
+
         M2O_EVENT_PLAYER_CONNECT,
         M2O_EVENT_PLAYER_DISCONNECT,
-
+        M2O_EVENT_PLAYER_NAME,
+        M2O_EVENT_PLAYER_CHAT,  /* not implemented */
+        M2O_EVENT_PLAYER_WEAPON_CHANGE, /* not implemented */
         M2O_EVENT_PLAYER_VEHICLE_ENTER,
         M2O_EVENT_PLAYER_VEHICLE_EXIT,
 
-        // ...
         M2O_EVENT_CUSTOM,
     } m2o_event_type;
+
+    typedef enum m2o_event_result {
+        M2O_EVENT_RESULT_NONE       = 0,
+        M2O_EVENT_RESULT_REJECTED   = (1 << 0),
+    } m2o_event_result;
 
     typedef enum m2o_arg_type {
         M2O_ARG_POINTER,
@@ -79,7 +91,7 @@
         usize size;
     } m2o_args;
 
-    typedef void (m2o_callback)(const m2o_args *);
+    typedef void (m2o_callback)(const m2o_args *, m2o_event_result *result);
 
     typedef struct {
         const char *name;
@@ -127,6 +139,7 @@
 // =======================================================================//
 
     M2O_SERVER_API void m2o_event_trigger(m2o_event_type type, const m2o_args* args);
+    M2O_SERVER_API void m2o_event_trigger_result(m2o_event_type type, const m2o_args* args, m2o_event_result *result);
 
     M2O_SERVER_API void m2o_args_init(m2o_args *arg) {
         zpl_array_init(arg->values, zpl_heap());

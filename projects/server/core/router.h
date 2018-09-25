@@ -109,18 +109,30 @@ void on_entity_remove(librg_event_t *event) {
 }
 
 void on_user_name_set(librg_message_t *msg) {
-    // TODO: read in a temp var first, and then apply to struct
-    u8 strsize = librg_data_ru8(msg->data);
     auto entity = librg_entity_find(msg->ctx, msg->peer);
     auto ped    = m2o_ped_get(entity);
-    librg_data_rptr(msg->data, ped->name, strsize);
 
-    mod_log("[info] client %d requested name change to: %s\n", entity->id, ped->name);
+    char buffer[128] = {0};
+    auto size = librg_data_ru8(msg->data);
+    librg_data_rptr(msg->data, buffer, size);
+
+    mod_log("[info] client %d requested name change to: %s\n", entity->id, buffer);
+
+    m2o_event_result result = M2O_EVENT_RESULT_NONE; {
+        m2o_args args = {0};
+        m2o_args_init(&args);
+        m2o_args_push_string(&args, buffer);
+        m2o_event_trigger_result(M2O_EVENT_PLAYER_NAME, &args, &result);
+        m2o_args_free(&args);
+    }
+
+    /* prevent execution if we rejected the event */
+    if (result & M2O_EVENT_RESULT_REJECTED) { return; }
 
     mod_message_send_instream_except(ctx, M2O_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
         librg_data_wu32(data, entity->id);
-        librg_data_wu8(data, strsize);
-        librg_data_wptr(data, (void *)ped->name, strsize);
+        librg_data_wu8(data, size);
+        librg_data_wptr(data, (void *)ped->name, size);
     });
 }
 

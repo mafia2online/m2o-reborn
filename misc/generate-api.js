@@ -55,6 +55,7 @@ const replaceTypesInline = line => {
         .replace('b8',  'bool')
         .replace('b64', 'bool')
         .replace('usize', 'size_t')
+        .replace('vec3', 'm2o_vec3')
 }
 
 const replaceTypes = data => {
