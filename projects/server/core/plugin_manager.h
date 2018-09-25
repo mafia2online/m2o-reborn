@@ -80,7 +80,10 @@ void m2o_event_trigger(m2o_event_type type, const m2o_args* args) {
 
         /* find needed event */
         switch (type) {
-            case M2O_EVENT_NONE: break;
+            case M2O_EVENT_NONE: /* non-triggerable events */
+            case M2O_EVENT_PLUGIN_INIT:
+            case M2O_EVENT_PLUGIN_TICK:
+            case M2O_EVENT_PLUGIN_STOP: break;
             case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
         }
 
@@ -95,7 +98,10 @@ void m2o_event_trigger_result(m2o_event_type type, const m2o_args* args, m2o_eve
 
         /* find needed event */
         switch (type) {
-            case M2O_EVENT_NONE: break;
+            case M2O_EVENT_NONE: /* non-triggerable events */
+            case M2O_EVENT_PLUGIN_INIT:
+            case M2O_EVENT_PLUGIN_TICK:
+            case M2O_EVENT_PLUGIN_STOP: break;
             case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
         }
 

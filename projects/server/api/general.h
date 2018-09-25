@@ -49,9 +49,12 @@
         M2O_EVENT_PLAYER_DISCONNECT,
         M2O_EVENT_PLAYER_NAME,
         M2O_EVENT_PLAYER_CHAT,  /* not implemented */
-        M2O_EVENT_PLAYER_WEAPON_CHANGE, /* not implemented */
-        M2O_EVENT_PLAYER_VEHICLE_ENTER,
-        M2O_EVENT_PLAYER_VEHICLE_EXIT,
+
+        M2O_EVENT_PED_WEAPON_CHANGE, /* not implemented */
+        M2O_EVENT_PED_CAR_ENTER,
+        M2O_EVENT_PED_CAR_EXIT,
+        M2O_EVENT_PED_DEATH, /* not implemented */
+        M2O_EVENT_PED_HEALTH_CHANGE, /* not implemented */
 
         M2O_EVENT_CUSTOM,
     } m2o_event_type;
@@ -99,9 +102,14 @@
 
             m2o_callback *player_connect;
             m2o_callback *player_disconnect;
+            m2o_callback *player_name;
+            m2o_callback *player_chat;
 
-            m2o_callback *player_vehicle_enter;
-            m2o_callback *player_vehicle_exit;
+            m2o_callback *ped_car_enter;
+            m2o_callback *ped_car_exit;
+            m2o_callback *ped_weapon_change;
+            m2o_callback *ped_health_change;
+            m2o_callback *ped_death;
 
             m2o_callback *custom_event;
         } callbacks;
