@@ -13,7 +13,7 @@ macos: brew install cmake
 1. Clone
 
 ```sh
-$ git clone git@gitlab.com:mafia2online/m2o-reborn.git
+$ git clone --recurse-submodules git@gitlab.com:mafia2online/m2o-reborn.git
 ```
 2. Generate project
 
