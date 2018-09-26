@@ -62,6 +62,9 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
     settings_readto(&root, "hostname", string, mod->settings.hostname);
     settings_readto(&root, "password", string, mod->settings.password);
 
+    mod->settings.port = address->port;
+    mod->settings.max_connections = ctx->max_connections;
+
     // free
     zpl_json_free(&root);
     zpl_mfree(content);

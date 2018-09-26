@@ -9,6 +9,9 @@
 #include "librg.h"
 #include "librg_ext.h"
 
+#define HTTP_IMPLEMENTATION
+#include "http.h"
+
 #if defined(ZPL_SYSTEM_WINDOWS)
 #include <clocale>
 #endif
@@ -21,9 +24,14 @@ struct mod_t {
     bool running;
     m2o_api_vtable *api;
 
+    u16 connected_amount;
+
     struct {
         std::string hostname;
         std::string password;
+
+        u16 port;
+        u16 max_connections;
     } settings;
 };
 
@@ -38,6 +46,7 @@ librg_ctx_t *ctx;
 
 // server modules
 #include "core/settings.h"
+#include "core/masterlist.h"
 // #include "core/vehicle.h"
 #include "core/pedestrian.h"
 #include "core/plugin_manager.h"
@@ -114,6 +123,10 @@ int main() {
     zpl_timer_set(tick_timer, 1.0, -1, mod_measure);
     zpl_timer_start(tick_timer, 0);
 
+    zpl_timer_t *masterlist_timer = zpl_timer_add(ctx->timers);
+    zpl_timer_set(masterlist_timer, MASTERLIST_SECONDS, -1, masterlist_update);
+    zpl_timer_start(masterlist_timer, 0);
+
     librg_network_start(ctx, address);
 
     mod.api = new m2o_api_vtable;
@@ -124,6 +137,7 @@ int main() {
 
     while (mod.running) {
         librg_tick(ctx);
+        masterlist_tick();
         m2o_plugins_tick(ctx, &mod);
         zpl_sleep_ms(5);
     }

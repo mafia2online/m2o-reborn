@@ -35,6 +35,9 @@ void mod_register_routes(librg_ctx_t *ctx) {
         entity->user_data = m2o_ped_alloc(NULL);
         librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 
+        /* update our connected player count */
+        mod.connected_amount++;
+
         m2o_args args = {0};
         m2o_args_init(&args);
         m2o_args_push_integer(&args, event->entity->id);
@@ -44,6 +47,9 @@ void mod_register_routes(librg_ctx_t *ctx) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, [](librg_event_t *event) {
         auto ped = m2o_ped_get(event->entity);
+
+        /* update our connected player count */
+        mod.connected_amount--;
 
         m2o_args args = {0};
         m2o_args_init(&args);
