@@ -10,7 +10,7 @@
 #include "librg_ext.h"
 
 #define m2sdk_log zpl_printf
-
+#define MAFIA_SDK_IMPLEMENTATION
 #include "m2sdk.h"
 
 #include "m2o_client.h"

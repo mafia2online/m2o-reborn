@@ -68,10 +68,8 @@ if (M2O_CLIENT)
         add_subdirectory(projects/worker)
     endif()
 
-    add_subdirectory(projects/m2sdk)
     add_subdirectory(projects/launcher)
     add_subdirectory(projects/client)
-    # add_subdirectory(projects/m2o_sdl)
 endif()
 
 if(MSVC)

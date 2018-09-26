@@ -8,21 +8,22 @@ file(GLOB_RECURSE FILES
     "${PROJECT_SOURCE_DIR}/../../vendor/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/sdl/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/steam_api/include/*.h"
-    "${PROJECT_SOURCE_DIR}/../../vendor/detours/include/*.h"
     "${PROJECT_SOURCE_DIR}/../../vendor/discord/include/*.h"
+    "${PROJECT_SOURCE_DIR}/../../vendor/m2sdk/include/*.h*"
 )
 
-set(LIBRARIES m2sdk discord-rpc SDL2 SDL2_ttf libfreetype-6)
+set(LIBRARIES)
 set(LIBRARY_FOLDERS
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/
+    ${PROJECT_SOURCE_DIR}/../../vendor/m2sdk/lib/
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/
 )
 set(INCLUDE_FOLDERS
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/../shared
-    ${PROJECT_SOURCE_DIR}/../m2sdk/include
     ${PROJECT_SOURCE_DIR}/../../vendor
     ${PROJECT_SOURCE_DIR}/../../vendor/sdl/include
+    ${PROJECT_SOURCE_DIR}/../../vendor/m2sdk/include
     ${PROJECT_SOURCE_DIR}/../../vendor/detours/include
     ${PROJECT_SOURCE_DIR}/../../vendor/discord/include
 )
@@ -37,15 +38,24 @@ if (WIN32)
         ws2_32  # for librg
         psapi   # for librg
         winmm   # for librg
+
         d3dx9
         dxgi
         dinput8
         dxguid
+
+        m2sdk
+        detours
+        discord-rpc
+
+        SDL2
+        SDL2_ttf
+        libfreetype-6
         imm32   # for sdl
         version # for sdl
     )
-elseif (UNIX)
-    set(LIBRARIES ${LIBRARIES} m pthread dl)
+else()
+    message("-- Can't compile on non-win32 platform")
 endif()
 
 if (M2O_CEF)

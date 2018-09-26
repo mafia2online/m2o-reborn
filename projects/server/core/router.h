@@ -123,6 +123,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
 
         char buffer[128] = {0};
         auto size = librg_data_ru8(msg->data);
+        size = zpl_min(size, 127);
         librg_data_rptr(msg->data, buffer, size);
 
         mod_log("[info] client %d requested name change to: %s\n", entity->id, buffer);
@@ -149,6 +150,8 @@ void mod_register_routes(librg_ctx_t *ctx) {
         char message_buffer[632], input_buffer[512];
 
         u32 strsize = librg_data_ru32(msg->data);
+        strsize = zpl_min(strsize, 511);
+
         librg_data_rptr(msg->data, input_buffer, strsize);
         input_buffer[strsize] = '\0';
 
