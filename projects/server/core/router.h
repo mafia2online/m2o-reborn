@@ -182,8 +182,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
     // =======================================================================//
 
     librg_network_add(ctx, M2O_PED_CREATE,   on_ped_create_command); /* testing */
-    // librg_network_add(ctx, M2O_CAR_CREATE,   on_car_create_command); /* testing */
-    // librg_network_add(ctx, M2O_CAR_ENTER,    on_car_enter_start);
-    // librg_network_add(ctx, M2O_CAR_EXIT,     on_car_exit_start);
-
+    librg_network_add(ctx, M2O_CAR_CREATE,   on_car_create_command); /* testing */
+    librg_network_add(ctx, M2O_CAR_ENTER,    on_car_enter);
+    librg_network_add(ctx, M2O_CAR_EXIT,     on_car_exit);
 }
