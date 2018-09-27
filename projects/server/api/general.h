@@ -37,18 +37,18 @@
         M2O_EVENT_PLUGIN_TICK,
         M2O_EVENT_PLUGIN_STOP,
 
-        M2O_EVENT_SERVER_CONSOLE, /* not implemented */
+        M2O_EVENT_SERVER_CONSOLE, /* TODO: not implemented */
 
         M2O_EVENT_PLAYER_CONNECT,
         M2O_EVENT_PLAYER_DISCONNECT,
         M2O_EVENT_PLAYER_NAME,
-        M2O_EVENT_PLAYER_CHAT,  /* not implemented */
+        M2O_EVENT_PLAYER_CHAT,  /* TODO: not implemented */
 
-        M2O_EVENT_PED_WEAPON_CHANGE, /* not implemented */
+        M2O_EVENT_PED_WEAPON_CHANGE, /* TODO: not implemented */
         M2O_EVENT_PED_CAR_ENTER,
         M2O_EVENT_PED_CAR_EXIT,
-        M2O_EVENT_PED_DEATH, /* not implemented */
-        M2O_EVENT_PED_HEALTH_CHANGE, /* not implemented */
+        M2O_EVENT_PED_DEATH, /* TODO: not implemented */
+        M2O_EVENT_PED_HEALTH_CHANGE, /* TODO: not implemented */
 
         M2O_EVENT_CUSTOM,
     } m2o_event_type;
