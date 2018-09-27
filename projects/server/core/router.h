@@ -167,7 +167,6 @@ void mod_register_routes(librg_ctx_t *ctx) {
         auto ped = m2o_ped_get(entity);
 
         zpl_snprintf(message_buffer, 632, "%s (%d): %s", ped->name, entity->id, input_buffer);
-
         mod_log("[chat] %s \n", message_buffer);
 
         mod_message_send(msg->ctx, M2O_USER_MESSAGE, [&](librg_data_t *data) {
