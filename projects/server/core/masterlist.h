@@ -32,7 +32,7 @@ void masterlist_tick() {
 
     if (status == HTTP_STATUS_FAILED) {
         // TODO: improve error message displaying
-        mod_log("[error] couldn't post update to the masterlist (%d): %s.\n", masterlist_request->status_code, masterlist_request->response_data);
+        mod_log("[error] couldn't post update to the masterlist (%d): %s", masterlist_request->status_code, masterlist_request->response_data);
         http_release(masterlist_request);
         masterlist_request = NULL;
         return;

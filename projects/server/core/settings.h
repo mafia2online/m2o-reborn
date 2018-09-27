@@ -1,5 +1,7 @@
 #define settings_default                    \
     "{\n"                                   \
+    "    /* json5 supported */\n\n"         \
+                                            \
     "    /* connection settings */\n"       \
     "    hostname: \"my m2o server\",\n"    \
     "    password: \"\",\n"                 \
@@ -8,7 +10,7 @@
                                             \
     "    /* server parameters */\n"         \
     "    stream_range: 250.0,\n"            \
-    "    tick_delay: 100.0,\n"              \
+    "    tick_delay: 100.0,\n\n"            \
                                             \
     "    /* masterlist parameters */\n"     \
     "    masterlist_login: \"\",\n"         \

@@ -50,9 +50,9 @@ librg_ctx_t *ctx;
 // server modules
 #include "core/settings.h"
 #include "core/masterlist.h"
+#include "core/plugin_manager.h"
 // #include "core/vehicle.h"
 #include "core/pedestrian.h"
-#include "core/plugin_manager.h"
 #include "core/router.h"
 
 /* simple bandwidth measurer */

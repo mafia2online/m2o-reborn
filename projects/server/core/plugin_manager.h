@@ -45,51 +45,19 @@ void m2o_plugins_init(librg_ctx_t *ctx, mod_t *mod) {
         zpl_array_append(m2o_plugins, plugin);
     }
 
-    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
-        if (m2o_plugins[i].callbacks.plugin_tick) {
-            m2o_plugins[i].callbacks.plugin_init(NULL, NULL);
-        }
-    }
+    m2o_event_trigger(M2O_EVENT_PLUGIN_INIT, NULL);
 
     zpl_string_free(filelst);
     zpl_array_free(files);
 }
 
 void m2o_plugins_tick(librg_ctx_t *ctx, mod_t *mod) {
-    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
-        if (m2o_plugins[i].callbacks.plugin_tick) {
-            m2o_plugins[i].callbacks.plugin_tick(NULL, NULL);
-        }
-    }
+    m2o_event_trigger(M2O_EVENT_PLUGIN_TICK, NULL);
 }
 
 void m2o_plugins_stop(librg_ctx_t *ctx, mod_t *mod) {
-    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
-        if (m2o_plugins[i].callbacks.plugin_stop) {
-            m2o_plugins[i].callbacks.plugin_stop(NULL, NULL);
-        }
-    }
-
+    m2o_event_trigger(M2O_EVENT_PLUGIN_STOP, NULL);
     zpl_array_free(m2o_plugins);
-}
-
-void m2o_event_trigger(m2o_event_type type, const m2o_args* args) {
-    for (int i = 0; i < zpl_array_count(m2o_plugins); ++i) {
-        m2o_callback *callback  = NULL;
-        m2o_event_result result = M2O_EVENT_RESULT_NONE;
-
-        /* find needed event */
-        switch (type) {
-            case M2O_EVENT_NONE: /* non-triggerable events */
-            case M2O_EVENT_PLUGIN_INIT:
-            case M2O_EVENT_PLUGIN_TICK:
-            case M2O_EVENT_PLUGIN_STOP: break;
-            case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
-        }
-
-        /* trigger the plugin event, if handler exists */
-        if (callback) { callback(args, &result); }
-    }
 }
 
 void m2o_event_trigger_result(m2o_event_type type, const m2o_args* args, m2o_event_result *result) {
@@ -98,14 +66,34 @@ void m2o_event_trigger_result(m2o_event_type type, const m2o_args* args, m2o_eve
 
         /* find needed event */
         switch (type) {
-            case M2O_EVENT_NONE: /* non-triggerable events */
-            case M2O_EVENT_PLUGIN_INIT:
-            case M2O_EVENT_PLUGIN_TICK:
-            case M2O_EVENT_PLUGIN_STOP: break;
-            case M2O_EVENT_CUSTOM: callback = m2o_plugins[i].callbacks.custom_event; break;
+            case M2O_EVENT_NONE: break;
+
+            case M2O_EVENT_PLUGIN_INIT:         callback = m2o_plugins[i].callbacks.plugin_init;        break;
+            case M2O_EVENT_PLUGIN_TICK:         callback = m2o_plugins[i].callbacks.plugin_tick;        break;
+            case M2O_EVENT_PLUGIN_STOP:         callback = m2o_plugins[i].callbacks.plugin_stop;        break;
+
+            case M2O_EVENT_SERVER_CONSOLE:      callback = m2o_plugins[i].callbacks.server_console;     break;
+
+            case M2O_EVENT_PLAYER_CONNECT:      callback = m2o_plugins[i].callbacks.player_connect;     break;
+            case M2O_EVENT_PLAYER_DISCONNECT:   callback = m2o_plugins[i].callbacks.player_disconnect;  break;
+            case M2O_EVENT_PLAYER_NAME:         callback = m2o_plugins[i].callbacks.player_name;        break;
+            case M2O_EVENT_PLAYER_CHAT:         callback = m2o_plugins[i].callbacks.player_chat;        break;
+
+            case M2O_EVENT_PED_WEAPON_CHANGE:   callback = m2o_plugins[i].callbacks.ped_car_enter;      break;
+            case M2O_EVENT_PED_CAR_ENTER:       callback = m2o_plugins[i].callbacks.ped_car_exit;       break;
+            case M2O_EVENT_PED_CAR_EXIT:        callback = m2o_plugins[i].callbacks.ped_weapon_change;  break;
+            case M2O_EVENT_PED_DEATH:           callback = m2o_plugins[i].callbacks.ped_health_change;  break;
+            case M2O_EVENT_PED_HEALTH_CHANGE:   callback = m2o_plugins[i].callbacks.ped_death;          break;
+
+            case M2O_EVENT_CUSTOM:              callback = m2o_plugins[i].callbacks.custom_event;       break;
         }
 
         /* trigger the plugin event, if handler exists */
         if (callback) { callback(args, result); }
     }
+}
+
+void m2o_event_trigger(m2o_event_type type, const m2o_args* args) {
+    m2o_event_result result = M2O_EVENT_RESULT_NONE;
+    m2o_event_trigger_result(type, args, &result);
 }

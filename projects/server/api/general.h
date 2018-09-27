@@ -100,6 +100,8 @@
             m2o_callback *plugin_tick;
             m2o_callback *plugin_stop;
 
+            m2o_callback *server_console;
+
             m2o_callback *player_connect;
             m2o_callback *player_disconnect;
             m2o_callback *player_name;
