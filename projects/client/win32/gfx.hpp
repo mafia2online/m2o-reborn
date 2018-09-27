@@ -2,7 +2,7 @@
 
 #define DECLSPEC /* disable dll exports for SDL */
 #include "SDL.h"
-#include "SDL_ttf.h"
+#include "SDL_ttf.h" /* TODO: add proper font atlas caching, maybe SDL_FontCache? */
 
 typedef IDirect3D9 *(WINAPI *gfx_d3dcreate9_cb)(UINT);
 
