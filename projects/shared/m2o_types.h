@@ -33,8 +33,6 @@ typedef enum m2o_entity_type {
 /* ped states */
 typedef enum ped_state {
     PED_ON_GROUND,
-    PED_ENTERING_CAR,
-    PED_EXITING_CAR,
     PED_IN_CAR,
 } ped_state;
 

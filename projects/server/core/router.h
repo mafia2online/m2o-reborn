@@ -81,7 +81,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED:  { on_ped_create(event); } break;
-            // case M2O_ENTITY_CAR:        { on_car_create(event); } break;
+            case M2O_ENTITY_CAR:        { on_car_create(event); } break;
         }
     });
 
@@ -89,7 +89,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED:  { auto ped = m2o_ped_get(event->entity); librg_data_wptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-            // case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_wptr(event->data, &car->stream, sizeof(car->stream)); } break;
+            case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_wptr(event->data, &car->stream, sizeof(car->stream)); } break;
         }
     });
 
@@ -105,7 +105,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED:  { on_ped_remove(event); } break;
-            // case M2O_ENTITY_CAR:        { on_car_remove(event); } break;
+            case M2O_ENTITY_CAR:        { on_car_remove(event); } break;
         }
     });
 
@@ -113,7 +113,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED:  { auto ped = m2o_ped_get(event->entity); librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream)); } break;
-            // case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_rptr(event->data, &car->stream, sizeof(car->stream)); } break;
+            case M2O_ENTITY_CAR:        { auto car = m2o_car_get(event->entity); librg_data_rptr(event->data, &car->stream, sizeof(car->stream)); } break;
         }
     });
 
