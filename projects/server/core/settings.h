@@ -9,6 +9,10 @@
     "    /* server parameters */\n"         \
     "    stream_range: 250.0,\n"            \
     "    tick_delay: 100.0,\n"              \
+                                            \
+    "    /* masterlist parameters */\n"     \
+    "    masterlist_login: \"\",\n"         \
+    "    masterlist_secret: \"\",\n"        \
     "}\n"
 
 zpl_json_object *settings_read_value(zpl_json_object *obj, char *name) {
@@ -62,8 +66,17 @@ void settings_read(librg_ctx_t *ctx, librg_address_t *address, mod_t *mod) {
     settings_readto(&root, "hostname", string, mod->settings.hostname);
     settings_readto(&root, "password", string, mod->settings.password);
 
+    settings_readto(&root, "masterlist_login", string, mod->settings.masterlist_login);
+    settings_readto(&root, "masterlist_secret", string, mod->settings.masterlist_secret);
+
     mod->settings.port = address->port;
     mod->settings.max_connections = ctx->max_connections;
+
+    if (mod->settings.hostname.size() > 256) {
+        mod_log("[error] server hostname can't be longer than 256 symbols");
+        mod_assert(0);
+        return;
+    }
 
     // free
     zpl_json_free(&root);

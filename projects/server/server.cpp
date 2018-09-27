@@ -30,6 +30,9 @@ struct mod_t {
         std::string hostname;
         std::string password;
 
+        std::string masterlist_login;
+        std::string masterlist_secret;
+
         u16 port;
         u16 max_connections;
     } settings;
