@@ -116,6 +116,8 @@ typedef struct m2o_car {
 // !
 // =======================================================================//
 
+// TODO: add pre-allocated pools, instead of random heap allocations
+
 m2o_ped *m2o_ped_alloc(void *ptr) {
     m2o_ped _entity = {0};
     m2o_ped *entity = (m2o_ped *)zpl_alloc(zpl_heap(), sizeof(m2o_ped));

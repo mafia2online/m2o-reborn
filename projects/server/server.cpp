@@ -41,6 +41,8 @@ struct mod_t {
 static mod_t mod;
 librg_ctx_t *ctx;
 
+#define M2O_API_DISABLE_VEC3
+
 #include "api/general.h"
 #include "api/vehicle.h"
 #include "api/pedestrian.h"

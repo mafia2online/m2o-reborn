@@ -1,6 +1,4 @@
-#if 0 // disabled from compilation in the orignal project
 #define M2O_SERVER_API_REGION
-
 // =======================================================================//
 // !
 // ! Basic types
@@ -21,10 +19,6 @@
 
 #endif // M2O_API_DISABLE_VEC3
 
-#undef M2O_SERVER_API_REGION
-#endif
-
-#define M2O_SERVER_API_REGION
     typedef enum {
         M2O_ERROR_NONE,
         M2O_UNDEFINED_ENTITY,

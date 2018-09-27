@@ -48,6 +48,7 @@ void on_car_enter(librg_message_t *msg) {
     ped->vehicle = vehicle->id;
     ped->seat    = seat;
 
+    /* if player is in the main seat - he becomes the vehicle streamer */
     if (seat == 1) {
         librg_entity_control_set(msg->ctx, vehicle->id, player->client_peer);
     }
