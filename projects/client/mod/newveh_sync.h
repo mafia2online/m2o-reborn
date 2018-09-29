@@ -1,140 +1,103 @@
-bool vehicle_HasTargetPosition(void) {
-    return (m_interp.pos.ulFinishTime != 0);
-}
-
-bool vehicle_HasTargetRotation(void) {
-    return (m_interp.rot.ulFinishTime != 0);
-}
-
 void vehicle_SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)
 {
-    // Are we streamed in?
-    if (m_pVehicle)
+    vehicle_UpdateTargetPosition();
+    // void vehicle_UpdateUnderFloorFix(const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ)
     {
-        vehicle_UpdateTargetPosition();
-        // void vehicle_UpdateUnderFloorFix(const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ)
-        {
-            CVector vecLocalPosition;
-            GetPosition(vecLocalPosition);
-
-            bool bForceLocalZ = false;
-            if (bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE)
-            {
-                // If remote z higher by too much and remote not doing any z movement, warp local z coord
-                float fDeltaZ = vecTargetPosition.fZ - vecLocalPosition.fZ;
-                if (fDeltaZ > 0.4f && fDeltaZ < 10.0f)
-                {
-                    if (fabsf(fVelocityZ) < 0.01f)
-                    {
-                        bForceLocalZ = true;
-                    }
-                }
-            }
-
-            // Only force z coord if needed for at least two consecutive calls
-            if (!bForceLocalZ)
-                m_uiForceLocalZCounter = 0;
-            else if (m_uiForceLocalZCounter++ > 1)
-            {
-                vecLocalPosition.fZ = vecTargetPosition.fZ;
-                SetPosition(vecLocalPosition);
-            }
-        }
-
-        unsigned long ulTime = CClientTime::GetTime();
-        CVector       vecLocalPosition;
+        CVector vecLocalPosition;
         GetPosition(vecLocalPosition);
 
-#ifdef MTA_DEBUG
-        m_interp.pos.vecStart = vecLocalPosition;
-#endif
-        m_interp.pos.vecTarget = vecTargetPosition;
-        // Calculate the relative error
-        m_interp.pos.vecError = vecTargetPosition - vecLocalPosition;
-
-        // Extrapolation
-        const SVehExtrapolateSettings& vehExtrapolate = g_pClientGame->GetVehExtrapolateSettings();
-        if (vehExtrapolate.bEnabled)
+        bool bForceLocalZ = false;
+        if (bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE)
         {
-            // Base amount to account for something
-            int iExtrapolateMs = vehExtrapolate.iBaseMs;
-
-            if (CClientPlayer* pPlayerDriver = DynamicCast<CClientPlayer>((CClientEntity*)m_pDriver))
-                iExtrapolateMs += pPlayerDriver->GetLatency() * vehExtrapolate.iScalePercent / 110;
-
-            // Limit amount
-            iExtrapolateMs = Clamp(0, iExtrapolateMs, vehExtrapolate.iMaxMs);
-
-            CVector vecVelocity;
-            GetMoveSpeed(vecVelocity);
-            vecVelocity *= 50.f * iExtrapolateMs * (1 / 1000.f);
-            m_interp.pos.vecError += vecVelocity;
+            // If remote z higher by too much and remote not doing any z movement, warp local z coord
+            float fDeltaZ = vecTargetPosition.fZ - vecLocalPosition.fZ;
+            if (fDeltaZ > 0.4f && fDeltaZ < 10.0f)
+            {
+                if (fabsf(fVelocityZ) < 0.01f)
+                {
+                    bForceLocalZ = true;
+                }
+            }
         }
 
-        // Apply the error over 400ms (i.e. 1/4 per 100ms )
-        m_interp.pos.vecError *= Lerp<const float>(0.25f, UnlerpClamped(100, ulDelay, 400), 1.0f);
-
-        // Get the interpolation interval
-        m_interp.pos.ulStartTime = ulTime;
-        m_interp.pos.ulFinishTime = ulTime + ulDelay;
-
-        // Initialize the interpolation
-        m_interp.pos.fLastAlpha = 0.0f;
+        // Only force z coord if needed for at least two consecutive calls
+        if (!bForceLocalZ)
+            m_uiForceLocalZCounter = 0;
+        else if (m_uiForceLocalZCounter++ > 1)
+        {
+            vecLocalPosition.fZ = vecTargetPosition.fZ;
+            SetPosition(vecLocalPosition);
+        }
     }
-    else
-    {
-        // Update our position now
-        SetPosition(vecTargetPosition);
-    }
-}
 
-void vehicle_RemoveTargetPosition(void)
-{
-    m_interp.pos.ulFinishTime = 0;
-}
-
-void vehicle_SetTargetRotation(const CVector& vecRotation, unsigned long ulDelay)
-{
-    // Are we streamed in?
-    if (m_pVehicle)
-    {
-        UpdateTargetRotation();
-
-        unsigned long ulTime = CClientTime::GetTime();
-        CVector       vecLocalRotation;
-        GetRotationDegrees(vecLocalRotation);
+    unsigned long ulTime = CClientTime::GetTime();
+    CVector       vecLocalPosition;
+    GetPosition(vecLocalPosition);
 
 #ifdef MTA_DEBUG
-        m_interp.rot.vecStart = vecLocalRotation;
+    m_interp.pos.vecStart = vecLocalPosition;
 #endif
-        m_interp.rot.vecTarget = vecRotation;
-        // Get the error
-        m_interp.rot.vecError.fX = GetOffsetDegrees(vecLocalRotation.fX, vecRotation.fX);
-        m_interp.rot.vecError.fY = GetOffsetDegrees(vecLocalRotation.fY, vecRotation.fY);
-        m_interp.rot.vecError.fZ = GetOffsetDegrees(vecLocalRotation.fZ, vecRotation.fZ);
+    m_interp.pos.vecTarget = vecTargetPosition;
+    // Calculate the relative error
+    m_interp.pos.vecError = vecTargetPosition - vecLocalPosition;
 
-        // Apply the error over 250ms (i.e. 2/5 per 100ms )
-        m_interp.rot.vecError *= Lerp<const float>(0.40f, UnlerpClamped(100, ulDelay, 400), 1.0f);
-
-        // Get the interpolation interval
-        m_interp.rot.ulStartTime = ulTime;
-        m_interp.rot.ulFinishTime = ulTime + ulDelay;
-
-        // Initialize the interpolation
-        m_interp.rot.fLastAlpha = 0.0f;
-    }
-    else
+    // Extrapolation
+    const SVehExtrapolateSettings& vehExtrapolate = g_pClientGame->GetVehExtrapolateSettings();
+    if (vehExtrapolate.bEnabled)
     {
-        // Update our rotation now
-        SetRotationDegrees(vecRotation);
+        // Base amount to account for something
+        int iExtrapolateMs = vehExtrapolate.iBaseMs;
+
+        if (CClientPlayer* pPlayerDriver = DynamicCast<CClientPlayer>((CClientEntity*)m_pDriver))
+            iExtrapolateMs += pPlayerDriver->GetLatency() * vehExtrapolate.iScalePercent / 110;
+
+        // Limit amount
+        iExtrapolateMs = Clamp(0, iExtrapolateMs, vehExtrapolate.iMaxMs);
+
+        CVector vecVelocity;
+        GetMoveSpeed(vecVelocity);
+        vecVelocity *= 50.f * iExtrapolateMs * (1 / 1000.f);
+        m_interp.pos.vecError += vecVelocity;
     }
+
+    // Apply the error over 400ms (i.e. 1/4 per 100ms )
+    m_interp.pos.vecError *= Lerp<const float>(0.25f, UnlerpClamped(100, ulDelay, 400), 1.0f);
+
+    // Get the interpolation interval
+    m_interp.pos.ulStartTime = ulTime;
+    m_interp.pos.ulFinishTime = ulTime + ulDelay;
+
+    // Initialize the interpolation
+    m_interp.pos.fLastAlpha = 0.0f;
+
 }
 
-void vehicle_RemoveTargetRotation(void)
-{
-    m_interp.rot.ulFinishTime = 0;
-}
+void vehicle_SetTargetRotation(const CVector& vecRotation, unsigned long ulDelay) {
+    UpdateTargetRotation();
 
+    unsigned long ulTime = CClientTime::GetTime();
+    CVector       vecLocalRotation;
+    GetRotationDegrees(vecLocalRotation);
+
+#ifdef MTA_DEBUG
+    m_interp.rot.vecStart = vecLocalRotation;
+#endif
+    m_interp.rot.vecTarget = vecRotation;
+    // Get the error
+    m_interp.rot.vecError.fX = GetOffsetDegrees(vecLocalRotation.fX, vecRotation.fX);
+    m_interp.rot.vecError.fY = GetOffsetDegrees(vecLocalRotation.fY, vecRotation.fY);
+    m_interp.rot.vecError.fZ = GetOffsetDegrees(vecLocalRotation.fZ, vecRotation.fZ);
+
+    // Apply the error over 250ms (i.e. 2/5 per 100ms )
+    m_interp.rot.vecError *= Lerp<const float>(0.40f, UnlerpClamped(100, ulDelay, 400), 1.0f);
+
+    // Get the interpolation interval
+    m_interp.rot.ulStartTime = ulTime;
+    m_interp.rot.ulFinishTime = ulTime + ulDelay;
+
+    // Initialize the interpolation
+    m_interp.rot.fLastAlpha = 0.0f;
+}
 void vehicle_UpdateTargetPosition(void)
 {
     if (vehicle_HasTargetPosition())
@@ -265,6 +228,23 @@ void vehicle_UpdateTargetRotation(void)
 
         SetRotationDegrees(vecCurrentRotation + vecCompensation, false);
     }
+}
+
+bool vehicle_HasTargetPosition(void) {
+    return (m_interp.pos.ulFinishTime != 0);
+}
+
+bool vehicle_HasTargetRotation(void) {
+    return (m_interp.rot.ulFinishTime != 0);
+}
+
+void vehicle_RemoveTargetPosition(void) {
+    m_interp.pos.ulFinishTime = 0;
+}
+
+void vehicle_RemoveTargetRotation(void)
+{
+    m_interp.rot.ulFinishTime = 0;
 }
 
 void vehicle_ResetInterpolation(void)

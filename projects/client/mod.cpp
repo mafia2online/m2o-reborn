@@ -17,7 +17,7 @@
 #include "m2o_types.h"
 
 #include "mod/mod.h"
-// #include "mod/vehicle.h"
+#include "mod/vehicle.h"
 #include "mod/pedestrian.h"
 
 // =======================================================================//
@@ -185,7 +185,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     zpl_zero_item(ctx);
 
     // setup manual client mode
-    ctx->tick_delay     = 32;
+    ctx->tick_delay     = 100.0f; /* sending updates 10 times a second */
     ctx->mode           = LIBRG_MODE_CLIENT;
     ctx->world_size     = zplm_vec3f(5000.0f, 5000.0f, 0);
     ctx->max_entities   = M2O_ENTITY_LIMIT;
@@ -237,7 +237,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_create(event); } break;
-            // case M2O_ENTITY_CAR: { m2o_callback_car_create(event); } break;
+            case M2O_ENTITY_CAR: { m2o_callback_car_create(event); } break;
         }
     });
 
@@ -245,7 +245,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_update(event); } break;
-            // case M2O_ENTITY_CAR: { m2o_callback_car_update(event); } break;
+            case M2O_ENTITY_CAR: { m2o_callback_car_update(event); } break;
         }
     });
 
@@ -253,7 +253,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_remove(event); } break;
-            // case M2O_ENTITY_CAR: { m2o_callback_car_remove(event); } break;
+            case M2O_ENTITY_CAR: { m2o_callback_car_remove(event); } break;
         }
     });
 
@@ -261,7 +261,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         switch (event->entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_clientstream(event); } break;
-            // case M2O_ENTITY_CAR { m2o_callback_car_clientstream(event); } break;
+            case M2O_ENTITY_CAR: { m2o_callback_car_clientstream(event); } break;
         }
     });
 
@@ -303,10 +303,8 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
         mod_log("set new name for client %u: %s\n", entity->id, ped->name);
     });
-
-    // // call inits for modules
-    // module_ped_init();
-    // module_car_init();
+    
+    m2o_car_callbacks_init();
 
     // discord_init();
 }

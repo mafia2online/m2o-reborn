@@ -100,7 +100,7 @@ int main() {
 
     /* fill up default settings */
     ctx->mode            = LIBRG_MODE_SERVER;
-    ctx->tick_delay      = 64.0f;
+    ctx->tick_delay      = 100.0f; /* sending updates 10 times a second */
     ctx->world_size      = zplm_vec3f(5000.0f, 5000.0f, 0.0f);
     ctx->max_entities    = M2O_ENTITY_LIMIT;
     ctx->max_connections = 1000;

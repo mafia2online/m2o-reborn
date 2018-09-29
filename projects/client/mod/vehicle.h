@@ -4,60 +4,49 @@
 // !
 // =======================================================================//
 
-#define MOD_CAR_SPEED_TRESHOLD 0.6f
-#define MOD_CAR_POSITION_TRESHOLD 0.02f
-#define MOD_CAR_ROTATION_TRESHOLD 0.15f
-
-/**
- * The entity enters the stream zone
- */
-void module_car_callback_create(librg_event_t *event) {
-    auto car = new car_t(event->entity);
+void m2o_callback_car_create(librg_event_t *event) {
+    auto car = m2o_car_alloc(NULL);
 
     car->model = librg_data_ru16(event->data);
-    car->state = librg_data_ru8(event->data);
+    car->state = (car_state)librg_data_ru8(event->data);
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    event->entity->flags |= MOD_ENTITY_INTERPOLATED;
+    event->entity->flags |= M2O_ENTITY_INTERPOLATED;
     event->entity->user_data = car;
 
-    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, 42);
+    M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_CAR, car->model);
 
     if (entity->IsActive()) {
         print_posm(event->entity->position, "[info] creating car at");
-        car->setCEntity(entity);
+        car->CEntity = entity;
         car->CCar->SetPos(event->entity->position);
-        car->CCar->SetRot(car->stream.rotation);
+        //car->CCar->SetRot(car->stream.rotation);
         car->CCar->m_pVehicle.SetEngineOn(true, false);
-        car->dbg();
     } else {
         mod_log("[warning] could not spawn a vehicle for entity: %d\n", event->entity->id);
     }
 }
 
-/**
- * The entity exists the stream zone
- */
-void module_car_callback_remove(librg_event_t *event) {
-    auto car = get_car(event->entity); mod_assert(car && car->CEntity);
+void m2o_callback_car_remove(librg_event_t *event) {
+    auto car = m2o_car_get(event->entity); mod_assert(car && car->CEntity);
     mod_log("destroying vehicle entity %d\n", event->entity->id);
 
     // iterate and remove all peds that are in the car
     librg_entity_iteratex(ctx, LIBRG_ENTITY_ALIVE, librg_lambda(entityid), {
         auto entity = librg_entity_fetch(ctx, entityid);
-        if (entity->type != TYPE_PED) continue;
-        auto ped = get_ped(entity);
+        if (entity->type != M2O_ENTITY_DUMMY_PED && entity->type != M2O_ENTITY_PLAYER_PED) continue;
+        auto ped = m2o_ped_get(entity);
 
-        if (ped->vehicle == event->entity && ped->CEntity) {
+        if (ped->vehicle == event->entity->id && ped->CEntity) {
             mod_log("[info] removing ped from the vehicle\n");
             // TODO: make it actually remove, for now just delete everyone
             M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
-            ped->CEntity = nullptr;
+            ped->CEntity = NULL;
         }
     });
 
     M2::Wrappers::DestroyEntity(car->CEntity, M2::eEntityType::MOD_ENTITY_CAR);
-    delete car;
+    m2o_car_free(car);
 }
 
 // =======================================================================//
@@ -69,42 +58,27 @@ void module_car_callback_remove(librg_event_t *event) {
 /**
  * The entity in our stream zone gets updated
  */
-void module_car_callback_update(librg_event_t *event) {
-    auto car = get_car(event->entity);
+void m2o_callback_car_update(librg_event_t *event) {
+    auto car = m2o_car_get(event->entity);
 
     // make sure we have all objects
     mod_assert(car && car->CEntity);
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
-    /* update interpolation tables */
-    cubic_hermite_v3_value(&car->inter_pos, event->entity->position);
-
     // car->CCar->SetRot(car->stream.rotation);
-    car->CCar->m_pVehicle.SetSteer(car->stream.steer);
-
-    car->inter_steer.last = car->inter_steer.targ;
-    car->inter_steer.targ = car->stream.steer;
-
-    car->inter_rot.last = car->inter_rot.targ;
-    car->inter_rot.targ = car->stream.rotation;
-
-    quat_t empty_quat = { 0 };
-    if (car->inter_rot.last == empty_quat) {
-        car->inter_rot.last = car->stream.rotation;
-    }
-
-    car->inter_delta = 0.0f;
+    //car->CCar->m_pVehicle.SetSteer(car->stream.steer);
+    car->CCar->SetPos(event->entity->position);
 }
 
 /**
  * The entity is streamed by us, and we are sending an update with new data
  */
-void module_car_callback_clientstream(librg_event_t *event) {
-    auto car = get_car(event->entity);
+void m2o_callback_car_clientstream(librg_event_t *event) {
+    auto car = m2o_car_get(event->entity);
     mod_assert(car && car->CEntity);
 
     event->entity->position = car->CEntity->GetPosition();
-    car->stream.rotation    = car->CEntity->GetRotation();
+    //car->stream.rotation    = car->CEntity->GetRotation();
     car->stream.steer       = car->CCar->m_pVehicle.m_fSteer;
     car->stream.speed       = car->CCar->m_pVehicle.m_vSpeed;
 
@@ -118,219 +92,113 @@ void module_car_callback_clientstream(librg_event_t *event) {
 // =======================================================================//
 
 void module_car_callback_interpolate(librg_entity_t *entity) {
-    auto car = get_car(entity); mod_assert(car && car->CEntity);
-
-    // last delta tick against constant tick delay
-    f32 alpha = car->inter_delta / ctx->timesync.server_delay;
-    car->inter_delta += (f32)mod.last_delta;
-
-    f32 dest_steer = zplm_lerp(car->inter_steer.last, car->inter_steer.targ, zpl_clamp01(alpha));
-
-    car->CCar->m_pVehicle.SetSteer(dest_steer);
-    car->CCar->SetPos(cubic_hermite_v3_interpolate(&car->inter_pos, alpha));
-
-    // TODO: fix camera wiggle
-    // for now apply speed only if you are not in the car
-    auto player_ped = get_ped(mod.player);
-    if (player_ped->vehicle != entity) {
-        if (zplm_vec3_mag2(car->stream.speed) > MOD_CAR_SPEED_TRESHOLD) {
-            car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
-        } else {
-            car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
-        }
-    }
-
-    /* rotation interpolation */
-    if (car->inter_rot.last != car->inter_rot.targ) {
-        auto curr_rot = car->CEntity->GetRotation();
-        auto diff_rot = zplm_quat_angle(curr_rot - car->stream.rotation);
-
-        if (diff_rot > MOD_CAR_ROTATION_TRESHOLD) {
-            auto last = car->inter_rot.last;
-            auto dest = car->inter_rot.targ;
-
-            quat_t dest_rotation;
-            zplm_quat_nlerp(&dest_rotation, zplm_quat_dot(last, dest) < 0 ? -last : last, dest, alpha);
-            car->CCar->SetRot(dest_rotation);
-        }
-    }
+    // TODO
 }
 
-// =======================================================================//
-// !
-// ! Local car events
-// !
-// =======================================================================//
+void m2o_car_callbacks_init() {
 
-/**
- * Event when local player starts entering a local car
- */
-void module_car_local_enter_start(librg_event_t *event) {
-    auto vehicle = (M2::C_Entity *)event->user_data;
-    auto ped     = get_ped(mod.player);
+    // =======================================================================//
+    // !
+    // ! Local car events
+    // !
+    // =======================================================================//
 
-    mod_assert(vehicle && ped);
-    u8 seat = *(u8*)event->data;
+    librg_event_add(ctx, M2O_CAR_ENTER, [](librg_event_t *event) {
+        auto vehicle = (M2::C_Entity *)event->user_data;
+        auto ped     = m2o_ped_get(mod.player);
 
-    // send vehicle create request onto server
-    mod_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, [&](librg_entity_t *entity) {
-        if (entity->type != TYPE_CAR) return;
-        auto car = get_car(entity);
+        mod_assert(vehicle && ped);
+        u8 seat = *(u8*)event->data;
 
-        if (car->CEntity == vehicle) {
-            // set the driver data
-            ped->stream.state = PED_ENTERING_CAR;
-            ped->seat         = seat;
-            ped->vehicle      = entity;
+        // send vehicle create request onto server
+        mod_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, [&](librg_entity_t *entity) {
+            if (entity->type != M2O_ENTITY_CAR) return;
+            auto car = m2o_car_get(entity);
 
-            mod_message_send(ctx, MOD_CAR_ENTER_START, [&](librg_data_t *data) {
-                librg_data_wu32(data, entity->id);
-                librg_data_wu8(data, seat);
-            });
-        }
+            if (car->CEntity == vehicle) {
+                /* set the passanger data */
+                ped->state      = PED_IN_CAR;
+                ped->seat       = seat;
+                ped->vehicle    = entity->id;
+
+                /* if we are being a driver */
+                if (seat == 1) {
+                    mod.player->flags |= M2O_ENTITY_DRIVER;
+                }
+
+                mod_message_send(ctx, M2O_CAR_ENTER, [&](librg_data_t *data) {
+                    librg_data_wu32(data, entity->id);
+                    librg_data_wu8(data, seat);
+                });
+            }
+        });
     });
-}
 
-/**
- * Local ped finished entering the car
- * @param event
- */
-void module_car_local_enter_finish(librg_event_t *event) {
-    auto ped = get_ped(mod.player);
+    librg_event_add(ctx, M2O_CAR_EXIT, [](librg_event_t *event) {
+        auto ped = m2o_ped_get(mod.player);
 
-    mod.player->flags |= MOD_ENTITY_DRIVER;
-    ped->stream.state = PED_IN_CAR;
+        /* force remove driving if we are */
+        mod.player->flags &= ~M2O_ENTITY_DRIVER;
 
-    mod_message_send(ctx, MOD_CAR_ENTER_FINISH, nullptr);
-}
+        ped->seat    = 0;
+        ped->vehicle = M2O_INVALID_ENTITY;
+        ped->state   = PED_ON_GROUND;
 
-/**
- * Event when local player starts leaving local car
- * @param event
- */
-void module_car_local_exit_start(librg_event_t *event) {
-    auto ped = get_ped(mod.player);
+        mod_message_send(ctx, M2O_CAR_EXIT, nullptr);
+    });
 
-    // reset the driver data
-    mod.player->flags &= ~MOD_ENTITY_DRIVER;
-    ped->stream.state = PED_EXITING_CAR;
+    // =======================================================================//
+    // !
+    // ! Remote car events
+    // !
+    // =======================================================================//
 
-    mod_message_send(ctx, MOD_CAR_EXIT_START, nullptr);
-}
+    librg_network_add(ctx, M2O_CAR_ENTER, [](librg_message_t *msg) {
+        auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
+        auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
+        mod_assert(player && vehicle);
 
-/**
- * Event when local player finished exiting local car
- * @param event
- */
-void module_car_local_exit_finish(librg_event_t *event) {
-    auto ped = get_ped(mod.player);
+        auto seat = librg_data_ru8(msg->data);
+        auto ped  = m2o_ped_get(player); mod_assert_msg(ped->CEntity, "trying to put ped in invalid car");
+        auto car  = m2o_car_get(vehicle); mod_assert_msg(car->CEntity, "trying to put invalid ped in car");
 
-    ped->seat = 0;
-    ped->vehicle = nullptr;
-    ped->stream.state = PED_ON_GROUND;
+        mod_log("[info] putting ped: %u in the car: %u\n", player->id, vehicle->id);
 
-    mod_message_send(ctx, MOD_CAR_EXIT_FINISH, nullptr);
-}
+        ped->state   = PED_IN_CAR;
+        ped->vehicle = vehicle->id;
+        ped->seat    = seat;
 
-// =======================================================================//
-// !
-// ! Remote car events
-// !
-// =======================================================================//
+        // TODO: fix crash on car enter
+        // // TODO: refactor this stuff
+        // M2::C_SyncObject *pSyncObject = nullptr;
+        // ped->CHuman->GetScript()->ScrDoAction(
+        //     &pSyncObject,
+        //     (M2::C_Vehicle *)car->CEntity, /* weird cast there, casting incompatible C_Car to C_Vehicle, probably argument should be C_Car */
+        //     true,
+        //     (M2::E_VehicleSeat)seat,
+        //     true
+        // );
+    });
 
-/**
- * Event when a remote ped starts entering the car
- */
-void module_car_remote_enter_start(librg_message_t *msg) {
-    auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data));
-    auto vehicle = librg_entity_fetch(ctx, librg_data_rent(msg->data));
-    mod_assert(player && vehicle);
+    librg_network_add(ctx, M2O_CAR_EXIT, [](librg_message_t *msg) {
+        auto player  = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
+        auto ped     = m2o_ped_get(player); mod_assert(ped && ped->CEntity);
+        auto vehicle = librg_entity_fetch(ctx, ped->vehicle);
+        auto car     = m2o_car_get(vehicle); mod_assert(car && car->CEntity);
 
-    auto seat = librg_data_ru8(msg->data);
-    auto ped = get_ped(player); mod_assert_msg(ped->CEntity, "trying to put ped in invalid car");
-    auto car = get_car(vehicle); mod_assert_msg(car->CEntity, "trying to put invalid ped in car");
+        mod_log("[info] removing ped: %u from the car: %u\n", player->id, ped->vehicle);
 
-    mod_log("[info] putting ped: %u in the car: %u\n", player->id, vehicle->id);
+        // M2::C_SyncObject *pSyncObject = nullptr;
+        // ped->CHuman->GetScript()->ScrDoAction(
+        //     &pSyncObject,
+        //     (M2::C_Vehicle *)car->CEntity,
+        //     true,
+        //     (M2::E_VehicleSeat)ped->seat,
+        //     true
+        // );
 
-    ped->vehicle = vehicle;
-    ped->seat = seat;
-
-    // TODO: add seat sync
-    M2::C_SyncObject *pSyncObject = nullptr;
-    ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
-        &pSyncObject, (M2::C_Vehicle *)car->CEntity,
-        true, (M2::E_VehicleSeat)seat, true
-    );
-}
-
-/**
- * Remote ped finished entering the car
- * @param msg
- */
-void module_car_remote_enter_finish(librg_message_t *msg) {
-    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
-    //auto ped = get_ped(player); mod_assert(ped && ped->object && ped->vehicle);
-    //auto car = get_car(ped->vehicle); mod_assert(car && car->object);
-
-    // TODO: add PutPlayerInVehicle focred if not in the car yet
-}
-
-/**
- * Remote ped started exiting the car
- * @param msg
- */
-void module_car_remote_exit_start(librg_message_t *msg) {
-    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
-    auto ped = get_ped(player); mod_assert(ped && ped->CEntity && ped->vehicle);
-    auto car = get_car(ped->vehicle); mod_assert(car && car->CEntity);
-
-    mod_log("[info] removing ped: %u from the car: %u\n", player->id, ped->vehicle->id);
-
-    M2::C_SyncObject *pSyncObject = nullptr;
-    ((M2::C_Human2 *)ped->CEntity)->GetScript()->ScrDoAction(
-        &pSyncObject, (M2::C_Vehicle *)car->CEntity,
-        true, (M2::E_VehicleSeat)ped->seat, true
-    );
-}
-
-/**
- * Remote ped finished exiting the car
- * @param msg
- */
-void module_car_remote_exit_finish(librg_message_t *msg) {
-    auto player = librg_entity_fetch(ctx, librg_data_rent(msg->data)); mod_assert(player);
-    auto ped = get_ped(player); mod_assert(ped && ped->CEntity);
-
-    ped->vehicle = nullptr;
-
-    // TODO: add forced exit for player
-}
-
-// =======================================================================//
-// !
-// ! Initializers, misc
-// !
-// =======================================================================//
-
-void module_car_interaction_finish(librg_event_t *event) {
-    auto ped = get_ped(mod.player);
-
-    /**/ if (ped->stream.state == PED_ENTERING_CAR) {
-        module_car_local_enter_finish(event);
-    }
-    else if (ped->stream.state == PED_EXITING_CAR) {
-        module_car_local_exit_finish(event);
-    }
-}
-
-void module_car_init() {
-    librg_event_add(ctx, MOD_CAR_INTERACTION_FINISH,  module_car_interaction_finish);
-
-    librg_event_add(ctx, MOD_CAR_ENTER_START,   module_car_local_enter_start);
-    librg_event_add(ctx, MOD_CAR_EXIT_START,    module_car_local_exit_start);
-
-    librg_network_add(ctx, MOD_CAR_ENTER_START,     module_car_remote_enter_start);
-    librg_network_add(ctx, MOD_CAR_ENTER_FINISH,    module_car_remote_enter_finish);
-    librg_network_add(ctx, MOD_CAR_EXIT_START,      module_car_remote_exit_start);
-    librg_network_add(ctx, MOD_CAR_EXIT_FINISH,     module_car_remote_exit_finish);
+        ped->state   = PED_ON_GROUND;
+        ped->vehicle = M2O_INVALID_ENTITY;
+        ped->seat    = 0;
+    });
 }

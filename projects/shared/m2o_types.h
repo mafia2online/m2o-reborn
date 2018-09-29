@@ -89,15 +89,41 @@ typedef struct m2o_ped {
 typedef struct m2o_car {
     u16 model;          /* entity model id */
     car_state state;    /* current entity state */
-    char name[128];     /* entity name */
 
     u8 gear;
     u8 unsued;
 
     struct {
         vec3 rotation;  /* vehicle euler? rotation */
-        f32 steer;      /* vehicle steering wheel -1..0..1 */
+        vec3 speed;     /* vehicle speed vector */
+        f32  steer;     /* vehicle steering wheel -1..0..1 */
     } stream;
+
+    #ifdef M2O_CLIENT
+    struct {            /* interpolation table */
+        struct {
+            #ifdef M2O_DEBUG
+            vec3 start;
+            #endif
+            vec3 target;
+            vec3 error;
+            f32  lastAlpha;
+            f64  startTime;
+            f64  finishTime;
+        } pos;
+
+        struct {
+            #ifdef M2O_DEBUG
+            vec3 start;
+            #endif
+            vec3 target;
+            vec3 error;
+            f32  lastAlpha;
+            f64  startTime;
+            f64  finishTime;
+        } rot;
+    } interp;
+    #endif
 
     /* a union representing a "autocastable" names for needed types */
     union {
@@ -116,7 +142,7 @@ typedef struct m2o_car {
 // !
 // =======================================================================//
 
-// TODO: add pre-allocated pools, instead of random heap allocations
+// TODO: add pre-allocated pools, instead of random heap allocations, or use different allocator
 
 m2o_ped *m2o_ped_alloc(void *ptr) {
     m2o_ped _entity = {0};
