@@ -128,21 +128,21 @@ void vehicle_UpdateTargetPosition(m2o_car *car) {
     car->CCar->SetPos(newPosition);
 
 #ifdef M2O_DEBUG
-        mod_log(
-            "------- Vehicle interpolation ------\n"
-            "start: %f %f %f\n"
-            "target: %f %f %f\n"
-            "position: %f %f %f\n"
-            "error: %f %f %f\n"
-            "alpha: %f\n"
-            "interp: %s\n",
-            car->interp.pos.start.x, car->interp.pos.start.y, car->interp.pos.start.z,
-            car->interp.pos.target.x, car->interp.pos.target.y, car->interp.pos.target.z,
-            newPosition.x, newPosition.y, newPosition.z,
-            car->interp.pos.error.x, car->interp.pos.error.y, car->interp.pos.error.z,
-            alpha,
-            (car->interp.pos.finishTime == 0 ? "no" : "yes")
-        );
+        // mod_log(
+        //     "------- Vehicle interpolation ------\n"
+        //     "start: %f %f %f\n"
+        //     "target: %f %f %f\n"
+        //     "position: %f %f %f\n"
+        //     "error: %f %f %f\n"
+        //     "alpha: %f\n"
+        //     "interp: %s\n",
+        //     car->interp.pos.start.x, car->interp.pos.start.y, car->interp.pos.start.z,
+        //     car->interp.pos.target.x, car->interp.pos.target.y, car->interp.pos.target.z,
+        //     newPosition.x, newPosition.y, newPosition.z,
+        //     car->interp.pos.error.x, car->interp.pos.error.y, car->interp.pos.error.z,
+        //     alpha,
+        //     (car->interp.pos.finishTime == 0 ? "no" : "yes")
+        // );
 #endif
 
     // TODO: add support for on-vehicle passangers
