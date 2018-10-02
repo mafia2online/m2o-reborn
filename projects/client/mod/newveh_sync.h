@@ -1,8 +1,7 @@
 // TODO: finish rewriting and attach to current veh code
 
-#define VEHICLE_THRESHOLD_FOR_SPEED  0.6f
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
+#define VEHICLE_THRESHOLD_FOR_SPEED 0.6f
+#define VEHICLE_INTERPOLATION_THRESHOLD 15
 
 zplm_vec3 zplm_vec3_to_radians(zplm_vec3 value) {
     zplm_vec3 result = {0};
@@ -109,34 +108,34 @@ void vehicle_UpdateTargetPosition(m2o_car *car) {
     vec3 newPosition = currentPosition + compensation;
 
     // Check if the distance to interpolate is too far.
-    vec3 velocity = car->CCar->m_pVehicle.m_vSpeed;
-    f32 threshold = (VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * zplm_vec3_mag(velocity)) * M2O_TICKRATE_SERVER / 0.1f;
+    // vec3 velocity = car->CCar->m_pVehicle.m_vSpeed;
+    // f32 threshold = (VEHICLE_INTERPOLATION_THRESHOLD * zplm_vec3_mag(velocity)) * M2O_TICKRATE_SERVER / 0.1f;
 
-    // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
-    if (!(zplm_vec3_mag(currentPosition - car->interp.pos.target) <= threshold)) {
-        // Abort all interpolation
-        if (vehicle_HasTargetRotation(car)) {
-            car->CCar->SetRot(zplm_quat_from_eular(
-                zplm_vec3_to_radians(car->interp.rot.target)
-            ));
-        }
+    // // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
+    // if (!(zplm_vec3_mag(currentPosition - car->interp.pos.target) <= threshold)) {
+    //     // Abort all interpolation
+    //     if (vehicle_HasTargetRotation(car)) {
+    //         car->CCar->SetRot(zplm_quat_from_eular(
+    //             zplm_vec3_to_radians(car->interp.rot.target)
+    //         ));
+    //     }
 
-        newPosition = car->interp.pos.target;
-        car->interp.pos.finishTime = 0;
-        car->interp.rot.finishTime = 0;
-    }
+    //     newPosition = car->interp.pos.target;
+    //     car->interp.pos.finishTime = 0;
+    //     car->interp.rot.finishTime = 0;
+    // }
 
     car->CCar->SetPos(newPosition);
 
 #ifdef M2O_DEBUG
         mod_log(
-            "-== Vehicle interpolation ==-\n"
+            "------- Vehicle interpolation ------\n"
             "start: %f %f %f\n"
             "target: %f %f %f\n"
-            "Position: %f %f %f\n"
-            "Error: %f %f %f\n"
-            "Alpha: %f\n"
-            "Interpolating: %s\n",
+            "position: %f %f %f\n"
+            "error: %f %f %f\n"
+            "alpha: %f\n"
+            "interp: %s\n",
             car->interp.pos.start.x, car->interp.pos.start.y, car->interp.pos.start.z,
             car->interp.pos.target.x, car->interp.pos.target.y, car->interp.pos.target.z,
             newPosition.x, newPosition.y, newPosition.z,
@@ -145,7 +144,6 @@ void vehicle_UpdateTargetPosition(m2o_car *car) {
             (car->interp.pos.finishTime == 0 ? "no" : "yes")
         );
 #endif
-
 
     // TODO: add support for on-vehicle passangers
     // // Update our contact players
@@ -275,7 +273,7 @@ void vehicle_SetTargetRotation(m2o_car *car, vec3 targetRot, f32 interpTime) {
     car->interp.rot.error.z = zplm_offset_degrees(rotation.z, targetRot.z);
 
     // Apply the error over 250ms (i.e. 2/5 per 100ms )
-    car->interp.pos.error *= zplm_lerp(0.40f, 1.0f, zplm_clamp01(zplm_unlerp(interpTime, 0.1f, 0.4f)));
+    car->interp.pos.error *= zplm_lerp(0.25f, 1.0f, zplm_clamp01(zplm_unlerp(interpTime, 0.1f, 0.4f)));
 
     // Get the interpolation interval
     car->interp.rot.startTime  = zpl_time_now();
