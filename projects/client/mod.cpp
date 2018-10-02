@@ -185,7 +185,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     zpl_zero_item(ctx);
 
     // setup manual client mode
-    ctx->tick_delay     = 100.0f; /* sending updates 10 times a second */
+    ctx->tick_delay     = 1000.0f / M2O_TICKRATE_CLIENT;
     ctx->mode           = LIBRG_MODE_CLIENT;
     ctx->world_size     = zplm_vec3f(5000.0f, 5000.0f, 0);
     ctx->max_entities   = M2O_ENTITY_LIMIT;
@@ -303,9 +303,8 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
         mod_log("set new name for client %u: %s\n", entity->id, ped->name);
     });
-    
-    m2o_car_callbacks_init();
 
+    m2o_car_callbacks_init();
     // discord_init();
 }
 
@@ -325,6 +324,9 @@ void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
 }
 
 void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
+    mod.last_delta  = zpl_time_now() - mod.last_update;
+    mod.last_update = zpl_time_now();
+
     // tick networking
     platform_tick();
     librg_tick(ctx);
@@ -334,7 +336,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         switch (entity->type) {
             case M2O_ENTITY_PLAYER_PED:
             case M2O_ENTITY_DUMMY_PED: { m2o_callback_ped_interpolate(entity); } break;
-            // case M2O_ENTITY_CAR { m2o_callback_car_interpolate(event); } break;
+            case M2O_ENTITY_CAR: { m2o_callback_car_interpolate(entity); } break;
         }
     });
 

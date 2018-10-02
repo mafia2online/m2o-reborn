@@ -33,6 +33,9 @@
 #define M2O_DEBUG 1
 #define LIBRG_DEBUG 1
 
+#define M2O_TICKRATE_SERVER 10 /* updates per second*/
+#define M2O_TICKRATE_CLIENT 10 /* updates per second*/
+
 // =======================================================================//
 // !
 // ! Other sutff used everywhere

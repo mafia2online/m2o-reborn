@@ -98,7 +98,11 @@ void m2o_callback_ped_update(librg_event_t *event) {
     // skip the udpate if we have removed ped cuz he was inside a removed car
     if (!ped->CEntity) return;
 
-    ped->CHuman->SetPos(entity->position);
+    if (ped->state == PED_ON_GROUND) {
+        ped->CHuman->SetPos(entity->position);
+    } else {
+        ped->CHuman->SetPos(zplm_vec3f_zero());  /* teleport far away for now */
+    }
 
     // read up the dynaymicly changed data
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));

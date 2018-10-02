@@ -122,6 +122,8 @@ typedef struct m2o_car {
             f64  startTime;
             f64  finishTime;
         } rot;
+
+        u32 forceLocalZCounter;
     } interp;
     #endif
 

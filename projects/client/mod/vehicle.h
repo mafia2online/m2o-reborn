@@ -1,3 +1,5 @@
+#include "newveh_sync.h"
+
 // =======================================================================//
 // !
 // ! Generic entity events
@@ -20,11 +22,13 @@ void m2o_callback_car_create(librg_event_t *event) {
         print_posm(event->entity->position, "[info] creating car at");
         car->CEntity = entity;
         car->CCar->SetPos(event->entity->position);
-        //car->CCar->SetRot(car->stream.rotation);
+        car->CCar->SetRot(zplm_quat_from_eular(zplm_vec3_to_radians(car->stream.rotation)));
         car->CCar->m_pVehicle.SetEngineOn(true, false);
     } else {
         mod_log("[warning] could not spawn a vehicle for entity: %d\n", event->entity->id);
     }
+
+    vehicle_ResetInterpolation(car);
 }
 
 void m2o_callback_car_remove(librg_event_t *event) {
@@ -39,7 +43,8 @@ void m2o_callback_car_remove(librg_event_t *event) {
 
         if (ped->vehicle == event->entity->id && ped->CEntity) {
             mod_log("[info] removing ped from the vehicle\n");
-            // TODO: make it actually remove, for now just delete everyone
+
+            // TODO: make it actually remove ped from the seat, for now just delete everyone
             M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
             ped->CEntity = NULL;
         }
@@ -65,9 +70,19 @@ void m2o_callback_car_update(librg_event_t *event) {
     mod_assert(car && car->CEntity);
     librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
 
+    // car->CCar->SetPos(event->entity->position);
     // car->CCar->SetRot(car->stream.rotation);
-    //car->CCar->m_pVehicle.SetSteer(car->stream.steer);
-    car->CCar->SetPos(event->entity->position);
+
+    if (zplm_vec3_mag2(car->stream.speed) > VEHICLE_THRESHOLD_FOR_SPEED) {
+        car->CCar->m_pVehicle.SetSpeed(car->stream.speed);
+    } else {
+        car->CCar->m_pVehicle.SetSpeed(zplm_vec3f_zero());
+    }
+
+    car->CCar->m_pVehicle.SetSteer(car->stream.steer);
+
+    vehicle_SetTargetPosition(car, event->entity->position, 1.0f / M2O_TICKRATE_SERVER, false, 0);
+    vehicle_SetTargetRotation(car, car->stream.rotation, 1.0f / M2O_TICKRATE_SERVER);
 }
 
 /**
@@ -78,9 +93,11 @@ void m2o_callback_car_clientstream(librg_event_t *event) {
     mod_assert(car && car->CEntity);
 
     event->entity->position = car->CEntity->GetPosition();
-    //car->stream.rotation    = car->CEntity->GetRotation();
     car->stream.steer       = car->CCar->m_pVehicle.m_fSteer;
     car->stream.speed       = car->CCar->m_pVehicle.m_vSpeed;
+    car->stream.rotation    = zplm_vec3_to_degrees(
+        zplm_quat_to_eular(car->CEntity->GetRotation())
+    );
 
     librg_data_wptr(event->data, &car->stream, sizeof(car->stream));
 }
@@ -91,8 +108,15 @@ void m2o_callback_car_clientstream(librg_event_t *event) {
 // !
 // =======================================================================//
 
-void module_car_callback_interpolate(librg_entity_t *entity) {
-    // TODO
+void m2o_callback_car_interpolate(librg_entity_t *entity) {
+    auto car = m2o_car_get(entity);
+
+    if (!car || !car->gameptr) {
+        mod_log("[warning] calling car interpolate w/o proper car object");
+        return;
+    }
+
+    vehicle_Interpolate(entity, car);
 }
 
 void m2o_car_callbacks_init() {
@@ -110,7 +134,6 @@ void m2o_car_callbacks_init() {
         mod_assert(vehicle && ped);
         u8 seat = *(u8*)event->data;
 
-        // send vehicle create request onto server
         mod_entity_iterate(ctx, LIBRG_ENTITY_ALIVE, [&](librg_entity_t *entity) {
             if (entity->type != M2O_ENTITY_CAR) return;
             auto car = m2o_car_get(entity);
