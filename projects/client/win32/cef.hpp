@@ -1,3 +1,5 @@
+#ifdef M2O_CEF
+
 #include "cef_app.h"
 #include "cef_client.h"
 #include "wrapper/cef_helpers.h"
@@ -772,3 +774,28 @@ class CefMinimal : public CefApp {
 
         return 0;
     }
+
+#else
+    /* create micro-impl for non-cef mode */
+
+    int cef_init() {return 0;}
+    int cef_free() {return 0;}
+    int cef_tick() {return 0;}
+
+    cef_handle cef_browser_create(const char *url, int w, int h, int zindex) {return 0;}
+
+    int cef_exists(cef_handle handle) {return 0;}
+
+    int cef_browser_resize(cef_handle handle, int w, int h) {return 0;}
+    int cef_browser_reload(cef_handle handle) {return 0;}
+    int cef_browser_destroy(cef_handle handle) {return 0;}
+
+    int cef_browser_show(cef_handle handle) {return 0;}
+    int cef_browser_hide(cef_handle handle) {return 0;}
+
+    int cef_zindex_get(cef_handle handle) {return 0;}
+    int cef_zindex_set(cef_handle handle, int zindex) {return 0;}
+
+    int cef_url_set(cef_handle handle, const char *url) {return 0;}
+    int cef_url_get(cef_handle handle, char *url, int maxlen) {return 0;}
+#endif

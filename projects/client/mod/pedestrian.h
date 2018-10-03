@@ -101,7 +101,7 @@ void m2o_callback_ped_update(librg_event_t *event) {
     if (ped->state == PED_ON_GROUND) {
         ped->CHuman->SetPos(entity->position);
     } else {
-        ped->CHuman->SetPos(zplm_vec3f_zero());  /* teleport far away for now */
+        // ped->CHuman->SetPos(zplm_vec3f_zero());  /* teleport far away for now */
     }
 
     // read up the dynaymicly changed data

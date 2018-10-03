@@ -10,7 +10,7 @@
 #include "nuklear.h"
 
 // instead of including whole m2sdk.h, we can just use this:
-#include "../m2sdk/include/utils/Memory.hpp"
+#include "m2sdk/include/utils/Memory.hpp"
 namespace M2 {
     void Initialize(void (*)(void));
     void *GetCameraWorldViewProjection();
@@ -45,9 +45,11 @@ LRESULT __stdcall mod_wndproc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     mod_win32_hwnd = hWnd;
     // mod_log("mod_wndproc_hook %x %u %u %u\n", hWnd, uMsg, wParam, lParam);
 
+    #ifdef M2O_CEF
     if (input_block_get()) {
         cef_inject_wndproc(uMsg, wParam, lParam);
     }
+    #endif
 
     return CallWindowProc(mod_wndproc_original, hWnd, uMsg, wParam, lParam);
 }
@@ -78,9 +80,11 @@ void platform_tick() {
     while (SDL_PollEvent(&event)) {
         input_inject_event(&event);
 
+        #ifdef M2O_CEF
         if (input_block_get()) {
             cef_inject_event((void *)&event);
         }
+        #endif
     }
 }
 

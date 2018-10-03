@@ -34,7 +34,7 @@ void m2o_callback_car_create(librg_event_t *event) {
 
 void m2o_callback_car_remove(librg_event_t *event) {
     auto car = m2o_car_get(event->entity); mod_assert(car && car->CEntity);
-    mod_log("destroying vehicle entity %d\n", event->entity->id);
+    mod_log("[info] destroying vehicle entity %d\n", event->entity->id);
 
     // iterate and remove all peds that are in the car
     librg_entity_iteratex(ctx, LIBRG_ENTITY_ALIVE, librg_lambda(entityid), {
