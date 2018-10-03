@@ -1,4 +1,7 @@
-#include "newveh_sync.h"
+#define VEHICLE_THRESHOLD_FOR_SPEED 0.6f
+#define VEHICLE_INTERPOLATION_THRESHOLD 15
+
+#include "vehicle/interp.h"
 
 // =======================================================================//
 // !
@@ -27,8 +30,6 @@ void m2o_callback_car_create(librg_event_t *event) {
     } else {
         mod_log("[warning] could not spawn a vehicle for entity: %d\n", event->entity->id);
     }
-
-    vehicle_ResetInterpolation(car);
 }
 
 void m2o_callback_car_remove(librg_event_t *event) {
@@ -81,8 +82,8 @@ void m2o_callback_car_update(librg_event_t *event) {
 
     car->CCar->m_pVehicle.SetSteer(car->stream.steer);
 
-    vehicle_SetTargetPosition(car, event->entity->position, 1.0f / M2O_TICKRATE_SERVER, false, 0);
-    vehicle_SetTargetRotation(car, car->stream.rotation, 1.0f / M2O_TICKRATE_SERVER);
+    m2o_car_target_position_set(car, event->entity->position, 1.0f / M2O_TICKRATE_SERVER, true, car->stream.speed.z);
+    m2o_car_target_rotation_set(car, car->stream.rotation, 1.0f / M2O_TICKRATE_SERVER);
 }
 
 /**
@@ -116,7 +117,22 @@ void m2o_callback_car_interpolate(librg_entity_t *entity) {
         return;
     }
 
-    vehicle_Interpolate(entity, car);
+    auto player_ped = m2o_ped_get(mod.player);
+
+    if (!player_ped || !player_ped->gameptr) {
+        mod_log("[warning] calling interpolation w/o player ped");
+        return;
+    }
+
+    // if (player_ped->vehicle != entity->id) {
+        m2o_car_target_position_update(car);
+        m2o_car_target_rotation_update(car);
+    // }
+    // else {
+    //     // Otherwize make sure we have no interpolation stuff stored
+    //     car->interp.pos.finishTime = 0;
+    //     car->interp.rot.finishTime = 0;
+    // }
 }
 
 void m2o_car_callbacks_init() {

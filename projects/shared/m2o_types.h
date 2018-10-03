@@ -102,9 +102,7 @@ typedef struct m2o_car {
     #ifdef M2O_CLIENT
     struct {            /* interpolation table */
         struct {
-            #ifdef M2O_DEBUG
             vec3 start;
-            #endif
             vec3 target;
             vec3 error;
             f32  lastAlpha;
@@ -113,9 +111,7 @@ typedef struct m2o_car {
         } pos;
 
         struct {
-            #ifdef M2O_DEBUG
             vec3 start;
-            #endif
             vec3 target;
             vec3 error;
             f32  lastAlpha;
