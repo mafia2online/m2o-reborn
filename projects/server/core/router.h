@@ -33,7 +33,7 @@ void mod_register_routes(librg_ctx_t *ctx) {
         );
 
         /* setup default timeout */
-        enet_peer_timeout(event->peer, 10, 10, 15);
+        enet_peer_timeout(event->peer, 10, 5000, 10000);
 
         entity->user_data = m2o_ped_alloc(NULL);
         librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);

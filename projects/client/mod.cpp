@@ -207,6 +207,9 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, [](librg_event_t *event) {
         mod_log("[info] connected to the server\n");
 
+        /* setup default timeout */
+        enet_peer_timeout(event->peer, 10, 5000, 10000);
+
         mod.player = event->entity;
         mod.player->user_data = m2o_ped_alloc(M2::C_Game::Get()->GetLocalPed());
 
