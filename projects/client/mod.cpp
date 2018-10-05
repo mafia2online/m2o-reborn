@@ -345,7 +345,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     // constnaly set our health to top (DEBUG)
     if (mod.player) {
-        m2o_ped_get(mod.player)->CHuman->GetScript()->SetHealth(720.0f);
+        ((M2::C_Human2 *)M2::C_Game::Get()->GetLocalPed())->GetScript()->SetHealth(720.0f);
     }
 
     /* show/hide mouse */
