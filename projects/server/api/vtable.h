@@ -1,5 +1,5 @@
 /* Mafia 2 Online Server Interal API header */
-/* Generated on Thu Sep 27 2018 11:35:05 GMT+0300 (EEST) */
+/* Generated on Fri Oct 05 2018 08:59:27 GMT+0300 (EEST) */
 
 void m2o_error_set(m2o_error error);
 m2o_error m2o_error_get();

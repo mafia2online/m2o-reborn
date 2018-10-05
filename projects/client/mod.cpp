@@ -400,46 +400,15 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         mod_log("Model ptr: 0x%X", model);
     }
 
-    if (input_key_down(VK_F8)) {
-        // int handle = gfx_create_rect(0, 0, 500, 500, vec4f(255, 255, 255, 255));
-        // int handle = gfx_create_line(0, 0, 500, 500, vec4f(255, 255, 255, 255));
-        // int handle = gfx_create_text(0, 24, "Hello world!", vec4f(0, 0, 255, 255));
-        int handle = gfx_create_texture_file("D:\\Projects\\m2o\\m2o-reborn\\binary\\other\\pug.bmp");
-
-        gfx_position_set(handle, 200, 200);
-        gfx_scale_set(handle, 1.0f, 1.0f);
-        gfx_render_add(handle, 15);
-        mod_log("attaching handle %d at layer 15\n", handle);
-
-        int h2 = gfx_create_text(0, 32, "hello привет!", vec4f(255, 255, 255, 255));
-
-        gfx_position_set(h2, 10, 10);
-        gfx_render_add(h2, 150);
-
-        gfx_render_dump();
-
-    }
-
-    static cef_handle browser;
-
     if (input_key_down(VK_F9)) {
-        // int handle = gfx_create_rect(200, 200, 500, 500, vec4f(255, 0, 0, 255));
-        // gfx_render_add(handle, -10);
-        // mod_log("attaching handle %d at layer -10\n", handle);
+        vec3_t curpos, tarpos;
+        curpos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetDirection();
+        tarpos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
 
-        // gfx_render_dump();
+        static M2::C_SyncObject *sync = NULL;
+        ((M2::C_Human2 *)ent)->GetScript()->ScrMoveV(&sync, tarpos, M2::HUMAN_MOVE_MODE_SPRINT, curpos, true);
 
-        int x, y;
-        gfx_util_screensize(&x, &y);
-        browser = cef_browser_create("https://google.com", x, y, 200);
-    }
-
-    if (input_key_down(VK_F10)) {
-        cef_browser_destroy(browser);
-        // cef_browser_resize(browser, 1024, 768);
-        // char myurl[1024];
-        // cef_url_set(browser, "https://google.com");
-
-        // //mod_log("the url: %s;", myurl);
+        print_posm(curpos, "direction");
+        mod_log("moving ped to your location");
     }
 }

@@ -71,8 +71,17 @@ typedef struct m2o_ped {
     u8 unsued;
 
     struct {
-        u8 unused;
+        f32 dirx;
+        f32 diry;
+        u8  move;
     } stream;
+
+    #ifdef M2O_CLIENT
+    M2::C_SyncObject *sync;
+    struct {
+        vec3 last;
+    } interp;
+    #endif
 
     /* a union representing a "autocastable" names for needed types */
     union {
@@ -94,7 +103,7 @@ typedef struct m2o_car {
     u8 unsued;
 
     struct {
-        vec3 rotation;  /* vehicle euler? rotation */
+        vec3 rotation;  /* vehicle euler rotation */
         vec3 speed;     /* vehicle speed vector */
         f32  steer;     /* vehicle steering wheel -1..0..1 */
     } stream;

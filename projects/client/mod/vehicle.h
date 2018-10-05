@@ -207,6 +207,8 @@ void m2o_car_callbacks_init() {
         ped->vehicle = vehicle->id;
         ped->seat    = seat;
 
+        ped->CHuman->SetPos(zplm_vec3f_zero());  /* teleport far away for now */
+
         // TODO: fix crash on car enter
         // // TODO: refactor this stuff
         // M2::C_SyncObject *pSyncObject = nullptr;

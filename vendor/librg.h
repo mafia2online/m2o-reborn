@@ -2425,7 +2425,7 @@ extern "C" {
 
             librg_entity_t *blob = librg_entity_fetch(msg->ctx, entity);
 
-            if (!(blob->flags & LIBRG_ENTITY_CONTROLLED) || blob->control_peer != msg->peer || control_generation != blob->control_generation) {
+            if (!(blob->flags & LIBRG_ENTITY_CONTROLLED) || blob->control_peer != msg->peer/* || control_generation != blob->control_generation*/) {
                 librg_dbg("[dbg] no component, or peer is different\n");
                 librg_data_set_rpos(msg->data, librg_data_get_rpos(msg->data) + size);
                 continue;

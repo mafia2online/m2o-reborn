@@ -32,6 +32,9 @@ void mod_register_routes(librg_ctx_t *ctx) {
             entity->position.z
         );
 
+        /* setup default timeout */
+        enet_peer_timeout(event->peer, 10, 10, 15);
+
         entity->user_data = m2o_ped_alloc(NULL);
         librg_entity_control_set(event->ctx, event->entity->id, event->entity->client_peer);
 
@@ -47,6 +50,10 @@ void mod_register_routes(librg_ctx_t *ctx) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, [](librg_event_t *event) {
         auto ped = m2o_ped_get(event->entity);
+
+        mod_log("[info] player %d has disconnected\n", event->entity->id);
+
+        librg_entity_control_remove(event->ctx, event->entity->id);
 
         /* update our connected player count */
         mod.connected_amount--;
