@@ -95,6 +95,8 @@ $ cd build && make -j4
 
 The list of contributors goes there (do not hesitate adding yourself):
 
+* [MyU](https://github.com/myudev)
+* [ZaKlaus](https://github.com/zaklaus)
 
 ## License
 
