@@ -1,0 +1,11 @@
+os:
+  - linux
+  - osx
+
+compiler:
+  - clang
+
+script:
+  - ./generate.sh.bat
+  - cd build
+  - cmake --build .
