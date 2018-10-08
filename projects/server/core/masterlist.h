@@ -1,5 +1,5 @@
 // TODO: move to http://mafia2-online.com/masterlist/push
-#define MASTERLIST_URLPTRN "http://139.59.142.46:8000/push?lgn=%s&key=%s"
+#define MASTERLIST_URLPTRN "http://mafia2-online.com:8000/push?lgn=%s&key=%s"
 #define MASTERLIST_PATTERN "{\"nm\":\"%s\",\"cp\":%d,\"mp\":%d,\"pp\":%d,\"sp\":\"%d\"}"
 #define MASTERLIST_SECONDS 90.0
 
