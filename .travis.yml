@@ -10,3 +10,9 @@ script:
   - ./generate.sh.bat
   - cd build
   - cmake --build .
+
+after_failure:
+    - curl -v -H User-Agent:bot -H Content-Type:application/json -d '{"content":"**m2o-reborn** '$TRAVIS_OS_NAME' build has failed! :no_entry:"}' https://discordapp.com/api/webhooks/$DISCORD_WEBHOOK_CHANNEL_ID/$DISCORD_WEBHOOK_TOKEN
+
+after_success:
+    - curl -v -H User-Agent:bot -H Content-Type:application/json -d '{"content":"**m2o-reborn** '$TRAVIS_OS_NAME' build has succeeded! :white_check_mark:"}' https://discordapp.com/api/webhooks/$DISCORD_WEBHOOK_CHANNEL_ID/$DISCORD_WEBHOOK_TOKEN
