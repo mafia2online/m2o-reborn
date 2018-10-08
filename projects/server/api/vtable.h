@@ -1,5 +1,5 @@
 /* Mafia 2 Online Server Interal API header */
-/* Generated on Fri Oct 05 2018 08:59:27 GMT+0300 (EEST) */
+/* Generated on Mon Oct 08 2018 18:12:23 GMT+0300 (EEST) */
 
 void m2o_error_set(m2o_error error);
 m2o_error m2o_error_get();
@@ -15,8 +15,8 @@ void m2o_args_push_real(m2o_args *arg, f64 real);
 void m2o_args_push_pointer(m2o_args *arg, void *pointer);
 u32 m2o_vehicle_create();
 bool m2o_vehicle_destroy(u32 vehicleid);
-bool m2o_vehicle_position_set(u32 vehicleid, vec3_t position);
-vec3_t m2o_vehicle_position_get(u32 vehicleid);
+bool m2o_vehicle_position_set(u32 vehicleid, vec3 position);
+vec3 m2o_vehicle_position_get(u32 vehicleid);
 bool m2o_player_kick(u32 playerid);
 u32 m2o_ped_create();
 bool m2o_ped_destroy(u32 pedid);
@@ -37,8 +37,8 @@ typedef void (m2o_api_args_push_real)(m2o_args *arg, f64 real);
 typedef void (m2o_api_args_push_pointer)(m2o_args *arg, void *pointer);
 typedef u32 (m2o_api_vehicle_create)();
 typedef bool (m2o_api_vehicle_destroy)(u32 vehicleid);
-typedef bool (m2o_api_vehicle_position_set)(u32 vehicleid, vec3_t position);
-typedef vec3_t (m2o_api_vehicle_position_get)(u32 vehicleid);
+typedef bool (m2o_api_vehicle_position_set)(u32 vehicleid, vec3 position);
+typedef vec3 (m2o_api_vehicle_position_get)(u32 vehicleid);
 typedef bool (m2o_api_player_kick)(u32 playerid);
 typedef u32 (m2o_api_ped_create)();
 typedef bool (m2o_api_ped_destroy)(u32 pedid);

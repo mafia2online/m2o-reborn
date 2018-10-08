@@ -12,13 +12,13 @@ M2O_SERVER_API bool m2o_vehicle_destroy(u32 vehicleid) {
     return true;
 }
 
-M2O_SERVER_API bool m2o_vehicle_position_set(u32 vehicleid, vec3_t position) {
+M2O_SERVER_API bool m2o_vehicle_position_set(u32 vehicleid, vec3 position) {
     M2O_FETCH_ENTITY(entity, vehicleid, false);
     entity->position = position;
     return true;
 }
 
-M2O_SERVER_API vec3_t m2o_vehicle_position_get(u32 vehicleid) {
+M2O_SERVER_API vec3 m2o_vehicle_position_get(u32 vehicleid) {
     M2O_FETCH_ENTITY(entity, vehicleid, zplm_vec3f_zero());
     return entity->position;
 }
