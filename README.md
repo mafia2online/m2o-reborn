@@ -63,7 +63,7 @@ Compiled binaries are automatically copied there after build.
 0. Install cmake
 
 ```
-windows: https://cmake.org/files/v3.9/cmake-3.9.0-win64-x64.msi
+windows: https://cmake.org/files/v3.9/cmake-3.9.0-win64-x64.msi (**Make sure to add to path**)
 linux: using your package manager
 macos: brew install cmake
 ```
