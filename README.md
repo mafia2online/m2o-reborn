@@ -40,11 +40,11 @@ To run the binaries you are **required** to have a steam version of the game ins
 * heavy use of single-header styled libraries
 * unity builds based projects
 * fast compile time orientation
-
+* auto-building and auto-delivery (not fully implemented atm)
 
 ## Prerequisites
 
-* visual studio 2017 (project itself isn't version dependant, however multiple static libs inside vendors, are built targetng vs2017, something that hepefully we gonna fix in the future)
+* visual studio 2017 (project itself isn't version dependant, however multiple static libs inside vendors, are built targeting vs2017, something that hepefully we gonna fix in the future)
 * bought and installed steam version of the Mafia II
 * running steam client
 
@@ -71,7 +71,7 @@ macos: brew install cmake
 1. Clone
 
 ```sh
-$ git clone --recurse-submodules https://github.com/inlife/m2o-reborn.git
+$ git clone --recurse-submodules https://github.com/mafia2online/m2o-reborn.git
 ```
 2. Generate project
 
