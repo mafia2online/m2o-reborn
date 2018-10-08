@@ -330,7 +330,7 @@ namespace Launcher
                 break;
 
             case STEAM_WRAPPER_ERROR_CONTEXT_CREATE:
-                errorMessage = "Unable to create the bridge between Mafia3Online and Steam, please be sure you have steam_appid.txt file.";
+                errorMessage = "Unable to create the bridge between Mafia2Online and Steam, please be sure you have steam_appid.txt file.";
                 break;
 
             case STEAM_WRAPPER_ERROR_CONTEXT_INIT:
