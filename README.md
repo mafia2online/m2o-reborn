@@ -34,11 +34,19 @@ We invite each and everyone to contribute, to add issues regarding bags/ideas/pr
 To run the binaries you are **required** to have a steam version of the game installed in your steam library.
 
 ## Features
+
 * cross-platform/env project generation
 * code style somewhat influenced by [Orthodox C++](https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b)
 * heavy use of single-header styled libraries
 * unity builds based projects
 * fast compile time orientation
+
+
+## Prerequisites
+
+* visual studio 2017 (project itself isn't version dependant, however multiple static libs inside vendors, are built targetng vs2017, something that hepefully we gonna fix in the future)
+* bought and installed steam version of the Mafia II
+* running steam client
 
 ## Structure
 
