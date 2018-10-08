@@ -4,7 +4,7 @@
 
 <div align="center">
     <a href="https://travis-ci.org/mafia2online/m2o-reborn"><img src="https://travis-ci.org/mafia2online/m2o-reborn.svg?branch=master" alt="Build status" /></a>
-    <a href="https://ci.appveyor.com/project/mafia2online/m2o-reborn"><img src="https://ci.appveyor.com/api/projects/status/5axr8wa5iyc5xkn8?svg=true" alt="Build status" /></a>
+    <a href="https://ci.appveyor.com/project/inlife/m2o-reborn"><img src="https://ci.appveyor.com/api/projects/status/tquw30xp8rjla33q?svg=true" alt="Build status" /></a>
     <a href="https://discord.gg/xyMepEk"><img src="https://discordapp.com/api/guilds/129213934887501824/embed.png" alt="Discord server" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/mafia2online/m2o-reborn.svg" alt="license" /></a>
 </div>
