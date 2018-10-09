@@ -370,11 +370,8 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     if (input_key_down(VK_F3)) {
         if (!ent) {
             ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 10);
-            //ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PLAYER, 10);
-            //M2::I_ActorActionModule::Get()->RegisterPlayer((M2::C_Actor*)ent);
         }
         if (ent) {
-            //*(uint8_t*)(((uintptr_t)ent) + 0x2E0) = 0x1;
             auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
             if (ent) {
                 ent->SetPosition(pos);
@@ -396,26 +393,16 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
             mod_log("moveCommand address = 0x%x\n", ((uintptr_t)moveCommand));
 
-            if (((M2::C_Command*)moveCommand)->commandID == 1) {
-                M2::staticHumanCommandCallBaseMoveDir* cmd = (M2::staticHumanCommandCallBaseMoveDir*)moveCommand;
-                cmd->moveSpeed = 0;
+            if (((M2::C_Command*)moveCommand)->m_iCommandID == 1) {
+                M2::S_HumanCommandMoveDir* cmd = (M2::S_HumanCommandMoveDir*)moveCommand;
+                cmd->moveSpeed = 2;
+                cmd->speedMultiplier = 0.1;
                 cmd->potentialMoveVector = { 1.f, 1.f };
             }
 
-            ((M2::C_Human2*)ent)->currentCommand = 1;
-            ((M2::C_Human2*)ent)->commandsArray[1].commandPtr = moveCommand;
+            ((M2::C_Human2*)ent)->m_iCurrentCommand = 1;
+            ((M2::C_Human2*)ent)->m_aCommandsArray[1].m_pCommand = moveCommand;
         }
-
-
-        // vec3 pos;
-        // pos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
-
-        // pos.z += 2.0;
-
-        // M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"load_test\")");
-        // M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
-        // M2::Wrappers::lua::Execute("icon:Activate()");
-        // M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
