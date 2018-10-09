@@ -395,7 +395,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
             }
 
             mod_log("moveCommand address = 0x%x\n", ((uintptr_t)moveCommand));
-
+/*
             if (((M2::C_Command*)moveCommand)->commandID == 1) {
                 M2::staticHumanCommandCallBaseMoveDir* cmd = (M2::staticHumanCommandCallBaseMoveDir*)moveCommand;
                 cmd->moveSpeed = 0;
@@ -403,7 +403,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
             }
 
             ((M2::C_Human2*)ent)->currentCommand = 1;
-            ((M2::C_Human2*)ent)->commandsArray[1].commandPtr = moveCommand;
+            ((M2::C_Human2*)ent)->commandsArray[1].commandPtr = moveCommand;*/
         }
 
 
