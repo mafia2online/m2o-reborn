@@ -1,5 +1,5 @@
 /* Mafia 2 Online Server Interal API header */
-/* Generated on Mon Oct 08 2018 18:12:23 GMT+0300 (EEST) */
+/* Generated on Tue Oct 09 2018 11:19:50 GMT+0300 (EEST) */
 
 void m2o_error_set(m2o_error error);
 m2o_error m2o_error_get();
@@ -13,10 +13,12 @@ void m2o_args_push_string(m2o_args *arg, const char *string);
 void m2o_args_push_integer(m2o_args *arg, i64 integer);
 void m2o_args_push_real(m2o_args *arg, f64 real);
 void m2o_args_push_pointer(m2o_args *arg, void *pointer);
-u32 m2o_vehicle_create();
-bool m2o_vehicle_destroy(u32 vehicleid);
-bool m2o_vehicle_position_set(u32 vehicleid, vec3 position);
+u32 m2o_vehicle_create(u16 model_id);
+int m2o_vehicle_destroy(u32 vehicleid);
 vec3 m2o_vehicle_position_get(u32 vehicleid);
+int m2o_vehicle_position_set(u32 vehicleid, vec3 position);
+vec3 m2o_vehicle_rotation_get(u32 vehicleid);
+int m2o_vehicle_rotation_set(u32 vehicleid, vec3 rotation);
 bool m2o_player_kick(u32 playerid);
 u32 m2o_ped_create();
 bool m2o_ped_destroy(u32 pedid);
@@ -35,10 +37,12 @@ typedef void (m2o_api_args_push_string)(m2o_args *arg, const char *string);
 typedef void (m2o_api_args_push_integer)(m2o_args *arg, i64 integer);
 typedef void (m2o_api_args_push_real)(m2o_args *arg, f64 real);
 typedef void (m2o_api_args_push_pointer)(m2o_args *arg, void *pointer);
-typedef u32 (m2o_api_vehicle_create)();
-typedef bool (m2o_api_vehicle_destroy)(u32 vehicleid);
-typedef bool (m2o_api_vehicle_position_set)(u32 vehicleid, vec3 position);
+typedef u32 (m2o_api_vehicle_create)(u16 model_id);
+typedef int (m2o_api_vehicle_destroy)(u32 vehicleid);
 typedef vec3 (m2o_api_vehicle_position_get)(u32 vehicleid);
+typedef int (m2o_api_vehicle_position_set)(u32 vehicleid, vec3 position);
+typedef vec3 (m2o_api_vehicle_rotation_get)(u32 vehicleid);
+typedef int (m2o_api_vehicle_rotation_set)(u32 vehicleid, vec3 rotation);
 typedef bool (m2o_api_player_kick)(u32 playerid);
 typedef u32 (m2o_api_ped_create)();
 typedef bool (m2o_api_ped_destroy)(u32 pedid);
@@ -60,8 +64,10 @@ typedef struct m2o_api_vtable {
     m2o_api_args_push_pointer *args_push_pointer;
     m2o_api_vehicle_create *vehicle_create;
     m2o_api_vehicle_destroy *vehicle_destroy;
-    m2o_api_vehicle_position_set *vehicle_position_set;
     m2o_api_vehicle_position_get *vehicle_position_get;
+    m2o_api_vehicle_position_set *vehicle_position_set;
+    m2o_api_vehicle_rotation_get *vehicle_rotation_get;
+    m2o_api_vehicle_rotation_set *vehicle_rotation_set;
     m2o_api_player_kick *player_kick;
     m2o_api_ped_create *ped_create;
     m2o_api_ped_destroy *ped_destroy;
@@ -84,8 +90,10 @@ void m2o_api_init(m2o_api_vtable *api) {
     api->args_push_pointer = m2o_args_push_pointer;
     api->vehicle_create = m2o_vehicle_create;
     api->vehicle_destroy = m2o_vehicle_destroy;
-    api->vehicle_position_set = m2o_vehicle_position_set;
     api->vehicle_position_get = m2o_vehicle_position_get;
+    api->vehicle_position_set = m2o_vehicle_position_set;
+    api->vehicle_rotation_get = m2o_vehicle_rotation_get;
+    api->vehicle_rotation_set = m2o_vehicle_rotation_set;
     api->player_kick = m2o_player_kick;
     api->ped_create = m2o_ped_create;
     api->ped_destroy = m2o_ped_destroy;

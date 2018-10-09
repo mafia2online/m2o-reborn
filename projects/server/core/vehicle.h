@@ -6,7 +6,7 @@
 
 void on_car_create_command(librg_message_t *msg) {
     auto player     = librg_entity_find(msg->ctx, msg->peer);
-    auto vehicleid  = m2o_vehicle_create();
+    auto vehicleid  = m2o_vehicle_create(10);
 
     m2o_vehicle_position_set(vehicleid, vec3f(
         player->position.x + 3.0f,
