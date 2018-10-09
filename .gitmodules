@@ -1,3 +1,0 @@
-[submodule "vendor/m2sdk"]
-	path = vendor/m2sdk
-	url = https://github.com/mafia2online/m2sdk.git
