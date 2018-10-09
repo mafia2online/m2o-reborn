@@ -23,6 +23,7 @@ namespace M2 {
 #include "win32/cef.hpp"
 #include "win32/vfs.hpp"
 #include "win32/exceptions.hpp"
+#include "minhook/include/MinHook.h"
 
 extern "C" { // NOTE: Tell the OS to prefer dedicated video card.
     __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
@@ -202,7 +203,9 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved) {
             vfs_override_set("gui-main.sds",    (modpath + "\\files\\gui-main.sds").c_str());
             vfs_override_set("tables.sds",      (modpath + "\\files\\tables.sds").c_str());
             vfs_override_set("sdsconfig.bin",   (modpath + "\\files\\sdsconfig.bin").c_str());
-            // vfs_override_set("StreamMapa.bin",  (modpath + "\\files\\StreamMapa.bin").c_str());
+            //vfs_override_set("StreamMapa.bin",  (modpath + "\\files\\StreamMapa.bin").c_str());
+
+            MH_Initialize();
 
             /* attach input manager hooks */
             input_init();

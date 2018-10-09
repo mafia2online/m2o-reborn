@@ -20,6 +20,8 @@
 #include "mod/vehicle.h"
 #include "mod/pedestrian.h"
 
+#include "minhook/include/MinHook.h"
+
 // =======================================================================//
 // !
 // ! General mod implementation part
@@ -169,6 +171,28 @@ void mod_respawn() {
 // ! General mod events
 // !
 // =======================================================================//
+static M2::C_Player2* local = nullptr;
+
+bool(__thiscall* UpdateInput_Original)(void*, int, float, float) = nullptr;
+bool __fastcall UpdateInput_Hooked(void* This, void* notUsed, int a1, float a2, float a3) {
+    if (!local)
+        local = ((M2::C_Player2 *)M2::C_Game::Get()->GetLocalPed());
+
+    if (This == local)
+        return UpdateInput_Original(This, a1, a2, a3);
+    else
+        return false;
+}
+
+void(__thiscall* UpdateHealth_Original)(void*, float) = nullptr;
+void __fastcall UpdateHealth_Hooked(void* This, void* notUsed, float health) {
+    if (!local)
+        local = ((M2::C_Player2 *)M2::C_Game::Get()->GetLocalPed());
+
+    mod_log("UpdateHealth called for player: 0x%x\n", This);
+    if (This == local)
+        return UpdateHealth_Original(This, health);
+}
 
 void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     mod_log("[GameModule]: EventGameInit\n");
@@ -308,6 +332,13 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     });
 
     m2o_car_callbacks_init();
+
+    MH_CreateHook((void*)0x42ABE0, UpdateInput_Hooked, (void**)&UpdateInput_Original);
+    MH_EnableHook((void*)0x42ABE0);
+
+    MH_CreateHook((void*)0x42D7F0, UpdateHealth_Hooked, (void**)&UpdateHealth_Original);
+    MH_EnableHook((void*)0x42D7F0);
+
     // discord_init();
 }
 
@@ -321,6 +352,7 @@ void m2o_module::load_finish(M2::I_TickedModuleCallEventContext &) {
         std::this_thread::sleep_for(
             std::chrono::milliseconds(1500)
         );
+        //Mem::Hooks::InstallCallPatch(0x43BD42, )
 
         mod_respawn();
     }).detach();
@@ -358,6 +390,12 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         mod_message_send(ctx, M2O_CAR_CREATE, nullptr);
     }
 
+    /* create a car */
+    /*if (input_key_down(VK_F3)) {
+        mod_log("My C_Player2 address = 0x%x\n", ((M2::C_Human2 *)M2::C_Game::Get()->GetLocalPed()));
+        
+    }*/
+
     /* connect to the server */
     if (input_key_down(VK_F5) && !mod.spawned) {
         mod_connect("localhost", 27010);
@@ -366,11 +404,26 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
     static M2::C_Entity *ent;
     if (input_key_down(VK_F3)) {
-        ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 10);
-        auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-        ent->SetPosition(pos);
-        mod_log("Ped created\n");
+        if (!ent) {
+            ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PLAYER, 10);
+            M2::I_ActorActionModule::Get()->RegisterPlayer((M2::C_Actor*)ent);
+            auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
+            if (ent) {
+                ent->SetPosition(pos);
+            }
+        }
+
+        mod_log("Player created. Player address = 0x%x\n", (uintptr_t)ent);
+        mod_log("My C_Player2 address = 0x%x\n", ((uintptr_t)M2::C_Game::Get()->GetLocalPed()));
+
+        //((M2::C_PlayerModelManager*)(0x1ABFE5C))->CreatePlayer();
     }
+
+    /*if (ent) {
+        *(uint8_t*)(((uintptr_t)ent) + 0x2E0) = 0x1;
+        *(uint8_t*)(((uintptr_t)ent) + 0x2E1) = 0x2;
+        *(uint8_t*)(((uintptr_t)ent) + 0x2E6) = 0x20;
+    }*/
 
     if (input_key_down(VK_F4) && mod.spawned) {
         vec3_t pos;
