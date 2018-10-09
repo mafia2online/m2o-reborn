@@ -407,10 +407,14 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         if (!ent) {
             ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PLAYER, 10);
             M2::I_ActorActionModule::Get()->RegisterPlayer((M2::C_Actor*)ent);
+        }
+        if (ent) {
+            *(uint8_t*)(((uintptr_t)ent) + 0x2E0) = 0x1;
             auto pos = reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetPos();
-            if (ent) {
-                ent->SetPosition(pos);
-            }
+            pos.x += 1.f;
+            pos.y += 1.f;
+            pos.z -= 2.f;
+            ent->SetPosition(pos);
         }
 
         mod_log("Player created. Player address = 0x%x\n", (uintptr_t)ent);
@@ -418,7 +422,6 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
         //((M2::C_PlayerModelManager*)(0x1ABFE5C))->CreatePlayer();
     }
-
     /*if (ent) {
         *(uint8_t*)(((uintptr_t)ent) + 0x2E0) = 0x1;
         *(uint8_t*)(((uintptr_t)ent) + 0x2E1) = 0x2;

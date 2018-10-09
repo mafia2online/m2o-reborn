@@ -55,7 +55,7 @@ class M2ORenderProcessHandler : public CefRenderProcessHandler {
 public:
     M2ORenderProcessHandler() {}
 
-    virtual OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) override {
+    void OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) override {
         // Retrieve the context's window object.
         CefRefPtr<CefV8Value> object = context->GetGlobal();
 
@@ -67,7 +67,7 @@ public:
 
 
         // Create an instance of my CefV8Handler object.
-        CefRefPtr<CefV8Handler> handler = new MyV8Handler();
+        CefRefPtr<CefV8Handler> handler = new M2OV8Handler();
 
         // Create the "myfunc" function.
         CefRefPtr<CefV8Value> func = CefV8Value::CreateFunction("myfunc", handler);
@@ -447,7 +447,7 @@ class CefMinimal : public CefApp {
         CefWindowInfo window_info;
         window_info.SetAsWindowless(NULL);
 
-        CefBrowserSettings settings = {0};
+        CefBrowserSettings settings;
         settings.windowless_frame_rate = 60;
         settings.background_color = 0x00000000;
 

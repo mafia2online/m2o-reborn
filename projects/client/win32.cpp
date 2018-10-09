@@ -26,7 +26,6 @@ namespace M2 {
 #include "win32/cef.hpp"
 #include "win32/vfs.hpp"
 #include "win32/exceptions.hpp"
-#include "minhook/include/MinHook.h"
 
 extern "C" { // NOTE: Tell the OS to prefer dedicated video card.
     __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; // NVIDIA
