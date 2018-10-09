@@ -16,6 +16,9 @@ namespace M2 {
     void *GetCameraWorldViewProjection();
 };
 
+#include "minhook/include/MinHook.h"
+#include "minhook/MinHook.c"
+
 #include "m2o_client.h"
 
 #include "win32/gfx.hpp"

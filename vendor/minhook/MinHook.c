@@ -1,0 +1,5 @@
+#include "src/hde/hde32.c"
+#include "src/hde/hde64.c"
+#include "src/trampoline.c"
+#include "src/buffer.c"
+#include "src/hook.c"
