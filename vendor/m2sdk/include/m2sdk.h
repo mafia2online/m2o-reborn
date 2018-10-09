@@ -203,6 +203,9 @@ namespace M2 {
 #include "classes/CWrappersList.hpp"
 #include "classes/CHuman2CarWrapper.hpp"
 #include "classes/IActorActionModule.hpp"
+#include "classes/SAgentCommandAim.hpp"
+#include "classes/SAgentCommandLookAt.hpp"
+#include "classes/SLightManager.hpp"
 
 /* Wrappers */
 #include "wrappers/camera.hpp"
