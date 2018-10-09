@@ -210,10 +210,11 @@ void m2o_car_callbacks_init() {
         ped->CHuman->SetPos(zplm_vec3f_zero());  /* teleport far away for now */
 
         // TODO: fix crash on car enter
-        // // TODO: refactor this stuff
-        // M2::C_SyncObject *pSyncObject = nullptr;
+        // if (ped->sync) {
+        //     // ped->sync->Done();
+        // }
         // ped->CHuman->GetScript()->ScrDoAction(
-        //     &pSyncObject,
+        //     &ped->sync,
         //     (M2::C_Vehicle *)car->CEntity, /* weird cast there, casting incompatible C_Car to C_Vehicle, probably argument should be C_Car */
         //     true,
         //     (M2::E_VehicleSeat)seat,

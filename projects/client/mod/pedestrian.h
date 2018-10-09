@@ -113,7 +113,7 @@ void m2o_callback_ped_update(librg_event_t *event) {
             );
         }
 
-        if (real_diff > zplm_cube(2.5f)) {
+        if (real_diff > zplm_cube(10.0f)) {
             ped->CHuman->SetPos(entity->position);
         }
     }
