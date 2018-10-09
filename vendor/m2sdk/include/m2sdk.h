@@ -1,3 +1,7 @@
+/*
+* Swag SDK for M2O
+*/
+
 #include <string>
 #include <vector>
 
