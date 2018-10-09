@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/mafia2online/m2sdk.git
+	branch = master
+	commit = 1001df87425c62b82542ec08b36fce25d0b82613
+	parent = 267dd771018a81f462ede04a3983fd070e8f6216
+	cmdver = 0.3.1
