@@ -32,6 +32,54 @@ struct {
 // !
 // =======================================================================//
 
+class M2OV8Handler : public CefV8Handler {
+public:
+    M2OV8Handler() {}
+
+    virtual bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& args, CefRefPtr<CefV8Value>& ret, CefString& expt) override {
+        if (name == "myfunc") {
+            // Return my string value.
+            ret = CefV8Value::CreateString("My Value!");
+            return true;
+        }
+
+        // Function does not exist.
+        return false;
+    }
+
+    // Provide the reference counting implementation for this class.
+    IMPLEMENT_REFCOUNTING(M2OV8Handler);
+};
+
+class M2ORenderProcessHandler : public CefRenderProcessHandler {
+public:
+    M2ORenderProcessHandler() {}
+
+    virtual OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) override {
+        // Retrieve the context's window object.
+        CefRefPtr<CefV8Value> object = context->GetGlobal();
+
+        // Create a new V8 string value. See the "Basic JS Types" section below.
+        CefRefPtr<CefV8Value> str = CefV8Value::CreateString("My Value!");
+
+        // Add the string to the window object as "window.myval". See the "JS Objects" section below.
+        object->SetValue("myval", str, V8_PROPERTY_ATTRIBUTE_NONE);
+
+
+        // Create an instance of my CefV8Handler object.
+        CefRefPtr<CefV8Handler> handler = new MyV8Handler();
+
+        // Create the "myfunc" function.
+        CefRefPtr<CefV8Value> func = CefV8Value::CreateFunction("myfunc", handler);
+
+        // Add the "myfunc" function to the "window" object.
+        object->SetValue("myfunc", func, V8_PROPERTY_ATTRIBUTE_NONE);
+    }
+
+    // Provide the reference counting implementation for this class.
+    IMPLEMENT_REFCOUNTING(M2ORenderProcessHandler);
+};
+
 class M2ORenderHandler : public CefRenderHandler {
     public:
         unsigned char* mPixelBuffer;
@@ -129,10 +177,7 @@ class M2ORenderHandler : public CefRenderHandler {
             return true;
         }
 
-        void OnCursorChange(CefRefPtr<CefBrowser> browser,
-                          CefCursorHandle cursor,
-                          CursorType type,
-                          const CefCursorInfo& custom_cursor_info) override {
+        void OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& custom_cursor_info) override {
             SetClassLong((HWND)platform_windowid(), GCL_HCURSOR, (LONG)cursor);
         }
 
@@ -281,10 +326,14 @@ class CefMinimal : public CefApp {
     public:
         ~CefMinimal() { }
 
-        void CefMinimal::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
+        void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
             command_line->AppendSwitch("disable-smooth-scrolling");
             command_line->AppendSwitchWithValue("disable-features", "TouchpadAndWheelScrollLatching");
             command_line->AppendSwitchWithValue("disable-features", "AsyncWheelEvents");
+        }
+
+        CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override {
+            return new M2ORenderProcessHandler();
         }
 
         void navigate(const std::string url) {
@@ -398,7 +447,7 @@ class CefMinimal : public CefApp {
         CefWindowInfo window_info;
         window_info.SetAsWindowless(NULL);
 
-        CefBrowserSettings settings;
+        CefBrowserSettings settings = {0};
         settings.windowless_frame_rate = 60;
         settings.background_color = 0x00000000;
 
@@ -541,11 +590,11 @@ class CefMinimal : public CefApp {
         return str.size();
     }
 
-    // =======================================================================//
-    // !
-    // ! Input handling
-    // !
-    // =======================================================================//
+// =======================================================================//
+// !
+// ! Input handling
+// !
+// =======================================================================//
 
     CefBrowserHost::MouseButtonType cef__translatemousebtn(SDL_MouseButtonEvent const &e) {
         CefBrowserHost::MouseButtonType result;
