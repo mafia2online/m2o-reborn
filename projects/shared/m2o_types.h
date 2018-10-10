@@ -78,8 +78,22 @@ typedef struct m2o_ped {
 
     #ifdef M2O_CLIENT
     M2::C_SyncObject *sync;
+
     struct {
-        vec3 last;
+        bool init;
+        int counter;
+        void *stand;
+        void *movedir;
+    } tasks;
+
+    struct {
+        struct {
+            vec3 start;
+            vec3 target;
+            f32  lastAlpha;
+            f64  startTime;
+            f64  finishTime;
+        } pos;
     } interp;
     #endif
 

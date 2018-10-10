@@ -58,6 +58,8 @@ void m2o_callback_ped_remove(librg_event_t *event) {
     if (ped->CEntity) { /* maybe it was deleted when we removed car from streamzone */
         M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
         ped->CEntity = NULL;
+
+        // if (ped->tasks.movedir) delete ped->tasks.movedir;
     }
 
     m2o_ped_free(ped);
@@ -95,30 +97,65 @@ void m2o_callback_ped_update(librg_event_t *event) {
     auto entity = event->entity;
     auto ped    = m2o_ped_get(entity);
 
-    // skip the udpate if we have removed ped cuz he was inside a removed car
-    if (!ped->CEntity) return;
-
     // read up the dynaymicly changed data
     librg_data_rptr(event->data, &ped->stream, sizeof(ped->stream));
 
-    // apply movement anim
-    if (ped->state == PED_ON_GROUND) {
-        auto pos_diff  = zplm_vec3_mag2(ped->interp.last - entity->position);
-        auto real_diff = zplm_vec3_mag2(ped->CEntity->GetPosition() - entity->position);
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
 
-        if (pos_diff > zplm_square(0.05f)) {
-            ped->CHuman->GetScript()->ScrMoveV(
-                &ped->sync, entity->position, (M2::eHumanMoveMode)ped->stream.move,
-                vec3f(ped->stream.dirx, ped->stream.diry, 0.0f), true
-            );
-        }
+    // // apply movement anim
+    //     auto pos_diff  = zplm_vec3_mag2(ped->interp.last - entity->position);
+    //     auto real_diff = zplm_vec3_mag2(ped->CEntity->GetPosition() - entity->position);
 
-        if (real_diff > zplm_cube(10.0f)) {
-            ped->CHuman->SetPos(entity->position);
+    //     if (pos_diff > zplm_square(0.05f)) {
+    //         ped->CHuman->GetScript()->ScrMoveV(
+    //             &ped->sync, entity->position, (M2::eHumanMoveMode)ped->stream.move,
+    //             vec3f(ped->stream.dirx, ped->stream.diry, 0.0f), true
+    //         );
+    //     }
+
+    //     if (real_diff > zplm_cube(10.0f)) {
+    //         ped->CHuman->SetPos(entity->position);
+    //     }
+    // }
+
+    /* ped tasks late-init (sync init right after ped creation causes crash sometimes) */
+    if (!ped->tasks.init && ++ped->tasks.counter > 20) {
+        ped->tasks.init = true;
+        mod_log("[info] calling late init for ped tasks...");
+
+        //ped->tasks.stand = CIE_Alloc(0x1E); // zpl_zero_item(ped->tasks.stand);
+        //ped->CHuman->AddCommand(M2::E_Command::COMMAND_STAND, ped->tasks.stand);
+
+        ped->tasks.movedir = CIE_Alloc(0x58); //zpl_zero_item(ped->tasks.movedir);
+        ped->CHuman->AddCommand(M2::E_Command::COMMAND_MOVEDIR, ped->tasks.movedir);
+    }
+
+    if (ped->state == PED_ON_GROUND && ped->tasks.init) {
+        auto pos_diff = zplm_vec3_mag2(ped->interp.pos.target - entity->position);
+
+        if (pos_diff > 0) {
+            auto cmd = (M2::S_HumanCommandMoveDir *)ped->tasks.movedir; {
+                cmd->speedMultiplier = 1.0f;
+                cmd->moveSpeed = ped->stream.move;
+                cmd->potentialMoveVector = { ped->stream.dirx, ped->stream.diry };
+            }
+
+            ped->CHuman->m_iCurrentCommand = 1;
+            ped->CHuman->m_aCommandsArray[1].m_pCommand = ped->tasks.movedir;
+        } else {
+            // ped->CHuman->m_iCurrentCommand = 0;
+            // ped->CHuman->m_aCommandsArray[0].m_pCommand = ped->tasks.stand;
         }
     }
 
-    ped->interp.last = entity->position;
+    // Get the interpolation interval
+    ped->interp.pos.startTime = zpl_time_now();
+    ped->interp.pos.finishTime = ped->interp.pos.startTime + (1.0f / M2O_TICKRATE_SERVER);
+    ped->interp.pos.lastAlpha = 0.0f;
+
+    ped->interp.pos.start = ped->interp.pos.target;
+    ped->interp.pos.target = entity->position;
 
     // module_ped_tasks_update(ped);
 }
@@ -159,11 +196,11 @@ void m2o_callback_ped_clientstream(librg_event_t *event) {
 
         // convert local player movement to human movement
         switch (movestate) {
-            case M2::E_MOVEMENT_WALK:     ped->stream.move = M2::HUMAN_MOVE_MODE_WALK; break;
-            case M2::E_MOVEMENT_JOG:      ped->stream.move = M2::HUMAN_MOVE_MODE_RUN; break;
-            case M2::E_MOVEMENT_SPRINT:   ped->stream.move = M2::HUMAN_MOVE_MODE_SPRINT; break;
-            case M2::E_MOVEMENT_IDLE:     ped->stream.move = M2::HUMAN_MOVE_MODE_BREATH; break;
-            case M2::E_MOVEMENT_STOPPING: ped->stream.move = M2::HUMAN_MOVE_MODE_END; break;
+            case M2::E_MOVEMENT_WALK:     ped->stream.move = 0; break;
+            case M2::E_MOVEMENT_JOG:      ped->stream.move = 1; break;
+            case M2::E_MOVEMENT_SPRINT:   ped->stream.move = 2; break;
+            // case M2::E_MOVEMENT_IDLE:     ped->stream.move = M2::HUMAN_MOVE_MODE_BREATH; break;
+            // case M2::E_MOVEMENT_STOPPING: ped->stream.move = M2::HUMAN_MOVE_MODE_END; break;
         }
     }
 
@@ -184,10 +221,31 @@ void m2o_callback_ped_clientstream(librg_event_t *event) {
 // =======================================================================//
 
 void m2o_callback_ped_interpolate(librg_entity_t *entity) {
-    // auto ped = get_ped(entity);
+    auto ped = m2o_ped_get(entity);
 
-    // // skip the udpate if we have removed ped cuz he was inside a removed car
-    // if (!ped->CEntity) return;
+    // skip the udpate if we have removed ped cuz he was inside a removed car
+    if (!ped->CEntity) return;
+
+    f64 currentTime = zpl_time_now();
+    f32 alpha = zplm_unlerp(currentTime, ped->interp.pos.startTime, ped->interp.pos.finishTime);
+
+    // Don't let it overcompensate the error too much
+    alpha = zplm_clamp(0.0f, alpha, 1.5f);
+
+    // Get the current error portion to compensate
+    f32 currentAlpha = alpha - ped->interp.pos.lastAlpha;
+    ped->interp.pos.lastAlpha = alpha;
+
+    // Apply the error compensation
+    vec3 compensation;
+    zplm_vec3_lerp(&compensation, ped->interp.pos.start, ped->interp.pos.target, alpha);
+
+    // If we finished compensating the error, finish it for the next pulse
+    if (alpha == 1.5f) {
+        ped->interp.pos.finishTime = 0;
+    }
+
+    ped->CHuman->SetPos(compensation);
 
     // // last delta tick against constant tick delay
     // f32 alpha = ped->inter_delta / ctx->timesync.server_delay;

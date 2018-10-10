@@ -13,6 +13,15 @@
 #define MAFIA_SDK_IMPLEMENTATION
 #include "m2sdk.h"
 
+void* CIE_Alloc(size_t siz) {
+    DWORD functionAddress = 0x00401830;
+    __asm {
+        push siz
+        call functionAddress
+        add esp, 0x4
+    };
+}
+
 #include "m2o_client.h"
 #include "m2o_types.h"
 
@@ -387,16 +396,21 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         if (ent) {
             static void* moveCommand = nullptr;
             if (!moveCommand) {
-                moveCommand = new char[0x58];
+                //moveCommand = zpl_malloc(0x58);
+                // zpl_zero_size(moveCommand, 0x58);
+                //mod_log("moveCommand address = 0x%x size: %d\n", ((uintptr_t)moveCommand), sizeof(moveCommand));
+                moveCommand = CIE_Alloc(0x58);
+                //moveCommand = new char[0x58];
                 ((M2::C_Human2*)ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCommand);
             }
 
-            mod_log("moveCommand address = 0x%x\n", ((uintptr_t)moveCommand));
+
+            mod_log("moveCommand address = 0x%x size: %d\n", ((uintptr_t)moveCommand), sizeof(char[0x58]));
 
             if (((M2::C_Command*)moveCommand)->m_iCommandID == 1) {
                 M2::S_HumanCommandMoveDir* cmd = (M2::S_HumanCommandMoveDir*)moveCommand;
-                cmd->moveSpeed = 2;
-                cmd->speedMultiplier = 0.1;
+                cmd->moveSpeed = 0;
+                cmd->speedMultiplier = 0.1f;
                 cmd->potentialMoveVector = { 1.f, 1.f };
             }
 
