@@ -59,7 +59,7 @@ void m2o_callback_ped_remove(librg_event_t *event) {
         M2::Wrappers::DestroyEntity(ped->CEntity, M2::eEntityType::MOD_ENTITY_PED);
         ped->CEntity = NULL;
 
-        // if (ped->tasks.movedir) delete ped->tasks.movedir;
+        if (ped->tasks.movedir) delete ped->tasks.movedir;
     }
 
     m2o_ped_free(ped);
@@ -127,7 +127,8 @@ void m2o_callback_ped_update(librg_event_t *event) {
         //ped->tasks.stand = CIE_Alloc(0x1E); // zpl_zero_item(ped->tasks.stand);
         //ped->CHuman->AddCommand(M2::E_Command::COMMAND_STAND, ped->tasks.stand);
 
-        ped->tasks.movedir = CIE_Alloc(0x58); //zpl_zero_item(ped->tasks.movedir);
+        // ped->tasks.movedir = CIE_Alloc(0x58); //zpl_zero_item(ped->tasks.movedir);
+        ped->tasks.movedir = new char[0x58]; //zpl_zero_item(ped->tasks.movedir);
         ped->CHuman->AddCommand(M2::E_Command::COMMAND_MOVEDIR, ped->tasks.movedir);
     }
 
