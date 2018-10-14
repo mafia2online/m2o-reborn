@@ -12,8 +12,10 @@ namespace M2
 {
     class C_Command {
     public:
-        pad(C_Command, pad0, 0xC);//0x0000
-        uint8_t m_iCommandID; //0x000C
+        pad(C_Command, pad0, 0x4);//0x0000
+        uint32_t countUsed;       //0x0004
+        pad(C_Command, pad1, 0x4);//0x0008
+        uint8_t m_iCommandID;     //0x000C
     };
 
     class S_HumanCommandMoveDir : public C_Command
@@ -28,6 +30,13 @@ namespace M2
         uint8_t moveSpeed; //0x0050
         pad(S_HumanCommandMoveDir, pad3, 0x3);//0x0051
         uint32_t int32_0x54; //0x0054
+    }; //Size=0x0058
+
+    class S_HumanCommandStand : public C_Command
+    {
+    public:
+        zpl_vec2 standingDirVector;                 //0000 - 0010
+        pad(S_HumanCommandStand, pad0, 0x8);        //0010 - 0018
     }; //Size=0x0058
 
     class C_CommandDescription
