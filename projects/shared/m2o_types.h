@@ -77,7 +77,9 @@ typedef struct m2o_ped {
     } stream;
 
     #ifdef M2O_CLIENT
-    M2::C_SyncObject *sync;
+    gfx_handle nickname_value;
+    gfx_handle healthbar_base;
+    gfx_handle healthbar_value;
 
     struct {
         bool init;

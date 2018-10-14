@@ -11,7 +11,8 @@ struct gfx_object {
 
     u8 valid : 1;
     u8 queued : 1;
-    u8 metadata : 6;
+    u8 visible : 1;
+    u8 metadata : 5;
 
     i32 zindex;
 
@@ -136,7 +137,14 @@ static zpl_mutex gfx_lock;
 
             if (!gfx_state.objects[gfx_state.object_cursor].valid) {
                 zpl_zero_item(&gfx_state.objects[gfx_state.object_cursor]);
-                gfx_state.objects[gfx_state.object_cursor].valid = 1;
+
+                /* fill up default global values */
+                gfx_state.objects[gfx_state.object_cursor].valid    = 1;
+                gfx_state.objects[gfx_state.object_cursor].visible  = 1;
+                gfx_state.objects[gfx_state.object_cursor].scalex   = 1.0f;
+                gfx_state.objects[gfx_state.object_cursor].scaley   = 1.0f;
+                gfx_state.objects[gfx_state.object_cursor].data.x   = 0;
+                gfx_state.objects[gfx_state.object_cursor].data.y   = 0;
 
                 zpl_array_count(gfx_state.objects)++;
                 return gfx_state.object_cursor;
@@ -155,10 +163,6 @@ static zpl_mutex gfx_lock;
 
         obj->type    = GFX_TEXTURE;
         obj->texture = SDL_CreateTexture(gfx_state.rnd, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
-        obj->scalex  = 1.0f;
-        obj->scaley  = 1.0f;
-        obj->data.x  = 0;
-        obj->data.y  = 0;
         obj->data.w  = w;
         obj->data.h  = h;
 
@@ -188,10 +192,6 @@ static zpl_mutex gfx_lock;
 
         obj->type    = GFX_TEXTURE;
         obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
-        obj->scalex  = 1.0f;
-        obj->scaley  = 1.0f;
-        obj->data.x  = 0;
-        obj->data.y  = 0;
         obj->data.w  = surface->w;
         obj->data.h  = surface->h;
 
@@ -223,10 +223,6 @@ static zpl_mutex gfx_lock;
 
         obj->type    = GFX_TEXTURE;
         obj->texture = SDL_CreateTextureFromSurface(gfx_state.rnd, surface);
-        obj->scalex  = 1.0f;
-        obj->scaley  = 1.0f;
-        obj->data.x  = 0;
-        obj->data.y  = 0;
         obj->data.w  = surface->w;
         obj->data.h  = surface->h;
         obj->color   = color;
@@ -461,6 +457,10 @@ static zpl_mutex gfx_lock;
         for (int i = 0; i < zpl_array_count(gfx_state.queue); ++i) {
             gfx_object *obj = &gfx_state.objects[gfx_state.queue[i]];
 
+            if (!obj->valid || !obj->visible || obj->scalex == 0 || obj->scaley == 0) {
+                continue;
+            }
+
             SDL_SetRenderDrawColor(
                 gfx_state.rnd,
                 (u8)obj->color.r,
@@ -474,7 +474,7 @@ static zpl_mutex gfx_lock;
                     SDL_RenderDrawLine(gfx_state.rnd, obj->data.x1, obj->data.y1, obj->data.x2, obj->data.y2);
                 } break;
                 case GFX_RECTANGLE: {
-                    SDL_Rect desc = {obj->data.x, obj->data.y, obj->data.w, obj->data.h};
+                    SDL_Rect desc = {obj->data.x, obj->data.y, obj->data.w * obj->scalex, obj->data.h * obj->scaley};
                     SDL_RenderFillRect(gfx_state.rnd, &desc);
                 } break;
 
@@ -576,6 +576,32 @@ static zpl_mutex gfx_lock;
         return 0;
     }
 
+    int gfx_visible_set(gfx_handle handle, int value) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        zpl_mutex_lock(&gfx_lock);
+        gfx_state.objects[handle].visible = value;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return 0;
+    }
+
+    int gfx_visible_get(gfx_handle handle) {
+        if (!gfx_exists(handle)) {
+            return -1;
+        }
+
+        int value = 0;
+
+        zpl_mutex_lock(&gfx_lock);
+        value = gfx_state.objects[handle].visible;
+        zpl_mutex_unlock(&gfx_lock);
+
+        return value;
+    }
+
 // =======================================================================//
 // !
 // ! Utils
@@ -587,11 +613,11 @@ static zpl_mutex gfx_lock;
         *h = static_cast<int>(gfx_state.present_params.BackBufferHeight);
     }
 
-    void gfx_util_screen2world(const vec3 *screen, vec3 *world) {
+    void gfx_util_screen2world(vec3 screen, vec3 *world) {
         ZPL_ASSERT_MSG(false, "TODO: implement gfx_util_screen2world");
     }
 
-    void gfx_util_world2screen(const vec3 *world, vec3 *screen) {
+    void gfx_util_world2screen(vec3 world, vec3 *screen) {
         // TODO: method copied from old version, needs proper refactor
 
         // Get the world view projection matrix
@@ -604,12 +630,12 @@ static zpl_mutex gfx_lock;
 
         // Transform the world coordinate by the worldViewProjection matrix
         D3DXVECTOR3 vec;
-        D3DXVec3TransformCoord(&vec, &D3DXVECTOR3(world->x, world->y, world->z), &mat);
+        D3DXVec3TransformCoord(&vec, &D3DXVECTOR3(world.x, world.y, world.z), &mat);
 
         screen->x = viewport.X + (1.0f + vec.x) * viewport.Width / 2.0f;
         screen->y = viewport.Y + (1.0f - vec.y) * viewport.Height / 2.0f;
         // screen->z = viewport.MinZ + vec.z * (viewport.MaxZ - viewport.MinZ);
-        screen->z = world->z * mat._33 + world->y * mat._23 + world->x * mat._13 + mat._43;
+        screen->z = world.z * mat._33 + world.y * mat._23 + world.x * mat._13 + mat._43;
     }
 
 // =======================================================================//

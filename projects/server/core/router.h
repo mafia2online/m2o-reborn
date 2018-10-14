@@ -135,8 +135,8 @@ void mod_register_routes(librg_ctx_t *ctx) {
         auto ped    = m2o_ped_get(entity);
 
         char buffer[128] = {0};
-        auto size = librg_data_ru8(msg->data);
-        size = zpl_min(size, 127);
+        auto size_actual = librg_data_ru8(msg->data);
+        auto size = zpl_clamp(0, size_actual, 127);
         librg_data_rptr(msg->data, buffer, size);
 
         mod_log("[info] client %d requested name change to: %s\n", entity->id, buffer);
@@ -150,12 +150,15 @@ void mod_register_routes(librg_ctx_t *ctx) {
         }
 
         /* prevent execution if we rejected the event */
-        if (result & M2O_EVENT_RESULT_REJECTED) { return; }
+        // if (result & M2O_EVENT_RESULT_REJECTED) { return; }
+
+        zpl_zero_item(ped->name);
+        zpl_memcopy(ped->name, buffer, size);
 
         mod_message_send_instream_except(msg->ctx, M2O_USER_SET_NAME, entity->id, msg->peer, [&](librg_data_t *data) {
             librg_data_wu32(data, entity->id);
             librg_data_wu8(data, size);
-            librg_data_wptr(data, (void *)ped->name, size);
+            librg_data_wptr(data, buffer, size);
         });
     });
 

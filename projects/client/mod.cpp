@@ -216,18 +216,12 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, [](librg_event_t *event) {
         mod_log("[info] connected to the server\n");
         M2::Wrappers::lua::Execute("game.game:SoundFadeIn(1000)");
-
-    
-        M2::Wrappers::lua::Execute("game.traffic : OpenSeason(50)");
+        M2::Wrappers::lua::Execute("game.traffic:OpenSeason(50)");
         M2::Wrappers::lua::Execute("game.speech:LoadStage(50)");
         M2::Wrappers::lua::Execute("game.radio:SetContent(\"Empire\", \"all\", \"Empire_07010\")");
-        M2::Wrappers::lua::Execute("game.radio : SetContent(\"Classic\", \"all\", \"Classic_07010\")");
-        M2::Wrappers::lua::Execute("game.radio : SetContent(\"Delta\" ,\"all\" , \"Delta_07010\")");
-            
-            
-            
-            
-            
+        M2::Wrappers::lua::Execute("game.radio:SetContent(\"Classic\", \"all\", \"Classic_07010\")");
+        M2::Wrappers::lua::Execute("game.radio:SetContent(\"Delta\" ,\"all\" , \"Delta_07010\")");
+
 
         /* setup default timeout */
         enet_peer_timeout(event->peer, 10, 5000, 10000);
@@ -320,16 +314,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
     /**
      * Custom/specific callbacks
      */
-    librg_network_add(ctx, M2O_USER_SET_NAME, [](librg_message_t *msg) {
-        auto entity = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data));
-        mod_assert(entity);
-
-        u8 strsize = librg_data_ru8(msg->data);
-        auto ped   = m2o_ped_get(entity);
-        librg_data_rptr(msg->data, ped->name, strsize);
-
-        mod_log("set new name for client %u: %s\n", entity->id, ped->name);
-    });
+    librg_network_add(ctx, M2O_USER_SET_NAME, m2o_callback_ped_namechange);
 
     m2o_car_callbacks_init();
 

@@ -4,6 +4,12 @@
 // !
 // =======================================================================//
 
+#define M2O_PED_NICKNAME_FONT_SIZE  18
+#define M2O_PED_HEALTHBAR_WIDTH     64
+#define M2O_PED_HEALTHBAR_HEIGH     12
+#define M2O_PED_HEALTHBAR_MARGIN    32 /* margin from the nickname */
+#define M2O_PED_HEALTHBAR_PADDING   1  /* internal border padding */
+
 /**
  * The entity enters the stream zone
  */
@@ -40,6 +46,22 @@ void m2o_callback_ped_create(librg_event_t *event) {
     } else {
         mod_log("[warning] could not create a ped for entity: %d\n", event->entity->id);
     }
+
+    { /* healthbar and nickname stuff */
+        ped->nickname_value  = gfx_create_text(0, M2O_PED_NICKNAME_FONT_SIZE, ped->name, vec4f(255,255,255,255));
+        ped->healthbar_base  = gfx_create_rect(0, 0, M2O_PED_HEALTHBAR_WIDTH, M2O_PED_HEALTHBAR_HEIGH, vec4f(50,50,50,170));
+        ped->healthbar_value = gfx_create_rect(
+            M2O_PED_HEALTHBAR_PADDING,
+            M2O_PED_HEALTHBAR_PADDING,
+            M2O_PED_HEALTHBAR_WIDTH - M2O_PED_HEALTHBAR_PADDING * 2,
+            M2O_PED_HEALTHBAR_HEIGH - M2O_PED_HEALTHBAR_PADDING * 2,
+            vec4f(255,122,122,250)
+        );
+
+        gfx_render_add(ped->nickname_value,  24);
+        gfx_render_add(ped->healthbar_base,  22);
+        gfx_render_add(ped->healthbar_value, 22);
+    }
 }
 
 /**
@@ -61,6 +83,10 @@ void m2o_callback_ped_remove(librg_event_t *event) {
 
         if (ped->tasks.movedir) delete ped->tasks.movedir;
     }
+
+    gfx_destroy(ped->nickname_value);
+    gfx_destroy(ped->healthbar_base);
+    gfx_destroy(ped->healthbar_value);
 
     m2o_ped_free(ped);
 }
@@ -89,6 +115,22 @@ void m2o_callback_ped_remove(librg_event_t *event) {
 //         }
 //     }
 // }
+
+void m2o_callback_ped_namechange(librg_message_t *msg) {
+    auto entity = librg_entity_fetch(msg->ctx, librg_data_ru32(msg->data)); mod_assert(entity);
+    auto ped = m2o_ped_get(entity); mod_assert(ped);
+
+    auto size_actual = librg_data_ru8(msg->data);
+    auto size = zpl_clamp(0, size_actual, 127);
+
+    zpl_zero_item(ped->name);
+    librg_data_rptr(msg->data, ped->name, size);
+    mod_log("[info] set new name for client %u: %s\n", entity->id, ped->name);
+
+    gfx_destroy(ped->nickname_value);
+    ped->nickname_value = gfx_create_text(0, 14, ped->name, vec4f(255,255,255,255));
+    gfx_render_add(ped->nickname_value,  24);
+}
 
 /**
  * The entity in our stream zone gets updated
@@ -257,6 +299,33 @@ void m2o_callback_ped_interpolate(librg_entity_t *entity) {
     // }
 
     // ped->CHuman->SetPos(cubic_hermite_v3_interpolate(&ped->inter_pos, alpha));
+
+
+    { /* drawing names and healthbars */
+        f32 vdmag = zplm_vec3_mag2(mod.player->position - compensation);
+        f32 scale = (1.0f - zplm_clamp01(vdmag / zplm_square(35.0f)));
+
+        vec3 screen;
+        gfx_util_world2screen(compensation + vec3f(0, 0, 2.5f), &screen);
+
+        /* setup nickaname stuff */
+        gfx_position_set(ped->nickname_value, screen.x - 50.f * scale, screen.y);
+        gfx_visible_set(ped->nickname_value, (screen.z > 1.0));
+        gfx_scale_set(ped->nickname_value, scale, scale);
+
+        /* setup healthbar stuff */
+        int hbasex = screen.x - (M2O_PED_HEALTHBAR_WIDTH * 0.5f) * scale;
+        int hevalx = screen.x - (M2O_PED_HEALTHBAR_WIDTH * 0.5f) * scale + M2O_PED_HEALTHBAR_PADDING * scale;
+
+        gfx_position_set(ped->healthbar_base,  hbasex, screen.y + M2O_PED_HEALTHBAR_MARGIN * scale);
+        gfx_position_set(ped->healthbar_value, hevalx, screen.y + M2O_PED_HEALTHBAR_MARGIN * scale + M2O_PED_HEALTHBAR_PADDING * scale);
+
+        gfx_visible_set(ped->healthbar_base,  (screen.z > 1.0));
+        gfx_visible_set(ped->healthbar_value, (screen.z > 1.0));
+        gfx_scale_set(ped->healthbar_base,  scale, scale);
+        gfx_scale_set(ped->healthbar_value, scale, scale /* TODO: multiply by health percentage */);
+    }
+
 }
 
 // =======================================================================//
