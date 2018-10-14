@@ -215,7 +215,10 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, [](librg_event_t *event) {
         mod_log("[info] connected to the server\n");
+
+        /* This enable the ingame sound */
         M2::Wrappers::lua::Execute("game.game:SoundFadeIn(1000)");
+        
 
         /* setup default timeout */
         enet_peer_timeout(event->peer, 10, 5000, 10000);
@@ -357,11 +360,6 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
         input_block_set(!input_block_get());
     }
 
-    /* create a car */
-    if (input_key_down(VK_F2)) {
-        mod_message_send(ctx, M2O_CAR_CREATE, nullptr);
-    }
-
     /* connect to the server */
     if (input_key_down(VK_F5) && !mod.spawned) {
         mod_connect("localhost", 27010);
@@ -370,6 +368,14 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
 
 
     static M2::C_Entity *ent;
+    static M2::C_Command* moveCommand = nullptr;
+    if (input_key_down(VK_F2)) {
+        if (ent) {
+            ((M2::C_Human2*)ent)->CleanMoveCommands();
+            moveCommand = nullptr;
+        }
+    }
+
     if (input_key_down(VK_F3)) {
         if (!ent) {
             ent = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, 10);
@@ -383,40 +389,26 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
             pos.y += 1.f;
             pos.z -= 2.f;
             ent->SetPosition(pos);
+
+            mod_log("remote ped address = 0x%x\n", ((uintptr_t)ent));
+            mod_log("my ped address = 0x%x\n", ((uintptr_t)(M2::C_Game::Get()->GetLocalPed())));
         }
     }
 
     if (input_key_down(VK_F4) && mod.spawned) {
-
         if (ent) {
-            static void* moveCommand = nullptr;
-            if (!moveCommand) {
-                //moveCommand = zpl_malloc(0x58);
-                // zpl_zero_size(moveCommand, 0x58);
-                //mod_log("moveCommand address = 0x%x size: %d\n", ((uintptr_t)moveCommand), sizeof(moveCommand));
-                moveCommand = CIE_Alloc(0x58);
-                //moveCommand = new char[0x58];
+            if(!moveCommand){
+                moveCommand = (M2::C_Command*)CIE_Alloc(sizeof(M2::S_HumanCommandMoveDir));
+
+                ZeroMemory(moveCommand, sizeof(M2::S_HumanCommandMoveDir));
+                *(uintptr_t*)moveCommand = 0x19661BC;
+                moveCommand->countUsed = 1;
+
                 ((M2::C_Human2*)ent)->AddCommand(M2::E_Command::COMMAND_MOVEDIR, moveCommand);
+                ((M2::C_Human2*)ent)->m_aCommandsArray[((M2::C_Human2*)ent)->m_iNextCommand].m_pCommand = moveCommand;
             }
-
-
-            mod_log("moveCommand address = 0x%x size: %d\n", ((uintptr_t)moveCommand), sizeof(char[0x58]));
-
-            if (((M2::C_Command*)moveCommand)->m_iCommandID == 1) {
-                M2::S_HumanCommandMoveDir* cmd = (M2::S_HumanCommandMoveDir*)moveCommand;
-                cmd->moveSpeed = 0;
-                cmd->speedMultiplier = 0.1f;
-                cmd->potentialMoveVector = { 1.f, 1.f };
-            }
-
-            ((M2::C_Human2*)ent)->m_iCurrentCommand = 1;
-            ((M2::C_Human2*)ent)->m_aCommandsArray[1].m_pCommand = moveCommand;
+            mod_log("moveCommand address = 0x%x\n", ((uintptr_t)moveCommand));
         }
-
-        //M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"11_galante_load\")");
-        //M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
-        //M2::Wrappers::lua::Execute("icon:Activate()");
-        //M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {

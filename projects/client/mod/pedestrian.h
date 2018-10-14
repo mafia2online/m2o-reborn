@@ -166,12 +166,16 @@ void m2o_callback_ped_update(librg_event_t *event) {
         ped->tasks.init = true;
         mod_log("[info] calling late init for ped tasks...");
 
-        //ped->tasks.stand = CIE_Alloc(0x1E); // zpl_zero_item(ped->tasks.stand);
-        //ped->CHuman->AddCommand(M2::E_Command::COMMAND_STAND, ped->tasks.stand);
 
-        // ped->tasks.movedir = CIE_Alloc(0x58); //zpl_zero_item(ped->tasks.movedir);
-        ped->tasks.movedir = new char[0x58]; //zpl_zero_item(ped->tasks.movedir);
+        /* Init move command */
+        ped->tasks.movedir = (M2::C_Command*)CIE_Alloc(sizeof(M2::S_HumanCommandMoveDir));
+        *(uintptr_t*)ped->tasks.movedir = 0x19661BC;
+        ped->tasks.movedir->countUsed = 1;
+
         ped->CHuman->AddCommand(M2::E_Command::COMMAND_MOVEDIR, ped->tasks.movedir);
+
+        /* Tag the first command the player will use */
+        ped->CHuman->m_aCommandsArray[ped->CHuman->m_iNextCommand].m_pCommand = ped->tasks.movedir;
     }
 
     if (ped->state == PED_ON_GROUND && ped->tasks.init) {
@@ -184,7 +188,7 @@ void m2o_callback_ped_update(librg_event_t *event) {
                 cmd->potentialMoveVector = { ped->stream.dirx, ped->stream.diry };
             }
 
-            ped->CHuman->m_iCurrentCommand = 1;
+            ped->CHuman->m_iNextCommand = 1;
             ped->CHuman->m_aCommandsArray[1].m_pCommand = ped->tasks.movedir;
         } else {
             // ped->CHuman->m_iCurrentCommand = 0;

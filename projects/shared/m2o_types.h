@@ -84,8 +84,8 @@ typedef struct m2o_ped {
     struct {
         bool init;
         int counter;
-        void *stand;
-        void *movedir;
+        M2::C_Command *stand;
+        M2::C_Command *movedir;
     } tasks;
 
     struct {
