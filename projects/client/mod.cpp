@@ -215,6 +215,7 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_ACCEPT, [](librg_event_t *event) {
         mod_log("[info] connected to the server\n");
+        M2::Wrappers::lua::Execute("game.game:SoundFadeIn(1000)");
 
         /* setup default timeout */
         enet_peer_timeout(event->peer, 10, 5000, 10000);
@@ -232,6 +233,8 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
     librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, [](librg_event_t *event) {
         mod_log("[info] disconnected form the server\n");
+        M2::Wrappers::lua::Execute("game.game:SoundFadeOut(1000)");
+
 
         M2::C_Game::Get()->GetLocalPed()->LockControls(true);
         // object->SetPosition(zplm_vec3_zero()); // creates black textures :O
@@ -384,6 +387,7 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (input_key_down(VK_F4) && mod.spawned) {
+
         if (ent) {
             static void* moveCommand = nullptr;
             if (!moveCommand) {
