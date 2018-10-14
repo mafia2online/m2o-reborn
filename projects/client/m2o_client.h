@@ -67,15 +67,18 @@ extern "C" {
     int gfx_zindex_get(gfx_handle handle);
     int gfx_zindex_set(gfx_handle handle, int zindex);
 
-    int gfx_position_set(gfx_handle handle, int x, int y);
     int gfx_position_get(gfx_handle handle, int *x, int *y);
+    int gfx_position_set(gfx_handle handle, int x, int y);
 
-    int gfx_scale_set(gfx_handle handle, float x, float y);
     int gfx_scale_get(gfx_handle handle, float *x, float *y);
+    int gfx_scale_set(gfx_handle handle, float x, float y);
+
+    int gfx_visible_get(gfx_handle handle);
+    int gfx_visible_set(gfx_handle handle, int value);
 
     void gfx_util_screensize(int *w, int *h);
-    void gfx_util_screen2world(vec3 *screen, vec3 *world);
-    void gfx_util_world2screen(vec3 *world, vec3 *screen);
+    void gfx_util_screen2world(vec3 screen, vec3 *world);
+    void gfx_util_world2screen(vec3 world, vec3 *screen);
 
 // =======================================================================//
 // !
@@ -103,8 +106,8 @@ extern "C" {
     int cef_zindex_get(cef_handle handle);
     int cef_zindex_set(cef_handle handle, int zindex);
 
-    int cef_url_set(cef_handle handle, const char *url);
     int cef_url_get(cef_handle handle, char *url, int maxlen);
+    int cef_url_set(cef_handle handle, const char *url);
 
 // =======================================================================//
 // !
