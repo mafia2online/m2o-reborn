@@ -153,8 +153,8 @@ void mod_respawn() {
         M2::C_SDSLoadingTable::Get()->ProcessLine("free_joe_load");
         M2::C_SDSLoadingTable::Get()->ProcessLine("free_summer_load");
 
-        M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRclear_day_late_afternoon");
-        mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_late_afternoon");
+        M2::C_GfxEnvironmentEffects::Get()->GetWeatherManager()->SetDayTemplate("DT_RTRrainy_day_evening");
+        mod_log("[info] setting day template: %s\n", "DT_RTRclear_day_afternoon");
     }
 
     /* Disable ambiant peds */
@@ -408,6 +408,11 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
             ((M2::C_Human2*)ent)->m_iCurrentCommand = 1;
             ((M2::C_Human2*)ent)->m_aCommandsArray[1].m_pCommand = moveCommand;
         }
+
+        //M2::Wrappers::lua::Execute("game.sds:ActivateStreamMapLine(\"11_galante_load\")");
+        //M2::Wrappers::lua::Execute("icon = game.entitywrapper:GetEntityByName(\"RTR_POUTA1_00\")");
+        //M2::Wrappers::lua::Execute("icon:Activate()");
+        //M2::Wrappers::lua::Executef("icon:SetPos(Math:newVector(%f, %f, %f))", pos.x, pos.y, pos.z);
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
