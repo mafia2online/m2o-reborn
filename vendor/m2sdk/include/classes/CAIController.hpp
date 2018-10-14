@@ -18,5 +18,9 @@ namespace M2
     class C_AIController : public ICAIController
     {
     public:
+        void NewCommand(void *cmd)
+        {
+            Mem::InvokeFunction<Mem::call_this, int>(0xF9F880, this, cmd);
+        }
     };
 };

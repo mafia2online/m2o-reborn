@@ -128,6 +128,11 @@ namespace M2
         {
             return Mem::InvokeFunction<Mem::call_this, double>(0x46AC70, this);
         }
+
+        float GetTransparency()
+        {
+            return Mem::InvokeFunction<Mem::call_this, double>(0x9A1DC0, this);
+        }
         
         Vector3 GetWheelPos(int index)
         {
@@ -248,6 +253,11 @@ namespace M2
         void SetSpeedFloat(float speed)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x9A01A0, this, speed);
+        }
+
+        void SetTransparency(float transparency)
+        {
+            Mem::InvokeFunction<Mem::call_this, unsigned int>(0x9CCCC0, this, transparency);
         }
 
         void Setup()
