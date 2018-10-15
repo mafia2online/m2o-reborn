@@ -42,6 +42,11 @@ namespace M2
 	class C_Player2 : public ICPlayer2
 	{
 	public:
+        bool IsControlLockFinished()
+        {
+            return Mem::InvokeFunction<Mem::call_this, bool>(0x426FD0, this);
+        }
+
 		void LockControls(bool lock)
 		{
 			Mem::InvokeFunction<Mem::call_this, void>(0x438230, this, lock);

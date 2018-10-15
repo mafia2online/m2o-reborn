@@ -572,9 +572,9 @@ void M2::InitializeSDKHandlers()
     });
 
     M2::C_CarActionBreakIn_Hooks::HookTestAction([&](C_Car * car) {
-        return true;
+        return false;
     });
-
+    
     M2::C_CarActionTankFuel_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
@@ -585,7 +585,7 @@ void M2::InitializeSDKHandlers()
     });
 
     M2::C_CarActionThrowFrom_Hooks::HookTestAction([&](C_Car * car) {
-        return true;
+        return false;
     });
 
     M2::C_Human2CarWrapper_Hooks::HookIsFreeToGetIn([&](C_Car * car) {

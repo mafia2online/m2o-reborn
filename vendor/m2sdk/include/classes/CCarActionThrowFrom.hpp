@@ -29,7 +29,7 @@ namespace M2
         {
             inline bool TestAction(C_Car *car)
             {
-                if (FunctionPointers::testAction != nullptr) {
+                if (FunctionPointers::testAction != nullptr && car != nullptr) {
                     return FunctionPointers::testAction(car);
                 }
                 return false;
@@ -61,7 +61,7 @@ namespace M2
         void HookTestAction(std::function<bool(C_Car *)> ptr)
         {
             FunctionPointers::testAction = ptr;
-            Mem::Hooks::InstallJmpPatch(0xA3F173, (DWORD)NakedFunctions::CCarActionThrowFrom__TestAction__Hook);
+            Mem::Hooks::InstallJmpPatch(0xA3F189, (DWORD)NakedFunctions::CCarActionThrowFrom__TestAction__Hook);
         }
     };
 #endif

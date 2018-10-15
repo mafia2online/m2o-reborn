@@ -64,5 +64,10 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x42DDF0, this, matrix);
         }
+
+        void ThrowItem(int item)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x436380, this, item);
+        }
 	};
 };
