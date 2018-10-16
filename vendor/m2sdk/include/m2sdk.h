@@ -156,6 +156,7 @@ namespace M2 {
 #include "classes/CHumanWeaponController.hpp"
 #include "classes/CLockpick.hpp"
 #include "classes/cmafiaframework.hpp"
+#include "classes/CMenu.hpp"
 #include "classes/CModel.hpp"
 #include "classes/CMusic.hpp"
 #include "classes/CNavigation.hpp"
@@ -169,6 +170,8 @@ namespace M2 {
 #include "classes/CPoliceWanted.hpp"
 #include "classes/CPoliceWrapper.hpp"
 #include "classes/CProgramsDB.hpp"
+#include "classes/CQuestion.hpp"
+#include "classes/CQuestionSelector.hpp"
 #include "classes/CRadio.hpp"
 #include "classes/CRangeMeter.hpp"
 #include "classes/CRefPtr.hpp"
@@ -212,6 +215,7 @@ namespace M2 {
 
 /* Wrappers */
 #include "wrappers/camera.hpp"
+#include "wrappers/dialogs.hpp"
 #include "wrappers/game.hpp"
 #include "wrappers/lua.hpp"
 #include "wrappers/models.hpp"

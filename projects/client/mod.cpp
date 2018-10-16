@@ -422,23 +422,11 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {
-        char *fileName = M2::C_Tables::Get()->GetModelFileName(M2::EntityTypes::Entity_Car, 5);
-        mod_log("Veh file : %s\n", fileName);
-
-        M2::CModelManager::Get().OpenModel(M2::EntityTypes::Entity_Car, fileName);
-        M2::C_Model* model = M2::CModelManager::Get().m_pModel;
-        mod_log("Model ptr: 0x%X", model);
+        M2::Wrappers::Dialogs::AskQuestion();
     }
 
-    if (input_key_down(VK_F9)) {
-        vec3_t curpos, tarpos;
-        curpos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetDirection();
-        tarpos = reinterpret_cast<M2::C_Entity*>(M2::C_Game::Get()->GetLocalPed())->GetPosition();
-
-        static M2::C_SyncObject *sync = NULL;
-        ((M2::C_Human2 *)ent)->GetScript()->ScrMoveV(&sync, tarpos, M2::HUMAN_MOVE_MODE_SPRINT, curpos, true);
-
-        print_posm(curpos, "direction");
-        mod_log("moving ped to your location");
+    if (input_key_down(VK_F9) & 0x1) {
+       M2::Wrappers::lua::Execute("game.gui:ShowQuestionScreen4(\"0057000005\",\"0000000010\",1,\"0059000014\",2,\"0059000015\",3,\"0059000005\",4)");
+       //M2::Wrappers::lua::Execute("game.gui:ShowQuestDialog(\"pinup01_ps\",\"0059230008\",\"\",\"0059363000\",1,1)");
     }
 }
