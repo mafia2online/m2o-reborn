@@ -6,12 +6,15 @@
 
 #pragma once
 
+#include "CGameGuiScriptW.hpp"
+
 namespace M2
 {
 	class ICGameGuiModule
 	{
 	public:
-		void *m_pVFTable;
+        pad(ICGameGuiModule, pad0, 0x1758);     //0000 - 1758
+        C_GameGuiScriptW    *m_pGuiScriptW;     //1758 - 175C
 	};
 
 	class C_GameGuiModule : public GameClassWrapperStatic<C_GameGuiModule, ICGameGuiModule, 0x1AB64F0>

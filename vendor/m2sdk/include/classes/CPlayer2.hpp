@@ -13,6 +13,18 @@
 
 namespace M2
 {
+    enum  E_SpecCommand : int {
+        SHOT = 0,
+        RELOAD = 2,
+        SWITCH_NEXT = 3,
+        SWITCH_PREV = 4,
+        SELECT_UP = 5,
+        SELECT_DOWN = 6,
+        SELECT_LEFT = 7,
+        SELECT_RIGHT = 8,
+        HOLSTER = 9,
+    };
+
     enum E_PlayerMovementType : BYTE
     {
         E_MOVEMENT_WALK = 0,
@@ -62,10 +74,12 @@ namespace M2
     namespace C_Player2_Hooks
     {
         void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)>);
+        void HookAddSpecCommand(std::function<void(E_SpecCommand type)>);
 
         namespace FunctionPointers
         {
             std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> enterCar;
+            std::function<void(E_SpecCommand type)> addSpecCommand;
         };
 
         namespace Functions
@@ -74,6 +88,13 @@ namespace M2
             {
                 if (FunctionPointers::enterCar != nullptr) {
                     FunctionPointers::enterCar(player, car, seat);
+                }
+            }
+
+            inline void AddSpecCommand(E_SpecCommand type)
+            {
+                if (FunctionPointers::addSpecCommand != nullptr) {
+                    FunctionPointers::addSpecCommand(type);
                 }
             }
         };
@@ -103,12 +124,37 @@ namespace M2
                     jmp CPlayer__EnterCar_JumpBack
                 }
             }
+
+            void __declspec(naked) CPlayer2__AddSpecCommand()
+            {
+                __asm {
+                    pushad;
+                        push ebp;
+                        call Functions::AddSpecCommand;
+                        add esp, 0x4;
+                    popad;
+                }
+
+                __asm {
+                    mov edi, dword ptr ds : [esi + 0x0B0];
+                    mov dword ptr ss : [esp + 0x10], edi;
+                    cmp ebp, 0x0D;
+                    movzx eax, byte ptr ss : [ebp + 0x43922C];
+                    jmp dword ptr ds : [eax * 4 + 0x439224];
+                }
+            }
         };
 
         void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> ptr)
         {
             FunctionPointers::enterCar = ptr;
             Mem::Hooks::InstallJmpPatch(0x437935, (DWORD)NakedFunctions::CPlayer2__EnterCar);
+        }
+
+        void HookAddSpecCommand(std::function<void(E_SpecCommand type)> ptr)
+        {
+            FunctionPointers::addSpecCommand = ptr;
+            Mem::Hooks::InstallJmpPatch(0x00438CC0, (DWORD)NakedFunctions::CPlayer2__AddSpecCommand);
         }
     };
 #endif

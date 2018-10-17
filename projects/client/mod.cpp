@@ -121,6 +121,31 @@ void mod_install() {
 
         librg_event_trigger(ctx, M2O_CAR_ENTER, &event);
     });
+
+    M2::C_Player2_Hooks::HookAddSpecCommand([&](M2::E_SpecCommand type) {
+        switch (type)
+        {
+        case M2::E_SpecCommand::HOLSTER:
+            mod_log("holster trigger\n");
+            break;
+
+        case M2::E_SpecCommand::RELOAD:
+            mod_log("player reloading\n");
+            break;
+
+        case M2::E_SpecCommand::SHOT:
+            mod_log("player shot\n");
+            break;
+
+        case M2::E_SpecCommand::SWITCH_NEXT:
+            mod_log("player switched next\n");
+            break;
+            
+        case M2::E_SpecCommand::SWITCH_PREV:
+            mod_log("Player switched prev\n");
+            break;
+        }
+    });
 }
 
 void mod_connect(const char *host, int port) {
@@ -412,21 +437,14 @@ void m2o_module::tick(M2::I_TickedModuleCallEventContext &) {
     }
 
     if (GetAsyncKeyState(VK_F7) & 0x1) {
-        M2::C_Entity *test = M2::C_WrappersList::Get()->GetEntityByName("RTR_POUTA1_00");
-        if (test) {
-            mod_log("entity : 0x%p\n", test);
-        }
-        else {
-            mod_log("null ptr\n");
-        }
+        reinterpret_cast<M2::C_Human2*>(M2::C_Game::Get()->GetLocalPed())->GetInventory()->AddWeapon(12, 120);
     }
 
     if (GetAsyncKeyState(VK_F6) & 0x1) {
-        M2::Wrappers::Dialogs::AskQuestion();
+        M2::Wrappers::Dialogs::ShowQuestDialog();
     }
 
     if (input_key_down(VK_F9) & 0x1) {
-       M2::Wrappers::lua::Execute("game.gui:ShowQuestionScreen4(\"0057000005\",\"0000000010\",1,\"0059000014\",2,\"0059000015\",3,\"0059000005\",4)");
-       //M2::Wrappers::lua::Execute("game.gui:ShowQuestDialog(\"pinup01_ps\",\"0059230008\",\"\",\"0059363000\",1,1)");
+        M2::Wrappers::lua::Execute("game.gui:ShowQuestDialog(\"pinup01_ps\",\"Text1\",\"\Text2\",\"Text3\")");
     }
 }

@@ -60,6 +60,11 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, unsigned int>(0x432020, this);
         }
 
+        void GetShotPosDir(zplm_vec3 *pos, zplm_vec3 *rot)
+        {
+            Mem::InvokeFunction<Mem::call_this, bool>(0x004277C0, this, pos, rot);
+        }
+
         void SetAnimationMatrices(const void *matrix)
         {
             Mem::InvokeFunction<Mem::call_this, void>(0x42DDF0, this, matrix);

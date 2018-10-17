@@ -16,12 +16,6 @@ namespace M2
     class C_Question : public ICQuestion
     {
     public:
-        C_Question(C_HashName *name, I_ScreenDaemon *daemon)
-        {
-            //This is not working ATM
-            Mem::InvokeFunction<Mem::call_this, C_Question*>(0x8C6460, this, daemon, &name);
-        }
-
         char* CreateParametrizedString(const char *id)
         {
             return Mem::InvokeFunction<Mem::call_this, char *>(0x87A1A0, this, id);

@@ -9,6 +9,8 @@
 
 #include "CHashName.hpp"
 
+#include "CBaseDaemon.hpp"
+
 namespace M2
 {
     struct S_FadeParam
@@ -21,11 +23,6 @@ namespace M2
     enum E_ScreenOperationType: int
     {
         SCREEN_OPERATION_TYPE_QUESTION = 2
-    };
-
-    class I_ScreenDaemon
-    {
-
     };
 
     class ICMenu
@@ -41,10 +38,10 @@ namespace M2
            return Mem::InvokeFunction<Mem::call_this, int>(0x8D9760, this, unk, unk2, type, &fade);
         }
 
-        I_ScreenDaemon *GetDaemon(C_HashName const *name)
+        C_BaseDaemon *GetDaemon(C_HashName const *name)
         {
             static char idk;
-            return Mem::InvokeFunction<Mem::call_this, I_ScreenDaemon*>(0x876110, this, &idk, &name);
+            return Mem::InvokeFunction<Mem::call_this, C_BaseDaemon*>(0x876110, this, &idk, name);
         }
     };
 };
