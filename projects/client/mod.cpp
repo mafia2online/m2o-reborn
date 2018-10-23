@@ -263,6 +263,12 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
         mod_log("[info] disconnected form the server\n");
         M2::Wrappers::lua::Execute("game.game:SoundFadeOut(1000)");
 
+        M2::C_RangeMeter::Get()->OpenSeason(50);
+        M2::C_SpeechSlotManager::Get()->LoadStage(50);
+        M2::Wrappers::Radio::SetContent("Empire", "all", "Empire_07010");
+        M2::Wrappers::Radio::SetContent("Classic", "all", "Classic_07010");
+        M2::Wrappers::Radio::SetContent("Delta", "all", "Delta_07010");
+
 
         M2::C_Game::Get()->GetLocalPed()->LockControls(true);
         // object->SetPosition(zplm_vec3_zero()); // creates black textures :O
