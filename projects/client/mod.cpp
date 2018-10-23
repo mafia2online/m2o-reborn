@@ -243,7 +243,16 @@ void m2o_module::init(M2::I_TickedModuleCallEventContext &) {
 
         /* This enable the ingame sound */
         M2::Wrappers::lua::Execute("game.game:SoundFadeIn(1000)");
+
         
+
+        M2::Wrappers::lua::Execute("game.traffic:OpenSeason(50)");
+        M2::Wrappers::lua::Execute("game.speech:LoadStage(50)");
+        M2::Wrappers::lua::Execute("game.radio:SetContent(\"Empire\", \"all\", \"Empire_07010\")");
+        M2::Wrappers::lua::Execute("game.radio:SetContent(\"Classic\", \"all\", \"Classic_07010\")");
+        M2::Wrappers::lua::Execute("game.radio:SetContent(\"Delta\" ,\"all\" , \"Delta_07010\")");
+
+
 
         /* setup default timeout */
         enet_peer_timeout(event->peer, 10, 5000, 10000);
