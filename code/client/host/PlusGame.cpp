@@ -163,12 +163,24 @@ void PlusGame::Launch(const wchar_t *game_dir)
 
     // this is here *temporarily* and needs to be replaced with patterns
     {
-        nio::put_ljump(0x00401D15, yes);
+        nio::put_call(0x00401D15, yes);
     //    nio::nop(0x00401D63, 5);
 
         nio::nop(0x00401CFB, 6);
         nio::put_call(0x00401CFB, no);
+
+        nio::return_function(0x1872780);
     }
+
+    const auto handle = LoadLibraryA("C:\Program Files (x86)\NVIDIA Corporation\PhysX\Engine\v2.8.3\PhysXCore.dll");
+    if (!handle) {
+        printf("0x%d", GetLastError());
+
+        auto addr = (uintptr_t)LoadLibraryA;
+        printf("LoadLibraryA addr = 0x%p", addr);
+        __debugbreak();
+    }
+
 
     // invoke EP
     entry_point();

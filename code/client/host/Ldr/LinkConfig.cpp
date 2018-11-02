@@ -13,7 +13,7 @@
 
 // game
 #pragma bss_seg(".maf")
-char dummy_seg[0x3000000];
+char maf_seg[0x3000000];
 
 // stub memory // not needed on 32bit
 // char stub_seg[0x100000];
