@@ -41,4 +41,41 @@ bool Utility::WriteString(const HKEY hKeyLocation, const char * szSubKey, const 
     return false;
 }
 
+bool Utility::ReadStringW(HKEY hKeyLocation, const wchar_t * szSubKey, const wchar_t * szKey, const wchar_t * szDefault, wchar_t * szData, DWORD dwSize)
+{
+    HKEY hKey = nullptr;
+
+    if (RegOpenKeyExW(hKeyLocation, szSubKey, NULL, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        DWORD dwType = REG_SZ;
+        const auto lStatus = RegQueryValueExW(hKey, szKey, nullptr, &dwType, reinterpret_cast<BYTE *>(szData), &dwSize);
+        RegCloseKey(hKey);
+        return (lStatus == ERROR_SUCCESS);
+    }
+
+    if (szDefault)
+        wcscpy(szData, szDefault);
+
+    return false;
+}
+
+bool Utility::WriteStringW(HKEY hKeyLocation, const wchar_t * szSubKey, const wchar_t * szKey, wchar_t * szData, DWORD dwSize)
+{
+    HKEY hKey = nullptr;
+
+    RegOpenKeyExW(hKeyLocation, szSubKey, NULL, KEY_WRITE, &hKey);
+
+    if (!hKey)
+        RegCreateKeyW(hKeyLocation, szSubKey, &hKey);
+
+    if (hKey)
+    {
+        RegSetValueExW(hKey, szKey, NULL, REG_SZ, reinterpret_cast<BYTE *>(szData), dwSize);
+        RegCloseKey(hKey);
+        return true;
+    }
+
+    return false;
+}
+
 #endif

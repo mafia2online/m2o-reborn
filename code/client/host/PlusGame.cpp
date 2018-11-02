@@ -68,20 +68,6 @@ void WINAPI RaiseException_Hook(DWORD dwExceptionCode, DWORD dwExceptionFlags, D
     RaiseException(dwExceptionCode, dwExceptionFlags, nNumberOfArguments, lpArguments);
 }
 
-static bool yes()
-{
-    printf("yes stub!\n");
-
-    return true;
-}
-
-static bool no()
-{
-    printf("no stuB!\n");
-
-    return false;
-}
-
 static const wchar_t *g_img_path;
 
 DWORD WINAPI GetModuleFileNameW_Hook(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
@@ -94,6 +80,12 @@ DWORD WINAPI GetModuleFileNameW_Hook(HMODULE hModule, LPWSTR lpFilename, DWORD n
     }
 
     return GetModuleFileNameW(hModule, lpFilename, nSize);
+}
+
+void ApplyRunPatch()
+{
+    char *loc = nio::pattern("81 EC ? ? ? ? 53 33 DB 68 ? ? ? ? 53").first();
+    nio::put_ljump(loc, loc + 0x1AC);
 }
 
 void PlusGame::Launch(const wchar_t *game_dir)
@@ -116,13 +108,13 @@ void PlusGame::Launch(const wchar_t *game_dir)
     fread(data, 1, length, file);
     fclose(file);
 
-    printf("Loaded game with size %ld\n", length);
+    printf("[Host] Loaded Game (%ld MB)\n", length / 1024);
 
     auto base = GetModuleHandle(nullptr);
     ExecutableLoader loader(data);
 
     // as no stub memory is required
-    loader.SetLoadLimit(0x30000000);
+    loader.SetLoadLimit(0x2500000);
 
     loader.SetLibraryLoader([](const char* library) -> HMODULE
     {
@@ -163,83 +155,9 @@ void PlusGame::Launch(const wchar_t *game_dir)
     // initialize nio
     nio::set_base(reinterpret_cast<uintptr_t>(base));
 
-    // this is here *temporarily* and needs to be replaced with patterns
-    {
-        nio::put_call(0x00401D15, yes);
-        nio::nop(0x00401D63, 5);
-
-        nio::nop(0x00401CFB, 6);
-        nio::put_call(0x00401CFB, no);
-
-        nio::return_function(0x1872780);
-
-        LoadLibraryA("C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Engine\\73BE2921551D\\ImplicitLibs\\cudart32_65.dll");
-
-        // Set this application as not being debugged
-        PPEB peb = (PPEB)__readfsdword(0x30);
-        peb->BeingDebugged = false;
-        //*(DWORD*)((char*)peb + 0xBC) &= ~0x70;
-
-        HMODULE hNtDll = LoadLibraryW(L"ntdll.dll");
-        uint8_t* ptr = (uint8_t*)GetProcAddress(hNtDll, "KiRaiseUserExceptionDispatcher");
-        DWORD oldProtect;
-        VirtualProtect(ptr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
-        *ptr = 0xC3;
-
-        static auto fuckyou = []() -> void {
-            printf("FUCK YOU");
-            __debugbreak();
-        };
-
-        static auto fuckyoubool = []() -> boolean {
-            printf("FUCK YOU #2");
-            __debugbreak();
-            return false;
-        };
-
-        HMODULE hKernel32 = LoadLibraryW(L"kernel32.dll");
-        uint8_t* ptr2 = (uint8_t*)GetProcAddress(hKernel32, "TerminateProcess");
-        uint8_t* ptr2_orig = nullptr;
-
-        uint8_t* ptr3 = (uint8_t*)GetProcAddress(hKernel32, "ExitProcess");
-        uint8_t* ptr3_orig = nullptr;
-
-        uint8_t* ptr4 = (uint8_t*)GetProcAddress(hKernel32, "IsDebuggerPresent");
-        uint8_t* ptr4_orig = nullptr;
-
-        auto faggot = MH_Initialize();
-        if (faggot != MH_OK)
-            __debugbreak();
-
-        /*VirtualProtect(ptr2, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
-        VirtualProtect(ptr3, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
-        VirtualProtect(ptr4, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
-
-        *ptr2 = 0xC3CC;
-        *ptr3 = 0xC3CC;
-        *ptr4 = 0xC3CC;*/
-
-        auto statuscr = MH_CreateHook(ptr2, (LPVOID)&fuckyou, (LPVOID*)&ptr2_orig);
-
-        if (statuscr != MH_OK)
-            __debugbreak();
-
-        auto status = MH_EnableHook(ptr2);
-
-        if (status != MH_OK)
-            __debugbreak();
-
-        MH_CreateHook(ptr3, (LPVOID)&fuckyou, (LPVOID*)&ptr3_orig);
-        MH_EnableHook(ptr3);
-        
-        MH_CreateHook(ptr4, (LPVOID)&fuckyoubool, (LPVOID*)&ptr4_orig);
-        MH_EnableHook(ptr4);
-
-        nio::return_function(0x00450520);
-    }
+    // dont create a mutex, dont check for launcher
+    ApplyRunPatch();
 
     // invoke EP
     entry_point();
-
-    __debugbreak();
 }

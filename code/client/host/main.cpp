@@ -4,6 +4,7 @@
 #include <cstdio>
 
 #include <Utility/PathUtils.h>
+#include <Utility/WinRegistry.h>
 
 #include <PlusGame.h>
 
@@ -107,8 +108,32 @@ int wmain()
         }
     }
 
+    // handle path variable
+    {
+        static wchar_t pathBuf[32768];
+        GetEnvironmentVariable(L"PATH", pathBuf, sizeof(pathBuf));
+
+        // append bin & game directorys
+        std::wstring newPath = localpath + L";" + game_dir + L";" + std::wstring(pathBuf);
+        SetEnvironmentVariable(L"PATH", newPath.c_str());
+    }
+
+    // fix some PhysX bug
+    {
+        // place "cudart32_65.dll" in your /bin/ directory, if not present through nvidia installation!
+        wchar_t buf[512];
+        if (Utility::ReadStringW(HKEY_LOCAL_MACHINE, L"Software\\AGEIA Technologies\\", L"PhysXCore Path", L"cudart32_65.dll", buf, sizeof(buf)))
+        {
+            auto ptr = wcsstr(buf, L"Engine");
+            wcscpy(ptr, L"Common\\cudart32_65.dll");
+        }
+
+        wprintf(L"[Host] Nvidia fix (%s)\n", buf);
+        LoadLibraryW(buf);
+    }
+
     lstrcatW(game_dir, EXE);
-    wprintf(L"Loading game from %s\n", game_dir);
+    wprintf(L"[Host] Game dir (%s)\n", game_dir);
 
     PlusGame::Launch(game_dir);
 
