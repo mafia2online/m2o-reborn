@@ -117,7 +117,7 @@ workspace "MPLUS"
     group "Vendor"
 	if os.target() == "windows" then
 		--include "vendor/nomad-common"
-		--include "vendor/minhook"
+		include "vendor/minhook"
 		--include "vendor/imgui"
 	end
 	--include "vendor/enet"

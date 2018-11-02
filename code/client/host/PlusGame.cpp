@@ -9,6 +9,8 @@
 #include <Utility/PathUtils.h>
 #include <Hooking.h>
 
+#include <MinHook.h>
+
 inline void InitializeModules()
 {   
     auto mod = LoadLibraryW(Utility::MakeAbsolutePathW(L"core-client.dll").c_str());
@@ -82,7 +84,7 @@ static bool no()
 
 static const wchar_t *g_img_path;
 
-DWORD WINAPI GetModuleFileNameW_Hook(HMODULE hModule,LPWSTR lpFilename,DWORD nSize)
+DWORD WINAPI GetModuleFileNameW_Hook(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 {
     if (!hModule)
     {
@@ -170,17 +172,9 @@ void PlusGame::Launch(const wchar_t *game_dir)
         nio::put_call(0x00401CFB, no);
 
         nio::return_function(0x1872780);
+
+        MH_Initialize();
     }
-
-    const auto handle = LoadLibraryA("C:\Program Files (x86)\NVIDIA Corporation\PhysX\Engine\v2.8.3\PhysXCore.dll");
-    if (!handle) {
-        printf("0x%d", GetLastError());
-
-        auto addr = (uintptr_t)LoadLibraryA;
-        printf("LoadLibraryA addr = 0x%p", addr);
-        __debugbreak();
-    }
-
 
     // invoke EP
     entry_point();

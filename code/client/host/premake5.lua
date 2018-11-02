@@ -23,19 +23,16 @@ project "Host"
         ["*"] = "premake5.lua"
     }
 
-    libdirs
-    {
-        --"../../Vendor/ntdll"
-    }
-
     includedirs
     {
+        "../../vendor/minhook",
         "."
     }
 
     links
     {
 		"shared",
+        "minhook"
     }
 
     files

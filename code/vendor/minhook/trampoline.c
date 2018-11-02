@@ -27,18 +27,16 @@
  */
 
 #include <windows.h>
-#include <intrin.h>
-
+#include "hde32.h"
 #ifndef ARRAYSIZE
     #define ARRAYSIZE(A) (sizeof(A)/sizeof((A)[0]))
 #endif
 
 #if defined(_M_X64) || defined(__x86_64__)
-    #include "./hde/hde64.h"
+#include "hde64.h"
     typedef hde64s HDE;
     #define HDE_DISASM(code, hs) hde64_disasm(code, hs)
 #else
-    #include "./hde/hde32.h"
     typedef hde32s HDE;
     #define HDE_DISASM(code, hs) hde32_disasm(code, hs)
 #endif
@@ -277,7 +275,7 @@ BOOL CreateTrampolineFunction(PTRAMPOLINE ct)
 #ifndef _MSC_VER
         memcpy((LPBYTE)ct->pTrampoline + newPos, pCopySrc, copySize);
 #else
-        __movsb((LPBYTE)ct->pTrampoline + newPos, (const unsigned char*)pCopySrc, copySize);
+        __movsb((LPBYTE)ct->pTrampoline + newPos, pCopySrc, copySize);
 #endif
         newPos += copySize;
         oldPos += hs.len;
