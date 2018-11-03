@@ -10,7 +10,12 @@ namespace nmd::gui
 
     public:
 
+        GuiInterface();
+        ~GuiInterface();
+
         void Init();
         void Shutdown();
+
+        void Render();
     };
 }

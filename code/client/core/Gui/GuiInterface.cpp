@@ -3,23 +3,31 @@
 
 namespace nmd::gui
 {
-    void GuiInterface::Init()
+    GuiInterface::GuiInterface()
     {
         cef_mgr = std::make_unique<CefManager>();
+    }
 
+    GuiInterface::~GuiInterface()
+    {
+        
+    }
+
+    void GuiInterface::Init()
+    {
         if (cef_mgr->Initialize())
         {
             printf("Initialized cef!\n");
         }
-
-
     }
 
     void GuiInterface::Shutdown()
     {
         cef_mgr->Shutdown();
+    }
 
-        //
-        cef_mgr.release();
+    void GuiInterface::Render()
+    {
+        cef_mgr->DoFrames();
     }
 }

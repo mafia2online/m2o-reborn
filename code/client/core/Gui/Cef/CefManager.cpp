@@ -1,6 +1,7 @@
 
 #include <Utility/PathUtils.h>
 #include <Gui/Cef/CefManager.h>
+#include <Gui/Cef/CefRenderImpl.h>
 
 #include <delayimp.h>
 
@@ -38,10 +39,10 @@ namespace nmd::gui
         // CEF Settings
         CefSettings cefSettings;
         cefSettings.no_sandbox = true;
-        cefSettings.multi_threaded_message_loop = true;
+        cefSettings.multi_threaded_message_loop = FALSE;
         cefSettings.remote_debugging_port = 13172; // config
         cefSettings.pack_loading_disabled = false;
-        cefSettings.windowless_rendering_enabled = true;
+        cefSettings.windowless_rendering_enabled = false;
 
         // Locale
         CefString(&cefSettings.locale)
@@ -81,6 +82,16 @@ namespace nmd::gui
             auto e = find(frames.begin(), frames.end(), element);
 
             if (e != frames.end()) frames.erase(e);
+        }
+    }
+
+    void CefManager::DoFrames()
+    {
+        for (auto &frame : frames)
+        {
+            auto ptr = (CefRenderImpl*)frame->GetRenderHandler().get();
+
+            ptr->Draw();
         }
     }
 }

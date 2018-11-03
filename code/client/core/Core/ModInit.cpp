@@ -6,7 +6,7 @@ static bool (*Initialize_Game__Orig)(void*);
 
 static bool Initialize_Game(void* self)
 {
-    printf("[Core] : CInit!\n");
+    printf("[Core] CInit!\n");
 
     return Initialize_Game__Orig(self);
 }

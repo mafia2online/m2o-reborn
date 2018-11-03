@@ -7,19 +7,16 @@ namespace mplus
     MPlusModule::MPlusModule()
     {
         Intialize(this);
-
-        gui.Init();
     }
 
     MPlusModule::~MPlusModule()
     {
         printf(__FUNCTION__ "\n");
-        gui.Shutdown();
     }
 
     void MPlusModule::Intialize(MPlusModule* inst)
     {
-        printf(__FUNCTION__ "\n");
+        printf("[Core]" __FUNCTION__ "\n");
 
         auto mgr = C_TickedModuleManager::GetInstance();
 
@@ -41,10 +38,13 @@ namespace mplus
 
     void MPlusModule::OnAppInit(I_TickedModuleCallEventContext&)
     {
+        gui.Init();
     }
 
     void MPlusModule::OnAppShutdown(I_TickedModuleCallEventContext&)
     {
+        gui.Shutdown();
+
         auto mgr = C_TickedModuleManager::GetInstance();
 
         //mgr->DelAction()
@@ -72,7 +72,6 @@ namespace mplus
 
     void MPlusModule::OnRender(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        gui.Render();
     }
 }

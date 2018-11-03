@@ -21,6 +21,8 @@ namespace nmd::gui
         // frame
         std::weak_ptr<CefFrame> AddFrame(const std::string &url, const CefFrameInfo &info);
         void RemoveFrame(std::weak_ptr<CefFrame> frame);
+
+        void DoFrames();
     };
 }
 
