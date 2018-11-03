@@ -1,11 +1,23 @@
 #/bin/bash 2>nul || goto :windows
 
-# bash
-echo [bash env]
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=linux;;
+    Darwin*)    machine=macos;;
+    MINGW*)     machine=mingw;;
+    *)          machine="unknown"
+esac
 
-mkdir -p build
-cd build
-cmake .. -DM2O_SERVER=1
+cd code
+
+if [[ $1 == "clean" ]]
+then
+    # Invoke premake5's clean action
+    echo "Performing clean action..."
+    build\{$machine}\premake5 clean
+else
+    build/${machine}/premake5 gmake2 "${@}"
+fi
 
 exit
 

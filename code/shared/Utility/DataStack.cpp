@@ -1,7 +1,7 @@
 
 #include <memory>
 #include <string.h>
-#include <Utility/DataStack.h>
+#include <utility/DataStack.h>
 
 DataStack::DataStack(const char* bytes, size_t length)
     : bytes_managed(false), bytes(const_cast<char*>(bytes)), end(length), length(0)

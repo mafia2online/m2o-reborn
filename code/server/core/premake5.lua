@@ -2,6 +2,8 @@ project "server-core"
     language "C++"
     kind "ConsoleApp"
 
+    architecture "x86_64"
+
     includedirs
     {
         "../../vendor",
@@ -17,3 +19,10 @@ project "server-core"
         "**.cpp",
         "**.rc"
     }
+
+    configuration { "macos" }
+        links { "m", "pthread", "dl" }
+
+    if os.target() ~= "windows" then
+        removeplatforms { "x86" }
+    end

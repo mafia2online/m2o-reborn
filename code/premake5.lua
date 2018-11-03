@@ -28,6 +28,7 @@ FX_NAME = "MAFIA PLUS"
 
 workspace "mplus"
     configurations { "Debug", "Release" }
+    platforms { "x86" }
 
     if os.istarget('windows') then
         buildoptions "/std:c++latest"
@@ -42,7 +43,6 @@ workspace "mplus"
     -- Enable position-independent-code generation
     pic "On"
     startproject "launcher"
-    platforms { "x86" }
 
     defines { "FXNAME=\"" .. FX_NAME .. "\""}
     defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
@@ -77,7 +77,7 @@ workspace "mplus"
         runtime "Debug"
 
     filter "configurations:Release"
-        staticruntime "On"
+        -- staticruntime "On"
         optimize "Speed"
 
     filter {"system:windows", "configurations:Release", "kind:not StaticLib"}

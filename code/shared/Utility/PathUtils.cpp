@@ -7,7 +7,7 @@
 #include <string.h>
 #endif
 
-#include <Utility/PathUtils.h>
+#include <utility/PathUtils.h>
 
 namespace Utility
 {
