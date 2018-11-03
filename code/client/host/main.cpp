@@ -1,12 +1,12 @@
-
 #include <Windows.h>
 #include <shellscalingapi.h>
 #include <cstdio>
 
-#include <Utility/PathUtils.h>
-#include <Utility/WinRegistry.h>
+#include <utility/PathUtils.h>
+#include <utility/WinRegistry.h>
 
-#include <PlusGame.h>
+#include "plusgame.h"
+#include "plusgame.cpp"
 
 #define EXE L"//mafia2.exe"
 #define KEY L"maf2_path"
@@ -135,7 +135,7 @@ int wmain()
     lstrcatW(game_dir, EXE);
     wprintf(L"[Host] Game dir (%s)\n", game_dir);
 
-    PlusGame::Launch(game_dir);
+    plusgame::launch(game_dir);
 
     return 0;
 }

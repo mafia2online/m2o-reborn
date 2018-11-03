@@ -1,7 +1,7 @@
-project "Shared"
+project "shared"
     language "C++"
     kind "StaticLib"
-	optimize "Speed"
+    optimize "Speed"
 
     vpaths
     {
@@ -13,7 +13,7 @@ project "Shared"
 
     includedirs
     {
-		"./nomad-common",
+        "./nomad-common",
         "."
     }
 
@@ -25,3 +25,12 @@ project "Shared"
         "**.cpp",
         "**.rc"
     }
+
+    filter "files:Hooking**.cpp"
+        flags {"ExcludeFromBuild"}
+
+    filter "files:nomad**.cpp"
+        flags {"ExcludeFromBuild"}
+
+    filter "files:utility**.cpp"
+        flags {"ExcludeFromBuild"}

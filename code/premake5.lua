@@ -26,31 +26,31 @@ FX_NAME = "MAFIA PLUS"
 --dofile('build/vendor/vendorfiles.lua')
 --dofile('build/modules/modules.lua')
 
-workspace "MPLUS"
+workspace "mplus"
     configurations { "Debug", "Release" }
 
-	if os.istarget('windows') then
-		buildoptions "/std:c++latest"
-		-- systemversion "10.0.15063.0"
-	else
-		buildoptions "-std=c++17"
-	end
+    if os.istarget('windows') then
+        buildoptions "/std:c++latest"
+    else
+        buildoptions "-std=c++17"
+    end
 
-    targetprefix ""
     symbols "On"
+    targetprefix ""
     characterset "Unicode"
-	
+
     -- Enable position-independent-code generation
     pic "On"
     startproject "launcher"
-	platforms { "x86" }
-	
-	defines { "FXNAME=\"" .. FX_NAME .. "\""}
-	defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
-	location "../build/"
-	targetdir "../bin/%{cfg.buildcfg}/"
-	os.mkdir"../build/symbols"
-	
+    platforms { "x86" }
+
+    defines { "FXNAME=\"" .. FX_NAME .. "\""}
+    defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
+
+    location "../build/"
+    targetdir "../bin/%{cfg.buildcfg}/"
+    os.mkdir"../build/symbols"
+
     defines
     {
         "NOMINMAX",
@@ -60,22 +60,24 @@ workspace "MPLUS"
     includedirs
     {
         ".",
-		"./shared",
+        "./shared",
     }
-	
-	libdirs
-	{
-		"./shared/Lib",
-	}
+
+    libdirs
+    {
+        -- "./shared/libs",
+    }
 
     filter "platforms:x64"
          architecture "x86_64"
 
     filter "configurations:Debug"
-        defines { "GC_DBG" }
+        defines { "DEBUG", "_DEBUG", "GC_DBG" }
+        optimize "Off"
+        runtime "Debug"
 
     filter "configurations:Release"
-        --flags { "StaticRuntime" }
+        staticruntime "On"
         optimize "Speed"
 
     filter {"system:windows", "configurations:Release", "kind:not StaticLib"}
@@ -94,35 +96,35 @@ workspace "MPLUS"
             "_CRT_NONSTDC_NO_DEPRECATE",
             "_SCL_SECURE_NO_WARNINGS",
             "_SCL_SECURE_NO_DEPRECATE",
-            
+
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
         }
 
-	if os.target() == "windows" then
-    	group "Client"
-		include "client/host"
-	end
-	
-	group "Server"
-	--include "server/host"
-	--include "server/host_gui"
-	--include "server/core"
-	
-	--group "Modules"
-	--do_modules()
-	
-	group "Shared"
-	include "./shared"
+    if os.target() == "windows" then
+        group "client"
+        include "client/host"
+    end
 
-    group "Vendor"
-	if os.target() == "windows" then
-		--include "vendor/nomad-common"
-		include "vendor/minhook"
-		--include "vendor/imgui"
-	end
-	--include "vendor/enet"
-	--do_vendor()
-	
+    group "server"
+    --include "server/host"
+    --include "server/host_gui"
+    --include "server/core"
+
+    --group "Modules"
+    --do_modules()
+
+    group ""
+    include "./shared"
+
+    group "vendor"
+    if os.target() == "windows" then
+        --include "vendor/nomad-common"
+        include "vendor/minhook"
+        --include "vendor/imgui"
+    end
+    --include "vendor/enet"
+    --do_vendor()
+
 -- Cleanup
 if _ACTION == "clean" then
     os.rmdir("../bin");

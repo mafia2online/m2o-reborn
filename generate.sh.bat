@@ -12,6 +12,17 @@ exit
 :windows
 @echo off
 
-if not exist build mkdir build
-cd build
-cmake .. -G"Visual Studio 15 2017" -DM2O_SERVER=1 -DM2O_CLIENT=1 -DM2O_CEF=1
+cd code
+
+if "%1" == "clean" (
+    :: Invoke premake5's clean action
+    echo Performing clean action...
+    build\win\premake5 clean
+) else (
+    :: Invoke premake5 with specified args and VS2017 action
+    build\win\premake5 %* vs2017
+)
+
+:: Pause for 5 seconds and auto-close the command window
+:end
+timeout /t 3 /nobreak

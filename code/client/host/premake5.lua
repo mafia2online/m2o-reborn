@@ -6,13 +6,14 @@
 -- Distributed under the MIT license (See accompanying file LICENSE or copy at
 -- https://opensource.org/licenses/MIT)
 
-project "Host"
+project "host"
     language "C++"
     kind "WindowedApp"
-    targetname "MPII_Host" 
-   -- linkoptions { "/IGNORE:4254 /DYNAMICBASE:NO /SAFESEH:NO /LARGEADDRESSAWARE /LARGEADDRESSAWARE /FIXED:NO /STACK:\"2097152\"  /BASE:\"0x1520000\" /MACHINE:X64 /SUBSYSTEM:WINDOWS /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" " }
+    targetname "MPII_Host"
+    -- linkoptions { "/IGNORE:4254 /DYNAMICBASE:NO /SAFESEH:NO /LARGEADDRESSAWARE /LARGEADDRESSAWARE /FIXED:NO /STACK:\"2097152\"  /BASE:\"0x1520000\" /MACHINE:X64 /SUBSYSTEM:WINDOWS /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" " }
     -- targetdir(buildpath("."))
-	flags { "NoIncrementalLink", "NoEditAndContinue" }
+    editandcontinue "Off"
+    flags { "NoIncrementalLink" }
     linkoptions "/IGNORE:4254 /ENTRY:wmainCRTStartup /OPT:NOLBR /SAFESEH:NO /DYNAMICBASE:NO /LARGEADDRESSAWARE /LAST:.zdata"
 
     vpaths
@@ -31,7 +32,7 @@ project "Host"
 
     links
     {
-		"shared",
+        "shared",
         "minhook"
     }
 
@@ -43,6 +44,9 @@ project "Host"
         "**.cpp",
         "**.rc"
     }
+
+    filter "files:plusgame.cpp"
+        flags { "ExcludeFromBuild" }
 
     filter "architecture:x64"
         flags { "ExcludeFromBuild" }
