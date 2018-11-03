@@ -335,4 +335,7 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-.DS_store
+# os stuff
+.DS_Store
+Thumbs.db
+.sync/
