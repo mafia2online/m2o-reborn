@@ -207,6 +207,7 @@ Releases the resources acquired by `http_get` or `http_post`. Should be call whe
 #else
     #include <stdlib.h>
     #include <stdio.h>
+    #include <signal.h>
     #include <string.h>
     #include <sys/types.h>
     #include <sys/socket.h>
