@@ -29,6 +29,11 @@ FX_NAME = "MAFIA PLUS"
 workspace "MPLUS"
     configurations { "Debug", "Release" }
 
+	if _OPTIONS['is_ci_build'] == 'true' then
+		
+	   defines "CI_BUILD"
+	end
+	
 	if os.istarget('windows') then
 		buildoptions "/std:c++latest"
 		-- systemversion "10.0.15063.0"
@@ -103,9 +108,10 @@ workspace "MPLUS"
 		include "client/host"
 	end
 	
+	include "client/core"
+	
 	group "Server"
-	--include "server/host"
-	--include "server/host_gui"
+	include "server/host"
 	--include "server/core"
 	
 	--group "Modules"
@@ -120,6 +126,8 @@ workspace "MPLUS"
 		include "vendor/minhook"
 		--include "vendor/imgui"
 	end
+	include "vendor/m2framework"
+	
 	--include "vendor/enet"
 	--do_vendor()
 	

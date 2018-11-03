@@ -445,6 +445,13 @@ inline void set_call(TTarget* target, T address)
 	*(T*)target = get_call(address);
 }
 
+template<typename TTarget, typename T, typename TFunc>
+inline void replace_call(TTarget *target, T address, TFunc fn)
+{
+    *(T*)target = get_call(address);
+    put_call(address, fn);
+}
+
 namespace vp
 {
 	template<typename T, typename AT>

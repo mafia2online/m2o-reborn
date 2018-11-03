@@ -68,4 +68,3 @@ end
 if os.target() == "windows" then
 	vendor_submodule 'cefwrapper'
 end
-vendor_submodule 'curl'

@@ -1,4 +1,3 @@
-
 #include <Windows.h>
 #include <shellscalingapi.h>
 #include <cstdio>
@@ -6,19 +5,17 @@
 #include <Utility/PathUtils.h>
 #include <Utility/WinRegistry.h>
 
-#include <PlusGame.h>
+#include <Host.h>
 
 #define EXE L"//mafia2.exe"
 #define KEY L"maf2_path"
 
-extern "C"
-{
-    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+extern "C" {
+__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 }
 
-extern "C"
-{
-    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+extern "C" {
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
 void OpenConsole()
@@ -39,26 +36,21 @@ int wmain()
 
     auto localpath = Utility::MakeAbsolutePathW(L"");
 
-    auto check = [=](const std::wstring& str)
     {
-        if (GetFileAttributesW((localpath + str).c_str()) == INVALID_FILE_ATTRIBUTES)
+        auto check = [=](const std::wstring& str)
         {
-            CreateDirectoryW((localpath + str).c_str(), nullptr);
-        }
-    };
+            if (GetFileAttributesW((localpath + str).c_str()) == INVALID_FILE_ATTRIBUTES)
+            {
+                CreateDirectoryW((localpath + str).c_str(), nullptr);
+            }
+        };
 
-    const std::wstring file_structure[2] = {
-        L"data",
-        L"bin"
-    };
-
-    for (const auto& file : file_structure)
-    {
-        check(file);
+        check(L"data");
+        check(L"bin");
     }
 
     // readout path and fx config
-    static wchar_t game_dir[MAX_PATH + 20] = { 0 };
+    static wchar_t game_dir[MAX_PATH + 20] = {0};
 
     std::wstring fullpath = localpath + L"fxconfig.ini";
     GetPrivateProfileStringW(L"fxconfig", KEY, nullptr, game_dir, MAX_PATH, fullpath.c_str());
@@ -86,10 +78,9 @@ int wmain()
         AddDllDirectory(localpath.c_str());
 
         // to prevent a) current directory DLL search being disabled and b) xlive.dll being taken from system if not overridden
-     //   SetDllDirectoryW(localpath.c_str());
+        //   SetDllDirectoryW(localpath.c_str());
 
         // game could expect relative pathing
-       // SetCurrentDirectoryW(game_dir);
         SetCurrentDirectoryW(game_dir);
     }
 
@@ -99,7 +90,8 @@ int wmain()
 
         if (shcore)
         {
-            auto SetProcessDpiAwareness = (decltype(&::SetProcessDpiAwareness))GetProcAddress(shcore, "SetProcessDpiAwareness");
+            auto SetProcessDpiAwareness = (decltype(&::SetProcessDpiAwareness))GetProcAddress(
+                shcore, "SetProcessDpiAwareness");
 
             if (SetProcessDpiAwareness)
             {
@@ -122,7 +114,8 @@ int wmain()
     {
         // place "cudart32_65.dll" in your /bin/ directory, if not present through nvidia installation!
         wchar_t buf[512];
-        if (Utility::ReadStringW(HKEY_LOCAL_MACHINE, L"Software\\AGEIA Technologies\\", L"PhysXCore Path", L"cudart32_65.dll", buf, sizeof(buf)))
+        if (Utility::ReadStringW(HKEY_LOCAL_MACHINE, L"Software\\AGEIA Technologies\\", L"PhysXCore Path",
+                                 L"cudart32_65.dll", buf, sizeof(buf)))
         {
             auto ptr = wcsstr(buf, L"Engine");
             wcscpy(ptr, L"Common\\cudart32_65.dll");
@@ -135,7 +128,7 @@ int wmain()
     lstrcatW(game_dir, EXE);
     wprintf(L"[Host] Game dir (%s)\n", game_dir);
 
-    PlusGame::Launch(game_dir);
+    Host::Launch(game_dir);
 
     return 0;
 }
