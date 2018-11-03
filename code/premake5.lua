@@ -87,15 +87,16 @@ workspace "mplus"
         linkoptions "/manifestdependency:\"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\""
 
     -- Disable deprecation warnings and errors
+    -- disabling as less warnings as possible
     filter "action:vs*"
         defines
         {
             "_CRT_SECURE_NO_WARNINGS",
-            "_CRT_SECURE_NO_DEPRECATE",
-            "_CRT_NONSTDC_NO_WARNINGS",
-            "_CRT_NONSTDC_NO_DEPRECATE",
-            "_SCL_SECURE_NO_WARNINGS",
-            "_SCL_SECURE_NO_DEPRECATE",
+            -- "_CRT_SECURE_NO_DEPRECATE",
+            -- "_CRT_NONSTDC_NO_WARNINGS",
+            -- "_CRT_NONSTDC_NO_DEPRECATE",
+            -- "_SCL_SECURE_NO_WARNINGS",
+            -- "_SCL_SECURE_NO_DEPRECATE",
 
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
         }
@@ -106,9 +107,9 @@ workspace "mplus"
     end
 
     group "server"
+    include "server/core"
     --include "server/host"
     --include "server/host_gui"
-    --include "server/core"
 
     --group "Modules"
     --do_modules()

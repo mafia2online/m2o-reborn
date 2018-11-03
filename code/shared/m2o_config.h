@@ -42,10 +42,6 @@
 // !
 // =======================================================================//
 
-#define _CRT_SECURE_NO_WARNINGS
-#define _SCL_SECURE_NO_WARNINGS
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #define Vector2 zplm_vec2
 #define Vector3 zplm_vec3
 #define Quaternion zplm_quat
