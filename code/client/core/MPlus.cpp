@@ -4,6 +4,13 @@ namespace mplus
 {
     MPlusModule *GMPlusModule;
 
+    MPlusModule::MPlusModule()
+    {
+        Intialize(this);
+
+        // create renderinterface etc
+    }
+
     void MPlusModule::Intialize(MPlusModule* inst)
     {
         printf(__FUNCTION__ "\n");
@@ -19,7 +26,7 @@ namespace mplus
         mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::TICK, 400, inst,
                        (C_TickedModuleManager::TickedModuleCallback)(&OnTick), -1.0f, 0, 0);
         mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::RENDER, 400, inst,
-                       (C_TickedModuleManager::TickedModuleCallback)(&OnTick), -1.0f, 0, 0);
+                       (C_TickedModuleManager::TickedModuleCallback)(&OnRender), -1.0f, 0, 0);
     }
 
     void MPlusModule::OnGameInitialize(I_TickedModuleCallEventContext&)

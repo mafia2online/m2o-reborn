@@ -8,6 +8,7 @@ namespace mplus
     {
     public:
 
+        MPlusModule();
         ~MPlusModule() = default;
 
         // == overrides == //
