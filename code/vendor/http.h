@@ -449,7 +449,7 @@ http_t* http_post( char const* url, void const* data, size_t size, void* memctx 
 
     #ifndef _WIN32
     int optval=1;
-    setsockopt(socket, SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(int));
+    signal(SIGPIPE, SIG_IGN);
     #endif
 
     http_internal_t* internal = http_internal_create( size, memctx );
