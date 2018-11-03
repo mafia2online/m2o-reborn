@@ -114,8 +114,11 @@ workspace "mplus"
     --group "Modules"
     --do_modules()
 
-    group ""
-    include "./shared"
+    -- not really a shared tho, needs some other name
+    if os.target() == "windows" then
+        group ""
+        include "./shared"
+    end
 
     group "vendor"
     if os.target() == "windows" then
