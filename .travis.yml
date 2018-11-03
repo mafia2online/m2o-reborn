@@ -7,9 +7,9 @@ compiler:
   - clang
 
 script:
-  - ./generate.sh.bat
+  - ./premake.sh.bat
   - cd build
-  - cmake --build .
+  - make
 
 after_failure:
     - curl -v -H User-Agent:bot -H Content-Type:application/json -d '{"content":"**m2o-reborn** '$TRAVIS_OS_NAME' build has failed! :no_entry:"}' https://discordapp.com/api/webhooks/$DISCORD_WEBHOOK_CHANNEL_ID/$DISCORD_WEBHOOK_TOKEN
