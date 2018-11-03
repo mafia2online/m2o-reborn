@@ -20,9 +20,7 @@ project "server-core"
         "**.rc"
     }
 
-    configuration { "macos" }
-        links { "m", "pthread", "dl" }
-
     if os.target() ~= "windows" then
+        links { "m", "pthread", "dl" }
         removeplatforms { "x86" }
     end
