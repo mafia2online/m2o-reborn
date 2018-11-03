@@ -4,11 +4,6 @@
 
 static bool (*Initialize_Game__Orig)(void*);
 
-static void InitializeM2Plus()
-{
-    printf("[Core] : InitializeM2Plus!\n");
-}
-
 static bool Initialize_Game(void* self)
 {
     printf("[Core] : CInit!\n");
@@ -16,11 +11,12 @@ static bool Initialize_Game(void* self)
     return Initialize_Game__Orig(self);
 }
 
-static C_TickedModuleManager * GetHook()
+static void InitializeModuleManager()
 {
     mplus::GMPlusModule = new mplus::MPlusModule;
 
-    return C_TickedModuleManager::GetInstance();
+    auto tickedModuleMgr = C_TickedModuleManager::GetInstance();
+    tickedModuleMgr->RegisterStaticPlugins();
 }
 
 static nomad::base_function init([]()
@@ -28,6 +24,7 @@ static nomad::base_function init([]()
     char* loc = nio::pattern("E8 ? ? ? ? 83 C4 04 84 C0 75 06").first();
     nio::replace_call(&Initialize_Game__Orig, loc, Initialize_Game);
 
-    //loc = nio::pattern("")
-    nio::put_call(0x00450347, GetHook);
+    loc = nio::pattern("8B 10 8B C8 8B 42 2C FF D0 8B 0D").first();
+    nio::nop(loc, 9);
+    nio::put_call(loc - 5, InitializeModuleManager);
 });
