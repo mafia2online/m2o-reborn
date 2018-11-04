@@ -22,7 +22,7 @@ namespace mplus
 
         mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::SYSTEM_INIT, 500, inst,
                        (C_TickedModuleManager::TickedModuleCallback)(&OnSysInit), -1.0f, 0, 0);
-        mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::SYSTEM_INIT, 500, inst,
+        mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::SYSTEM_DONE, 500, inst,
                        (C_TickedModuleManager::TickedModuleCallback)(&OnSysShutdown), -1.0f, 0, 0);
         mgr->AddAction(C_TickedModuleManager::E_TickedModuleEvent::GAME_INIT, 500, inst,
                        (C_TickedModuleManager::TickedModuleCallback)(&OnGameInit), -1.0f, 0, 0);
@@ -45,6 +45,9 @@ namespace mplus
     void MPlusModule::OnSysShutdown(I_TickedModuleCallEventContext&)
     {
         printf(__FUNCTION__ "\n");
+
+        // lol
+        delete this;
     }
 
     void MPlusModule::OnGameInit(I_TickedModuleCallEventContext&)
