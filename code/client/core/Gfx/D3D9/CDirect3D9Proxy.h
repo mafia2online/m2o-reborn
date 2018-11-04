@@ -6,7 +6,7 @@
 * Developers : AaronLad <aaron@m2-multiplayer.com>
 *
 ***************************************************************/
-
+#if 0
 class CDirect3D9Proxy : public IDirect3D9
 {
 private:
@@ -143,3 +143,4 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 
     return hr;
 }
+#endif

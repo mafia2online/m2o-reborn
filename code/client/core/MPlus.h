@@ -2,14 +2,18 @@
 #include <m2/modules/C_TickedModule.h>
 #include <m2/modules/C_TickedModuleManager.h>
 
+#include <Gui/GuiInterface.h>
+
 namespace mplus
 {
     class MPlusModule : public C_TickedModule
     {
+        nmd::gui::GuiInterface gui;
+
     public:
 
         MPlusModule();
-        ~MPlusModule() = default;
+        ~MPlusModule();
 
         // == overrides == //
         int32_t GetTypeID() override
@@ -35,7 +39,10 @@ namespace mplus
 
         // == callbacks == //
 
-        void OnGameInitialize(I_TickedModuleCallEventContext &);
+        void OnAppInit(I_TickedModuleCallEventContext &);
+        void OnAppShutdown(I_TickedModuleCallEventContext &);
+
+        void OnGameInit(I_TickedModuleCallEventContext &);
         void OnLoadStart(I_TickedModuleCallEventContext &);
         void OnLoadFinish(I_TickedModuleCallEventContext &);
         void OnTick(I_TickedModuleCallEventContext &);

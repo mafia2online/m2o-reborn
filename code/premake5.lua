@@ -14,16 +14,17 @@
 
 premake.path = premake.path .. ";build"
 
-CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows64"
+--x86 !
+CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
 
 --dofile('build/helpers/type_select.lua')
---dofile('build/helpers/cef_setup.lua')
+dofile('build/helpers/cef_setup.lua')
 
---verifycef(CEF_VERSION)
+verifycef(CEF_VERSION)
 
 FX_NAME = "MAFIA PLUS"
 
---dofile('build/vendor/vendorfiles.lua')
+dofile('build/vendor/vendorfiles.lua')
 --dofile('build/modules/modules.lua')
 
 workspace "MPLUS"
@@ -106,6 +107,7 @@ workspace "MPLUS"
 	if os.target() == "windows" then
     	group "Client"
 		include "client/host"
+		include "client/worker"
 	end
 	
 	include "client/core"
@@ -129,7 +131,7 @@ workspace "MPLUS"
 	include "vendor/m2framework"
 	
 	--include "vendor/enet"
-	--do_vendor()
+	do_vendor()
 	
 -- Cleanup
 if _ACTION == "clean" then

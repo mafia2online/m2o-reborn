@@ -7,6 +7,7 @@
 *
 ***************************************************************/
 
+#if 0
 class CDirect3DDevice9Proxy : public IDirect3DDevice9
 {
 private:
@@ -709,3 +710,4 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::DeletePatch(UINT Handle) {
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::CreateQuery(D3DQUERYTYPE Type, IDirect3DQuery9 ** ppQuery) {
     return m_pD3DDevice->CreateQuery(Type, ppQuery);
 }
+#endif

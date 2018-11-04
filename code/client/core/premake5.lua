@@ -36,15 +36,26 @@ project "core-client"
 		"../../shared",
         "../../vendor/minhook",
 		"../../vendor/m2framework",
+		"../../vendor/cef/" .. CEF_VERSION, 
+		"../../vendor/d3d9/include",
     }
 
     links
     {
 		"ws2_32",
 		"crypt32", 
+        "delayimp",
+
+        "d3d9",
+		"d3dx9",
+
         "shared",
         "minhook",
+
 	    "m2framework",
+
+		"cefwrapper",
+        "libcef",
     }
 
     filter "system:windows"
