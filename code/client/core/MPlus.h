@@ -3,12 +3,14 @@
 #include <m2/modules/C_TickedModuleManager.h>
 
 #include <Gui/GuiInterface.h>
+#include <Net/NetInterface.h>
 
 namespace mplus
 {
     class MPlusModule : public C_TickedModule
     {
         nmd::gui::GuiInterface gui;
+        nmd::net::NetInterface net;
 
     public:
 
