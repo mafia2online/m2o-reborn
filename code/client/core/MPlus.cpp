@@ -31,31 +31,31 @@ namespace mplus
 
     void MPlusModule::OnGameInitialize(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        //printf(__FUNCTION__"\n");
+        //printf("wat!\n");
     }
 
     void MPlusModule::OnLoadStart(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        //printf(__FUNCTION__"\n");
+        //printf("wat!\n");
     }
 
     void MPlusModule::OnLoadFinish(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        //printf(__FUNCTION__"\n");
+        //printf("wat!\n");
     }
 
     void MPlusModule::OnTick(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        //printf(__FUNCTION__"\n");
+        //printf("wat!\n");
     }
 
     void MPlusModule::OnRender(I_TickedModuleCallEventContext&)
     {
-        printf(__FUNCTION__"\n");
-        printf("wat!\n");
+        //printf(__FUNCTION__"\n");
+        //printf("wat!\n");
     }
 }

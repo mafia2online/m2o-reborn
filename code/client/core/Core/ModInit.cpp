@@ -16,11 +16,12 @@ static bool Initialize_Game(void* self)
     return Initialize_Game__Orig(self);
 }
 
-static C_TickedModuleManager * GetHook()
+static void GetHook()
 {
     mplus::GMPlusModule = new mplus::MPlusModule;
 
-    return C_TickedModuleManager::GetInstance();
+    auto tickedModuleMgr = C_TickedModuleManager::GetInstance();
+    tickedModuleMgr->RegisterStaticPlugins();
 }
 
 static nomad::base_function init([]()
@@ -29,5 +30,6 @@ static nomad::base_function init([]()
     nio::replace_call(&Initialize_Game__Orig, loc, Initialize_Game);
 
     //loc = nio::pattern("")
+    nio::nop(0x45034C, 9);
     nio::put_call(0x00450347, GetHook);
 });
