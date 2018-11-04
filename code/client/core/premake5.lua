@@ -34,6 +34,7 @@ project "core-client"
     {
         ".",
 		"../../shared",
+        "../../vendor",
         "../../vendor/minhook",
 		"../../vendor/m2framework",
 		"../../vendor/cef/" .. CEF_VERSION, 

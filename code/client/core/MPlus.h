@@ -3,12 +3,14 @@
 #include <m2/modules/C_TickedModuleManager.h>
 
 #include <Gui/GuiInterface.h>
+#include <Net/NetInterface.h>
 
 namespace mplus
 {
     class MPlusModule : public C_TickedModule
     {
         nmd::gui::GuiInterface gui;
+        nmd::net::NetInterface net;
 
     public:
 
@@ -39,8 +41,8 @@ namespace mplus
 
         // == callbacks == //
 
-        void OnAppInit(I_TickedModuleCallEventContext &);
-        void OnAppShutdown(I_TickedModuleCallEventContext &);
+        void OnSysInit(I_TickedModuleCallEventContext &);
+        void OnSysShutdown(I_TickedModuleCallEventContext &);
 
         void OnGameInit(I_TickedModuleCallEventContext &);
         void OnLoadStart(I_TickedModuleCallEventContext &);
