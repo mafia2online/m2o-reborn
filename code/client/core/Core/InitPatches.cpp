@@ -8,7 +8,7 @@
 
 static nomad::base_function init([]()
 {
-#if 0
+#if 1
     // Do not pause game in background
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
     nio::put_ljump(0xAC6E57, 0xAC6F79);
