@@ -5,9 +5,6 @@
 //#include <VFS/C_VirtualFileSystemCache_Wrapper.h>
 //#include <Vfs/C_VirtualFileSystem_Wrapper.h>
 
-#if 0
-
-#endif
 
 static nomad::base_function init([]()
 {
@@ -18,9 +15,7 @@ static nomad::base_function init([]()
 
     // Remove nvidia & 2k init logos
     nio::write<uint32_t>(0x08CA820, 0x90C300B0);
-
 #endif
-
 
 #if 0
     
