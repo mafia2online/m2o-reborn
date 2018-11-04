@@ -41,8 +41,8 @@ namespace mplus
 
         // == callbacks == //
 
-        void OnAppInit(I_TickedModuleCallEventContext &);
-        void OnAppShutdown(I_TickedModuleCallEventContext &);
+        void OnSysInit(I_TickedModuleCallEventContext &);
+        void OnSysShutdown(I_TickedModuleCallEventContext &);
 
         void OnGameInit(I_TickedModuleCallEventContext &);
         void OnLoadStart(I_TickedModuleCallEventContext &);

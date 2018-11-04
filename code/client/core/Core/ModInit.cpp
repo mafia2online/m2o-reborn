@@ -15,8 +15,9 @@ static void InitializeModuleManager()
 {
     mplus::GMPlusModule = new mplus::MPlusModule;
 
-    auto tickedModuleMgr = C_TickedModuleManager::GetInstance();
-    tickedModuleMgr->RegisterStaticPlugins();
+    auto mgr = C_TickedModuleManager::GetInstance();
+
+    mgr->RegisterStaticPlugins();
 }
 
 static nomad::base_function init([]()

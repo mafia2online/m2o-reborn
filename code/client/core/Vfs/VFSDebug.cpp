@@ -454,5 +454,5 @@ static nomad::base_function init([]()
 {
    // *(uint16_t*)0x69A358 = sizeof(C_VirtualFileSystemCache_Wrapper);
 
-    nio::replace_call(&Construct_VFS_Orig, 0x69A36A, Construct_VFS);
+    //nio::replace_call(&Construct_VFS_Orig, 0x69A36A, Construct_VFS);
 });

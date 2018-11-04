@@ -12,6 +12,7 @@ namespace nmd::net
     NetInterface::NetInterface()
     {
         ctx = new librg_ctx_t;
+        memset(ctx, 0, sizeof(librg_ctx_t));
     }
 
     NetInterface::~NetInterface()
@@ -57,6 +58,7 @@ namespace nmd::net
 
         librg_event_add(ctx, LIBRG_CONNECTION_REFUSE, [](librg_event_t* event)
         {
+
         });
 
         librg_event_add(ctx, LIBRG_CONNECTION_DISCONNECT, [](librg_event_t* event)
