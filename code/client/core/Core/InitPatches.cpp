@@ -21,15 +21,16 @@ int __stdcall BinkOpen_Hooked(int a, int b)
 
 static nomad::base_function init([]()
 {
-    BinkOpen_original = nio::iat("binkw32.dll", BinkOpen_Hooked, "_BinkOpen@8");
-    nio::nop(0x004F2B8D, 5);
-
-#if 0
+#if 1
     // Do not pause game in background
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
     nio::put_ljump(0xAC6E57, 0xAC6F79);
 
+    // Legal
+    nio::nop(0x04F2B8D, 5);
+
     // Remove nvidia & 2k init logos
+    BinkOpen_original = nio::iat("binkw32.dll", BinkOpen_Hooked, "_BinkOpen@8");
     nio::write<uint32_t>(0x08CA820, 0x90C300B0);
 #endif
 

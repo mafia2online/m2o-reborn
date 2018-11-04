@@ -20,12 +20,18 @@ public:
 
     C_VirtualFileSystemCache_Wrapper(uint32_t *ptr)
     {
+        Prepare(ptr);
+    }
+
+    void Prepare(uint32_t *ptr) {
         printf(__FUNCTION__": Inst 0x%p\n", ptr);
         dev_ref = reinterpret_cast<ue::sys::filesystem::C_VirtualFileSystemCache*>(ptr);
 
         auto vtableAddr = *(uintptr_t*)(uintptr_t)this;
         auto vtableMemberAddr = (15 * 4) + vtableAddr; // offset 15 to patch
         nio::writeVP<uint32_t>(vtableMemberAddr, 0x00696D90); // ;
+
+        nio::return_function(0x696B60);
     }
 
     ue::sys::filesystem::C_VirtualFileSystemCache* GetDeviceRef() {
@@ -346,28 +352,28 @@ uint32_t *Construct_VFS(uint32_t *ptr)
 {
     auto dev = Construct_VFS_Orig(ptr);
 
-   // auto vt = reinterpret_cast<DWORD_PTR*>(reinterpret_cast<DWORD_PTR*>(a1)[0]);
+    uint32_t* mem = nio::call<uint32_t*>(0x401830, sizeof(C_VirtualFileSystemCache_Wrapper));
 
-    auto inst = new C_VirtualFileSystemCache_Wrapper(dev);
- 
+    auto dummyFag = new C_VirtualFileSystemCache_Wrapper(dev);
+    auto dummyFagVTable = *(uintptr_t*)(uintptr_t)dummyFag;
+
+    // auto inst = new C_VirtualFileSystemCache_Wrapper(dev);;
+    auto inst = (C_VirtualFileSystemCache_Wrapper*)mem;
+    *(uintptr_t*)(uintptr_t)mem = dummyFagVTable;
+
+    inst->Prepare(dev);
+
+    auto refDevice = inst->GetDeviceRef();
+    *(uint32_t*)0x1BDC918 = (uintptr_t)refDevice;
+
     return (uint32_t*)inst;
 }
 
 #if 0
 static nomad::base_function init([]()
 {
-   // *(uint16_t*)0x69A358 = sizeof(C_VirtualFileSystemCache_Wrapper);
-
     nio::replace_call(&Construct_VFS_Orig, 0x69A36A, Construct_VFS);
 
-    nio::replace_call(&VFS_Init_Orig, 0x4FABCC, (LPVOID)&[](uint32_t* a1) {
-        auto res = VFS_Init_Orig(a1);
-
-        auto vfsWrapper = (C_VirtualFileSystemCache_Wrapper*)0x1BDC918;
-        auto refDevice = vfsWrapper->GetDeviceRef();
-        *(uint32_t*)0x1BDC918 = 0x1BDC918;
-
-        return a1;
-    });
+    nio::nop(0x0069A384, 6);
 });
 #endif
