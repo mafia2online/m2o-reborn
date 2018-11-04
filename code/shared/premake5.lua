@@ -1,7 +1,6 @@
 project "Shared"
     language "C++"
     kind "StaticLib"
-	optimize "Speed"
 
     vpaths
     {
