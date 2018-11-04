@@ -2,26 +2,16 @@
 #include <Hooking.h>
 #include <future>
 
-#include <ue/sys/filesystem.h>
-#include <wrappers/C_VirtualFileSystemCache_Wrapper.h>
+//#include <VFS/C_VirtualFileSystemCache_Wrapper.h>
+//#include <Vfs/C_VirtualFileSystem_Wrapper.h>
 
-static void* origVFSInit;
-bool CreateVFSHook(uint32_t a1) {
-  uintptr_t result = nio::call<uintptr_t>(origVFSInit, a1);
+#if 0
 
-  auto vfsSys = ue::sys::filesystem::C_VirtualFileSystemCache::GetInstance();
-
-  static auto virtualFileSysWrapper = static_cast<ue::sys::filesystem::C_VirtualFileSystemCache_Wrapper*>(vfsSys);
-  virtualFileSysWrapper->Cast();
-
-  return true;
-}
+#endif
 
 static nomad::base_function init([]()
 {
-    // Disable mutex
-    nio::put_ljump(0x00401B89, 0x00401C16);
-
+#if 0
     // Do not pause game in background
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
     nio::put_ljump(0xAC6E57, 0xAC6F79);
@@ -29,11 +19,8 @@ static nomad::base_function init([]()
     // Remove nvidia & 2k init logos
     nio::write<uint32_t>(0x08CA820, 0x90C300B0);
 
-    // Tmp development stuff
-    //nio::replace_call(&origVFSInit, (void*)0x69A35C, AllocVFS);
-    *(uint8_t*)0x69A358 = 0xFF; // allocate 255 instead of 224 bytes
+#endif
 
-    nio::replace_call(&origVFSInit, (void*)0x69A36A, CreateVFSHook);
 
 #if 0
     
