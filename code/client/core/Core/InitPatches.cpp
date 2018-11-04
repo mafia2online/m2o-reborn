@@ -5,9 +5,25 @@
 //#include <VFS/C_VirtualFileSystemCache_Wrapper.h>
 //#include <Vfs/C_VirtualFileSystem_Wrapper.h>
 
+static bool(*Initialize_Game__Orig)(void*);
+
+void* BinkOpen_original = nullptr;
+int __stdcall BinkOpen_Hooked(int a, int b)
+{
+    static int Bink_counter = 0;
+    Bink_counter++;
+
+    if (Bink_counter > 2)
+        return nio::std_call<int>(BinkOpen_original, a, b);
+
+    return 0;
+}
 
 static nomad::base_function init([]()
 {
+    BinkOpen_original = nio::iat("binkw32.dll", BinkOpen_Hooked, "_BinkOpen@8");
+    nio::nop(0x004F2B8D, 5);
+
 #if 0
     // Do not pause game in background
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
@@ -63,4 +79,5 @@ static nomad::base_function init([]()
             nio::call(origScreen, instance, 1);
     });
 #endif
+    
 });

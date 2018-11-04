@@ -80,6 +80,12 @@ constexpr inline TRet call(AddressType address, TArgs... args)
     return reinterpret_cast<TRet(*)(TArgs...)>(address)(args ...);
 }
 
+template <typename TRet = void, typename... TArgs, typename AddressType>
+constexpr inline TRet std_call(AddressType address, TArgs... args)
+{
+    return reinterpret_cast<TRet(__stdcall *)(TArgs...)>(address)(args ...);
+}
+
 template <typename TRet = void, typename... TArgs>
 constexpr inline TRet this_call(TRet address, TArgs... args)
 {
