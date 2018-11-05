@@ -20,17 +20,17 @@ return {
         -- dont question this output path!
         targetdir "../bin/vendor/%{cfg.buildcfg}"
 
+        vpaths { ["*"] = "*" }
+
         local cef_base = "vendor/cef/" .. CEF_VERSION .. "/libcef_dll/"
 
-        includedirs
-        {
+        includedirs {
             cef_base,
             cef_base .. "../",
         }
 
         -- dont question those paths.
-        files
-        {
+        files {
             cef_base .. "/**.hpp",
             cef_base .. "/**.h",
             cef_base .. "/cerwrapper.cc",

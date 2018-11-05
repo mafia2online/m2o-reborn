@@ -1,5 +1,5 @@
-#include <Host.h>
-#include <Windows.h>
+#include <host.h>
+#include <windows.h>
 
 #if 0
 

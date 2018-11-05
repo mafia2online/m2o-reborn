@@ -30,7 +30,6 @@ dofile('../tools/premake/vendor/vendorfiles.lua')
 
 workspace "mplus"
     configurations { "Debug", "Release" }
-    platforms { "x86" }
 
     if os.istarget('windows') then
         buildoptions "/std:c++latest"
@@ -53,14 +52,12 @@ workspace "mplus"
     targetdir "../bin/%{cfg.buildcfg}/"
     os.mkdir"../build/symbols"
 
-    defines
-    {
+    defines {
         "NOMINMAX",
         --"WIN32_LEAN_AND_MEAN"
     }
 
-    includedirs
-    {
+    includedirs {
         ".",
         "./shared",
     }
@@ -86,8 +83,7 @@ workspace "mplus"
     -- Disable deprecation warnings and errors
     -- disabling as less warnings as possible
     filter "action:vs*"
-        defines
-        {
+        defines {
             "_CRT_SECURE_NO_WARNINGS",
             -- "_CRT_SECURE_NO_DEPRECATE",
             -- "_CRT_NONSTDC_NO_WARNINGS",
@@ -107,12 +103,15 @@ workspace "mplus"
     if os.target() == "windows" then
         group "client"
         include "client/host"
+        include "client/core"
         include "client/worker"
     end
 
     group "server"
-    include "server/host"
     include "server/core"
+    if os.target() == "windows" then
+        include "server/host" -- not yet ready for macos/linux
+    end
 
     -- not really a shared tho, needs some other name
     if os.target() == "windows" then

@@ -4,14 +4,15 @@
 *  More information regarding licensing can be found in LICENSE.md
 */
 
-#include <Ui/UiApp.h>
+#include <ui/uiapp.h>
+#include <ui/uiapp.cpp>
 
 #ifndef _WIN32
 int main()
 
 #else
 
-#include <Windows.h>
+#include <windows.h>
 #include <delayimp.h>
 
 int CALLBACK WinMain(

@@ -1,12 +1,12 @@
-#include <Windows.h>
+#include <windows.h>
 #include <shellscalingapi.h>
 #include <cstdio>
 
 #include <utility/PathUtils.h>
 #include <utility/WinRegistry.h>
 
-#include <Host.h>
-#include <Host.cpp>
+#include <host.h>
+#include <host.cpp>
 
 #define EXE L"//mafia2.exe"
 #define KEY L"maf2_path"

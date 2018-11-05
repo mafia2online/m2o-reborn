@@ -2,8 +2,7 @@ project "minhook"
     language "C++"
     kind "StaticLib"
 
-    vpaths
-    {
+    vpaths {
         ["Headers/*"] = "**.hpp",
         ["Headers/*"] = "**.h",
         ["Sources/*"] = "**.cpp",
@@ -11,8 +10,7 @@ project "minhook"
         ["*"] = "premake5.lua"
     }
 
-    files
-    {
+    files {
         "premake5.lua",
         "MinHook.c",
         "*.h"

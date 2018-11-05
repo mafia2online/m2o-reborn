@@ -4,45 +4,37 @@
 --
 -- Copyright (c) 2015-2018 Dev-Force
 
-project "core-client"
+project "client-core"
     language "C++"
     kind "SharedLib"
-    targetname "core-client"
+    targetname "client-core"
     linkoptions {"/DELAYLOAD:libcef.dll"}
     disablewarnings { "4099" }
     --flags { "StaticRuntime" }
 
-    libdirs
-    {
-         "../../../bin/vendor/%{cfg.buildcfg}",
+    libdirs {
+        "../../../bin/vendor/%{cfg.buildcfg}",
+        "../../vendor/d3d9",
     }
 
-    defines
-    {
+    vpaths { ["*"] = "*" }
+
+    defines {
         "WIN32_LEAN_AND_MEAN",
     }
 
-    vpaths
-    {
-        ["Headers/*"] = { "**.hpp", "**.h" },
-        ["Sources/*"] = "**.cpp",
-        ["Resources/*"] = "**.rc",
-        ["*"] = "premake5.lua"
-    }
-
-    includedirs
-    {
+    includedirs {
         ".",
         "../../shared",
         "../../vendor",
         "../../vendor/minhook",
+        "../../vendor/d3d9/include",
         "../../vendor/m2framework",
         "../../vendor/cef/" .. CEF_VERSION,
         "../../vendor/d3d9/include",
     }
 
-    links
-    {
+    links {
         "ws2_32",
         "crypt32",
         "delayimp",
@@ -62,8 +54,7 @@ project "core-client"
     filter "system:windows"
         links "Winmm"
 
-    files
-    {
+    files {
         "premake5.lua",
         "**.h",
         "**.hpp",

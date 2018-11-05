@@ -2,17 +2,19 @@ project "server-core"
     language "C++"
     kind "ConsoleApp"
 
-    architecture "x86_64"
+    if os.target() ~= "windows" then
+        -- architecture "x86_64"
+    end
 
-    includedirs
-    {
+    vpaths { ["*"] = "*" }
+
+    includedirs {
         "../../vendor",
         "../../shared",
         "."
     }
 
-    files
-    {
+    files {
         "premake5.lua",
         "**.h",
         "**.hpp",
