@@ -38,6 +38,7 @@ namespace mplus
 
     void MPlusModule::OnSysInit(I_TickedModuleCallEventContext&)
     {
+        printf("Core [SysInit]");
         gui.Init();
         net.Init();
     }
@@ -74,11 +75,13 @@ namespace mplus
                 net.Connect("localhost", 27010);
                 printf("[Core] Started Network!\n");
             }
+#if 0
             else
             {
                 net.Disconnect();
                 printf("[Core] Stopped Network!\n");
             }
+#endif
         }
     }
 

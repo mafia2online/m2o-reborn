@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#include <I_BaseObject.h>
+//#include <I_BaseObject.h>
 
 #include <ue/sys/math/C_Vector.h>
 #include <ue/sys/math/C_Quat.h>

@@ -1,9 +1,12 @@
-#include "../ue.h"
-#include "I_TicketModuleCallEventContext.h"
+
+class I_TicketModuleCallEventContext;
 
 class C_Entity;
-struct I_Game
+
+class I_Game
 {
+public:
+
 	virtual ~I_Game() = 0;
 	
 	virtual void unk_Function1() = 0;

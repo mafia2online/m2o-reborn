@@ -43,7 +43,7 @@ workspace "mplus"
 
     -- Enable position-independent-code generation
     pic "On"
-    startproject "launcher"
+    startproject "client-host"
 
     defines { "FXNAME=\"" .. FX_NAME .. "\""}
     defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
