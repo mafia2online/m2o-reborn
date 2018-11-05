@@ -66,6 +66,7 @@ namespace nmd::net
             printf("[net] disconnected from the server\n");
             //   M2::Wrappers::lua::Execute("game.game:SoundFadeOut(1000)");
 
+            NetInterface *net = (NetInterface*)event->user_data;
 
             //   M2::C_Game::Get()->GetLocalPed()->LockControls(true);
             // object->SetPosition(zplm_vec3_zero()); // creates black textures :O

@@ -5,10 +5,18 @@
 //#include <VFS/C_VirtualFileSystemCache_Wrapper.h>
 //#include <Vfs/C_VirtualFileSystem_Wrapper.h>
 
+static int yes(int a1, int a2)
+{
+    printf("CALLED FROM %p %d\n", _ReturnAddress(), a2);
+    return 1;
+}
 
 static nomad::base_function init([]()
 {
-#if 1
+  //  nio::put_ljump(0x008CA820 , yes);
+    nio::nop(0x004F2B8D, 5);
+
+#if 0
     // Do not pause game in background
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
     nio::put_ljump(0xAC6E57, 0xAC6F79);
