@@ -2,13 +2,7 @@ project "shared"
     language "C++"
     kind "StaticLib"
 
-    vpaths
-    {
-        ["Headers/*"] = { "**.hpp", "**.h" },
-        ["Sources/*"] = "**.cpp",
-        ["Resources/*"] = "**.rc",
-        ["*"] = "premake5.lua"
-    }
+    -- shared folder looks best if no vpaths are used at all
 
     includedirs
     {

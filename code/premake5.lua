@@ -18,16 +18,15 @@ if os.target() == "windows" then
     --x86 !
     CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
 
-    --dofile('build/helpers/type_select.lua')
-    dofile('build/helpers/cef_setup.lua')
+    --dofile('../tools/premake/helpers/type_select.lua')
+    dofile('../tools/premake/helpers/cef_setup.lua')
 
     verifycef(CEF_VERSION)
 end
 
 FX_NAME = "MAFIA PLUS"
 
-dofile('build/vendor/vendorfiles.lua')
---dofile('build/modules/modules.lua')
+dofile('../tools/premake/vendor/vendorfiles.lua')
 
 workspace "mplus"
     configurations { "Debug", "Release" }
@@ -64,11 +63,6 @@ workspace "mplus"
     {
         ".",
         "./shared",
-    }
-
-    libdirs
-    {
-        -- "./shared/libs",
     }
 
     filter "platforms:x64"

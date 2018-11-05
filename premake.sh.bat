@@ -8,15 +8,13 @@ case "${unameOut}" in
     *)          machine="unknown"
 esac
 
-cd code
-
 if [[ $1 == "clean" ]]
 then
     # Invoke premake5's clean action
     echo "Performing clean action..."
-    build\{$machine}\premake5 clean
+    tools/premake/bin/{$machine}/premake5 clean --file=code/premake5.lua
 else
-    build/${machine}/premake5 gmake2 "${@}"
+    tools/premake/bin/${machine}/premake5 gmake2 "${@}" --file=code/premake5.lua
 fi
 
 exit
@@ -24,15 +22,13 @@ exit
 :windows
 @echo off
 
-cd code
-
 if "%1" == "clean" (
     :: Invoke premake5's clean action
     echo Performing clean action...
-    build\win\premake5 clean
+    tools\premake\bin\win32\premake5 clean --file=code/premake5.lua
 ) else (
     :: Invoke premake5 with specified args and VS2017 action
-    build\win\premake5 %* vs2017
+    tools\premake\bin\win32\premake5 %* vs2017 --file=code/premake5.lua
 )
 
 :: Pause for 5 seconds and auto-close the command window
