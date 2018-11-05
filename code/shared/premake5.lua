@@ -2,8 +2,6 @@ project "shared"
     language "C++"
     kind "StaticLib"
 
-    optimize "Speed"
-
     vpaths
     {
         ["Headers/*"] = { "**.hpp", "**.h" },

@@ -15,14 +15,14 @@
 class ExecutableLoader
 {
     const uint8_t* m_origBinary;
-    HMODULE m_module;
+    HMODULE m_module{};
     uintptr_t m_loadLimit;
 
-    void* m_entryPoint;
+    void* m_entryPoint{};
 
-    HMODULE(*m_libraryLoader)(const char*);
+    HMODULE (*m_libraryLoader)(const char*){};
 
-    LPVOID(*m_functionResolver)(HMODULE, const char*);
+    LPVOID (*m_functionResolver)(HMODULE, const char*){};
 
     std::function<bool(const IMAGE_TLS_DIRECTORY*)> m_tlsInitializer;
 
@@ -37,14 +37,14 @@ class ExecutableLoader
 
     HMODULE ResolveLibrary(const char* name);
 
-    template<typename T>
-    inline const T* GetRVA(uint32_t rva)
+    template <typename T>
+    const T* GetRVA(uint32_t rva)
     {
         return (T*)(m_origBinary + rva);
     }
 
-    template<typename T>
-    inline T* GetTargetRVA(uint32_t rva)
+    template <typename T>
+    T* GetTargetRVA(uint32_t rva)
     {
         return (T*)((uint8_t*)m_module + rva);
     }
@@ -52,27 +52,27 @@ class ExecutableLoader
 public:
     ExecutableLoader(const uint8_t* origBinary);
 
-    inline void SetLoadLimit(uintptr_t loadLimit)
+    void SetLoadLimit(uintptr_t loadLimit)
     {
         m_loadLimit = loadLimit;
     }
 
-    inline void SetLibraryLoader(HMODULE(*loader)(const char*))
+    void SetLibraryLoader(HMODULE (*loader)(const char*))
     {
         m_libraryLoader = loader;
     }
 
-    inline void SetFunctionResolver(LPVOID(*functionResolver)(HMODULE, const char*))
+    void SetFunctionResolver(LPVOID (*functionResolver)(HMODULE, const char*))
     {
         m_functionResolver = functionResolver;
     }
 
-    inline void SetTLSInitializer(const std::function<bool(const IMAGE_TLS_DIRECTORY*)>& callback)
+    void SetTLSInitializer(const std::function<bool(const IMAGE_TLS_DIRECTORY*)>& callback)
     {
         m_tlsInitializer = callback;
     }
 
-    inline void* GetEntryPoint()
+    void* GetEP()
     {
         return m_entryPoint;
     }

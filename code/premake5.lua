@@ -14,16 +14,17 @@
 
 premake.path = premake.path .. ";build"
 
-CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows64"
+--x86 !
+CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
 
 --dofile('build/helpers/type_select.lua')
---dofile('build/helpers/cef_setup.lua')
+dofile('build/helpers/cef_setup.lua')
 
---verifycef(CEF_VERSION)
+verifycef(CEF_VERSION)
 
 FX_NAME = "MAFIA PLUS"
 
---dofile('build/vendor/vendorfiles.lua')
+dofile('build/vendor/vendorfiles.lua')
 --dofile('build/modules/modules.lua')
 
 workspace "mplus"
@@ -101,18 +102,19 @@ workspace "mplus"
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
         }
 
+    --
+    -- Source subprojects
+    --
+
     if os.target() == "windows" then
         group "client"
         include "client/host"
+        include "client/worker"
     end
 
     group "server"
+    include "server/host"
     include "server/core"
-    --include "server/host"
-    --include "server/host_gui"
-
-    --group "Modules"
-    --do_modules()
 
     -- not really a shared tho, needs some other name
     if os.target() == "windows" then
@@ -122,12 +124,10 @@ workspace "mplus"
 
     group "vendor"
     if os.target() == "windows" then
-        --include "vendor/nomad-common"
         include "vendor/minhook"
-        --include "vendor/imgui"
     end
-    --include "vendor/enet"
-    --do_vendor()
+
+    do_vendor()
 
 -- Cleanup
 if _ACTION == "clean" then

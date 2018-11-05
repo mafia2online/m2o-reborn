@@ -80,6 +80,12 @@ constexpr inline TRet call(AddressType address, TArgs... args)
     return reinterpret_cast<TRet(*)(TArgs...)>(address)(args ...);
 }
 
+template <typename TRet = void, typename... TArgs, typename AddressType>
+constexpr inline TRet std_call(AddressType address, TArgs... args)
+{
+    return reinterpret_cast<TRet(__stdcall *)(TArgs...)>(address)(args ...);
+}
+
 template <typename TRet = void, typename... TArgs>
 constexpr inline TRet this_call(TRet address, TArgs... args)
 {
@@ -443,6 +449,13 @@ template<typename TTarget, typename T>
 inline void set_call(TTarget* target, T address)
 {
 	*(T*)target = get_call(address);
+}
+
+template<typename TTarget, typename T, typename TFunc>
+inline void replace_call(TTarget *target, T address, TFunc fn)
+{
+    *(T*)target = get_call(address);
+    put_call(address, fn);
 }
 
 namespace vp

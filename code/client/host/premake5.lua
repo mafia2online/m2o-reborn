@@ -11,10 +11,9 @@ project "host"
     kind "WindowedApp"
 
     targetname "MPII_Host"
-    -- linkoptions { "/IGNORE:4254 /DYNAMICBASE:NO /SAFESEH:NO /LARGEADDRESSAWARE /LARGEADDRESSAWARE /FIXED:NO /STACK:\"2097152\"  /BASE:\"0x1520000\" /MACHINE:X64 /SUBSYSTEM:WINDOWS /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" " }
-    -- targetdir(buildpath("."))
-    editandcontinue "Off"
     flags { "NoIncrementalLink" }
+    editandcontinue "Off"
+
     linkoptions "/IGNORE:4254 /ENTRY:wmainCRTStartup /OPT:NOLBR /SAFESEH:NO /DYNAMICBASE:NO /LARGEADDRESSAWARE /LAST:.zdata"
 
 
@@ -28,14 +27,12 @@ project "host"
 
     includedirs
     {
-        "../../vendor/minhook",
         "."
     }
 
     links
     {
         "shared",
-        "minhook"
     }
 
     files
@@ -47,7 +44,7 @@ project "host"
         "**.rc"
     }
 
-    filter "files:plusgame.cpp"
+    filter "files:host.cpp"
         flags { "ExcludeFromBuild" }
 
     filter "architecture:x64"

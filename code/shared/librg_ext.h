@@ -2,6 +2,8 @@
  * This file contains various global shorcuts and extensions
  */
 
+#include <functional>
+
 using message_callback_t = std::function<void(librg_data_t *data)>;
 using entity_callback_t  = std::function<void(librg_entity_t *entity)>;
 

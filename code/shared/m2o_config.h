@@ -5,25 +5,23 @@
 // !
 // =======================================================================//
 
-    #define M2O_NAME "Mafia 2 Online - Reborn"
+#define M2O_VERSION_MAJOR 1
+#define M2O_VERSION_MINOR 0
+#define M2O_VERSION_PATCH 0
 
-    #define M2O_VERSION_MAJOR 1
-    #define M2O_VERSION_MINOR 0
-    #define M2O_VERSION_PATCH 0
+#define M2O_QUOTE_X(t) #t
+#define M2O_QUOTE(t) M2O_QUOTE_X(t)
+#define M2O_VERSION_CREATE(major, minor, patch) (((major)<<16) | ((minor)<<8) | (patch))
+#define M2O_VERSION_GET_MAJOR(version) (((version)>>16)&0xFF)
+#define M2O_VERSION_GET_MINOR(version) (((version)>>8)&0xFF)
+#define M2O_VERSION_GET_PATCH(version) ((version)&0xFF)
 
-    #define M2O_QUOTE_X(t) #t
-    #define M2O_QUOTE(t) M2O_QUOTE_X(t)
-    #define M2O_VERSION_CREATE(major, minor, patch) (((major)<<16) | ((minor)<<8) | (patch))
-    #define M2O_VERSION_GET_MAJOR(version) (((version)>>16)&0xFF)
-    #define M2O_VERSION_GET_MINOR(version) (((version)>>8)&0xFF)
-    #define M2O_VERSION_GET_PATCH(version) ((version)&0xFF)
+#define M2O_VERSION_STRING M2O_QUOTE(M2O_VERSION_MAJOR) "." M2O_QUOTE(M2O_VERSION_MINOR) "." M2O_QUOTE(M2O_VERSION_PATCH)
+#define M2O_VERSION_NUMBER M2O_VERSION_CREATE(M2O_VERSION_MAJOR, M2O_VERSION_MINOR, M2O_VERSION_PATCH)
+#define M2O_VERSION_PRETTY FXNAME ". v" M2O_VERSION_STRING
 
-    #define M2O_VERSION_STRING M2O_QUOTE(M2O_VERSION_MAJOR) "." M2O_QUOTE(M2O_VERSION_MINOR) "." M2O_QUOTE(M2O_VERSION_PATCH)
-    #define M2O_VERSION_NUMBER M2O_VERSION_CREATE(M2O_VERSION_MAJOR, M2O_VERSION_MINOR, M2O_VERSION_PATCH)
-    #define M2O_VERSION_PRETTY M2O_NAME ". v" M2O_VERSION_STRING
-
-    #define M2O_ENTITY_LIMIT 16000
-    #define M2O_INVALID_ENTITY M2O_ENTITY_LIMIT
+#define M2O_ENTITY_LIMIT 16000
+#define M2O_INVALID_ENTITY M2O_ENTITY_LIMIT
 
 #undef M2O_SERVER_API_REGION
 
@@ -61,10 +59,6 @@
 // helpers
 #define when(init, name) auto name = init; if (name)
 #define when_assert(init, name) auto name = init; librg_assert(name); if (name)
-
-#ifdef M2O_SERVER
-#define mod_log zpl_printf
-#endif
 
 #define print_posm(vec, msg) mod_log("%s %f %f %f\n", msg, vec.x, vec.y, vec.z)
 #define print_pos(vec) print_posm(vec, "print_pos: ")

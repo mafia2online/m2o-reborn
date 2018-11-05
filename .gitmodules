@@ -1,0 +1,3 @@
+[submodule "code/vendor/m2framework"]
+	path = code/vendor/m2framework
+	url = https://github.com/Nomad-Group/M2Framework

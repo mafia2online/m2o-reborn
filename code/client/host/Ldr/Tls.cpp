@@ -1,4 +1,6 @@
 
+#include <Windows.h>
+
 // Tls pool for the game
 #pragma region tls
 __declspec(thread) int tls1;
@@ -503,8 +505,6 @@ __declspec(thread) int tls499;
 __declspec(thread) int tls500;
 
 #pragma endregion
-
-#include <Windows.h>
 
 struct TlsToucher
 {
