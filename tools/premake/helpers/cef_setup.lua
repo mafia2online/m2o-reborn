@@ -12,7 +12,6 @@ function verifycef(version)
     -- ensure path existence
     if os.isdir("vendor/cef") or os.isdir("vendor/cef/cur_dl") then
         print("cef dir allready exists, skipping step")
-        1
         return;
     else
 

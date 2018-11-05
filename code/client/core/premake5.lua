@@ -10,12 +10,12 @@ project "core-client"
     targetname "core-client"
     linkoptions {"/DELAYLOAD:libcef.dll"}
     disablewarnings { "4099" }
-	--flags { "StaticRuntime" }
+    --flags { "StaticRuntime" }
 
     libdirs
-	{
+    {
          "../../../bin/vendor/%{cfg.buildcfg}",
-	}
+    }
 
     defines
     {
@@ -29,33 +29,33 @@ project "core-client"
         ["Resources/*"] = "**.rc",
         ["*"] = "premake5.lua"
     }
-		
+
     includedirs
     {
         ".",
-		"../../shared",
+        "../../shared",
         "../../vendor",
         "../../vendor/minhook",
-		"../../vendor/m2framework",
-		"../../vendor/cef/" .. CEF_VERSION, 
-		"../../vendor/d3d9/include",
+        "../../vendor/m2framework",
+        "../../vendor/cef/" .. CEF_VERSION,
+        "../../vendor/d3d9/include",
     }
 
     links
     {
-		"ws2_32",
-		"crypt32", 
+        "ws2_32",
+        "crypt32",
         "delayimp",
 
         "d3d9",
-		"d3dx9",
+        "d3dx9",
 
         "shared",
         "minhook",
 
-	    "m2framework",
+        "m2framework",
 
-		"cefwrapper",
+        "cefwrapper",
         "libcef",
     }
 

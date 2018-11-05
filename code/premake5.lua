@@ -98,6 +98,8 @@ workspace "mplus"
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
         }
 
+    files { "../.clang-format" }
+
     --
     -- Source subprojects
     --
