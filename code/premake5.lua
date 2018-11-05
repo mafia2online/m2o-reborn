@@ -122,6 +122,7 @@ workspace "mplus"
 
     group "vendor"
     if os.target() == "windows" then
+        include "vendor/m2framework"
         include "vendor/minhook"
     end
 

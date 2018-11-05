@@ -1,11 +1,11 @@
 project "m2framework"
     language "C++"
     kind "StaticLib"
-    
+
     vpaths
     {
         ["Headers/*"] = "**.hpp",
-		["Headers/*"] = "**.h",
+        ["Headers/*"] = "**.h",
         ["Sources/*"] = "**.cpp",
         ["Sources/*"] = "**.c",
         ["*"] = "premake5.lua"
@@ -15,8 +15,8 @@ project "m2framework"
     {
         "premake5.lua",
         "**.cpp",
-        "**.hpp",        
-        "**.h",      
+        "**.hpp",
+        "**.h",
         "**.c"
     }
 
