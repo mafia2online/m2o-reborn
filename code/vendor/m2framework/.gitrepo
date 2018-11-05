@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:Nomad-Group/M2Framework.git
+	branch = master
+	commit = 85e6b25285c390e2109906be3168b53d3e6221d1
+	parent = e806d0dc9496dc4abf7978e48d399258f42700a1
+	cmdver = 0.3.1
