@@ -2,7 +2,7 @@ project "shared"
     language "C++"
     kind "StaticLib"
 
-    -- shared folder looks best if no vpaths are used at all
+    vpaths { ["*"] = "*" }
 
     includedirs
     {

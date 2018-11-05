@@ -20,8 +20,6 @@ return {
         -- dont question this output path!
         targetdir "../bin/vendor/%{cfg.buildcfg}"
 
-        vpaths { ["*"] = "*" }
-
         local cef_base = "vendor/cef/" .. CEF_VERSION .. "/libcef_dll/"
 
         includedirs {
