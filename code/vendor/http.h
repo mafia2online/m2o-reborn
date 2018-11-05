@@ -13,8 +13,8 @@ before you include this file in *one* C/C++ file to create the implementation.
 #ifndef http_hpp
 #define http_hpp
 
-#define _CRT_NONSTDC_NO_DEPRECATE
-#define _CRT_SECURE_NO_WARNINGS
+// #define _CRT_NONSTDC_NO_DEPRECATE
+// #define _CRT_SECURE_NO_WARNINGS
 #include <stddef.h> // for size_t
 
 typedef enum http_status_t
@@ -187,8 +187,8 @@ Releases the resources acquired by `http_get` or `http_post`. Should be call whe
 #ifdef HTTP_IMPLEMENTATION
 
 #ifdef _WIN32
-    #define _CRT_NONSTDC_NO_DEPRECATE
-    #define _CRT_SECURE_NO_WARNINGS
+    // #define _CRT_NONSTDC_NO_DEPRECATE
+    // #define _CRT_SECURE_NO_WARNINGS
     #pragma warning( push )
     #pragma warning( disable: 4127 ) // conditional expression is constant
     #pragma warning( disable: 4255 ) // 'function' : no function prototype given: converting '()' to '(void)'
@@ -207,6 +207,7 @@ Releases the resources acquired by `http_get` or `http_post`. Should be call whe
 #else
     #include <stdlib.h>
     #include <stdio.h>
+    #include <signal.h>
     #include <string.h>
     #include <sys/types.h>
     #include <sys/socket.h>
@@ -219,8 +220,8 @@ Releases the resources acquired by `http_get` or `http_post`. Should be call whe
 #endif
 
 #ifndef HTTP_MALLOC
-    #define _CRT_NONSTDC_NO_DEPRECATE
-    #define _CRT_SECURE_NO_WARNINGS
+    // #define _CRT_NONSTDC_NO_DEPRECATE
+    // #define _CRT_SECURE_NO_WARNINGS
     #include <stdlib.h>
     #define HTTP_MALLOC( ctx, size ) ( malloc( size ) )
     #define HTTP_FREE( ctx, ptr ) ( free( ptr ) )
@@ -446,6 +447,11 @@ http_t* http_post( char const* url, void const* data, size_t size, void* memctx 
 
     HTTP_SOCKET socket = http_internal_connect( address, port );
     if( socket == HTTP_INVALID_SOCKET ) return NULL;
+
+    #ifndef _WIN32
+    int optval=1;
+    signal(SIGPIPE, SIG_IGN);
+    #endif
 
     http_internal_t* internal = http_internal_create( size, memctx );
     internal->socket = socket;

@@ -1,5 +1,4 @@
-
-#include <Windows.h>
+#include <windows.h>
 
 // Tls pool for the game
 #pragma region tls

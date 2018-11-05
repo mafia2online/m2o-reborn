@@ -12,44 +12,35 @@
 -- you add a new build file, there must be some path of dependencies from this
 -- file to your new one or Premake won't know about it.
 
-project "ServerHost"
+project "server-host"
     language "C++"
     kind "ConsoleApp"
-    targetname "MPlus Server"
 
+    targetname "server-host"
+
+    vpaths { ["*"] = "*" }
+
+    -- why like this tho
     if os.target() == "linux" then
-	linkoptions { "-ldl -pthread -fvisibility=hidden" }
-	targetdir ("../../../bin/_sv_linux/%{cfg.buildcfg}/")
+        linkoptions { "-ldl -pthread -fvisibility=hidden" }
+    	targetdir ("../../../bin/_sv_linux/%{cfg.buildcfg}/")
 	else
-	targetdir ("../../../bin/_sv/%{cfg.buildcfg}/")
+        targetdir ("../../../bin/_sv/%{cfg.buildcfg}/")
 	end
 
-    vpaths
-    {
-        ["Headers/*"] = { "**.hpp", "**.h" },
-        ["Sources/*"] = "**.cpp",
-        ["Resources/*"] = "**.rc",
-        ["*"] = "premake5.lua"
-    }
+    libdirs {}
 
-    libdirs
-    {
-    }
-
-    includedirs
-    {
+    includedirs {
         "../../shared",
         "./include",
         "."
     }
 
-    links
-    {
+    links {
         "shared",
     }
 
-    files
-    {
+    files {
         "premake5.lua",
         "**.h",
         "**.hpp",

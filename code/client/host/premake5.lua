@@ -6,40 +6,36 @@
 -- Distributed under the MIT license (See accompanying file LICENSE or copy at
 -- https://opensource.org/licenses/MIT)
 
-project "Host"
+project "client-host"
     language "C++"
     kind "WindowedApp"
-    targetname "MPII_Host" 
-	flags { "NoIncrementalLink" }
-	editandcontinue "Off"
+
+    targetname "client-host"
+    flags { "NoIncrementalLink" }
+    editandcontinue "Off"
+
+    vpaths { ["*"] = "*" }
+
     linkoptions "/IGNORE:4254 /ENTRY:wmainCRTStartup /OPT:NOLBR /SAFESEH:NO /DYNAMICBASE:NO /LARGEADDRESSAWARE /LAST:.zdata"
 
-    vpaths
-    {
-        ["Headers/*"] = { "**.hpp", "**.h" },
-        ["Sources/*"] = "**.cpp",
-        ["Resources/*"] = "**.rc",
-        ["*"] = "premake5.lua"
-    }
-
-    includedirs
-    {
+    includedirs {
         "."
     }
 
-    links
-    {
-		"shared",
+    links {
+        "shared",
     }
 
-    files
-    {
+    files {
         "premake5.lua",
         "**.h",
         "**.hpp",
         "**.cpp",
         "**.rc"
     }
+
+    filter "files:host.cpp"
+        flags { "ExcludeFromBuild" }
 
     filter "architecture:x64"
         flags { "ExcludeFromBuild" }

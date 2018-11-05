@@ -14,74 +14,64 @@
 
 premake.path = premake.path .. ";build"
 
---x86 !
-CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
+if os.target() == "windows" then
+    --x86 !
+    CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
 
---dofile('build/helpers/type_select.lua')
-dofile('build/helpers/cef_setup.lua')
+    --dofile('../tools/premake/helpers/type_select.lua')
+    dofile('../tools/premake/helpers/cef_setup.lua')
 
-verifycef(CEF_VERSION)
+    verifycef(CEF_VERSION)
+end
 
 FX_NAME = "MAFIA PLUS"
 
-dofile('build/vendor/vendorfiles.lua')
---dofile('build/modules/modules.lua')
+dofile('../tools/premake/vendor/vendorfiles.lua')
 
-workspace "MPLUS"
+workspace "mplus"
     configurations { "Debug", "Release" }
 
-	if _OPTIONS['is_ci_build'] == 'true' then
-		
-	   defines "CI_BUILD"
-	end
-	
-	if os.istarget('windows') then
-		buildoptions "/std:c++latest"
-		-- systemversion "10.0.15063.0"
-	else
-		buildoptions "-std=c++17"
-	end
+    if os.istarget('windows') then
+        buildoptions "/std:c++latest"
+    else
+        buildoptions "-std=c++17"
+    end
 
-    targetprefix ""
     symbols "On"
+    targetprefix ""
     characterset "Unicode"
-	
+
     -- Enable position-independent-code generation
     pic "On"
     startproject "launcher"
-	platforms { "x86" }
-	
-	defines { "FXNAME=\"" .. FX_NAME .. "\""}
-	defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
-	location "../build/"
-	targetdir "../bin/%{cfg.buildcfg}/"
-	os.mkdir"../build/symbols"
-	
-    defines
-    {
+
+    defines { "FXNAME=\"" .. FX_NAME .. "\""}
+    defines { "FXNAME_WIDE=L\"" .. FX_NAME .. "\""}
+
+    location "../build/"
+    targetdir "../bin/%{cfg.buildcfg}/"
+    os.mkdir"../build/symbols"
+
+    defines {
         "NOMINMAX",
         --"WIN32_LEAN_AND_MEAN"
     }
 
-    includedirs
-    {
+    includedirs {
         ".",
-		"./shared",
+        "./shared",
     }
-	
-	libdirs
-	{
-		"./shared/Lib",
-	}
 
     filter "platforms:x64"
          architecture "x86_64"
 
     filter "configurations:Debug"
-        defines { "GC_DBG" }
+        defines { "DEBUG", "_DEBUG", "GC_DBG" }
+        optimize "Off"
+        runtime "Debug"
 
     filter "configurations:Release"
-        --flags { "StaticRuntime" }
+        -- staticruntime "On"
         optimize "Speed"
 
     filter {"system:windows", "configurations:Release", "kind:not StaticLib"}
@@ -91,48 +81,52 @@ workspace "MPLUS"
         linkoptions "/manifestdependency:\"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\""
 
     -- Disable deprecation warnings and errors
+    -- disabling as less warnings as possible
     filter "action:vs*"
-        defines
-        {
+        defines {
             "_CRT_SECURE_NO_WARNINGS",
-            "_CRT_SECURE_NO_DEPRECATE",
-            "_CRT_NONSTDC_NO_WARNINGS",
-            "_CRT_NONSTDC_NO_DEPRECATE",
-            "_SCL_SECURE_NO_WARNINGS",
-            "_SCL_SECURE_NO_DEPRECATE",
-            
+            -- "_CRT_SECURE_NO_DEPRECATE",
+            -- "_CRT_NONSTDC_NO_WARNINGS",
+            -- "_CRT_NONSTDC_NO_DEPRECATE",
+            -- "_SCL_SECURE_NO_WARNINGS",
+            -- "_SCL_SECURE_NO_DEPRECATE",
+
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
         }
 
-	if os.target() == "windows" then
-    	group "Client"
-		include "client/host"
-		include "client/worker"
-	end
-	
-	include "client/core"
-	
-	group "Server"
-	include "server/host"
-	--include "server/core"
-	
-	--group "Modules"
-	--do_modules()
-	
-	group "Shared"
-	include "./shared"
+    files { "../.clang-format" }
 
-    group "Vendor"
-	if os.target() == "windows" then
-		--include "vendor/nomad-common"
-		include "vendor/minhook"
-		--include "vendor/imgui"
-	end
-	include "vendor/m2framework"
-	
-	--include "vendor/enet"
-	do_vendor()
-	
+    --
+    -- Source subprojects
+    --
+
+    if os.target() == "windows" then
+        group "client"
+        include "client/host"
+        include "client/core"
+        include "client/worker"
+    end
+
+    group "server"
+    include "server/core"
+    if os.target() == "windows" then
+        include "server/host" -- not yet ready for macos/linux
+    end
+
+    -- not really a shared tho, needs some other name
+    if os.target() == "windows" then
+        group ""
+        include "./shared"
+    end
+
+    group "vendor"
+    if os.target() == "windows" then
+        include "vendor/m2framework"
+        include "vendor/minhook"
+    end
+
+    do_vendor()
+
 -- Cleanup
 if _ACTION == "clean" then
     os.rmdir("../bin");

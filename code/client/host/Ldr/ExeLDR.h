@@ -8,7 +8,7 @@
 #pragma once
 
 #include <functional>
-#include <Windows.h>
+#include <windows.h>
 #include <winnt.h>
 #include <cstdint>
 
