@@ -33,7 +33,7 @@ return {
         {
             cef_base .. "/**.hpp",
             cef_base .. "/**.h",
-            cef_base .. "/main.cc",
+            cef_base .. "/cerwrapper.cc",
         }
 
         -- single source cef wrapper (unity build)
@@ -41,11 +41,11 @@ return {
         local p = os.matchfiles(cef_base .. "/**.cc")
         for _, v in pairs(p) do
             local name = v:gsub(cef_base, "")
-            if name ~= "main.cc" then
+            if name ~= "cerwrapper.cc" then
                 cnt = cnt .. "#include \"" .. name .. "\"\n"
             end
         end
-        io.writefile(cef_base .. "/main.cc", cnt)
+        io.writefile(cef_base .. "/cerwrapper.cc", cnt)
 
     end
 }

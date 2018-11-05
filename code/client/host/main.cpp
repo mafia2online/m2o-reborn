@@ -6,6 +6,7 @@
 #include <utility/WinRegistry.h>
 
 #include <Host.h>
+#include <Host.cpp>
 
 #define EXE L"//mafia2.exe"
 #define KEY L"maf2_path"
