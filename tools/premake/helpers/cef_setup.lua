@@ -2,23 +2,32 @@ function progress(total, current)
     local ratio = current / total;
     ratio = math.min(math.max(ratio, 0), 1);
     local percent = math.floor(ratio * 100);
-    print("Cef Download progress (" .. percent .. "%/100%)")
+    print(" - CEF download progress (" .. percent .. "%/100%)")
 end
 
 function verifycef(version)
     -- cmd needs absolute pathing
     local abs_path = path.getabsolute('')
+    local cef_dir = "vendor/cef/" .. version
 
     -- ensure path existence
     if os.isdir("vendor/cef") or os.isdir("vendor/cef/cur_dl") then
-        print("cef dir allready exists, skipping step")
+        print(" - CEF exists, skipping step")
+
+        os.execute("{COPY} " .. cef_dir .. "/Debug ../bin/Debug/bin")
+        os.execute("{COPY} " .. cef_dir .. "/Release ../bin/Release/bin")
+
+        if _ACTION == "clean" then
+            os.rmdir("vendor/cef");
+            os.rmdir("vendor/cef/cur_dl");
+        end
+
         return;
     else
-
         os.mkdir("vendor/cef")
         os.mkdir("vendor/cef/cur_dl")
 
-        print("installing cef.")
+        print(" - installing CEF " .. version)
     end
 
     -- finally, do the download
@@ -31,7 +40,7 @@ function verifycef(version)
 
     -- and unpack it
     if os.host() == "windows" then
-        local sz_exe = abs_path .. "/build/win/7z.exe"
+        local sz_exe = abs_path .. "/../tools/premake/bin/win32/7z.exe"
         local src = abs_path .. "/vendor/cef/cur_dl/cef.tar.bz2"
         local dest = abs_path .. "/vendor/cef/cur_dl"
 
@@ -47,8 +56,6 @@ function verifycef(version)
     os.rmdir("vendor/cef/cur_dl")
 
     -- now copy the lib files to the bin dir
-    local cef_dir = "vendor/cef/" .. version
-
     os.mkdir("../bin/vendor/Debug")
     os.mkdir("../bin/vendor/Release")
 
@@ -57,6 +64,9 @@ function verifycef(version)
 
     os.copyfile(cef_dir .. "/Release/cef_sandbox.lib", "../bin/vendor/Release/cef_sandbox.lib")
     os.copyfile(cef_dir .. "/Release/libcef.lib", "../bin/vendor/Release/libcef.lib")
+
+    os.execute("{COPY} " .. cef_dir .. "/Debug ../bin/Debug/bin")
+    os.execute("{COPY} " .. cef_dir .. "/Release ../bin/Release/bin")
 
     return;
 end

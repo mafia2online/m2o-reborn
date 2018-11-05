@@ -64,3 +64,30 @@ project "client-core"
 
     filter "system:not windows"
         flags { "ExcludeFromBuild" }
+
+
+    -- additional data
+    local additional = function()
+        print(" - generating additional client data")
+
+        local steam_id = "50130"
+        local fxconfig = "[fxconfig]\r\n"
+
+        fxconfig = fxconfig .. "maf2_path=C://Program Files//Steam//steamapps//common//Mafia II//pc\r\n"
+
+        local dpath = "../../../bin/Debug/"
+        local rpath = "../../../bin/Release/"
+
+        local function file_exists(name)
+           local f=io.open(name,"r")
+           if f~=nil then io.close(f) return true else return false end
+        end
+
+        io.writefile(dpath .. "steam_appid.txt", steam_id)
+        io.writefile(rpath .. "steam_appid.txt", steam_id)
+
+        if not file_exists(dpath .. "fxconfig.ini") then io.writefile(dpath .. "fxconfig.ini", fxconfig) end
+        if not file_exists(rpath .. "fxconfig.ini") then io.writefile(rpath .. "fxconfig.ini", fxconfig) end
+    end
+
+    additional();

@@ -33,7 +33,7 @@ do_vendor = function()
             comp.ran = true
             changed = true
 
-            print('vendorfile : ' .. comp.rawName)
+            print(' - using vendor: ' .. comp.rawName)
 
             project(comp.rawName)
 
