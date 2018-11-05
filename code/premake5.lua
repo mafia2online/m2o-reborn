@@ -14,13 +14,15 @@
 
 premake.path = premake.path .. ";build"
 
---x86 !
-CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
+if os.target() == "windows" then
+    --x86 !
+    CEF_VERSION = "cef_binary_3.3440.1806.g65046b7_windows32"
 
---dofile('build/helpers/type_select.lua')
-dofile('build/helpers/cef_setup.lua')
+    --dofile('build/helpers/type_select.lua')
+    dofile('build/helpers/cef_setup.lua')
 
-verifycef(CEF_VERSION)
+    verifycef(CEF_VERSION)
+end
 
 FX_NAME = "MAFIA PLUS"
 

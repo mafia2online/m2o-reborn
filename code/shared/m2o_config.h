@@ -56,6 +56,8 @@
 #define vec3f zplm_vec3f
 #define vec4f zplm_vec4f
 
+#define mod_log printf
+
 // helpers
 #define when(init, name) auto name = init; if (name)
 #define when_assert(init, name) auto name = init; librg_assert(name); if (name)
