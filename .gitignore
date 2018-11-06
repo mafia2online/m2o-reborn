@@ -341,3 +341,6 @@ ASALocalRun/
 .DS_Store
 Thumbs.db
 .sync/
+
+# custom user specific stuff
+m2framework-push.sh
