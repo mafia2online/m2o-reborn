@@ -19,12 +19,12 @@ ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 0
 Cpp11BracedListStyle: true
 DerivePointerBinding: false
-IndentCaseLabels: false
+IndentCaseLabels: true
 IndentFunctionDeclarationAfterType: false
 IndentWidth: 4
 Language: Cpp
 MaxEmptyLinesToKeep: 2
-NamespaceIndentation: None
+NamespaceIndentation: All
 ObjCSpaceAfterProperty: true
 ObjCSpaceBeforeProtocolList: true
 PenaltyBreakBeforeFirstCallParameter: 100
