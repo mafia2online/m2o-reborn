@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/Nomad-Group/M2Framework.git
 	branch = master
-	commit = 85e6b25285c390e2109906be3168b53d3e6221d1
-	parent = e806d0dc9496dc4abf7978e48d399258f42700a1
+	commit = 100af81950f9bd9ae2700467e83d4b4658e8b91c
+	parent = 8bc2fdb9a48683a7af0d23e70e1d77c358b3abdd
 	cmdver = 0.3.1
