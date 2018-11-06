@@ -19,6 +19,17 @@ int __stdcall BinkOpen_Hooked(int a, int b)
     return 0;
 }
 
+void *SteamAPI_Init_original = nullptr;
+int __stdcall SteamAPI_Init_Hook() {
+    auto result = nio::std_call<int32_t>(SteamAPI_Init_original);
+
+    if (!result) {
+        // TODO load language from localization file
+        MessageBoxA(NULL, "Start your Steam, faggot!", "Start your Steam, faggot!", 0);
+    }
+
+    return result;
+}
 static nomad::base_function init([]()
 {
 #if 1
@@ -26,12 +37,16 @@ static nomad::base_function init([]()
     nio::put_ljump(0xAC6D2B, 0xAC6F79);
     nio::put_ljump(0xAC6E57, 0xAC6F79);
 
-    // Legal
+    // Remove legal starting screen
     nio::nop(0x04F2B8D, 5);
 
-    // Remove nvidia & 2k init logos
+    // Remove NVIDIA & 2k init logos
     BinkOpen_original = nio::iat("binkw32.dll", BinkOpen_Hooked, "_BinkOpen@8");
     nio::write<uint32_t>(0x08CA820, 0x90C300B0);
+
+    // Hook SteamINIT to show if a user needs to start steam first
+    // TODO check if the binary is a steam version
+    SteamAPI_Init_original = nio::iat("steam_api.dll", SteamAPI_Init_Hook, "SteamAPI_Init");
 #endif
 
 #if 0

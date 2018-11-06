@@ -111,7 +111,7 @@ void Host::Launch(const wchar_t* game_dir)
     fread(data, 1, length, file);
     fclose(file);
 
-    printf("[Host] Loaded Game (%ld MB)\n", length / 1024);
+    printf("[Host] Loaded Game (%ld MB)\n", length / 1024 / 1024);
 
     auto base = GetModuleHandle(nullptr);
     ExecutableLoader loader(data);
