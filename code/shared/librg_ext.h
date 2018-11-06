@@ -52,7 +52,7 @@ inline void mod_message_add(librg_ctx_t *ctx, librg_message_id id, message_callb
 #define librg_message_send librg_message_send_all
 
 
-zplm_vec3 zplm_vec3_to_radians(zplm_vec3 value) {
+static inline zplm_vec3 zplm_vec3_to_radians(zplm_vec3 value) {
     zplm_vec3 result = {0};
     result.x = zplm_to_radians(value.x);
     result.y = zplm_to_radians(value.y);
@@ -60,7 +60,7 @@ zplm_vec3 zplm_vec3_to_radians(zplm_vec3 value) {
     return result;
 }
 
-zplm_vec3 zplm_vec3_to_degrees(zplm_vec3 value) {
+static inline zplm_vec3 zplm_vec3_to_degrees(zplm_vec3 value) {
     zplm_vec3 result = {0};
     result.x = zplm_to_degrees(value.x);
     result.y = zplm_to_degrees(value.y);
@@ -68,7 +68,7 @@ zplm_vec3 zplm_vec3_to_degrees(zplm_vec3 value) {
     return result;
 }
 
-zplm_quat zplm_quat_from_eular(zplm_vec3 radians) {
+static inline zplm_quat zplm_quat_from_eular(zplm_vec3 radians) {
     f32 cosZ = zplm_cos(0.5f * radians.z);
     f32 cosY = zplm_cos(0.5f * radians.y);
     f32 cosX = zplm_cos(0.5f * radians.x);
@@ -89,7 +89,7 @@ zplm_quat zplm_quat_from_eular(zplm_vec3 radians) {
     return result;
 }
 
-zplm_vec3 zplm_quat_to_eular(zplm_quat input) {
+static inline zplm_vec3 zplm_quat_to_eular(zplm_quat input) {
     f32 sqw = (input.w * input.w);
     f32 sqx = (input.x * input.x);
     f32 sqy = (input.y * input.y);
@@ -102,7 +102,7 @@ zplm_vec3 zplm_quat_to_eular(zplm_quat input) {
     return result;
 }
 
-f32 zplm_offset_degrees(f32 a, f32 b) {
+static inline f32 zplm_offset_degrees(f32 a, f32 b) {
     f32 c = (b > a) ? b - a : 0.0f - (a - b);
     if (c > 180.0f) { c = 0.0f - (360.0f - c); }
     else if (c <= -180.0f) { c = (360.0f + c); }

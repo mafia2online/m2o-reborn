@@ -113,7 +113,7 @@ typedef struct m2o_car {
 // TODO: add pre-allocated pools, instead of random heap allocations, or use different allocator
 
 // legacy
-m2o_ped *m2o_ped_alloc(void *ptr) {
+static inline m2o_ped *m2o_ped_alloc(void *ptr) {
     m2o_ped _entity = {0};
     m2o_ped *entity = (m2o_ped *)zpl_alloc(zpl_heap(), sizeof(m2o_ped));
 
@@ -125,14 +125,14 @@ m2o_ped *m2o_ped_alloc(void *ptr) {
     return entity;
 }
 
-void m2o_ped_free(m2o_ped *ped) { zpl_free(zpl_heap(), ped); }
+static inline void m2o_ped_free(m2o_ped *ped) { zpl_free(zpl_heap(), ped); }
 
-m2o_ped *m2o_ped_get(librg_entity_t *entity) {
+static inline m2o_ped *m2o_ped_get(librg_entity_t *entity) {
     mod_assert(entity && entity->user_data);
     return (m2o_ped *)(entity->user_data);
 }
 
-m2o_car *m2o_car_alloc(void *ptr) {
+static inline m2o_car *m2o_car_alloc(void *ptr) {
     m2o_car _entity = {0};
     m2o_car *entity = (m2o_car *)zpl_alloc(zpl_heap(), sizeof(m2o_car));
 
@@ -143,9 +143,9 @@ m2o_car *m2o_car_alloc(void *ptr) {
     return entity;
 }
 
-void m2o_car_free(m2o_car *ped) { zpl_free(zpl_heap(), ped); }
+static inline void m2o_car_free(m2o_car *ped) { zpl_free(zpl_heap(), ped); }
 
-m2o_car *m2o_car_get(librg_entity_t *entity) {
+static inline m2o_car *m2o_car_get(librg_entity_t *entity) {
     mod_assert(entity && entity->user_data);
     return (m2o_car *)(entity->user_data);
 }
