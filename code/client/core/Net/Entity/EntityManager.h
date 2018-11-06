@@ -1,6 +1,7 @@
 
 struct librg_ctx_t;
 struct librg_entity_t;
+struct librg_event_t;
 class C_Player2;
 
 namespace nmd::net {
@@ -12,9 +13,13 @@ class EntityManager {
 public:
     EntityManager(librg_ctx_t *);
 
-    void Init();
+    void Init() const;
 
     void CreateLocalNetPlayer(librg_entity_t *p, C_Player2*);
+
+    // events
+    static void CreateCar(librg_event_t*);
+    static void CreatePed(librg_event_t*);
 };
 
 } // namespace nmd::net

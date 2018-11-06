@@ -1,7 +1,8 @@
 #ifndef M2O_TYPES_H
 #define M2O_TYPES_H
-
 #include "m2o_config.h"
+
+//#include "m2o_config.h"
 
 // =======================================================================//
 // !
@@ -53,7 +54,7 @@ enum {
 
 // =======================================================================//
 // !
-// ! Generic data structs
+// ! Generic sync data structs
 // !
 // =======================================================================//
 
@@ -78,38 +79,9 @@ typedef struct m2o_ped {
         u8 move;
     } stream;
 
-#ifdef M2O_CLIENT
-    gfx_handle nickname_value;
-    gfx_handle healthbar_base;
-    gfx_handle healthbar_value;
-
-    struct {
-        bool init;
-        int counter;
-        M2::C_Command *stand;
-        M2::C_Command *movedir;
-    } tasks;
-
-    struct {
-        struct {
-            vec3 start;
-            vec3 target;
-            f32 lastAlpha;
-            f64 startTime;
-            f64 finishTime;
-        } pos;
-    } interp;
-#endif
-
     /* a union representing a "autocastable" names for needed types */
     union {
         void *gameptr;
-
-#ifdef M2O_CLIENT
-        M2::C_Player2 *CPlayer; /* watch out, not all peds are players */
-        M2::C_Human2 *CHuman;
-        M2::C_Entity *CEntity;
-#endif
     };
 } m2o_ped;
 
@@ -126,38 +98,9 @@ typedef struct m2o_car {
         f32 steer; /* vehicle steering wheel -1..0..1 */
     } stream;
 
-#ifdef M2O_CLIENT
-    struct { /* interpolation table */
-        struct {
-            vec3 start;
-            vec3 target;
-            vec3 error;
-            f32 lastAlpha;
-            f64 startTime;
-            f64 finishTime;
-        } pos;
-
-        struct {
-            vec3 start;
-            vec3 target;
-            vec3 error;
-            f32 lastAlpha;
-            f64 startTime;
-            f64 finishTime;
-        } rot;
-
-        u32 forceLocalZCounter;
-    } interp;
-#endif
-
     /* a union representing a "autocastable" names for needed types */
     union {
         void *gameptr;
-
-#ifdef M2O_CLIENT
-        M2::C_Car *CCar;
-        M2::C_Entity *CEntity;
-#endif
     };
 } m2o_car;
 
@@ -169,6 +112,7 @@ typedef struct m2o_car {
 
 // TODO: add pre-allocated pools, instead of random heap allocations, or use different allocator
 
+// legacy
 m2o_ped *m2o_ped_alloc(void *ptr) {
     m2o_ped _entity = {0};
     m2o_ped *entity = (m2o_ped *)zpl_alloc(zpl_heap(), sizeof(m2o_ped));
