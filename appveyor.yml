@@ -7,7 +7,7 @@ configuration:
   - Release
 
 before_build:
-  - generate.sh.bat
+  - premake.sh.bat
 
 build:
-  project: $(APPVEYOR_BUILD_FOLDER)\build\$(APPVEYOR_PROJECT_NAME).sln
+  project: $(APPVEYOR_BUILD_FOLDER)\build\mplus.sln

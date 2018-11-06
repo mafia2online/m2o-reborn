@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <SVHost.h>
-#include <Utility/PathUtils.h>
+#include <utility/PathUtils.h>
 #include <IModules.h>
 
 #ifdef __linux__

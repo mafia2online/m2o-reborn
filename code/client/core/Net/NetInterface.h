@@ -1,6 +1,7 @@
+
 #include <memory>
 
-#include <m2o_config.h>
+#include "Entity/EntityManager.h"
 
 struct librg_ctx_t;
 
@@ -12,12 +13,14 @@ namespace nmd::net
         // and c code
         librg_ctx_t* ctx;
 
+        std::unique_ptr<EntityManager> entitymgr;
+
     public:
 
         NetInterface();
         ~NetInterface();
 
-        void Init() const;
+        void Init();
 
         bool IsActive() const
         {

@@ -1,1 +1,0 @@
-Run pmake.cmd, the solution will be emitted to the build directory.

@@ -1,12 +1,9 @@
-
 #include <SVHost.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     SVHost host(argc, argv);
 
-    if (!host.Initialize())
-    {
+    if (!host.Initialize()) {
         return 0;
     }
 

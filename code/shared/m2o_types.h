@@ -1,6 +1,8 @@
 #ifndef M2O_TYPES_H
 #define M2O_TYPES_H
 
+#include "m2o_config.h"
+
 // =======================================================================//
 // !
 // ! Generic flags and constants
@@ -46,7 +48,7 @@ typedef enum car_state {
 /* entity flags */
 enum {
     M2O_ENTITY_INTERPOLATED = (1 << 20),
-    M2O_ENTITY_DRIVER       = (1 << 21),
+    M2O_ENTITY_DRIVER = (1 << 21),
 };
 
 // =======================================================================//
@@ -56,9 +58,9 @@ enum {
 // =======================================================================//
 
 typedef struct m2o_ped {
-    u16 model;          /* entity model id */
-    ped_state state;    /* current entity state */
-    char name[128];     /* entity name */
+    u16 model; /* entity model id */
+    ped_state state; /* current entity state */
+    char name[128]; /* entity name */
 
     /* depending on the entity state it will have a vehicle it is seating in,
         or might have a target it is following/shooting at */
@@ -67,16 +69,16 @@ typedef struct m2o_ped {
         librg_entity_id target;
     };
 
-    u8 seat;  /* if ped is in the car, number represents a seat, (valid seat always >0) */
+    u8 seat; /* if ped is in the car, number represents a seat, (valid seat always >0) */
     u8 unsued;
 
     struct {
         f32 dirx;
         f32 diry;
-        u8  move;
+        u8 move;
     } stream;
 
-    #ifdef M2O_CLIENT
+#ifdef M2O_CLIENT
     gfx_handle nickname_value;
     gfx_handle healthbar_base;
     gfx_handle healthbar_value;
@@ -92,70 +94,70 @@ typedef struct m2o_ped {
         struct {
             vec3 start;
             vec3 target;
-            f32  lastAlpha;
-            f64  startTime;
-            f64  finishTime;
+            f32 lastAlpha;
+            f64 startTime;
+            f64 finishTime;
         } pos;
     } interp;
-    #endif
+#endif
 
     /* a union representing a "autocastable" names for needed types */
     union {
         void *gameptr;
 
-        #ifdef M2O_CLIENT
+#ifdef M2O_CLIENT
         M2::C_Player2 *CPlayer; /* watch out, not all peds are players */
         M2::C_Human2 *CHuman;
         M2::C_Entity *CEntity;
-        #endif
+#endif
     };
 } m2o_ped;
 
 typedef struct m2o_car {
-    u16 model;          /* entity model id */
-    car_state state;    /* current entity state */
+    u16 model; /* entity model id */
+    car_state state; /* current entity state */
 
     u8 gear;
     u8 unsued;
 
     struct {
-        vec3 rotation;  /* vehicle euler rotation */
-        vec3 speed;     /* vehicle speed vector */
-        f32  steer;     /* vehicle steering wheel -1..0..1 */
+        vec3 rotation; /* vehicle euler rotation */
+        vec3 speed; /* vehicle speed vector */
+        f32 steer; /* vehicle steering wheel -1..0..1 */
     } stream;
 
-    #ifdef M2O_CLIENT
-    struct {            /* interpolation table */
+#ifdef M2O_CLIENT
+    struct { /* interpolation table */
         struct {
             vec3 start;
             vec3 target;
             vec3 error;
-            f32  lastAlpha;
-            f64  startTime;
-            f64  finishTime;
+            f32 lastAlpha;
+            f64 startTime;
+            f64 finishTime;
         } pos;
 
         struct {
             vec3 start;
             vec3 target;
             vec3 error;
-            f32  lastAlpha;
-            f64  startTime;
-            f64  finishTime;
+            f32 lastAlpha;
+            f64 startTime;
+            f64 finishTime;
         } rot;
 
         u32 forceLocalZCounter;
     } interp;
-    #endif
+#endif
 
     /* a union representing a "autocastable" names for needed types */
     union {
         void *gameptr;
 
-        #ifdef M2O_CLIENT
+#ifdef M2O_CLIENT
         M2::C_Car *CCar;
         M2::C_Entity *CEntity;
-        #endif
+#endif
     };
 } m2o_car;
 
@@ -174,14 +176,12 @@ m2o_ped *m2o_ped_alloc(void *ptr) {
     /* copy default values */
     *entity = _entity;
     entity->gameptr = ptr;
-    entity->target  = M2O_INVALID_ENTITY;
+    entity->target = M2O_INVALID_ENTITY;
 
     return entity;
 }
 
-void m2o_ped_free(m2o_ped *ped) {
-    zpl_free(zpl_heap(), ped);
-}
+void m2o_ped_free(m2o_ped *ped) { zpl_free(zpl_heap(), ped); }
 
 m2o_ped *m2o_ped_get(librg_entity_t *entity) {
     mod_assert(entity && entity->user_data);
@@ -199,9 +199,7 @@ m2o_car *m2o_car_alloc(void *ptr) {
     return entity;
 }
 
-void m2o_car_free(m2o_car *ped) {
-    zpl_free(zpl_heap(), ped);
-}
+void m2o_car_free(m2o_car *ped) { zpl_free(zpl_heap(), ped); }
 
 m2o_car *m2o_car_get(librg_entity_t *entity) {
     mod_assert(entity && entity->user_data);
