@@ -36,10 +36,10 @@ namespace nmd::net
         C_Car *CCar;
         C_Entity *CEntity;
 
+    public:
+
         void UpdatePosition();
         void UpdateRotation();
-
-    public:
 
         void SetPosition(vec3 targetPos, f32 interpTime, bool validVelocityZ, f32 velocityZ);
         void SetRotation(vec3 targetRot, f32 interpTime);

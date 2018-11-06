@@ -1,37 +1,30 @@
 
-#include <memory>
-
-#include "Entity/EntityManager.h"
-
 struct librg_ctx_t;
 
-namespace nmd::net
-{
-    class NetInterface
-    {
+
+#include <Net/Entity/EntityManager.h>
+
+namespace nmd::net {
+    class NetInterface {
         // its slightly annoying to deal with smart pointers
         // and c code
-        librg_ctx_t* ctx;
+        librg_ctx_t *ctx;
 
-        std::unique_ptr<EntityManager> entitymgr;
+        EntityManager *entity_mgr;
 
     public:
-
         NetInterface();
         ~NetInterface();
 
         void Init();
 
-        bool IsActive() const
-        {
-            return ctx;
-        }
+        bool IsActive() const { return ctx; }
 
         bool IsConnected() const;
 
-        void Connect(const char*, uint16_t) const;
+        void Connect(const char *, uint16_t) const;
         void Disconnect() const;
 
         void Process() const;
     };
-}
+} // namespace nmd::net

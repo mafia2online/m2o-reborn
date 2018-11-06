@@ -6,6 +6,7 @@
 class C_Player2;
 class C_Human2;
 class C_Entity;
+class C_Command;
 
 namespace nmd::net
 {
@@ -15,14 +16,12 @@ namespace nmd::net
        // gfx_handle healthbar_base;
        // gfx_handle healthbar_value;
 
-        struct {
+        struct 
+        {
             bool init;
             int counter;
-            //M2::C_Command *stand;
-            //M2::C_Command *movedir;
-
-            void *stand;
-            void *movedir;
+            C_Command *stand;
+            C_Command *movedir;
 
         } tasks;
 

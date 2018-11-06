@@ -1,15 +1,18 @@
-
 #include <Net/Entity/EntityManager.h>
 
 #include <Net/Entity/NetVehicle.h>
 #include <Net/Entity/NetPed.h>
 
-namespace nmd::net 
-{
-    EntityManager::EntityManager(librg_ctx_t *ctx) : ctx(ctx) {}
+namespace nmd::net {
+    EntityManager::EntityManager(librg_ctx_t *ctx)
+        : ctx(ctx) {
+    }
 
-    void EntityManager::CreateCar(librg_event_t *event)
-    {
+    /*
+     *  Vehicle Generic Net Events
+     */
+
+    void EntityManager::CreateCar(librg_event_t *event) {
         // entitymanager pool ?
         auto car = new NetVehicle;
         memset(car, 0, sizeof(NetVehicle));
@@ -36,8 +39,19 @@ namespace nmd::net
 #endif
     }
 
-    void EntityManager::CreatePed(librg_event_t *event)
-    {
+    void EntityManager::DestroyCar(librg_event_t *event) {
+        auto car = (NetVehicle*)event->entity->user_data;
+
+        printf("TODO [REMOVE PED FROM VEHICLE!]\n");
+
+        delete car;
+    }
+
+    /*
+     * Ped generic Net Events
+     */
+
+    void EntityManager::CreatePed(librg_event_t *event) {
         // pool
         auto ped = new NetPed;
         memset(ped, 0, sizeof(NetPed));
@@ -55,13 +69,14 @@ namespace nmd::net
             case PED_IN_CAR: {
                 ped->vehicle = librg_data_ru32(event->data);
                 ped->seat = librg_data_ru8(event->data);
-            } break;
+            }
+            break;
         }
 
         event->entity->flags |= M2O_ENTITY_INTERPOLATED;
         event->entity->user_data = ped;
 
-        #if 0
+#if 0
        M2::C_Entity *entity = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, ped->model);
 
         if (entity->IsActive()) {
@@ -93,58 +108,80 @@ namespace nmd::net
 #endif
     }
 
-    void EntityManager::Init() const 
-    {
+    void EntityManager::DestroyPed(librg_event_t *event) {
+        auto ped = (NetPed *)event->entity->user_data;
+
+        printf("TODO [FINISH!]\n");
+
+        delete ped;
+    }
+
+    /*
+     *  Event registration
+     */
+
+    void EntityManager::Init() const {
         // entitymanager pool ?
-        librg_event_add(ctx, LIBRG_ENTITY_CREATE, [](librg_event_t *event) 
+        librg_event_add(ctx, LIBRG_ENTITY_CREATE, [](librg_event_t *event)
         {
-            switch (event->entity->type) 
-            {
+            switch (event->entity->type) {
                 case M2O_ENTITY_PLAYER_PED:
-                case M2O_ENTITY_DUMMY_PED: 
-                {
+                case M2O_ENTITY_DUMMY_PED: {
                     CreatePed(event);
-                } break;
-                case M2O_ENTITY_CAR:
-                {
+                }
+                    break;
+                case M2O_ENTITY_CAR: {
                     CreateCar(event);
-                } break;
+                }
+                break;
             }
         });
 
-        librg_event_add(ctx, LIBRG_ENTITY_UPDATE, [](librg_event_t *event) {
+        librg_event_add(ctx, LIBRG_ENTITY_REMOVE, [](librg_event_t *event)
+        {
+            switch (event->entity->type) {
+                case M2O_ENTITY_PLAYER_PED:
+                case M2O_ENTITY_DUMMY_PED: {
+                    DestroyPed(event);
+                }
+                    break;
+                case M2O_ENTITY_CAR: {
+                    DestroyCar(event);
+                }
+                break;
+            }
+        });
+
+        librg_event_add(ctx, LIBRG_ENTITY_UPDATE, [](librg_event_t *event)
+        {
             switch (event->entity->type) {
                 case M2O_ENTITY_PLAYER_PED:
                 case M2O_ENTITY_DUMMY_PED: {
                     // m2o_callback_ped_update(event);
-                } break;
+                }
+                    break;
                 case M2O_ENTITY_CAR: {
-                    // m2o_callback_car_update(event);
-                } break;
+                    auto car = (NetVehicle*)event->entity->user_data;
+
+                    librg_data_rptr(event->data, &car->stream, sizeof(car->stream));
+
+                }
+                break;
             }
         });
 
-        librg_event_add(ctx, LIBRG_ENTITY_REMOVE, [](librg_event_t *event) {
-            switch (event->entity->type) {
-                case M2O_ENTITY_PLAYER_PED:
-                case M2O_ENTITY_DUMMY_PED: {
-                    //  m2o_callback_ped_remove(event);
-                } break;
-                case M2O_ENTITY_CAR: {
-                    //  m2o_callback_car_remove(event);
-                } break;
-            }
-        });
-
-        librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, [](librg_event_t *event) {
+        librg_event_add(ctx, LIBRG_CLIENT_STREAMER_UPDATE, [](librg_event_t *event)
+        {
             switch (event->entity->type) {
                 case M2O_ENTITY_PLAYER_PED:
                 case M2O_ENTITY_DUMMY_PED: {
                     // m2o_callback_ped_clientstream(event);
-                } break;
+                }
+                    break;
                 case M2O_ENTITY_CAR: {
                     //  m2o_callback_car_clientstream(event);
-                } break;
+                }
+                break;
             }
         });
 
@@ -159,7 +196,7 @@ namespace nmd::net
             event->entity->flags &= ~M2O_ENTITY_INTERPOLATED;
         });
 
-        librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, [](librg_event_t *event) 
+        librg_event_add(ctx, LIBRG_CLIENT_STREAMER_REMOVE, [](librg_event_t *event)
         {
             printf("[info] removing an entity %d from clientstream\n", event->entity->id);
 
@@ -175,9 +212,44 @@ namespace nmd::net
         });
     }
 
-    void EntityManager::CreateLocalNetPlayer(librg_entity_t *p, C_Player2 *game_player) {
+    void EntityManager::CreateLocalNetPlayer(librg_entity_t *p, C_Player2 *game_player) const 
+    {
+        auto player = new NetPed;
+
+        player->gameptr = game_player;
+
         // for now
-        local_player->user_data = m2o_ped_alloc(game_player);
+        local_player->user_data = player;
+    }
+
+    void EntityManager::Update() 
+    {
+        librg_entity_iterate(ctx, (LIBRG_ENTITY_ALIVE | M2O_ENTITY_INTERPOLATED), [](librg_ctx_t *ctx, librg_entity_t *entity)
+        {
+            switch (entity->type) {
+                case M2O_ENTITY_PLAYER_PED:
+                case M2O_ENTITY_DUMMY_PED: {
+                    // m2o_callback_ped_interpolate(entity);
+                } break;
+                case M2O_ENTITY_CAR: 
+                {
+                    auto car = (NetVehicle *)entity->user_data;
+
+                    if (!car || !car->gameptr) {
+                        mod_log("[warning] calling car interpolate w/o proper car object");
+                        return;
+                    }
+
+                    //auto local_player = ((EntityManager *)ctx->user_data)->GetLocalNetPlayer();
+
+                    //auto llp =
+
+                    car->UpdatePosition();
+                    car->UpdateRotation();
+
+                } break;
+            }
+        });
     }
 
 } // namespace nmd::net
