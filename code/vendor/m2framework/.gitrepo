@@ -7,5 +7,5 @@
 	remote = https://github.com/Nomad-Group/M2Framework.git
 	branch = master
 	commit = 100af81950f9bd9ae2700467e83d4b4658e8b91c
-	parent = 8bc2fdb9a48683a7af0d23e70e1d77c358b3abdd
+	parent = 5d4ec79b2180f459362c4b563481a99e349af672
 	cmdver = 0.3.1
