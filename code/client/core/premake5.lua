@@ -15,6 +15,7 @@ project "client-core"
     libdirs {
         "../../../bin/vendor/%{cfg.buildcfg}",
         "../../vendor/d3d9",
+        "../../vendor/m2framework",
     }
 
     vpaths { ["*"] = "*" }
@@ -45,6 +46,7 @@ project "client-core"
         "shared",
         "minhook",
 
+        "m2adhesive",
         "m2framework",
 
         "cefwrapper",

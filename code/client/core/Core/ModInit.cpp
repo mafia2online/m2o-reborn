@@ -1,5 +1,4 @@
 #include <Hooking.h>
-
 #include <MPlus.h>
 
 static bool (*Initialize_Game__Orig)(void*);
@@ -20,8 +19,11 @@ static void InitializeModuleManager()
     mgr->RegisterStaticPlugins();
 }
 
-static nomad::base_function init([]()
-{
+static nomad::base_function init([]() {
+    extern void M2Adhesive(); {
+        M2Adhesive();
+    }
+
     char* loc = nio::pattern("E8 ? ? ? ? 83 C4 04 84 C0 75 06").first();
     nio::replace_call(&Initialize_Game__Orig, loc, Initialize_Game);
 

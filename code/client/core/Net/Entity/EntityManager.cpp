@@ -212,7 +212,7 @@ namespace nmd::net {
         });
     }
 
-    void EntityManager::CreateLocalNetPlayer(librg_entity_t *p, C_Player2 *game_player) const 
+    void EntityManager::CreateLocalNetPlayer(librg_entity_t *p, C_Player2 *game_player)
     {
         auto player = new NetPed;
 
