@@ -151,7 +151,7 @@ void m2o_car_target_rotation_set(m2o_car *car, vec3 targetRot, f32 interpTime) {
     car->interp.rot.error.z = zplm_offset_degrees(rotation.z, targetRot.z);
 
     // Apply the error over 250ms (i.e. 2/5 per 100ms )
-    car->interp.pos.error *= zplm_lerp(0.25f, 1.0f, zplm_clamp01(zplm_unlerp(interpTime, 0.1f, 0.4f)));
+    car->interp.rot.error *= zplm_lerp(0.25f, 1.0f, zplm_clamp01(zplm_unlerp(interpTime, 0.1f, 0.4f)));
 
     // Get the interpolation interval
     car->interp.rot.startTime  = zpl_time_now();
